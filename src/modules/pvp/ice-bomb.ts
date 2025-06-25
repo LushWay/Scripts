@@ -1,7 +1,7 @@
 import { Entity, EntityComponentTypes, ItemStack, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vec, ms } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { customItems } from 'lib/rpg/custom-item'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { toPoint } from 'lib/utils/point'
@@ -10,8 +10,8 @@ import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 
 export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
-  t`§3Снежная бомба`,
-  t`Используйте, чтобы отправить все к снежной королеве подо льдину`,
+  i18n`§3Снежная бомба`,
+  i18n`Используйте, чтобы отправить все к снежной королеве подо льдину`,
 )
 customItems.push(IceBombItem)
 

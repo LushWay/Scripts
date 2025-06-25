@@ -1,5 +1,5 @@
 import { Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
-import { l, t, TextTable } from 'lib/i18n/text'
+import { i18n, noI18n, TextTable } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
   actionGuard,
@@ -124,8 +124,8 @@ export class MineareaRegion extends RegionWithStructure {
     return true
   }
 
-  get displayName(): string {
-    return this.newbie ? t.nocolor`§bЗона добычи новичков` : t.nocolor`§7Зона добычи`
+  get displayName(): Text {
+    return this.newbie ? i18n.nocolor`§bЗона добычи новичков` : i18n.nocolor`§7Зона добычи`
   }
 
   customFormDescription(player: Player): TextTable {
@@ -139,7 +139,7 @@ export class MineareaRegion extends RegionWithStructure {
 }
 
 registerSaveableRegion('minearea', MineareaRegion)
-registerRegionType(l`Зоны добычи`, MineareaRegion)
+registerRegionType(noI18n`Зоны добычи`, MineareaRegion)
 
 regionTypesThatIgnoreIsBuildingGuard.push(MineareaRegion)
 
@@ -158,13 +158,13 @@ actionGuard((player, region, ctx) => {
   if (!(region instanceof MineareaRegion)) return
 
   if (region.newbie && !isNewbie(player))
-    return player.fail(t.error`Вы не можете добывать блоки в зоне добычи новичков`)
+    return player.fail(i18n.error`Вы не можете добывать блоки в зоне добычи новичков`)
 
   const building = isNotPlaying(player)
 
-  if (region.building && !building) return player.fail(t.error`Регион сохраняется`)
+  if (region.building && !building) return player.fail(i18n.error`Регион сохраняется`)
   if (region.creating && !building)
-    return player.fail(t.error`Регион создается. ${~~region.restoringStructurePercent}%%`)
+    return player.fail(i18n.error`Регион создается. ${~~region.restoringStructurePercent}%%`)
 
   switch (ctx.type) {
     case 'interactWithBlock':
@@ -243,8 +243,8 @@ function notifyBuilder(player: Player, region: MineareaRegion) {
   if (region.scheduledToPlaceBlocks.length || region.creating) {
     system.delay(() => {
       player.fail(
-        l.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${
-          region.creating ? l`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`
+        noI18n.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${
+          region.creating ? noI18n`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`
         }`,
       )
       region.restoreStructure(() => void 0)

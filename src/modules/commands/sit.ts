@@ -2,14 +2,14 @@ import { system, world } from '@minecraft/server'
 import { LockAction } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
 new Command('sit')
-  .setDescription(t`Присаживает вас`)
+  .setDescription(i18n`Присаживает вас`)
   .setGroup('public')
   .setPermissions('member')
   .executes(ctx => {
-    if (ctx.player.getVelocity().y !== 0) return ctx.error(t.error`Вы не можете сесть в падении!`)
+    if (ctx.player.getVelocity().y !== 0) return ctx.error(i18n.error`Вы не можете сесть в падении!`)
     if (LockAction.locked(ctx.player)) return
     const entity = ctx.player.dimension.spawnEntity(CustomEntityTypes.Sit, ctx.player.location)
     ctx.player.closeChat()
@@ -19,7 +19,7 @@ new Command('sit')
 
     system.delay(() => {
       ctx.player.onScreenDisplay.setActionBar(
-        t.nocolor`§3> §fВы сели. Чтобы встать, крадитесь`,
+        i18n.accent`Вы сели. Чтобы встать, крадитесь`.toString(ctx.player.lang),
         ActionbarPriority.Highest,
       )
     })

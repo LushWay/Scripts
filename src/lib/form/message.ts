@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MessageFormData, MessageFormResponse } from '@minecraft/server-ui'
-import { i18n, l, MaybeRawText } from 'lib/i18n/text'
+import { i18n, MaybeRawText, noI18n } from 'lib/i18n/text'
 import { util } from '../util'
 import { NewFormCallback } from './new'
 import { showForm } from './utils'
@@ -36,7 +36,7 @@ export class MessageForm {
     this.form = new MessageFormData()
     if (title) this.form.title(title)
     if (body) this.form.body(body)
-    this.setButton2(l`Оk`, () => 0)
+    this.setButton2(noI18n`Оk`, () => 0)
     this.setButton1('', () => 0)
     this.triedToShow = 0
   }

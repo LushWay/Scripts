@@ -2,7 +2,7 @@ import { Block, GameMode, Player, StructureRotation, system, world } from '@mine
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, ms, RegionCreationOptions, registerRegionType, registerSaveableRegion, Vec } from 'lib'
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Area } from 'lib/region/areas/area'
 import { DungeonRegion, DungeonRegionDatabase } from './dungeon'
 import { Dungeon } from './loot'
@@ -62,7 +62,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 
   override get displayName() {
-    return Dungeon.customNames[this.ldb.name] ?? t`Данж`
+    return Dungeon.customNames[this.ldb.name] ?? i18n`Данж`
   }
 
   addCustomChest(location: Vector3, loot: keyof (typeof Dungeon)['customLoot'], restoreTimeMin: number) {
@@ -74,7 +74,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 }
 registerSaveableRegion('customDungeon', CustomDungeonRegion)
-registerRegionType(l`Кастомный данж`, CustomDungeonRegion, false, true)
+registerRegionType(noI18n`Кастомный данж`, CustomDungeonRegion, false, true)
 
 function eventHelper(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false
@@ -106,7 +106,7 @@ world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermut
     region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
     region.chests = region.chests.filter(e => !Vec.equals(e.location, location))
 
-    player.success(t`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime / 60_000}min`)
+    player.success(i18n`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime / 60_000}min`)
   }
 })
 
@@ -135,9 +135,9 @@ function editChest(
 ) {
   const keys: string[] = []
 
-  new ModalForm(l`Сундук с лутом`)
+  new ModalForm(noI18n`Сундук с лутом`)
     .addDropdownFromObject(
-      l`Лут`,
+      noI18n`Лут`,
       Object.fromEntries(
         Object.entriesStringKeys(Dungeon.customLoot)
           .map(([key, value]) => [key, (value?.id ?? key).replace('mystructure:dungeons/', '')])
@@ -145,13 +145,13 @@ function editChest(
       ),
       { defaultValueIndex: chest?.loot },
     )
-    .addSlider(l`Время восстановления (в минутах)`, 1, 180, 1, chest ? chest.restoreTime / 60_000 : 20)
+    .addSlider(noI18n`Время восстановления (в минутах)`, 1, 180, 1, chest ? chest.restoreTime / 60_000 : 20)
     .show(player, (_, loot, restoreTime) => {
       if (chest) {
       } else {
         region.addCustomChest(location, loot as keyof (typeof Dungeon)['customLoot'], restoreTime)
       }
-      player.success(t`Created a chest with loot ${loot} and restore time ${restoreTime}min`)
+      player.success(i18n`Created a chest with loot ${loot} and restore time ${restoreTime}min`)
     })
 }
 

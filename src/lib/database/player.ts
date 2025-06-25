@@ -1,6 +1,6 @@
 import { Player, world, type PlayerDatabase } from '@minecraft/server'
 import { expand } from 'lib/extensions/extend'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { DEFAULT_ROLE } from 'lib/roles'
 import { Table, table } from './abstract'
 
@@ -70,9 +70,9 @@ Object.defineProperty(Player.prototype, 'database', {
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   if (!initialSpawn) return
   if (player.database.name && player.database.name !== player.name) {
-    const message = t.warn`Игрок ${player.database.name} сменил ник на ${player.name}`
+    const message = i18n.warn`Игрок ${player.database.name} сменил ник на ${player.name}`
 
-    world.say(message)
+    for (const player of world.getAllPlayers()) player.tell(message)
     console.warn(message)
   }
 

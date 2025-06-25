@@ -2,7 +2,7 @@ import { Player, system } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Cooldown, ms } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { BaseRegion } from 'modules/places/base/region'
@@ -18,7 +18,9 @@ function youCannot(player: Player) {
   if (textCooldown.isExpired(player)) {
     system.delay(() =>
       player.onScreenDisplay.setActionBar(
-        t.error`Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`,
+        i18n.error`Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`.toString(
+          player.lang,
+        ),
         ActionbarPriority.Highest,
       ),
     )

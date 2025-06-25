@@ -1,17 +1,17 @@
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { playerSettingsMenu, worldSettingsMenu } from 'lib/settings'
 
 new Command('settings')
   .setAliases('options')
   .setPermissions('member')
-  .setDescription(t`Настройки`)
+  .setDescription(i18n`Настройки`)
   .executes(ctx => {
     playerSettingsMenu(ctx.player)
   })
 
 new Command('wsettings')
   .setPermissions('techAdmin')
-  .setDescription(t`Настройки мира`)
+  .setDescription(i18n`Настройки мира`)
   .executes(ctx => {
     worldSettingsMenu(ctx.player)
   })

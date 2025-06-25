@@ -2,7 +2,7 @@ import { Player, TeleportOptions, Vector3, system, world } from '@minecraft/serv
 import { isEmpty } from 'lib/util'
 import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
-import { t } from './i18n/text'
+import { i18n, noI18n } from './i18n/text'
 import { Place } from './rpg/place'
 import { Settings } from './settings'
 import { VectorInDimension } from './utils/point'
@@ -97,7 +97,7 @@ class Location<T extends Vector3> {
 
     const input = raw.trim().split(' ').map(Number)
     if (input.length !== this.format.split(' ').length || input.some(e => isNaN(e))) {
-      const error = new TypeError(t.error`Invalid location, expected '${this.format}' but recieved '${raw}'`)
+      const error = new TypeError(noI18n.error`Invalid location, expected '${this.format}' but recieved '${raw}'`)
       if (throws) throw error
       else return console.warn(error)
     }
@@ -179,14 +179,14 @@ export function migrateLocationName(oldGroup: string, oldName: string, newGroup:
   const group = Settings.worldDatabase.get(oldGroup)
   const location = group[oldName]
   if (typeof location !== 'undefined') {
-    console.debug(t`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
+    console.debug(i18n`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
 
     Settings.worldDatabase.get(newGroup)[newName] = location
 
     Reflect.deleteProperty(Settings.worldDatabase.get(oldGroup), oldName)
   } else if (!Settings.worldDatabase.get(newGroup)[newName]) {
     console.warn(
-      t.error`No location found at ${oldGroup}:${oldName}. Group: ${isEmpty(group) ? [...Settings.worldDatabase.keys()] : Object.keys(group)}`,
+      i18n.error`No location found at ${oldGroup}:${oldName}. Group: ${isEmpty(group) ? [...Settings.worldDatabase.keys()] : Object.keys(group)}`,
     )
   }
 }
@@ -194,12 +194,14 @@ export function migrateLocationName(oldGroup: string, oldName: string, newGroup:
 export function migrateLocationGroup(from: string, to: string) {
   const group = Settings.worldDatabase.get(from)
   if (typeof group !== 'undefined') {
-    console.debug(t`Migrating group ${from} to ${to}`)
+    console.debug(i18n`Migrating group ${from} to ${to}`)
 
     Settings.worldDatabase.set(to, { ...Settings.worldDatabase.get(to), ...group })
 
     Settings.worldDatabase.delete(from)
   } else {
-    console.warn(t.error`No group found for migration: ${from} -> ${to}. Groups: ${[...Settings.worldDatabase.keys()]}`)
+    console.warn(
+      i18n.error`No group found for migration: ${from} -> ${to}. Groups: ${[...Settings.worldDatabase.keys()]}`,
+    )
   }
 }

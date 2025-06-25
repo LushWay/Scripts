@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Loot, ms } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18nShared } from 'lib/i18n/text'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
 import { MagicSlimeBall } from './items'
@@ -10,7 +10,7 @@ export function createBossSlime(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('slime')
-    .name(t`Магический Слайм`)
+    .name(i18nShared`Магический Слайм`)
     .typeId(MinecraftEntityTypes.Slime)
     .loot(
       new Loot('slime boss')

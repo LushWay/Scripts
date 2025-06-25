@@ -4,7 +4,7 @@ import { Vec, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { ActionGuardOrder, actionGuard } from 'lib/region/index'
 import { Group, Place } from 'lib/rpg/place'
 import { FreeCost, MoneyCost } from 'lib/shop/cost'
@@ -13,7 +13,7 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
 
 const furnaceExpireTime = ms.from('hour', 1)
-const furnaceExpireTimeText = t`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
+const furnaceExpireTimeText = i18n`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
 
 export class Furnacer extends ShopNpc {
   static create() {
@@ -49,7 +49,7 @@ export class Furnacer extends ShopNpc {
     onlyInStoneQuarry: boolean,
   ) {
     super(place)
-    this.shop.body(() => t`У меня ты можешь купить ключ доступа к печкам\n\n`)
+    this.shop.body(() => i18n`У меня ты можешь купить ключ доступа к печкам\n\n`)
     Furnacer.npcs.push(this)
 
     if (onlyInStoneQuarry) {
@@ -63,10 +63,10 @@ export class Furnacer extends ShopNpc {
 
       form.itemStack(item, new MoneyCost(50), getAuxOrTexture(MinecraftItemTypes.TripwireHook, true))
       form.itemModifier(
-        t`Сдать неиспользуемый ключ`,
+        i18n`Сдать неиспользуемый ключ`,
         FreeCost,
         i => FurnaceKeyItem.schema.is(i),
-        t`Ключ от печки`,
+        i18n`Ключ от печки`,
         (slot, _, text) => {
           const parsed = FurnaceKeyItem.schema.parse(slot)
           if (!parsed) return
@@ -107,7 +107,7 @@ actionGuard((player, region, ctx) => {
 
   // Restrictions
   const notAllowed = (
-    message = t`Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!`,
+    message = i18n`Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!`,
   ) => {
     return () => (system.delay(() => player.fail(message)), false)
   }
@@ -116,7 +116,7 @@ actionGuard((player, region, ctx) => {
     const lore = FurnaceKeyItem.schema.parse(slot, undefined, false)
     if (!lore) return notAllowed()
 
-    if (lore.furnacer !== furnacer.id) return notAllowed(t`Этот ключ используется для других печек!`)
+    if (lore.furnacer !== furnacer.id) return notAllowed(i18n`Этот ключ используется для других печек!`)
 
     const blockId = Vec.string(ctx.event.block)
     const furnace = FurnaceKeyItem.db.get(blockId)
@@ -136,7 +136,7 @@ actionGuard((player, region, ctx) => {
           // Notify previous owner (Maybe?)
         } else {
           return notAllowed(
-            t.error`Эта печка уже занята. Печка освободится через ${t.error.time(furnace.expires - Date.now())}, ключ: ${furnace.code}`,
+            i18n.error`Эта печка уже занята. Печка освободится через ${i18n.error.time(furnace.expires - Date.now())}, ключ: ${furnace.code}`,
           )
         }
       } else {
@@ -158,7 +158,7 @@ actionGuard((player, region, ctx) => {
         // Prevent from opening furnace dialog
         return false
       }
-    } else return notAllowed(t.error`Вы уже использовали этот ключ для другой печки.`)
+    } else return notAllowed(i18n.error`Вы уже использовали этот ключ для другой печки.`)
   }
 
   const mainhand = tryItem(player.mainhand())
@@ -172,7 +172,7 @@ actionGuard((player, region, ctx) => {
         if (typeof result === 'function') {
           lastError = result
         } else {
-          player.info(t`Использован ключ из слота ${index}`)
+          player.info(i18n`Использован ключ из слота ${index}`)
           return result
         }
       }
@@ -185,27 +185,27 @@ class FurnaceKeyItem {
   static db = table<{ expires: number; code: string; lastPlayerId: string; warnedAboutExpire?: 1 }>('furnaceKeys')
 
   static schema = new ItemLoreSchema('furnace key')
-    .nameTag(() => t`§6Ключ от печки`)
-    .lore(t`§7Открывает печку в каменоломне.`)
+    .nameTag(() => i18n`§6Ключ от печки`)
+    .lore(i18n`§7Открывает печку в каменоломне.`)
 
     .property('furnacer', String)
 
     .property('code', String)
 
     .property('location', String)
-    .display(t`На`, l => (!l ? false : l))
+    .display(i18n`На`, l => (!l ? false : l))
 
     .property('player', String)
-    .display(t`Владелец`)
+    .display(i18n`Владелец`)
 
     .property<'status', 'notUsed' | 'inUse' | 'used'>('status', 'notUsed')
     .display('', unit => this.status[unit])
     .build()
 
   static status = {
-    notUsed: t.nocolor`§r§aНе использован`,
-    inUse: t.nocolor`§r§6Печка плавит...`,
-    used: t.nocolor`§r§cВремя истекло`,
+    notUsed: i18n.nocolor`§r§aНе использован`,
+    inUse: i18n.nocolor`§r§6Печка плавит...`,
+    used: i18n.nocolor`§r§cВремя истекло`,
   }
 
   static {
@@ -223,7 +223,7 @@ class FurnaceKeyItem {
             const player = players.find(e => e.id === furnace.lastPlayerId)
             if (player) {
               player.warn(
-                t`Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ${key}, ключ: ${furnace.code}`,
+                i18n`Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ${key}, ключ: ${furnace.code}`,
               )
 
               furnace.warnedAboutExpire = 1

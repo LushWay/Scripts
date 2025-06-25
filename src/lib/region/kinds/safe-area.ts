@@ -1,6 +1,6 @@
 import { GameMode, Player, system } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { registerRegionType } from 'lib/region/command'
 import { toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
@@ -8,7 +8,7 @@ import { RegionEvents } from '../events'
 import { Region, RegionCreationOptions, RegionPermissions } from './region'
 
 interface SafeAreaRegionOptions extends RegionCreationOptions {
-  safeAreaName?: string
+  safeAreaName?: Text
   allowUsageOfCraftingTable?: boolean
 }
 
@@ -33,7 +33,7 @@ export class SafeAreaRegion extends Region {
 
   readonly allowUsageOfCraftingTable: boolean = false
 
-  readonly safeAreaName?: string
+  readonly safeAreaName?: Text
 
   constructor(area: Area, options: SafeAreaRegionOptions, key: string) {
     super(area, options, key)
@@ -42,14 +42,14 @@ export class SafeAreaRegion extends Region {
   }
 
   get name() {
-    return this.safeAreaName ? t.nocolor`Безопасная зона ${this.safeAreaName}` : super.name
+    return this.safeAreaName ? i18n.nocolor`Безопасная зона ${this.safeAreaName}` : super.name
   }
 
   get displayName() {
     return this.safeAreaName
   }
 }
-registerRegionType(l`Мирные зоны`, SafeAreaRegion)
+registerRegionType(noI18n`Мирные зоны`, SafeAreaRegion)
 export const disableAdventureNear: (typeof Region)[] = []
 export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion]
 

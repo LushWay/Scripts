@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { BUTTON } from 'lib/form/utils'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { NewFormCallback } from './new'
 
 /**
@@ -106,13 +106,13 @@ export function selectPlayer(
       players.push({ online: !!player, name, id, player })
     }
 
-    new ArrayForm(t`§3Выберите игрока чтобы ${reason}`, players)
+    new ArrayForm(i18n`§3Выберите игрока чтобы ${reason}`, players)
       .filters({
         sort: {
-          name: t`Сортировать по`,
+          name: i18n`Сортировать по`,
           value: [
-            ['online', t`Онлайну`],
-            ['date', t`Дате входа`],
+            ['online', i18n`Онлайну`],
+            ['date', i18n`Дате входа`],
           ],
         },
       })

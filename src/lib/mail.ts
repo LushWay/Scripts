@@ -1,8 +1,10 @@
 import { Player } from '@minecraft/server'
 
 import { Rewards } from 'lib/utils/rewards'
+import { defaultLang } from './assets/lang'
 import { table } from './database/abstract'
-import { l, t } from './i18n/text'
+import { Message } from './i18n/message'
+import { i18n, noI18n } from './i18n/text'
 
 /** A global letter is a letter sent to multiple players */
 interface GlobalLetter {
@@ -27,7 +29,7 @@ export class Mail {
 
   static dbGlobal = table<GlobalLetter>('mailGlobal')
 
-  static globalNotFound: GlobalLetter = { title: l`Not found`, content: l`404 Error`, rewards: [] }
+  static globalNotFound: GlobalLetter = { title: noI18n`Not found`, content: noI18n`404 Error`, rewards: [] }
 
   /**
    * Sends the mail for the player
@@ -37,16 +39,24 @@ export class Mail {
    * @param content The letter content
    * @param rewards The attached rewards
    */
-  static send(playerId: string, title: string, content: string, rewards = new Rewards()) {
+  static send(playerId: string, title: Message, content: Message, rewards = new Rewards()) {
     Mail.inform(playerId, title)
     this.dbPlayers
       .get(playerId)
-      .push({ read: false, title, content, rewards: rewards.serialize(), rewardsClaimed: false })
+      // TODO Use player offline lang once added
+
+      .push({
+        read: false,
+        title: title.toString(defaultLang),
+        content: content.toString(defaultLang),
+        rewards: rewards.serialize(),
+        rewardsClaimed: false,
+      })
   }
 
-  private static inform(playerId: string, title: string) {
+  private static inform(playerId: string, title: Message) {
     const player = Player.getById(playerId)
-    if (player) player.info(t`${t.header`Почта`}: ${title}, просмотреть: .mail`)
+    if (player) player.info(i18n`${i18n.header`Почта`}: ${title}, просмотреть: .mail`)
   }
 
   /**
@@ -57,7 +67,7 @@ export class Mail {
    * @param {string} content The letter content
    * @param {Rewards} rewards The attached rewards
    */
-  static sendMultiple(playerIds: string[], title: string, content: string, rewards: Rewards) {
+  static sendMultiple(playerIds: string[], title: Message, content: Message, rewards: Rewards) {
     let id = new Date().toISOString()
 
     if (id in this.dbGlobal) {
@@ -66,7 +76,12 @@ export class Mail {
       id = id + postfix.toString()
     }
 
-    this.dbGlobal.set(id, { title, content, rewards: rewards.serialize() })
+    // TODO Use player offline lang once added
+    this.dbGlobal.set(id, {
+      title: title.toString(defaultLang),
+      content: content.toString(defaultLang),
+      rewards: rewards.serialize(),
+    })
 
     for (const playerId of playerIds) {
       Mail.inform(playerId, title)

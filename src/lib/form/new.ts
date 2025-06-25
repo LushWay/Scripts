@@ -4,7 +4,7 @@ import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
 import { Message } from 'lib/i18n/message'
-import { i18n, l } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { doNothing, util } from 'lib/util'
 
@@ -102,7 +102,7 @@ class Form {
     return this
   }
 
-  quest(quest: Quest, textOverride?: string, descriptionOverride?: string) {
+  quest(quest: Quest, textOverride?: Text, descriptionOverride?: Text) {
     const rendered = quest.button.render(this.player, () => this.show(), descriptionOverride)
     if (!rendered) return
 
@@ -135,7 +135,7 @@ class Form {
   show = async () => {
     const callbackExecutor: (fn: VoidFunction) => void = __TEST__ ? f => f() : util.catch
 
-    if (!this.buttons.length) this.button(l`Empty`, undefined, this.show)
+    if (!this.buttons.length) this.button(noI18n`Empty`, undefined, this.show)
 
     const response = await showForm(this.form, this.player)
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')

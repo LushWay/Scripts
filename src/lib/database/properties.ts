@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 
@@ -22,7 +22,7 @@ class DynamicPropertyDB<Value = unknown, Key extends string = string> extends Pr
     try {
       this.value = new Map(this.restore(LongDynamicProperty.get(this.id) as Record<string, unknown>))
     } catch (error) {
-      console.error(new DatabaseError(t`Failed to init table '${this.id}': ${error}`))
+      console.error(new DatabaseError(noI18n`Failed to init table '${this.id}': ${error}`))
     }
   }
 
@@ -88,7 +88,7 @@ export class LongDynamicProperty {
     if (typeof value !== 'string') {
       console.error(
         new DatabaseError(
-          t.error`Corrupted database table '${propertyId}', index ${i}, expected string, recieved '${value}'`,
+          noI18n.error`Corrupted database table '${propertyId}', index ${i}, expected string, recieved '${value}'`,
         ),
       )
 

@@ -5,7 +5,7 @@ import { Group } from 'lib/rpg/place'
 export class GuideNpc extends NpcForm {
   constructor(
     group: Group,
-    name: string,
+    name: SharedText,
     create: NpcFormCreator,
     readonly point = group.place('guide').name(name),
   ) {

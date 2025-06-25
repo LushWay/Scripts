@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { developersAreWarned } from 'lib/assets/text'
 import { MessageForm } from 'lib/form/message'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Cost } from './cost'
 import { CostType } from './cost/cost'
 import { Shop } from './shop'
@@ -82,7 +82,7 @@ export class Product<T extends Cost = any> {
   private ensurePlayerCanBuy() {
     if (this.cost.has(this.player)) return true
 
-    this.backForm(t.error`Покупка невозможна:${this.cost.multiline ? '\n' : ' '}${this.cost.failed(this.player)}`)
+    this.backForm(i18n.error`Покупка невозможна:${this.cost.multiline ? '\n' : ' '}${this.cost.failed(this.player)}`)
     return false
   }
 
@@ -106,11 +106,13 @@ export class Product<T extends Cost = any> {
     const costString = this.cost.toString(player, true)
 
     new MessageForm(
-      t.header`Подтверждение`,
-      sell ? t`Продать ${costString} за ${name}?` : t`Купить ${name} за ${costString}?`,
+      i18n.header`Подтверждение`.toString(player.lang),
+      (sell ? i18n`Продать ${costString} за ${name}?` : i18n`Купить ${name} за ${costString}?`).toString(player.lang),
     )
-      .setButton1(sell ? t`Продать!` : t`Купить!`, this.buy)
-      .setButton2(t.error`Отмена`, () => backForm(sell ? t.error`Продажа отменена` : t.error`Покупка отменена`))
+      .setButton1((sell ? i18n`Продать!` : i18n`Купить!`).toString(player.lang), this.buy)
+      .setButton2(i18n.error`Отмена`.toString(player.lang), () =>
+        backForm(sell ? i18n.error`Продажа отменена` : i18n.error`Покупка отменена`),
+      )
       .show(player)
   }
 
@@ -120,8 +122,8 @@ export class Product<T extends Cost = any> {
     const { sell, name } = this
     const costString = this.cost.toString(this.player, true)
     const successBuyText = sell
-      ? t.success`Успешная продажа ${name} за ${costString}!`
-      : t.success`Успешная покупка ${name} за ${costString}!`
+      ? i18n.success`Успешная продажа ${name} за ${costString}!`
+      : i18n.success`Успешная покупка ${name} за ${costString}!`
 
     const successBuy = () => this.backForm(successBuyText)
 
@@ -142,7 +144,10 @@ function wrapWithCatch<T extends (...args: any[]) => unknown>(func: T, player: P
     try {
       return func(...(args as Parameters<T>)) as ReturnType<T>
     } catch (e) {
-      new MessageForm(t`Ошибка`, t`При покупке произошла ошибка. ${developersAreWarned}`).show(player)
+      new MessageForm(
+        i18n`Ошибка`.toString(player.lang),
+        i18n`При покупке произошла ошибка. ${developersAreWarned}`.toString(player.lang),
+      ).show(player)
 
       throw e
     }

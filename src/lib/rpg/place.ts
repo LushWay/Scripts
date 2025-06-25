@@ -26,7 +26,7 @@ export class Group {
              * @param name - Name of the point that will be displayed to the users
              * @returns - PointOfMatter
              */
-            name: (name: string) => onCreate(new Place(group, id, name)),
+            name: (name: SharedText | string) => onCreate(new Place(group, id, name)),
           }
         },
       }),
@@ -35,7 +35,7 @@ export class Group {
 
   constructor(
     readonly id: string,
-    readonly name?: string,
+    readonly name?: SharedText,
   ) {
     const existing = Group.groups.get(id)
     if (existing) return existing
@@ -83,7 +83,7 @@ export class Place {
     /** Example: 'foodOvener' */
     readonly shortId: string,
     /** Example: 'Печкин' */
-    readonly name: string,
+    readonly name: SharedText | string,
   ) {
     // Trim start needed for empty point
     this.id = `${group.id} ${this.shortId}`.trimStart()

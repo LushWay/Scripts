@@ -1,6 +1,5 @@
-/* i18n-ignore */
-
 import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecraft/server'
+import { defaultLang } from 'lib/assets/lang'
 import { expand } from 'lib/extensions/extend'
 import { capitalize } from 'lib/util'
 
@@ -35,7 +34,7 @@ declare module '@minecraft/server' {
   }
 }
 
-export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, string> = {
+export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, Text> = {
   leafs: '§aЛистья',
   money: '§6Монеты',
   kills: 'Убийств',
@@ -87,7 +86,7 @@ export const scoreboardObjectiveNames = {
     .concat(scoreboardStatNames) as ScoreNames.GameModesStat[],
 }
 
-const untypedDisplayNames: Record<string, string> = scoreboardDisplayNames
+const untypedDisplayNames: Record<string, Text> = scoreboardDisplayNames
 
 expand(ScoreboardObjective.prototype, {
   get displayName() {
@@ -124,7 +123,10 @@ export class ScoreboardDB {
               if (typeof p === 'symbol')
                 throw new Error(`Symbol objectives to set are not accepted, recieved ${p.description}`)
 
-              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(playerId, Math.round(newValue))
+              ScoreboardDB.objective(p, untypedDisplayNames[p]?.toString(defaultLang)).setScore(
+                playerId,
+                Math.round(newValue),
+              )
               return true
             },
             get(_, p) {
@@ -132,7 +134,7 @@ export class ScoreboardDB {
                 throw new Error(`Symbol objectives to get are not accepted, recieved ${p.description}`)
 
               try {
-                return ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(playerId) ?? 0
+                return ScoreboardDB.objective(p, untypedDisplayNames[p]?.toString(defaultLang)).getScore(playerId) ?? 0
               } catch (e) {
                 return 0
               }

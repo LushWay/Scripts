@@ -15,7 +15,7 @@ import {
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { Message } from 'lib/i18n/message'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
@@ -98,8 +98,7 @@ export function materialsToRString(ldbMaterials: Readonly<Record<string, number>
 export function baseRottingButton(base: BaseRegion, player: Player, back?: VoidFunction) {
   let text: Message
   if (base.ldb.state === RottingState.NoMaterials) {
-    text = i18n.nocolor`§cБаза гниет!
-§4Срочно пополните материалы!`
+    text = i18n.nocolor`§cБаза гниет!\n§4Срочно пополните материалы!`
   } else if (base.ldb.state === RottingState.Destroyed) {
     text = i18n.nocolor`§cБаза разрушена!\n§4Срочно поставьте блок базы на ${Vec.string(base.area.center, true)}!`
   } else {
@@ -115,8 +114,8 @@ async function startRotting(base: BaseRegion, state: RottingState) {
   base.ldb.state = state
   base.save()
 
-  const messageAction = state === RottingState.NoMaterials ? t.error`гниет` : t.error`разрушена`
-  const message = t.error`База с владельцем ${base.ownerName} ${messageAction}.`
+  const messageAction = state === RottingState.NoMaterials ? i18n.error`гниет` : i18n.error`разрушена`
+  const message = i18n.error`База с владельцем ${base.ownerName} ${messageAction}.`
   base.forEachOwner(player => {
     if (player instanceof Player) {
       player.fail(message)
@@ -125,8 +124,8 @@ async function startRotting(base: BaseRegion, state: RottingState) {
         player,
         message,
         state === RottingState.NoMaterials
-          ? t`Нужно срочно положить материалы в бочку!`
-          : t`База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью`,
+          ? i18n`Нужно срочно положить материалы в бочку!`
+          : i18n`База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью`,
       )
     }
   })
@@ -347,7 +346,7 @@ actionGuard((player, base, ctx) => {
     }
 
     if (base.ldb.state === RottingState.NoMaterials)
-      player.fail(t.error`База гниет! Положите материалы из .base -> Гниение в бочку`)
+      player.fail(i18n.error`База гниет! Положите материалы из .base -> Гниение в бочку`)
     return base.ldb.state !== RottingState.NoMaterials
   }
 }, ActionGuardOrder.BlockAction)

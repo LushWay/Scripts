@@ -1,8 +1,8 @@
 import { ItemStack, system } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
-import { Language } from 'lib/assets/lang'
+import { defaultLang } from 'lib/assets/lang'
 import { translateTypeId } from 'lib/i18n/lang'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
 export const customItems: ItemStack[] = []
 
@@ -25,15 +25,15 @@ class CustomItem {
 
   protected _nameTag: string | undefined
 
-  nameTag(nameTag: string) {
-    this._nameTag = nameTag
+  nameTag(nameTag: Text) {
+    this._nameTag = nameTag.toString(defaultLang)
     return this
   }
 
   private _description: string | undefined
 
-  lore(desc: string) {
-    this._description = desc
+  lore(desc: Text) {
+    this._description = desc.toString(defaultLang)
     return this
   }
 
@@ -70,8 +70,10 @@ export class CustomItemWithBlueprint extends CustomItem {
 
   get blueprint() {
     return new ItemStack(Items.Blueprint).setInfo(
-      t`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, Language.ru_RU) : this._bprintName)}`,
-      t`С помощью него вы можете сделать предмет у инженера`,
+      i18n`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, defaultLang) : this._bprintName)}`.toString(
+        defaultLang,
+      ),
+      i18n`С помощью него вы можете сделать предмет у инженера`.toString(defaultLang),
     )
   }
 }

@@ -1,6 +1,7 @@
 import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
-import { t, textUnitColorize } from 'lib/i18n/text'
+import { defaultLang } from 'lib/assets/lang'
+import { i18n, textUnitColorize } from 'lib/i18n/text'
 import { noBoolean, wrapLore } from 'lib/util'
 
 export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
@@ -53,8 +54,8 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
     return this
   }
 
-  lore(prepareLore: PrepareLore<T> | string) {
-    this.prepareLore = typeof prepareLore === 'string' ? p => [prepareLore, ...p] : prepareLore
+  lore(prepareLore: PrepareLore<T> | Text) {
+    this.prepareLore = typeof prepareLore === 'function' ? prepareLore : p => [prepareLore, ...p]
 
     return this
   }
@@ -69,8 +70,12 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   }
 
   private prepareItem(itemStack: Item, storage: ParsedSchema<T>) {
-    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage)
-    itemStack.setLore(this.prepareLore(this.prepareProperties(storage), itemStack, storage).map(wrapLore).flat())
+    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage).toString(defaultLang)
+    itemStack.setLore(
+      this.prepareLore(this.prepareProperties(storage), itemStack, storage)
+        .map(e => wrapLore(e.toString(defaultLang)))
+        .flat(),
+    )
   }
 
   private prepareLore: PrepareLore<T> = properties => properties
@@ -122,7 +127,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
     if (typeof lsid === 'string') {
       if (lsid !== this.lsid) return
     } else {
-      if (lsid) console.warn(t.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${lsid}`)
+      if (lsid) console.warn(i18n.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${lsid}`)
       return
     }
 
@@ -211,8 +216,8 @@ type ParsedSchemaProperty<T extends Schema.Property.Any> = T extends StringConst
 
 type Item = Pick<ItemStack, 'getDynamicProperty' | 'setDynamicProperty' | 'setLore' | 'isStackable' | 'nameTag'>
 
-type PrepareProperty<U = any> = (unit: U, key: string) => string | false
+type PrepareProperty<U = any> = (unit: U, key: string) => Text | false
 
-type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => string[]
+type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => Text[]
 
-type PrepareNameTag<T extends TypeSchema> = (itemStack: Item, storage: ParsedSchema<T>) => string
+type PrepareNameTag<T extends TypeSchema> = (itemStack: Item, storage: ParsedSchema<T>) => Text

@@ -3,7 +3,7 @@ import { Boss, BossArenaRegion, LockAction, ms, Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { RegionEvents } from 'lib/region/events'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
@@ -38,18 +38,18 @@ const settings = Settings.world(...Settings.worldCommon, {
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   indicator: {
-    name: t`Индикатор`,
-    description: t`Индикатор попадания по существу из лука`,
+    name: i18n`Индикатор`,
+    description: i18n`Индикатор попадания по существу из лука`,
     value: true,
   },
   bowSound: {
-    name: t`Звук лука`,
-    description: t`Звук попадания по существо из лука`,
+    name: i18n`Звук лука`,
+    description: i18n`Звук попадания по существо из лука`,
     value: true,
   },
 })
 
-const lockAction = new LockAction(p => p.scores.pvp > 0, t`Вы находитесь в режиме сражения!`)
+const lockAction = new LockAction(p => p.scores.pvp > 0, i18n`Вы находитесь в режиме сражения!`)
 
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
   if (deadEntity.isPlayer()) deadEntity.scores.pvp = 0
@@ -150,7 +150,7 @@ Core.afterEvents.worldLoad.subscribe(() => {
     if (!settings.pvpEnabled) return
 
     if (player.scores.pvp > 0) {
-      player.warn(t.warn`Вы вышли из сервера во время сражения, поэтому были убиты при входе.`)
+      player.warn(i18n.warn`Вы вышли из сервера во время сражения, поэтому были убиты при входе.`)
       player.kill()
     }
   })

@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
-import { t, textTable } from 'lib/i18n/text'
+import { i18n, textTable } from 'lib/i18n/text'
 import { DailyQuest } from 'lib/quest/quest'
 import { RecurringEvent } from 'lib/recurring-event'
 import later from 'lib/utils/later'
@@ -79,7 +79,7 @@ function hasAccessToDaily(player: Player, tell = true) {
   if (completed.length !== CityInvestigating.list.length) {
     if (tell) {
       player.fail(
-        t.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${CityInvestigating.list
+        i18n.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${CityInvestigating.list
           .filter(e => !completed.includes(e))
           .map(e => e.city.group.name)
           .join(', ')}`,
@@ -101,7 +101,7 @@ DailyQuest.onEnd.subscribe(({ quest, player }) => {
   }
 })
 
-new Command('daily').setDescription(t`Ежедневные задания`).executes(ctx => {
+new Command('daily').setDescription(i18n`Ежедневные задания`).executes(ctx => {
   if (!hasAccessToDaily(ctx.player)) return
 
   dailyQuestsForm.show(ctx.player)
@@ -109,9 +109,9 @@ new Command('daily').setDescription(t`Ежедневные задания`).exec
 
 export const dailyQuestsForm = form((f, { player }) => {
   const playerDb = db.get(player.id)
-  f.title(t`Ежедневные задания`)
+  f.title(i18n`Ежедневные задания`)
   f.body(
-    t`Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ${dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий ${questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n${textTable([[t`Выполнено подряд`, playerDb.streak]])}`,
+    i18n`Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ${dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий ${questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n${textTable([[i18n`Выполнено подряд`, playerDb.streak]])}`,
   )
 
   const name = currentDailyQuestCity?.group.name
@@ -120,18 +120,18 @@ export const dailyQuestsForm = form((f, { player }) => {
     f.button(
       (completed
         ? playerDb.takenToday
-          ? t.colors({ text: '§8', unit: '§7', num: '§7' })
-          : t
-        : t.error)`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`,
+          ? i18n.colors({ text: '§8', unit: '§7', num: '§7' })
+          : i18n
+        : i18n.error)`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`,
       () => {
-        if (!completed) return player.fail(t.error`Сначала выполните все ежедневные задания!`)
-        if (playerDb.takenToday) return player.fail(t.error`Вы уже забрали награды сегодня! Заходите завтра`)
+        if (!completed) return player.fail(i18n.error`Сначала выполните все ежедневные задания!`)
+        if (playerDb.takenToday) return player.fail(i18n.error`Вы уже забрали награды сегодня! Заходите завтра`)
 
         const donut = playerDb.streak > 0 && playerDb.streak % questsStreakToGainDonutCrate === 0
         const crate = donut ? currentDailyQuestCity?.donutCrate : currentDailyQuestCity?.normalCrate
         if (!crate) return
 
-        player.success(t`Вы получили ключ!`)
+        player.success(i18n`Вы получили ключ!`)
         player.container?.addItem(crate.createKeyItemStack())
         playerDb.takenToday = true
       },

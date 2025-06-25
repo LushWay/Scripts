@@ -14,7 +14,8 @@ import {
   Vector3Radius,
 } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
-import { l, MaybeRawText, t } from 'lib/i18n/text'
+import { SharedI18nMessage } from 'lib/i18n/message'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
@@ -26,19 +27,21 @@ export class SafePlace {
 
   readonly group = new Group(this.groupId, this.name)
 
-  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name(l`мирная зона`))
+  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name(noI18n`мирная зона`))
 
-  portalTeleportsTo = locationWithRotation(this.group.place('portal teleports to').name(l`портал телепортирует на`))
+  portalTeleportsTo = locationWithRotation(
+    this.group.place('portal teleports to').name(noI18n`портал телепортирует на`),
+  )
 
-  private portalFrom = location(this.group.place('portal from').name(l`портал от`), undefined, true)
+  private portalFrom = location(this.group.place('portal from').name(noI18n`портал от`), undefined, true)
 
-  private portalTo = location(this.group.place('portal to').name(l`портал до`), undefined, true)
+  private portalTo = location(this.group.place('portal to').name(noI18n`портал до`), undefined, true)
 
   safeArea?: SafeAreaRegion
 
   constructor(
     private readonly groupId: string,
-    public readonly name: string,
+    public readonly name: SharedI18nMessage,
   ) {
     this.safeAreaLocation.onLoad.subscribe(location => {
       this.createSafeArea(location)
@@ -69,7 +72,7 @@ export class SafePlace {
 
       player.database.unlockedPortals ??= []
       if (!player.database.unlockedPortals.includes(this.groupId)) {
-        player.success(t`Открыт новый портал! [Когда-нибудь здесь будет анимация...]`)
+        player.success(i18n`Открыт новый портал! [Когда-нибудь здесь будет анимация...]`)
         player.database.unlockedPortals.push(this.groupId)
       }
 
@@ -85,7 +88,7 @@ export class SafePlace {
     RegionEvents.onEnter(this.safeArea, player => {
       if (this.showOnEnterTitle(player)) {
         player.onScreenDisplay.setHudTitle(`§f${this.name}`, {
-          subtitle: t`§aМирная зона`,
+          subtitle: i18n.success`Мирная зона`.toString(player.lang),
           fadeInDuration: 0.5 * TicksPerSecond,
           stayDuration: 1 * TicksPerSecond,
           fadeOutDuration: 1 * TicksPerSecond,
@@ -121,7 +124,7 @@ const portalMenuOnce = debounceMenu(function portalMenu(
   to?: Vector3,
 ) {
   return new ArrayForm(
-    t`Перемещение...`,
+    i18n`Перемещение...`,
     SafePlace.places
       .map(e => ({ location: e.portalTeleportsTo, group: e.group }))
       .filter(e => e.location.valid && e.group.id !== group?.id),
@@ -136,7 +139,11 @@ const portalMenuOnce = debounceMenu(function portalMenu(
         .onBuy(() => {
           if (place.location.valid) Portal.teleport(player, place.location, { title: '' })
 
-          system.runTimeout(() => Portal.showHudTitle(player, place.group.name, 3), 'teleport title', 10)
+          system.runTimeout(
+            () => Portal.showHudTitle(player, place.group.name?.toString(player.lang), 3),
+            'teleport title',
+            10,
+          )
 
           // Do not open product form on successful teleportation
           return false
@@ -157,6 +164,6 @@ const portalMenuOnce = debounceMenu(function portalMenu(
 })
 
 new Command('portals')
-  .setDescription(t`Порталы`)
+  .setDescription(i18n`Порталы`)
   .setPermissions('techAdmin')
   .executes(ctx => portalMenuOnce(ctx.player))

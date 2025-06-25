@@ -1,13 +1,13 @@
 import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { form, NewFormCallback } from 'lib/form/new'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { Achievement } from './achievement'
 
 Achievement.command = new Command('achiv')
   .setAliases('ach', 'achievement', 'achiev', 'achivs', 'achievs')
-  .setDescription(t`Достижения`)
+  .setDescription(i18n`Достижения`)
   .setPermissions('member')
   .executes(ctx => achievementsForm(ctx.player))
 
@@ -19,22 +19,22 @@ export function achievementsFormName(player: Player) {
 export function achievementsForm(player: Player, back?: NewFormCallback) {
   const self = () => achievementsForm(player, back)
 
-  new ArrayForm(t`Достижения`, Achievement.list)
+  new ArrayForm(i18n`Достижения`, Achievement.list)
     .back(back)
     .filters({
       sortMode: {
-        name: t`Режим сортировки`,
+        name: i18n`Режим сортировки`,
         value: [
-          ['achivDate', t`По дате получения`],
-          ['alphabet', t`По алфавиту`],
+          ['achivDate', i18n`По дате получения`],
+          ['alphabet', i18n`По алфавиту`],
         ],
       },
       hideUnknown: {
-        name: t`Скрыть неизвестные`,
+        name: i18n`Скрыть неизвестные`,
         value: false,
       },
       showOnlyUncollected: {
-        name: t`Несобранные вверху`,
+        name: i18n`Несобранные вверху`,
         value: true,
       },
     })
@@ -42,7 +42,7 @@ export function achievementsForm(player: Player, back?: NewFormCallback) {
       if (filters.hideUnknown) array = array.filter(e => e.isDone(player))
 
       if (filters.sortMode === 'alphabet') {
-        array = array.slice().sort((a, b) => b.name.localeCompare(a.name))
+        array = array.slice().sort((a, b) => b.name.toString(player.lang).localeCompare(a.name.toString(player.lang)))
       } else array = array.slice().sort((a, b) => (b.getDatabase(player).d ?? 0) - (a.getDatabase(player).d ?? 0))
 
       const notTaken = array.filter(e => e.isDone(player) && !e.isRewardTaken(player))
@@ -57,7 +57,7 @@ export function achievementsForm(player: Player, back?: NewFormCallback) {
       const isRewardTaken = item.isRewardTaken(player)
       // TODO Fix colors
       return [
-        isDone ? (isRewardTaken ? item.name : t`${item.name}§c*\n§aЗаберите награды!`) : i18n`?\nНеизвестно`,
+        isDone ? (isRewardTaken ? item.name : i18n`${item.name}§c*\n§aЗаберите награды!`) : i18n`?\nНеизвестно`,
         isDone ? p => achievementDetails(item).show(p, self) : self,
       ] as const
     })

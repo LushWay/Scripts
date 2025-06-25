@@ -1,12 +1,13 @@
 import { Player } from '@minecraft/server'
 import { ROLES, getRole } from 'lib'
+import { defaultLang } from 'lib/assets/lang'
 import { CmdLet } from 'lib/command/cmdlet'
 import { Command } from 'lib/command/index'
 import { commandNoPermissions, commandNotFound } from 'lib/command/utils'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 
 const help = new Command('help')
-  .setDescription(t`Выводит список команд`)
+  .setDescription(i18n`Выводит список команд`)
   .setAliases('?', 'h')
   .setPermissions('everybody')
 
@@ -22,17 +23,17 @@ help
 
     const cv = colors[getRole(ctx.player.id)]
 
-    ctx.reply(l.nocolor`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
+    ctx.reply(noI18n.nocolor`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
 
     for (const command of path) {
       const q = '§f.'
 
       const c = `${cv}§r ${q}${command.sys.name} §o§7- ${
-        command.sys.description ? command.sys.description : t` Пусто` //§r
+        command.sys.description ? command.sys.description : i18n` Пусто` //§r
       }`
-      ctx.reply(l.nocolor`§ы` + c)
+      ctx.reply(noI18n.nocolor`§ы` + c)
     }
-    ctx.reply(t`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
+    ctx.reply(i18n`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
   })
 
 function helpForCommand(player: Player, commandName: string) {
@@ -43,8 +44,8 @@ function helpForCommand(player: Player, commandName: string) {
   if (!cmd.sys.requires(player)) return commandNoPermissions(player, cmd)
 
   const d = cmd.sys
-  const aliases = d.aliases.length > 0 ? t` §7(также §f` + d.aliases.join('§7, §f') + '§7)§r' : ''
-  const overview = t`   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
+  const aliases = d.aliases.length > 0 ? i18n` (также ${d.aliases.join(', ')})` : ''
+  const overview = i18n`   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
 
   player.tell(' ')
   player.tell(overview)
@@ -62,11 +63,11 @@ function helpForCommand(player: Player, commandName: string) {
 Command.getHelpForCommand = (command, ctx) => helpForCommand(ctx.player, command.sys.name)
 help.string('commandName').executes((ctx, command) => helpForCommand(ctx.player, command))
 
-new CmdLet('help').setDescription(t`Выводит справку о команде`).executes(ctx => {
+new CmdLet('help').setDescription(i18n`Выводит справку о команде`).executes(ctx => {
   helpForCommand(ctx.player, ctx.command.sys.name)
   return 'stop'
 })
 
 const colors: Record<Role, string> = Object.fromEntries(
-  Object.entriesStringKeys(ROLES).map(([role, display]) => [role, display.slice(0, 2)]),
+  Object.entriesStringKeys(ROLES).map(([role, display]) => [role, display.toString(defaultLang).slice(0, 2)]),
 )

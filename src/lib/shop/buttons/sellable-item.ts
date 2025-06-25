@@ -3,7 +3,7 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
-import { i18n, l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { ItemCost, MoneyCost, MultiCost } from '../cost'
@@ -47,7 +47,7 @@ export function createSellableItem({
     return i18n`Товара на складе: ${count}/${maxCount}, ${((count / maxCount) * 100).toFixed(2)}%%`
   }
   const adminBody = () => {
-    return l`${body()}\n\nAdmin info below\n${t`DB count: ${db[type]}\nDefault count: ${defaultCount}`}`
+    return noI18n`${body()}\n\nAdmin info below\n${i18n`DB count: ${db[type]}\nDefault count: ${defaultCount}`}`
   }
   const amount = inventory.get(type) ?? 0
   const settings = Shop.getPlayerSettings(player)
@@ -104,8 +104,8 @@ export function createSellableItem({
   )
 }
 
-const TooMuchItems = ErrorCost(t.error`Склад переполнен`)
-const NoItemsToSell = ErrorCost(t.error`Товар закончился`)
+const TooMuchItems = ErrorCost(i18n.error`Склад переполнен`)
+const NoItemsToSell = ErrorCost(i18n.error`Товар закончился`)
 function createBuy(
   getCount: () => number,
   getBuy: (n: number) => number,

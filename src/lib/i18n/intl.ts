@@ -1,13 +1,13 @@
 /* i18n-ignore */
 import 'lib/assets/intl'
 
-import { IntlLanguage, Language, supportedLanguages } from 'lib/assets/lang'
+import { defaultLang, IntlLanguage, Language, supportedLanguages } from 'lib/assets/lang'
 import { ms } from 'lib/utils/ms'
 import { Text, textUnitColorize } from './text'
 
 function intlCreate<T>(creator: (intlLocale: string) => T) {
   const locales = Object.fromEntries(supportedLanguages.map(e => [e, creator(IntlLanguage[e])]))
-  return (locale: Language) => (locales[locale] as T | undefined) ?? locales[Language.en_US]
+  return (locale: Language) => (locales[locale] as T | undefined) ?? locales[defaultLang]
 }
 
 const conjunction = intlCreate(e => new Intl.ListFormat(e, { type: 'conjunction', localeMatcher: 'lookup' }))

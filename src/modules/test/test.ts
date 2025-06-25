@@ -40,7 +40,7 @@ import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nJoin, noI18n } from 'lib/i18n/text'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
@@ -186,7 +186,7 @@ const tests: Record<
       [Region, RoadRegion, SafeAreaRegion, BaseRegion]
         // [Region]
         .map(type => {
-          const label = t`${type.name} ${type.getAll().length} - `
+          const label = noI18n`${type.name} ${type.getAll().length} - `
           return [
             [() => type.getManyAt(ctx.player, false), label + 'getManyAt old'],
             [() => type.getManyAt(ctx.player, true), label + 'getManyAt §lnew'],
@@ -221,7 +221,7 @@ const tests: Record<
     const to = Vec.add(center, new Vec(radius, offset, radius))
 
     player.onScreenDisplay.setActionBar(
-      t`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
+      noI18n`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
       ActionbarPriority.Highest,
     )
 
@@ -242,7 +242,7 @@ const tests: Record<
     }
   },
   rotation(ctx) {
-    ctx.reply(t`${ctx.player.getRotation()}`)
+    ctx.reply(i18n`${ctx.player.getRotation()}`)
   },
   air(ctx) {
     const airdrop = new Airdrop({ loot })
@@ -370,7 +370,7 @@ const tests: Record<
   lush(ctx) {
     let size = parseInt(ctx.args[1] ?? '')
     size = isNaN(size) ? 10 : size
-    ctx.player.info(t`Trying to replace air under the cave vines with structure void in radius ${size}`)
+    ctx.player.info(i18n`Trying to replace air under the cave vines with structure void in radius ${size}`)
 
     const vines = [
       MinecraftBlockTypes.Vine,
@@ -394,7 +394,7 @@ const tests: Record<
 
           if (vines.includes(above.typeId)) {
             ctx.player.dimension.setBlockType(vector, MinecraftBlockTypes.StructureVoid)
-            ctx.player.success(t`lush > ${Vec.floor(vector)}!`)
+            ctx.player.success(i18n`lush > ${Vec.floor(vector)}!`)
           }
         }
       })(),
@@ -526,14 +526,14 @@ const tests: Record<
   },
 
   mail(ctx) {
-    Mail.send(ctx.player.id, 'Zolkin', 'Привет, мир!', new Rewards())
+    Mail.send(ctx.player.id, i18nJoin`Zolkin`, i18nJoin`Привет, мир!`, new Rewards())
   },
   mailr(ctx) {
     ctx.player.id
     Mail.send(
       ctx.player.id,
-      'Bugrock',
-      'это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст',
+      i18nJoin`Bugrock`,
+      i18nJoin`это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст`,
       new Rewards().score('money', 50).score('leafs', 100).item(MinecraftItemTypes.Diamond, 12),
     )
   },
@@ -594,7 +594,7 @@ function bench<T>(
 ) {
   const subruns = yildEach
   const r = Math.round(runs / subruns)
-  player.tell(t`Will run ${r} with ${subruns}`)
+  player.tell(i18n`Will run ${r} with ${subruns}`)
   const start = Date.now()
   const results = new Set<unknown>()
   return new Promise<Set<unknown>>(resolve => {

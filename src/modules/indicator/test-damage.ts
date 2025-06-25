@@ -5,7 +5,7 @@ import { registerAsync } from '@minecraft/server-gametest'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Enchantments, isKeyof, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { TestStructures } from 'test/constants'
 
 const players: Player[] = []
@@ -32,7 +32,7 @@ registerAsync('test', 'damage', async test => {
         if (event.damageSource.damagingEntity instanceof Player) {
           const hp = event.hurtEntity.getComponent('health')?.currentValue ?? 0
           event.damageSource.damagingEntity.onScreenDisplay.setActionBar(
-            t`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`,
+            noI18n`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`,
             ActionbarPriority.Highest,
           )
         }

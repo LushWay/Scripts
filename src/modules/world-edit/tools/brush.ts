@@ -2,7 +2,7 @@ import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
 import { ModalForm, Vec, is, isKeyof, isLocationError } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Cuboid } from '../../../lib/utils/cuboid'
 import { WE_CONFIG } from '../config'
@@ -132,8 +132,8 @@ class BrushTool extends WorldEditToolBrush<Storage> {
 
         this.saveStorage(slot, storage)
         player.success(
-          t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
-            replaceBlocksSet ? t`, заменяемым набором блоков ${replaceBlocksSet}` : ''
+          i18n`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} кисть ${shape} с набором блоков ${blocksSet}${
+            replaceBlocksSet ? i18n`, заменяемым набором блоков ${replaceBlocksSet}` : ''
           } и радиусом ${radius}`,
         )
       })
@@ -141,7 +141,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
 
   ensureShape(player: Player, shape: string): keyof typeof SHAPES {
     if (!isKeyof(shape, SHAPES)) {
-      player.warn(t`Неизвестная кисть: ${shape}`)
+      player.warn(i18n`Неизвестная кисть: ${shape}`)
       return Object.keys(SHAPES)[0] as unknown as keyof typeof SHAPES
     } else return shape
   }

@@ -2,10 +2,11 @@
 
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
 import { Area, AreaAsJson } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -197,9 +198,19 @@ export class Boss {
     } else if (this.location.valid) {
       this.floatingText.update(
         Vec.add(this.location, { x: 0, y: 2, z: 0 }),
-        t`${this.options.place.name}\nДо появления\nосталось ${t.hhmmss(this.options.respawnTime - (Date.now() - db.date))}`,
+        i18nShared`${this.options.place.name}\nДо появления\nосталось ${i18n.hhmmss(this.options.respawnTime - (Date.now() - db.date))}`,
       )
     }
+  }
+
+  private getName() {
+    if (typeof this.options.place.name === 'string')
+      throw new TypeError(`Boss ${this.id} name is string, expected I18nSharedMessage`)
+
+    return this.options.place.name.toString(defaultLang)
+
+    // TODO add once supported
+    // return this.options.place.name.toRawText()
   }
 
   private spawnEntity() {
@@ -215,7 +226,7 @@ export class Boss {
           if (entity.id !== this.entity?.id) return
 
           system.delay(() => {
-            entity.nameTag = this.options.place.name
+            entity.nameTag = this.getName()
             entity.addTag(Boss.entityTag)
             EventSignal.emit(this.onBossEntitySpawn, entity)
           })
@@ -248,7 +259,7 @@ export class Boss {
       if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
-      this.entity.nameTag = this.options.place.name
+      this.entity.nameTag = this.getName()
       this.floatingText.hide()
     }
   }
@@ -270,7 +281,7 @@ export class Boss {
     Boss.db.set(this.options.place.id, { id: '', date: Date.now(), dead: true })
 
     if (dropLoot) {
-      world.say(t.header`Убит босс ${this.options.place.name}!`)
+      for (const player of world.getAllPlayers()) player.tell(i18n.header`Убит босс ${this.options.place.name}!`)
 
       this.options.loot.generate().forEach(e => {
         if (e) {

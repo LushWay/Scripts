@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { form, NewFormCallback, NewFormCreator } from './new'
 
 interface LoreFormDb {
@@ -41,13 +41,13 @@ export class LoreForm {
     } else add(this.form)
   }
 
-  question(id: string, name: string, answer: string): LoreForm {
+  question(id: string, name: Text, answer: Text): LoreForm {
     this.add(id, f => {
       f.button(name, player =>
         form(f => {
           f.title(name)
           f.body(answer)
-          f.button(t`Хорошо, назад`, this.back)
+          f.button(i18n`Хорошо, назад`, this.back)
           this.db.seen.push(id)
         }).show(player),
       )

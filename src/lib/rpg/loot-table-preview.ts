@@ -4,7 +4,7 @@ import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
 import { translateEnchantment } from 'lib/i18n/lang'
 import { I18nMessage } from 'lib/i18n/message'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { LootTable } from './loot-table'
 
@@ -35,7 +35,7 @@ export const lootTablePreview = form.withParams<{ lootTable: LootTable; name?: I
         : ''
 
       f.button(
-        t`${name}\n${'§r§7' + (~~((item.weight / maxPercent) * 100)).toString()}§7%%${amountText}${enchantmentsText}`,
+        i18n`${name}\n${'§r§7' + (~~((item.weight / maxPercent) * 100)).toString()}§7%%${amountText}${enchantmentsText}`,
         getAuxOrTexture(itemStack.typeId, enchanted),
         itemForm({ item }),
       )
@@ -45,7 +45,7 @@ export const lootTablePreview = form.withParams<{ lootTable: LootTable; name?: I
 
 new Command('loottable')
   .setPermissions('techAdmin')
-  .setDescription(t`Просмотр содержимого таблиц лута`)
+  .setDescription(i18n`Просмотр содержимого таблиц лута`)
   .executes(ctx => {
     lootTables(ctx.player)
   })
@@ -62,7 +62,7 @@ function lootTables(player: Player) {
     .button((table, settings, _, back) => {
       if (!table.id && settings.onlyWithId) return false
       return [
-        table.id ?? t`Unkown table with ${table.items.length} items`,
+        table.id ?? i18n`Unkown table with ${table.items.length} items`,
         () => lootTablePreview({ lootTable: table }).show(player, back),
       ] as const
     })

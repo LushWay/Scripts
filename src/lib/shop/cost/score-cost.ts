@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
-import { t } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { separateNumberWithDots } from 'lib/util'
 import { Cost } from '../cost'
 
@@ -35,7 +35,7 @@ export abstract class ScoreboardCost extends Cost {
   failed(player: Player) {
     super.failed(player)
     const have = player.scores[this.scoreboard]
-    return t.error`${have}/${this.cost}${this.emoji}`
+    return noI18n`${have}/${this.cost}${this.emoji}`
   }
 }
 

@@ -1,10 +1,10 @@
 import { ActionForm } from 'lib/form/action'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Npc } from 'lib/rpg/npc'
 import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'
 
-export function QSDialogue(this: PlayerQuest, npc: Npc, text = t.nocolor`Вас ждет §f${npc.name}`) {
+export function QSDialogue(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Вас ждет §f${npc.name}`) {
   return this.dynamic(text)
     .target(npc.location.toPoint())
     .activate(ctx => {
@@ -19,7 +19,7 @@ export function QSDialogue(this: PlayerQuest, npc: Npc, text = t.nocolor`Вас 
     })
 }
 
-export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = t.nocolor`Вас ждет §f${npc.name}`) {
+export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Вас ждет §f${npc.name}`) {
   return {
     body: (body: string) => ({
       buttons: (...buttons: [string, (ctx: QSDynamic, back: VoidFunction) => void][]) => {
@@ -27,7 +27,7 @@ export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = t.nocolor
           .target(npc.location.toPoint())
           .activate(ctx => {
             const show = () => {
-              const form = new ActionForm(npc.name, body)
+              const form = new ActionForm(npc.name.toString(this.player.lang), body)
 
               for (const [text, callback] of buttons) {
                 form.button(text, callback.bind(null, ctx, show))

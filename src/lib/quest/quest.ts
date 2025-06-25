@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Compass } from 'lib/rpg/menu'
 import { Group, Place } from 'lib/rpg/place'
@@ -23,14 +23,14 @@ export class Quest {
   static error = class QuestError extends Error {}
 
   static playerSettings = Settings.player(
-    t`Задания
+    i18n`Задания
 §7Настройки игровых заданий`,
     'quest',
     {
       messageForEachStep: {
         value: false,
-        name: t`Сообщение в чат при каждом шаге`,
-        description: t`Отправлять ли сообщение в чат при каждом новом разделе задания`,
+        name: i18n`Сообщение в чат при каждом шаге`,
+        description: i18n`Отправлять ли сообщение в чат при каждом новом разделе задания`,
       },
     },
   )
@@ -209,7 +209,7 @@ export class Quest {
       system.runTimeout(
         () => {
           // TODO Fix colors
-          player.onScreenDisplay.setHudTitle('§6' + this.name, {
+          player.onScreenDisplay.setHudTitle('§6' + this.name.toString(player.lang), {
             subtitle: this.description.toString(player.lang),
             fadeInDuration: 0,
             stayDuration: 20 * 8,
@@ -249,7 +249,7 @@ export class Quest {
   }
 
   get group() {
-    return new Group(`quest: ${this.id}`, t`Задание: ${this.name}\n§7${this.description}`)
+    return new Group(`quest: ${this.id}`, i18nShared`Задание: ${this.name}\n§7${this.description}`)
   }
 
   button = new QuestButton(this)

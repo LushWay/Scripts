@@ -2,7 +2,7 @@ import { ItemStack, system } from '@minecraft/server'
 
 import { MinecraftBlockTypes, MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { isKeyof, ms } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { RegionEvents } from 'lib/region/events'
 import { actionGuard, ActionGuardOrder, disableAdventureNear, Region, RegionPermissions } from 'lib/region/index'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
@@ -23,8 +23,8 @@ export class QuartzMineRegion extends Region {
     owners: [],
   }
 
-  get displayName(): string | undefined {
-    return t.nocolor`Озеро Технограда`
+  get displayName(): Text | undefined {
+    return i18n.nocolor`Озеро Технограда`
   }
 }
 disableAdventureNear.push(QuartzMineRegion)

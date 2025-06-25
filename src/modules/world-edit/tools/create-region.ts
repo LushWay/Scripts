@@ -2,7 +2,7 @@ import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { ModalForm, Region, regionTypes, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { WeBackup, WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -49,7 +49,7 @@ class RegionTool extends WorldEditTool<Storage> {
         storage.minDistance = minDistance
         storage.minDistanceSameKind = minDistanceSameKind
 
-        slot.nameTag = t`Создать регион ${regionTypes.find(e => e.region.kind === storage.regionKind)?.name}`
+        slot.nameTag = noI18n`Создать регион ${regionTypes.find(e => e.region.kind === storage.regionKind)?.name}`
         this.saveStorage(slot, storage)
       })
   }
@@ -83,7 +83,7 @@ class RegionTool extends WorldEditTool<Storage> {
       name => new WeRegionBackup(name, region, create),
     )
 
-    const msg = t`§aРегион создан!`
+    const msg = noI18n`§aРегион создан!`
     player.success(msg)
     player.onScreenDisplay.setActionBar(msg, ActionbarPriority.Highest)
   }

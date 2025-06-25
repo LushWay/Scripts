@@ -1,7 +1,7 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, translateTypeId } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
 import {
@@ -60,7 +60,7 @@ export function useBlockSelection(
     const type = block instanceof BlockPermutation ? block.type : BlockTypes.get(block.typeId)
 
     if (!type) {
-      player.fail(t.error`Неизвестный тип блока: ${inspect(selection.permutations[0])}`)
+      player.fail(i18n.error`Неизвестный тип блока: ${inspect(selection.permutations[0])}`)
       throw new Error(`Unknown block type: ${inspect(selection.permutations[0])}`)
     }
 
@@ -107,11 +107,13 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 
   const promise = new Promise<SelectedBlock>(resolve => {
     const base = new ActionForm('Выбери блок/набор блоков')
-      .button(ActionForm.backText, back)
+      .button(ActionForm.backText.toString(player.lang), back)
       .button(selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков', () => {
         const blocksSets = getAllBlocksSets(player.id)
 
-        const form = new ActionForm('Наборы блоков').button(ActionForm.backText, () => base.show(player))
+        const form = new ActionForm('Наборы блоков').button(ActionForm.backText.toString(player.lang), () =>
+          base.show(player),
+        )
 
         for (const blocksSet of Object.keys(blocksSets)) {
           form.button(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
@@ -225,7 +227,8 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 function selectBlockByIdModal(player: Player, resolve: (v: SelectedBlock) => void, error = '') {
   new ModalForm('Введи айди блока').addTextField(`${error}ID блока`, 'например, stone').show(player, (_, id) => {
     let error = ''
-    if (!blockIsAvaible(id, { fail: m => (error += m) })) return selectBlockByIdModal(player, resolve, `${error}\n`)
+    if (!blockIsAvaible(id, { tell: m => (error += m.toString(player.lang)), lang: player.lang }))
+      return selectBlockByIdModal(player, resolve, `${error}\n`)
 
     resolve({ permutations: [BlockPermutation.resolve(id)] })
   })

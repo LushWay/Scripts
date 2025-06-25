@@ -2,7 +2,7 @@ import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
 import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { skipForBlending } from '../utils/blending'
@@ -106,7 +106,7 @@ class ShovelTool extends WorldEditTool<Storage> {
 
           this.saveStorage(slot, storage)
           player.success(
-            t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
+            i18n`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
           )
         },
       )

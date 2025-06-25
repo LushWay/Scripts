@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { ArrayForm, ask, BUTTON, doNothing, ModalForm } from 'lib'
-import { t } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { WorldEditTool } from './world-edit-tool'
 
 export interface ToolsDataStorage {
@@ -62,19 +62,19 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
         })
 
         if (filters.mode === 'sort') {
-          form.button(t`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
+          form.button(noI18n.nocolor`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
             options.sortMode = options.sortMode === SortMode.Up ? SortMode.Down : SortMode.Up
             back()
           })
         }
 
-        form.button(t`§l§dНастройки`, () => this.settingsForm(slot, player, back))
+        form.button(noI18n.nocolor`§l§dНастройки`, () => this.settingsForm(slot, player, back))
       })
       .button((item, filters, _, back) => {
         const tool = this.getToolByData(item)
         const onClick = () => {
           if (filters.mode === 'delete') {
-            ask(player, t.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
+            ask(player, noI18n.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
               const newTools = tools.filter(e => e !== item)
               this.saveToolsData(slot, newTools)
               this.updateItemSlot(slot, newTools)
@@ -102,7 +102,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
   }
 
   protected updateItemSlot(slot: ContainerSlot, toolsData: ToolData[]) {
-    slot.nameTag = t`§r§l${this.name} (${toolsData.length})`
+    slot.nameTag = noI18n.nocolor`§r§l${this.name} (${toolsData.length})`
     slot.setLore([' ', ...toolsData.map(e => e.name)])
   }
 

@@ -1,5 +1,5 @@
 import { isNotPlaying } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { RegionEvents } from 'lib/region/events'
 import { City } from './city'
@@ -11,11 +11,11 @@ export class CityInvestigating<T extends City> {
 
   goToCityQuest = new Quest(
     this.city.group.place('goTo').name(''),
-    t`Доберитесь до указанного города или деревни`,
+    i18n`Доберитесь до указанного города или деревни`,
     q => {
-      if (!this.city.safeArea) return q.failed(t`Город не настроен!`)
+      if (!this.city.safeArea) return q.failed(i18n`Город не настроен!`)
 
-      q.reachRegion(this.city.safeArea, t`Доберитесь до города!`)
+      q.reachRegion(this.city.safeArea, i18n`Доберитесь до города!`)
     },
     true,
   )
@@ -37,12 +37,12 @@ export class CityInvestigating<T extends City> {
 
     this.quest = new Quest(
       this.city.group.place('investigating').name(''),
-      t`Исследуйте новый город!`,
+      i18n`Исследуйте новый город!`,
       (q, player) => {
-        if (!this.city.safeArea) return q.failed(t`Город не настроен!`)
+        if (!this.city.safeArea) return q.failed(i18n`Город не настроен!`)
 
         if (this.city.cutscene.sections.length)
-          q.dynamic(t`Обзор города`).activate(ctx => {
+          q.dynamic(i18n`Обзор города`).activate(ctx => {
             this.city.cutscene.play(ctx.player)?.finally(() => ctx.next())
           })
 

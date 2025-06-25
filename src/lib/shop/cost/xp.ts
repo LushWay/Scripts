@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { i18n, l } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Cost } from './cost'
 
 export class XPCost extends Cost {
@@ -10,7 +10,7 @@ export class XPCost extends Cost {
   }
 
   toString(_: Player, canBuy?: boolean): string {
-    return l.colors({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' })`${this.levels.toString()}lvl`
+    return noI18n.colors({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' })`${this.levels.toString()}lvl`
   }
 
   has(player: Player): boolean {

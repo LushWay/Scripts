@@ -5,7 +5,7 @@ import {
 } from '@minecraft/vanilla-data'
 import { Language } from 'lib/assets/lang'
 import { langToken, translateToken } from 'lib/i18n/lang'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
 /** Returns <item name>\nx<count> */
 export function itemNameXCount(
@@ -34,7 +34,7 @@ function uncolor(t: string) {
   return t.replaceAll(/§./g, '')
 }
 
-const modifierIndexToS = ['', t` (долгое)`, ' II']
+const modifierIndexToS = ['', i18n` (долгое)`, ' II']
 
 // TODO Ensure it works properly for all modifiers
 const potionModifierToTime: Record<string, undefined | [normal: string, longPlus: string, levelTwo: string]> = {

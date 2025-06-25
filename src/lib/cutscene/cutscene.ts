@@ -3,7 +3,7 @@ import { Vec } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
-import { l } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
 import { restorePlayerCamera } from 'lib/utils/game'
@@ -60,7 +60,7 @@ export class Cutscene {
 
   constructor(
     public id: string,
-    public displayName: string,
+    public displayName: Text,
   ) {
     Cutscene.all.set(id, this)
 
@@ -84,7 +84,7 @@ export class Cutscene {
   play(player: Player) {
     if (!this.sections[0]?.points[0]) {
       console.error(`${this.id}: cutscene is not ready.`)
-      player.fail(l`${this.displayName}: cutscene is not ready.`)
+      player.fail(noI18n`${this.displayName}: cutscene is not ready.`)
       return
     }
 
@@ -246,7 +246,7 @@ export class Cutscene {
     } else {
       if (warn) {
         source.warn(
-          l`Unable to find section. Section index: ${sectionIndex}, total amount of sections: ${sections.length}`,
+          noI18n`Unable to find section. Section index: ${sectionIndex}, total amount of sections: ${sections.length}`,
         )
       }
 

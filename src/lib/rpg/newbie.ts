@@ -2,7 +2,7 @@ import { EntityDamageCause, Player, system, world } from '@minecraft/server'
 import { PlayerProperties } from 'lib/assets/player-json'
 import { Cooldown } from 'lib/cooldown'
 import { ask } from 'lib/form/message'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
@@ -19,21 +19,21 @@ export function askForExitingNewbieMode(
   player: Player,
   reason: Text,
   callback: VoidFunction,
-  back: VoidFunction = () => player.success(t`Успешно отменено`),
+  back: VoidFunction = () => player.success(i18n`Успешно отменено`),
 ) {
   if (!isNewbie(player)) return callback()
 
   ask(
     player,
-    t`Если вы совершите это действие, вы потеряете статус новичка:
+    i18n`Если вы совершите это действие, вы потеряете статус новичка:
  - Другие игроки смогут наносить вам урон
  - Другие игроки смогут забирать ваш лут после смерти`,
-    t`§cЯ больше не новичок`,
+    i18n`§cЯ больше не новичок`,
     () => {
       exitNewbieMode(player, reason)
       callback()
     },
-    t`НЕТ, НАЗАД`,
+    i18n`НЕТ, НАЗАД`,
     back,
   )
 }
@@ -43,7 +43,7 @@ const logger = createLogger('Newbie')
 function exitNewbieMode(player: Player, reason: Text) {
   if (!isNewbie(player)) return
 
-  player.warn(t.nocolor`§eВы ${reason}, поэтому вышли из режима новичка.`)
+  player.warn(i18n.nocolor`§eВы ${reason}, поэтому вышли из режима новичка.`)
   delete player.database.survival.newbie
   player.setProperty(property, false)
 
@@ -82,27 +82,27 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       denyDamage()
       askForExitingNewbieMode(
         damagingEntity,
-        t`ударили игрока`,
+        i18n`ударили игрока`,
         () => void 0,
-        () => damagingEntity.info(t`Будь осторожнее в следующий раз.`),
+        () => damagingEntity.info(i18n`Будь осторожнее в следующий раз.`),
       )
     } else {
-      exitNewbieMode(damagingEntity, t`снова ударили игрока`)
+      exitNewbieMode(damagingEntity, i18n`снова ударили игрока`)
     }
   }
 })
 
 new Command('newbie')
   .setPermissions('member')
-  .setDescription(t`Используйте, чтобы выйти из режима новичка`)
+  .setDescription(i18n`Используйте, чтобы выйти из режима новичка`)
   .executes(ctx => {
     if (isNewbie(ctx.player)) {
-      askForExitingNewbieMode(ctx.player, t`использовали команду`, () => void 0)
-    } else return ctx.error(t`Вы не находитесь в режиме новичка.`)
+      askForExitingNewbieMode(ctx.player, i18n`использовали команду`, () => void 0)
+    } else return ctx.error(i18n`Вы не находитесь в режиме новичка.`)
   })
   .overload('set')
   .setPermissions('techAdmin')
-  .setDescription(t`Вводит в режим новичка`)
+  .setDescription(i18n`Вводит в режим новичка`)
   .executes(ctx => {
     enterNewbieMode(ctx.player)
     ctx.player.success()
@@ -110,5 +110,5 @@ new Command('newbie')
 
 system.runPlayerInterval(player => {
   if (isNewbie(player) && player.scores.anarchyOnlineTime * 2.5 > newbieTime)
-    exitNewbieMode(player, t`провели на анархии больше 2 часов`)
+    exitNewbieMode(player, i18n`провели на анархии больше 2 часов`)
 }, 'newbie mode exit')

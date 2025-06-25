@@ -3,7 +3,7 @@ import { GameMode, Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { InventoryStore, Portal, Settings, locationWithRotation, util } from 'lib'
 
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
@@ -16,7 +16,7 @@ import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
 
 class SpawnBuilder extends AreaWithInventory {
-  group = new Group('common', t`Общее`)
+  group = new Group('common', i18nShared`Общее`)
 
   private readonly name = 'Spawn'
 
@@ -29,16 +29,16 @@ class SpawnBuilder extends AreaWithInventory {
   inventoryName: InventoryTypeName = 'spawn'
 
   location = locationWithRotation(
-    this.group.place('spawn').name(t`Спавн`),
+    this.group.place('spawn').name(noI18n`Спавн`),
     { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
     true,
   )
 
-  settings = Settings.player(t`Вход`, 'join', {
+  settings = Settings.player(i18n`Вход`, 'join', {
     teleportToSpawnOnJoin: {
       value: true,
-      name: t`Телепорт на спавн`,
-      description: t`Определяет, будете ли вы телепортироваться на спавн при входе`,
+      name: i18n`Телепорт на спавн`,
+      description: i18n`Определяет, будете ли вы телепортироваться на спавн при входе`,
     },
   })
 
@@ -65,7 +65,7 @@ class SpawnBuilder extends AreaWithInventory {
       this.portal
         .createCommand()
         .setPermissions('everybody')
-        .setDescription(t.nocolor`§r§bПеремещает на спавн`)
+        .setDescription(i18n.nocolor`§r§bПеремещает на спавн`)
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {

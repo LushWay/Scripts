@@ -2,18 +2,18 @@ import { EntityComponentTypes, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { actionGuard, ActionGuardOrder, Cooldown, ms, Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
-  .lore(t`Используй этот предмет, чтобы установить пушку`)
+  .lore(i18n`Используй этот предмет, чтобы установить пушку`)
 
 export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')
   .typeId('lw:cannon_shell')
-  .lore(t`Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.`)
+  .lore(i18n`Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.`)
 
 const cooldown = new Cooldown(ms.from('sec', 5))
 const tellCooldown = new Cooldown(ms.from('sec', 1), false)
@@ -25,7 +25,7 @@ actionGuard((player, _, ctx) => {
 }, ActionGuardOrder.Feature)
 
 function guide(player: Player) {
-  if (tellCooldown.isExpired(player)) system.delay(() => player.fail(t.error`Используй этот предмет сидя на пушке`))
+  if (tellCooldown.isExpired(player)) system.delay(() => player.fail(i18n.error`Используй этот предмет сидя на пушке`))
   return false
 }
 

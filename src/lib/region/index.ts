@@ -10,7 +10,7 @@ import {
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { onPlayerMove } from 'lib/player-move'
 import { isNotPlaying } from 'lib/utils/game'
 import { AbstractPoint } from 'lib/utils/point'
@@ -213,7 +213,10 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   direction = Vec.multiply(direction, 10)
 
   if (damagingEntity instanceof Player) {
-    damagingEntity.onScreenDisplay.setActionBar(t.error`Нельзя сражаться в мирной зоне`, ActionbarPriority.Highest)
+    damagingEntity.onScreenDisplay.setActionBar(
+      i18n.error`Нельзя сражаться в мирной зоне`.toString(damagingEntity.lang),
+      ActionbarPriority.Highest,
+    )
   }
 
   const health = damagingEntity.getComponent(EntityHealthComponent.componentId)

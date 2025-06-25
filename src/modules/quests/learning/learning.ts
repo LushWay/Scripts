@@ -10,8 +10,9 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
+import { defaultLang } from 'lib/assets/lang'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { l, t } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { noGroup } from 'lib/rpg/place'
@@ -29,231 +30,242 @@ const logger = createLogger('Learning Quest')
 class Learning {
   id = 'learning'
 
-  quest = new Quest(noGroup.place('learning').name(t`Обучение`), t`Обучение базовым механикам сервера`, (q, player) => {
-    if (!this.learningLocation.valid || !this.craftingTableLocation.valid)
-      return q.failed(l`Learning is not setup properly`)
+  quest = new Quest(
+    noGroup.place('learning').name(i18nShared`Обучение`),
+    i18n`Обучение базовым механикам сервера`,
+    (q, player) => {
+      if (!this.learningLocation.valid || !this.craftingTableLocation.valid)
+        return q.failed(noI18n`Learning is not setup properly`)
 
-    const maxReturnToAreaSteps = 4
-    const returnToMineArea = (step: number) => () => {
-      if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) return
+      const maxReturnToAreaSteps = 4
+      const returnToMineArea = (step: number) => () => {
+        if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) return
 
-      const regions = MineareaRegion.getManyAt(player)
-      if (!regions.length) {
-        player.fail(
-          t.error`Вы не можете покинуть зону добычи, пока не завершили задания ${step}/${maxReturnToAreaSteps}`,
-        )
-        this.learningLocation.teleport(player)
+        const regions = MineareaRegion.getManyAt(player)
+        if (!regions.length) {
+          player.fail(
+            i18n.error`Вы не можете покинуть зону добычи, пока не завершили задания ${step}/${maxReturnToAreaSteps}`,
+          )
+          this.learningLocation.teleport(player)
+        }
       }
-    }
 
-    q.counter((current, end) => t.header`Добыто дерева: ${current}/${end}`, 5)
-      .description(t`Нарубите дерева`)
-      .activate((ctx, firstTime) => {
-        ctx.onInterval(returnToMineArea(1))
+      q.counter((current, end) => i18n.header`Добыто дерева: ${current}/${end}`, 5)
+        .description(i18n`Нарубите дерева`)
+        .activate((ctx, firstTime) => {
+          ctx.onInterval(returnToMineArea(1))
 
-        if (firstTime) {
-          // Delay code by one tick to prevent giving item
-          // in spawn inventory that will be replaced with
-          // anarchy
-          system.delay(() => {
-            this.startAxeGiveCommand.ensure(player)
-            player.getComponent('equippable')?.setEquipment(EquipmentSlot.Offhand, Menu.itemStack)
-          })
-        }
-
-        const trees = Object.values(MinecraftBlockTypes).filter(e => /log/i.exec(e)) as string[]
-
-        ctx.world.afterEvents.playerBreakBlock.subscribe(({ player: ep, brokenBlockPermutation }) => {
-          if (player.id !== ep.id) return
-          if (!trees.includes(brokenBlockPermutation.type.id)) return
-
-          logger.player(player).info`Mined ${brokenBlockPermutation.type.id}`
-
-          player.playSound(Sounds.Success)
-          ctx.add(1)
-        })
-      })
-
-    q.dynamic(t.header`Выйди под открытое небо`)
-      .description(t`Деревья могут помешать. Выйди туда, где над тобой будет только небо`)
-      .activate(ctx => {
-        ctx.onInterval(returnToMineArea(2))
-
-        ctx.system.runInterval(
-          () => {
-            const hit = player.dimension.getBlockFromRay(
-              player.location,
-              { x: 0, y: 1, z: 0 },
-              { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 },
-            )
-
-            if (!hit) ctx.next()
-          },
-          'learning quest, free space detecter',
-          20,
-        )
-      })
-
-    q.dynamic(t`Заберите все из сундука, упавшего с неба`)
-      .description(t`Заберите все из упавшего с неба сундука. На него указывает компас`)
-      .activate((ctx, firstTime) => {
-        ctx.onInterval(returnToMineArea(3))
-
-        if (!player.isValid) return
-
-        function spawnAirdrop() {
-          const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })
-          ctx.db = airdrop.id
-          const position = Vec.add(player.location, { x: 0, y: 20, z: 0 })
-          airdrop.spawn(position)
-          return airdrop
-        }
-
-        function getAirdrop() {
-          const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
-          if (!airdrop) {
-            logger.player(player).warn`No airdrop found`
-            return spawnAirdrop()
+          if (firstTime) {
+            // Delay code by one tick to prevent giving item
+            // in spawn inventory that will be replaced with
+            // anarchy
+            system.delay(() => {
+              this.startAxeGiveCommand.ensure(player)
+              player.getComponent('equippable')?.setEquipment(EquipmentSlot.Offhand, Menu.itemStack)
+            })
           }
-          return airdrop
-        }
 
-        const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
+          const trees = Object.values(MinecraftBlockTypes).filter(e => /log/i.exec(e)) as string[]
 
-        ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
-          const airdropEntity = airdrop.chest
-          if (!airdropEntity) return
-          if (event.target.id !== airdropEntity.id) return
+          ctx.world.afterEvents.playerBreakBlock.subscribe(({ player: ep, brokenBlockPermutation }) => {
+            if (player.id !== ep.id) return
+            if (!trees.includes(brokenBlockPermutation.type.id)) return
 
-          if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
-        })
-
-        ctx.world.afterEvents.entityDie.subscribe(event => {
-          if (event.deadEntity.id !== airdrop.chest?.id) return
-          ctx.system.delay(() => ctx.next())
-        })
-
-        let i = 0
-        ctx.onInterval(() => {
-          if (i === 1) {
-            i = 0
-
-            if (!airdrop.chest) {
-              player.onScreenDisplay.setActionBar(
-                t.error`Не удалось найти аирдроп
-Используйте .wipe чтобы перепройти обучение`,
-                ActionbarPriority.Highest,
-              )
-            } else {
-              ctx.target = airdrop.showParticleTrace()
-              ctx.update()
-            }
-          } else i++
-        })
-      })
-
-    q.dynamic(t`Используй монеты в инвентаре`)
-      .description(t`Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет`)
-      .activate(ctx => {
-        let money = 0
-        if (ctx.player.container) {
-          for (const [, item] of ctx.player.container.entries()) if (item?.typeId === Items.Money) money += item.amount
-        }
-
-        if (!money) ctx.next()
-
-        ctx.world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
-          if (source.id !== ctx.player.id || itemStack.typeId !== Items.Money) return
-
-          ctx.next()
-        })
-      })
-
-    const crafting = createPointVec(
-      Vec.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 }),
-      this.craftingTableLocation.dimensionType,
-    )
-
-    q.reachArea(
-      ...Vec.around(crafting.location, 10),
-      t.header`Следуя компасу, доберитесь до верстака`,
-      crafting.dimensionType,
-    )
-
-    q.item(t.header`Сделайте деревянную кирку`)
-      .description(t`Используя верстак сделайте деревянную кирку!`)
-      .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
-      .target(crafting)
-
-    q.breakCounter((i, end) => t.header`Спуститесь в шахту и добудьте камня: ${i}/${end}`, 10)
-      .description(t`Отправляйтесь в шахту, найдите и накопайте камня.`)
-      .filter(broken => broken.type.id === b.Stone)
-      .activate(ctx => {
-        ctx.subscribe(OrePlace, () => true)
-      })
-
-    q.item(t.header`Сделайте каменную кирку`)
-      .description(t`Вернитесь к верстаку и улучшите свой инструмент.`)
-      .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
-      .target(crafting)
-
-    q.counter(
-      i =>
-        i === 0 ? t.header`Вновь вскопайте камень в шахте ${0}/${1}` : t.header`Добыто железной руды: ${i - 1}/${3}`,
-      3 + 1,
-    )
-      .description(t`Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!`)
-      .activate(ctx => {
-        // Force iron ore generation
-        ctx.subscribe(
-          OrePlace,
-          ({ player, isDeepslate, possibleBlocks, place }) => {
-            if (player.id !== ctx.player.id) return false
-
-            ctx.db ??= { count: ctx.value }
-            ;(ctx.db as { iron?: number }).iron ??= 0
-
-            if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
-              if (ctx.db.iron >= ctx.end - 1) return true
-
-              for (const block of possibleBlocks) {
-                if (ctx.db.iron >= ctx.end - 1) break
-                if (place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
-                  ctx.db.iron++
-                }
-              }
-              return true
-            } else return false
-          },
-          10,
-        )
-
-        // Check if it breaks
-        ctx.world.afterEvents.playerBreakBlock.subscribe(
-          ({
-            brokenBlockPermutation: {
-              type: { id },
-            },
-            player,
-          }) => {
-            if (player.id !== player.id) return
-            if (ctx.value === 0 ? id !== b.Stone : id !== b.IronOre && id !== MinecraftItemTypes.DeepslateIronOre)
-              return
+            logger.player(player).info`Mined ${brokenBlockPermutation.type.id}`
 
             player.playSound(Sounds.Success)
             ctx.add(1)
-          },
-        )
-      })
+          })
+        })
 
-    q.dialogue(VillageOfMiners.guide, t`Шахтер зовет вас наверх, чтобы поговорить!`)
-  })
+      q.dynamic(i18n.header`Выйди под открытое небо`)
+        .description(i18n`Деревья могут помешать. Выйди туда, где над тобой будет только небо`)
+        .activate(ctx => {
+          ctx.onInterval(returnToMineArea(2))
 
-  learningLocation = location(this.quest.group.place('tp').name(l`Куда игроки будут тепаться при обучении`))
+          ctx.system.runInterval(
+            () => {
+              const hit = player.dimension.getBlockFromRay(
+                player.location,
+                { x: 0, y: 1, z: 0 },
+                { includeLiquidBlocks: true, includePassableBlocks: true, maxDistance: 60 },
+              )
 
-  craftingTableLocation = location(this.quest.group.place('crafting table').name(l`Верстак`))
+              if (!hit) ctx.next()
+            },
+            'learning quest, free space detecter',
+            20,
+          )
+        })
 
-  startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(t`§r§6Начальный топор`, t`Начальный топор`)
+      q.dynamic(i18n`Заберите все из сундука, упавшего с неба`)
+        .description(i18n`Заберите все из упавшего с неба сундука. На него указывает компас`)
+        .activate((ctx, firstTime) => {
+          ctx.onInterval(returnToMineArea(3))
+
+          if (!player.isValid) return
+
+          function spawnAirdrop() {
+            const airdrop = new Airdrop({ loot: airdropTable, forPlayerId: player.id })
+            ctx.db = airdrop.id
+            const position = Vec.add(player.location, { x: 0, y: 20, z: 0 })
+            airdrop.spawn(position)
+            return airdrop
+          }
+
+          function getAirdrop() {
+            const airdrop = Airdrop.instances.find(e => e.id === ctx.db)
+            if (!airdrop) {
+              logger.player(player).warn`No airdrop found`
+              return spawnAirdrop()
+            }
+            return airdrop
+          }
+
+          const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
+
+          ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
+            const airdropEntity = airdrop.chest
+            if (!airdropEntity) return
+            if (event.target.id !== airdropEntity.id) return
+
+            if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
+          })
+
+          ctx.world.afterEvents.entityDie.subscribe(event => {
+            if (event.deadEntity.id !== airdrop.chest?.id) return
+            ctx.system.delay(() => ctx.next())
+          })
+
+          let i = 0
+          ctx.onInterval(() => {
+            if (i === 1) {
+              i = 0
+
+              if (!airdrop.chest) {
+                player.onScreenDisplay.setActionBar(
+                  i18n.error`Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение`.toString(
+                    player.lang,
+                  ),
+                  ActionbarPriority.Highest,
+                )
+              } else {
+                ctx.target = airdrop.showParticleTrace()
+                ctx.update()
+              }
+            } else i++
+          })
+        })
+
+      q.dynamic(i18n`Используй монеты в инвентаре`)
+        .description(i18n`Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет`)
+        .activate(ctx => {
+          let money = 0
+          if (ctx.player.container) {
+            for (const [, item] of ctx.player.container.entries())
+              if (item?.typeId === Items.Money) money += item.amount
+          }
+
+          if (!money) ctx.next()
+
+          ctx.world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
+            if (source.id !== ctx.player.id || itemStack.typeId !== Items.Money) return
+
+            ctx.next()
+          })
+        })
+
+      const crafting = createPointVec(
+        Vec.add(this.craftingTableLocation, { x: 0.5, y: 0.5, z: 0.5 }),
+        this.craftingTableLocation.dimensionType,
+      )
+
+      q.reachArea(
+        ...Vec.around(crafting.location, 10),
+        i18n.header`Следуя компасу, доберитесь до верстака`,
+        crafting.dimensionType,
+      )
+
+      q.item(i18n.header`Сделайте деревянную кирку`)
+        .description(i18n`Используя верстак сделайте деревянную кирку!`)
+        .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
+        .target(crafting)
+
+      q.breakCounter((i, end) => i18n.header`Спуститесь в шахту и добудьте камня: ${i}/${end}`, 10)
+        .description(i18n`Отправляйтесь в шахту, найдите и накопайте камня.`)
+        .filter(broken => broken.type.id === b.Stone)
+        .activate(ctx => {
+          ctx.subscribe(OrePlace, () => true)
+        })
+
+      q.item(i18n.header`Сделайте каменную кирку`)
+        .description(i18n`Вернитесь к верстаку и улучшите свой инструмент.`)
+        .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
+        .target(crafting)
+
+      q.counter(
+        i =>
+          i === 0
+            ? i18n.header`Вновь вскопайте камень в шахте ${0}/${1}`
+            : i18n.header`Добыто железной руды: ${i - 1}/${3}`,
+        3 + 1,
+      )
+        .description(i18n`Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!`)
+        .activate(ctx => {
+          // Force iron ore generation
+          ctx.subscribe(
+            OrePlace,
+            ({ player, isDeepslate, possibleBlocks, place }) => {
+              if (player.id !== ctx.player.id) return false
+
+              ctx.db ??= { count: ctx.value }
+              ;(ctx.db as { iron?: number }).iron ??= 0
+
+              if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
+                if (ctx.db.iron >= ctx.end - 1) return true
+
+                for (const block of possibleBlocks) {
+                  if (ctx.db.iron >= ctx.end - 1) break
+                  if (place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
+                    ctx.db.iron++
+                  }
+                }
+                return true
+              } else return false
+            },
+            10,
+          )
+
+          // Check if it breaks
+          ctx.world.afterEvents.playerBreakBlock.subscribe(
+            ({
+              brokenBlockPermutation: {
+                type: { id },
+              },
+              player,
+            }) => {
+              if (player.id !== player.id) return
+              if (ctx.value === 0 ? id !== b.Stone : id !== b.IronOre && id !== MinecraftItemTypes.DeepslateIronOre)
+                return
+
+              player.playSound(Sounds.Success)
+              ctx.add(1)
+            },
+          )
+        })
+
+      q.dialogue(VillageOfMiners.guide, i18n`Шахтер зовет вас наверх, чтобы поговорить!`)
+    },
+  )
+
+  learningLocation = location(this.quest.group.place('tp').name(noI18n`Куда игроки будут тепаться при обучении`))
+
+  craftingTableLocation = location(this.quest.group.place('crafting table').name(noI18n`Верстак`))
+
+  startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(
+    i18n`§r§6Начальный топор`.toString(defaultLang),
+    undefined,
+  )
 
   startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
 
@@ -273,7 +285,7 @@ class Learning {
       if (ctx.type !== 'break') return
       if (ctx.event.dimension.type !== 'overworld') return
       if ([...this.blockedOre.values()].flat().includes(Vec.string(ctx.event.block))) {
-        player.fail(t.error`Вы не можете ломать руду новичка.`)
+        player.fail(i18n.error`Вы не можете ломать руду новичка.`)
         return false
       }
 
@@ -292,9 +304,9 @@ class Learning {
           ).includes(ctx.event.block.typeId)
         system.delay(() => {
           if (isOre) {
-            player.fail(t.error`Блоки можно ломать только глубоко в шахте!`)
+            player.fail(i18n.error`Блоки можно ломать только глубоко в шахте!`)
           } else {
-            player.fail(t.error`В мирной зоне ломать блоки запрещено.`)
+            player.fail(i18n.error`В мирной зоне ломать блоки запрещено.`)
           }
         })
       }
@@ -303,7 +315,7 @@ class Learning {
     Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (player.database.role === 'spectator') {
         player.info(
-          l`§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.`,
+          noI18n`§fСервер еще не готов. Если вы хотите стать строителем или тестером - подайте заявку на нашем дискорд сервере: §bdsc.gg/lushway§f, а пока вы можете только наблюдать.`,
         )
       }
     })
@@ -315,7 +327,7 @@ class Learning {
 
       const toSpawn = () => (temp.cleanup(), Spawn.portal?.teleport(player))
       if (!this.learningLocation.valid)
-        return toSpawn(), player.fail(l.error`Learning is not setup properly (1)`), false
+        return toSpawn(), player.fail(noI18n.error`Learning is not setup properly (1)`), false
 
       const temp = new Temporary(ctx => {
         const fadeCamera = () => {
@@ -335,10 +347,12 @@ class Learning {
       return new Promise<boolean>(resolve => {
         sent.add(player)
         new ActionForm(
-          t`Режим Перерождение`,
-          t`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`,
+          i18n`Режим Перерождение`.toString(player.lang),
+          i18n`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`.toString(
+            player.lang,
+          ),
         )
-          .button(t`Вперед!`, () => {
+          .button(i18n`Вперед!`.toString(player.lang), () => {
             if (!this.learningLocation.valid) return
 
             logger.player(player).info`Teleporting to ${this.learningLocation}`

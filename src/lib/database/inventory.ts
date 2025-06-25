@@ -2,7 +2,7 @@ import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/ser
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Core } from 'lib/extensions/core'
-import { l } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import stringifyError from 'lib/utils/error'
 import { DatabaseError } from './abstract'
 import { DatabaseUtils } from './utils'
@@ -63,7 +63,7 @@ export class InventoryStore {
       try {
         if (typeof item !== 'undefined') container.setItem(Number(i), item)
       } catch (e) {
-        to.fail(l`Failed to load item to slot ${i}.`)
+        to.fail(noI18n`Failed to load item to slot ${i}.`)
         console.error(
           `§cFailed to load inventory slot §f${i}§c for player §f${to.name}§r§c, item: `,
           item,
@@ -248,7 +248,7 @@ export class InventoryStore {
         if (!store.equipment[key]) continue
         const move = manifest.slots.push(key)
         const eq = store.equipment[key]
-        if (typeof eq === 'undefined') throw new DatabaseError(l.error`Failed to get equipment with key ${key}`)
+        if (typeof eq === 'undefined') throw new DatabaseError(noI18n.error`Failed to get equipment with key ${key}`)
 
         items[storeIndex + move] = eq
       }

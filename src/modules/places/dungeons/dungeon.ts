@@ -12,7 +12,7 @@ import {
   Vec,
 } from 'lib'
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
-import { l, t, TextTable } from 'lib/i18n/text'
+import { i18n, noI18n, TextTable } from 'lib/i18n/text'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
@@ -144,7 +144,7 @@ export class DungeonRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.button(l`Установить структуру`, () => {
+    form.button(noI18n`Установить структуру`, () => {
       this.placeStructure()
     })
   }
@@ -273,10 +273,10 @@ export class DungeonRegion extends Region {
     })
   }
 
-  get displayName(): string | undefined {
-    return Dungeon.names[this.structureId] ?? t`Данж`
+  get displayName(): Text | undefined {
+    return Dungeon.names[this.structureId] ?? i18n`Данж`
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion)
-registerRegionType(l`Данжи`, DungeonRegion, false, true)
+registerRegionType(noI18n`Данжи`, DungeonRegion, false, true)
 adventureModeRegions.push(DungeonRegion)

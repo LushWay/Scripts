@@ -1,15 +1,15 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { DailyQuest } from 'lib/quest/quest'
 import { Rewards } from 'lib/utils/rewards'
 import { City } from 'modules/places/lib/city'
 import { ores } from 'modules/places/mineshaft/algo'
 
 export function createMineQuests(city: City) {
-  function createMineQuest(id: string, text: string, amount: number, itemTypes: string[], rewards: Rewards) {
+  function createMineQuest(id: string, text: SharedText, amount: number, itemTypes: string[], rewards: Rewards) {
     return new DailyQuest(
       city.group.place(id).name(text),
-      t`Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!`,
+      i18n`Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!`,
       (q, player) => {
         const ore = itemTypes[0] && ores.getOre(itemTypes[0])
         if (!ore) return q.failed('No ore found', true)
@@ -23,7 +23,7 @@ export function createMineQuests(city: City) {
           (c, end) =>
             inRange()
               ? `${c}/${end} y=${above}..${y}..${below}`
-              : t.error`Копать нужно на высоте ${above}..${below}. Ваш y = ${y}`,
+              : i18n.error`Копать нужно на высоте ${above}..${below}. Ваш y = ${y}`,
           amount,
         )
           .filter(({ type: { id } }) => itemTypes.includes(id))
@@ -41,7 +41,7 @@ export function createMineQuests(city: City) {
 
   const iron10 = createMineQuest(
     'mine-10-iron',
-    t`Добыть железо`,
+    i18nShared`Добыть железо`,
     10,
     [b.IronOre, b.DeepslateIronOre],
     new Rewards().money(600),
@@ -49,7 +49,7 @@ export function createMineQuests(city: City) {
 
   const coal10 = createMineQuest(
     'mine-10-coal',
-    t`Добыть уголь`,
+    i18nShared`Добыть уголь`,
     10,
     [b.CoalOre, b.DeepslateCoalOre],
     new Rewards().money(400),
@@ -57,7 +57,7 @@ export function createMineQuests(city: City) {
 
   const diamonds10 = createMineQuest(
     'mine-10-diamonds',
-    t`Добыть алмазы`,
+    i18nShared`Добыть алмазы`,
     10,
     [b.DiamondOre, b.DeepslateDiamondOre],
     new Rewards().money(1000),

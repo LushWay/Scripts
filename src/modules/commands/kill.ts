@@ -1,7 +1,7 @@
 import { LockAction } from 'lib/action'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
-new Command('kill').setDescription(t`Убивает вас. Используйте, если застряли где-то`).executes(ctx => {
+new Command('kill').setDescription(i18n`Убивает вас. Используйте, если застряли где-то`).executes(ctx => {
   if (LockAction.locked(ctx.player)) return
 
   ctx.player.kill()

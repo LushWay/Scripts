@@ -1,6 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import type { Command } from 'lib/command'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { Rewards } from 'lib/utils/rewards'
 
@@ -30,7 +30,7 @@ export class Achievement<T> {
   static create() {
     return {
       id: (id: string) => ({
-        name: (name: string) => ({
+        name: (name: SharedText) => ({
           defaultStorage: <T>(defaultStorage: () => T) => ({
             creator: (creator: CreatorAchievement<T>) => ({
               reward: (reward: Rewards) => {
@@ -47,7 +47,7 @@ export class Achievement<T> {
 
   protected constructor(
     readonly id: string,
-    readonly name: string,
+    readonly name: SharedText,
     protected readonly databaseDefaultValue: () => T,
     creator: (ctx: Achievement<T>) => void,
     readonly reward: Rewards,
@@ -68,7 +68,7 @@ export class Achievement<T> {
     const db = this.getDatabase(player)
     if (db.d) return
 
-    player.success(t`Достижение получено: ${this.name}! Заберите награды, используя ${Achievement.command}`)
+    player.success(i18n`Достижение получено: ${this.name}! Заберите награды, используя ${Achievement.command}`)
     db.d = Date.now()
   }
 
@@ -127,7 +127,7 @@ export class CountingAchievement<T extends { count: number }> extends Achievemen
     return {
       value: (value: number) => ({
         id: (id: (v: number) => string) => ({
-          name: (name: (v: number) => string) => ({
+          name: (name: (v: number) => SharedText) => ({
             creator: (creator: (ctx: CountingAchievement<T>) => void) => {
               let d: undefined | (() => T)
 
@@ -149,7 +149,7 @@ export class CountingAchievement<T extends { count: number }> extends Achievemen
   protected constructor(
     protected readonly value: number,
     id: (v: number) => string,
-    name: (v: number) => string,
+    name: (v: number) => SharedText,
     creator: (ctx: StripUnneded<CountingAchievement<T>>) => void,
     reward: Rewards,
     databaseDefaultValue: () => T = () => ({ count: 0 }) as T,

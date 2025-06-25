@@ -6,7 +6,7 @@ import { Vec } from 'lib/vector'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
 import { Cooldown } from 'lib/cooldown'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Temporary } from 'lib/temporary'
 import { util } from 'lib/util'
 import { isLocationError } from 'lib/utils/game'
@@ -64,7 +64,7 @@ const controls: Record<
     ),
     (player, cutscene, temp) => {
       temp.cleanup()
-      player.success(t`Сохранено. Проверить: ${cusceneCommand}§f play ${cutscene.id}`)
+      player.success(i18n`Сохранено. Проверить: ${cusceneCommand}§f play ${cutscene.id}`)
     },
   ],
 }

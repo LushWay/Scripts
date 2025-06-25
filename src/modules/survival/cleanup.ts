@@ -8,13 +8,13 @@ import {
   world,
 } from '@minecraft/server'
 import { ms, Settings } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 import { gravestoneEntityTypeId, gravestoneGetOwner } from './death-quest-and-gravestone'
 
 const logger = createLogger('cleanup')
 
-const settings = Settings.world(t`Очистка\n§7От предметов/могилок`, 'cleanup', {
+const settings = Settings.world(i18n`Очистка\n§7От предметов/могилок`, 'cleanup', {
   enabled: {
     name: 'Включена',
     description: 'Определяет, включена очистка или нет',

@@ -1,5 +1,5 @@
 import { RawMessage, RawText } from '@minecraft/server'
-import { Language } from 'lib/assets/lang'
+import { defaultLang, Language } from 'lib/assets/lang'
 import { Text, textUnitColorize } from './text'
 type I18nMessages = Record<string, Record<string, readonly string[]>>
 
@@ -114,6 +114,10 @@ export class Message {
 
     if (nextText) yield { text: this.colors.text }
   }
+
+  protected toJSON() {
+    return this.toString(defaultLang)
+  }
 }
 
 export class I18nMessage extends Message {
@@ -141,6 +145,10 @@ export class I18nMessage extends Message {
     for (const arg of this.args) rawtext.push(...this.argToRawText(arg))
     return { rawtext }
   }
+}
+
+export class SharedI18nMessage extends I18nMessage {
+  shared = true
 }
 
 export class ServerSideI18nMessage extends I18nMessage {

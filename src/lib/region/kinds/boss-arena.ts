@@ -1,7 +1,7 @@
 import { Entity, Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { registerRegionType } from 'lib/region/command'
 import { adventureModeRegions } from 'lib/region/kinds/safe-area'
 import { Boss } from 'lib/rpg/boss'
@@ -10,7 +10,7 @@ import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
 
 interface BossArenaRegionOptions extends RegionCreationOptions {
-  bossName: string
+  bossName: Text
 
   boss?: Boss
 }
@@ -18,12 +18,12 @@ interface BossArenaRegionOptions extends RegionCreationOptions {
 export class BossArenaRegion extends Region {
   protected priority = 10
 
-  bossName: string
+  bossName: Text
 
   boss?: Boss
 
-  get displayName(): string | undefined {
-    return t.nocolor`§cБосс §6${this.bossName}`
+  get displayName(): Text | undefined {
+    return i18n.nocolor`§cБосс §6${this.bossName}`
   }
 
   protected readonly defaultPermissions: RegionPermissions = {
@@ -60,7 +60,7 @@ export class BossArenaRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.button(l`Вызвать босса`, () => {
+    form.button(noI18n`Вызвать босса`, () => {
       if (this.boss) Boss.db.delete(this.boss.id)
     })
   }

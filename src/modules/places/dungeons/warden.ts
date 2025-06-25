@@ -10,7 +10,7 @@ import {
   registerRegionType,
   registerSaveableRegion,
 } from 'lib'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
@@ -21,12 +21,12 @@ const logger = createLogger('warden')
 class WardenDungeonRegion extends Region {
   protected priority = 3
 
-  get displayName(): string | undefined {
-    return t.nocolor`§5Варден`
+  get displayName(): Text | undefined {
+    return i18n.nocolor`§5Варден`
   }
 }
 registerSaveableRegion('wardenDungeon', WardenDungeonRegion)
-registerRegionType(t`Данж вардена`, WardenDungeonRegion)
+registerRegionType(noI18n`Данж вардена`, WardenDungeonRegion)
 
 interface LinkedDatabase extends JsonObject {
   blocks: { x: number; y: number; z: number }[]
@@ -34,8 +34,8 @@ interface LinkedDatabase extends JsonObject {
 
 class WardenDungeonLootRegion extends Region {
   protected priority = 4
-  get displayName(): string | undefined {
-    return t.nocolor`§dНезеритовая жила`
+  get displayName(): Text | undefined {
+    return i18n.nocolor`§dНезеритовая жила`
   }
   ldb: LinkedDatabase = { blocks: [] }
 
@@ -62,7 +62,7 @@ class WardenDungeonLootRegion extends Region {
   }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
-registerRegionType(l`Лут данжа вардена`, WardenDungeonLootRegion)
+registerRegionType(noI18n`Лут данжа вардена`, WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {
   if (region instanceof WardenDungeonLootRegion) {

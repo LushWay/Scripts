@@ -29,7 +29,7 @@ declare module '@minecraft/server' {
     is(another: ItemStack): boolean
 
     /** Sets nameTag and lore */
-    setInfo(nameTag: string | undefined, description: string | undefined): ItemStack
+    setInfo(nameTag: Text | undefined, description: Text | undefined): ItemStack
   }
 }
 

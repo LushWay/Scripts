@@ -1,10 +1,10 @@
 import { ItemStack, Player } from '@minecraft/server'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { ErrorCost } from './cost/cost'
 
-export const ImpossibleBuyCost = ErrorCost(t.error`Покупка невозможна`)
-export const ImpossibleSellCost = ErrorCost(t.error`Продажа невозможна`)
-export const InventoryFull = (amount: number) => ErrorCost(t.error`Нет места в инвентаре (нужно еще ${amount})`)
+export const ImpossibleBuyCost = ErrorCost(i18n.error`Покупка невозможна`)
+export const ImpossibleSellCost = ErrorCost(i18n.error`Продажа невозможна`)
+export const InventoryFull = (amount: number) => ErrorCost(i18n.error`Нет места в инвентаре (нужно еще ${amount})`)
 
 export function getFreeSpaceForItemInInventory(player: Player, item: ItemStack) {
   if (!player.container) return 0

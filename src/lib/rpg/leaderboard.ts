@@ -2,7 +2,7 @@
 
 import { Entity, Player, ScoreboardObjective, ScoreboardScoreInfo, system, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 
@@ -26,9 +26,9 @@ export class Leaderboard {
 
   static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
     if (scoreboardId.endsWith('SpeedRun')) {
-      return t.hhmmss(score)
+      return i18n.hhmmss(score)
     } else if (scoreboardId.endsWith('Time')) {
-      return t.hhmmss(score * 2.5)
+      return i18n.hhmmss(score * 2.5)
     } else if (scoreboardId.endsWith('Date')) {
       return new Date(score * 1000).format()
     }

@@ -1,6 +1,6 @@
 import { Player, system } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { RegionEvents } from '../events'
 import { registerRegionType, registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
@@ -22,13 +22,13 @@ export class RoadRegion extends Region {
 
   protected priority = -1
 
-  get displayName(): string | undefined {
-    return t`Дорога`
+  get displayName(): Text | undefined {
+    return i18n`Дорога`
   }
 }
 
 registerSaveableRegion('road', RoadRegion)
-registerRegionType(l`Дороги`, RoadRegion)
+registerRegionType(noI18n`Дороги`, RoadRegion)
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest }) => {
   speed(player, newest)

@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Boss, Loot, ms, Vec } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Chip } from './engineer'
 
@@ -9,7 +9,7 @@ export function createBossGolem(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('golem')
-    .name(t`Робот`)
+    .name(i18nShared`Робот`)
     .typeId(MinecraftEntityTypes.IronGolem)
     .loot(
       new Loot('GolemLoot')

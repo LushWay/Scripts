@@ -1,5 +1,5 @@
 import { ChatSendAfterEvent } from '@minecraft/server'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { CommandContext } from './context'
 import { Command } from './index'
 
@@ -10,7 +10,7 @@ export class CmdLet {
 
   callback: CmdLetCallback | undefined
 
-  description: string | undefined
+  description: Text | undefined
 
   name: string
 
@@ -38,7 +38,7 @@ export class CmdLet {
 
     if (cmdlets.length > 0 && results.length < 1) {
       event.sender.fail(
-        t.error`Неизвестный аргумент: ${cmdlets.join(
+        i18n.error`Неизвестный аргумент: ${cmdlets.join(
           '§c, §f',
         )}.\nДоступные командлеты: \n${CmdLet.list.map(e => `\n  §f${e.name} §7§o- ${e.description}`)}\n `,
       )
@@ -54,7 +54,7 @@ export class CmdLet {
     CmdLet.list.push(this)
   }
 
-  setDescription(string: string) {
+  setDescription(string: Text) {
     this.description = string
     return this
   }

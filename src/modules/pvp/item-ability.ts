@@ -1,7 +1,8 @@
 import { EntityDamageCause, world } from '@minecraft/server'
 import { isKeyof } from 'lib'
+import { defaultLang } from 'lib/assets/lang'
 import { ItemLoreSchema } from 'lib/database/item-stack'
-import { l, t } from 'lib/i18n/text'
+import { i18n, i18nJoin, noI18n } from 'lib/i18n/text'
 import { rollChance } from 'lib/rpg/random'
 
 export enum Ability {
@@ -11,21 +12,23 @@ export enum Ability {
 }
 
 const names = {
-  [Ability.Vampire]: t`Вампиризм`,
-  [Ability.ExtraDamage]: t`Дополнительный урон`,
-  [Ability.Nothing]: t`Неизвестная`,
-} satisfies Record<Ability, string>
+  [Ability.Vampire]: i18n`Вампиризм`,
+  [Ability.ExtraDamage]: i18n`Дополнительный урон`,
+  [Ability.Nothing]: i18n`Неизвестная`,
+} satisfies Record<Ability, Text>
 
 const descriptions = {
-  [Ability.Vampire]: t`Восстанавливает вам половину наносимого этим мечом урона`,
-  [Ability.ExtraDamage]: t`10% шанс сделать двойной урон`,
+  [Ability.Vampire]: i18n`Восстанавливает вам половину наносимого этим мечом урона`,
+  [Ability.ExtraDamage]: i18n`10% шанс сделать двойной урон`,
   [Ability.Nothing]: '',
 }
 
 export const schema = new ItemLoreSchema('item-ability')
   .property('ability', String)
-  .display(t`Способность`, p =>
-    isKeyof(p, descriptions) ? `${names[p]}\n\n${descriptions[p]}` : names[Ability.Nothing],
+  .display(i18n`Способность`, p =>
+    isKeyof(p, descriptions)
+      ? i18nJoin`${names[p]}\n\n${descriptions[p]}`.toString(defaultLang)
+      : names[Ability.Nothing].toString(defaultLang),
   )
   .build()
 
@@ -37,7 +40,7 @@ export const ItemAbility = {
 }
 
 new Command('itemability')
-  .setDescription(l`Позволяет получать предмет с кастомной чаркой`)
+  .setDescription(noI18n`Позволяет получать предмет с кастомной чаркой`)
   .setPermissions('techAdmin')
   .array('sword type', ['diamond', 'iron', 'netherite'])
   .array('ability', [Ability.Vampire, Ability.ExtraDamage])
@@ -69,7 +72,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
     }
     case Ability.ExtraDamage: {
       if (rollChance(10)) {
-        damagingEntity.success(t`х2 урон!`, false)
+        damagingEntity.success(i18n`х2 урон!`, false)
         hurtEntity.applyDamage(damage, { damagingEntity, cause })
       }
       break

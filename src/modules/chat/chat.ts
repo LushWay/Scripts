@@ -4,7 +4,7 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
 class ChatBuilder {
   db = table<Record<string, number>>('chatCooldown', () => ({}))
@@ -31,15 +31,15 @@ class ChatBuilder {
     },
   })
 
-  playerSettings = Settings.player(t`Чат\n§7Звуки и внешний вид чата`, 'chat', {
+  playerSettings = Settings.player(i18n`Чат\n§7Звуки и внешний вид чата`, 'chat', {
     hightlightMessages: {
-      name: t`Подсветка моих сообщений`,
-      description: t`Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r`,
+      name: i18n`Подсветка моих сообщений`,
+      description: i18n`Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r`,
       value: true,
     },
     disableSound: {
-      name: t`Выключение звука`,
-      description: t`Выключение звука чужих сообщений`,
+      name: i18n`Выключение звука`,
+      description: i18n`Выключение звука чужих сообщений`,
       value: false,
     },
   })
@@ -101,7 +101,7 @@ class ChatBuilder {
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages
         event.sender.tell(
-          doHightlight ? t.nocolor`${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message,
+          doHightlight ? i18n.nocolor`${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message,
         )
       } catch (error) {
         console.error(error)

@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { disableAdventureNear } from 'lib'
-import { i18n, l, TextTable } from 'lib/i18n/text'
+import { i18n, noI18n, TextTable } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
@@ -82,5 +82,5 @@ export class BaseRegion extends RegionWithStructure {
 }
 
 registerSaveableRegion('base', BaseRegion)
-registerRegionType(l`Базы`, BaseRegion)
+registerRegionType(noI18n`Базы`, BaseRegion)
 disableAdventureNear.push(BaseRegion)

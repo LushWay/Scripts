@@ -1,5 +1,5 @@
 import { Loot } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
 import { GuideNpc } from '../lib/npc/guide'
@@ -12,7 +12,7 @@ import { createBossSlime } from './slime.boss'
 
 class VillageOfExporersBuilder extends City {
   constructor() {
-    super('VillageOfExporers', t`Деревня исследователей`)
+    super('VillageOfExporers', i18nShared`Деревня исследователей`)
     this.create()
   }
 
@@ -30,14 +30,14 @@ class VillageOfExporersBuilder extends City {
 
   stoner = new Stoner(this.group)
 
-  guide = new GuideNpc(this.group, t`Исследователь`, (f, { lf }) => {
+  guide = new GuideNpc(this.group, i18nShared`Исследователь`, (f, { lf }) => {
     lf.question(
       'wtfCity',
-      t`А что за город`,
-      t`Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ`,
+      i18n`А что за город`,
+      i18n`Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ`,
     )
 
-    f.quest(techCityInvestigating.goToCityQuest, t`А где мне базу сделать-то?`)
+    f.quest(techCityInvestigating.goToCityQuest, i18n`А где мне базу сделать-то?`)
   })
 }
 

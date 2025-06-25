@@ -3,14 +3,14 @@ import { ItemStack, system, world } from '@minecraft/server'
 import { Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { customItems } from 'lib/rpg/custom-item'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
 
 export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
   undefined,
-  t`Используйте, чтобы отправить все в огненный ад`,
+  i18n`Используйте, чтобы отправить все в огненный ад`,
 )
 
 customItems.push(FireBallItem)

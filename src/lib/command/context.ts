@@ -47,7 +47,7 @@ export class CommandContext {
    *
    * @param errorText - Text to send
    */
-  error(errorText: string) {
+  error(errorText: Text) {
     this.player.fail(errorText)
   }
 }

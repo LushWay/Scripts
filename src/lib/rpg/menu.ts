@@ -2,24 +2,20 @@ import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Playe
 import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
 import { form } from 'lib/form/new'
-import { l, t } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
 
 export class Menu {
-  static settings: [string, string] = [
-    t`Меню
-§7Разные настройки интерфейсов и меню в игре`,
-    'menu',
-  ]
+  static settings: [Text, string] = [i18n`Меню\n§7Разные настройки интерфейсов и меню в игре`, 'menu']
 
-  static createItem(typeId: string = Items.Menu, name?: string) {
+  static createItem(typeId: string = Items.Menu, name?: SharedText) {
     if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
-      t.nocolor`§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu`,
+      i18n.nocolor`§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu`,
     )
     item.lockMode = ItemLockMode.inventory
     item.keepOnDeath = true
@@ -29,7 +25,7 @@ export class Menu {
 
   static itemStack = this.createItem()
 
-  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), t`меню`)
+  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), i18n`меню`)
 
   static {
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -42,7 +38,7 @@ export class Menu {
     })
   }
 
-  static form = form(f => f.title(l`Меню выключено`).body(l`Все еще в разработке`))
+  static form = form(f => f.title(noI18n`Меню выключено`).body(noI18n`Все еще в разработке`))
 
   static isCompass(slot: Pick<ContainerSlot, 'typeId'>) {
     return !!slot.typeId?.startsWith(Items.CompassPrefix)
@@ -71,7 +67,7 @@ export class Compass {
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(`${Items.CompassPrefix}${i}`, t.nocolor`§r§l§6Цель\n§r§7(use)`)
+    return Menu.createItem(`${Items.CompassPrefix}${i}`, i18nShared.nocolor`§r§l§6Цель\n§r§7(use)`)
   })
 
   /** Map of player as key and compass target as value */
@@ -141,7 +137,7 @@ export function createPublicGiveItemCommand(
   name: string,
   itemStack: ItemStack,
   is = itemStack.is.bind(itemStack),
-  itemNameTag = itemStack.nameTag?.split('\n')[0],
+  itemNameTag: Text | undefined = itemStack.nameTag?.split('\n')[0],
 ) {
   /** Gives player an item */
   function give(player: Player, { mode = 'tell' }: { mode?: 'tell' | 'ensure' } = {}) {
@@ -171,7 +167,7 @@ export function createPublicGiveItemCommand(
   }
 
   const command = new Command(name)
-    .setDescription(t`Выдает или убирает ${itemNameTag} из инвентаря`)
+    .setDescription(i18n`Выдает или убирает ${itemNameTag} из инвентаря`)
     .setGroup('public')
     .setPermissions('member')
     .executes(ctx => {

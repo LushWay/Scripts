@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { BUTTON, settingsModal } from 'lib'
-import { t } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { getReplaceMode, ReplaceMode } from 'modules/world-edit/utils/blocks-set'
 import { REPLACE_MODES } from 'modules/world-edit/utils/default-block-sets'
@@ -13,7 +13,7 @@ export function useReplaceMode(player: Player, storage: WeakPlayerMap<ReplaceMod
   }
   const replaceModeButton: ChestButton = {
     icon: BUTTON.settings,
-    nameTag: t`Режим замены:\n${localStorage.replaceMode}`,
+    nameTag: noI18n`Режим замены:\n${localStorage.replaceMode}`,
     callback(p) {
       settingsModal(
         p,

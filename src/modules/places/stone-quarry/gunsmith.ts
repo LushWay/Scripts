@@ -1,7 +1,7 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { translateTypeId } from 'lib'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { rollChance } from 'lib/rpg/random'
 import { MultiCost } from 'lib/shop/cost'
@@ -12,8 +12,8 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
-    super(group.place('gunsmith').name(t`Оружейник`))
-    this.shop.body(() => t`Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.`)
+    super(group.place('gunsmith').name(i18nShared`Оружейник`))
+    this.shop.body(() => i18n`Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.`)
 
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
@@ -21,7 +21,7 @@ export class Gunsmith extends ShopNpc {
     this.shop.menu((form, player) => {
       form
         .itemModifierSection(
-          t`Улучшить до незерита`,
+          i18n`Улучшить до незерита`,
           item =>
             (
               [
@@ -34,20 +34,20 @@ export class Gunsmith extends ShopNpc {
                 i.DiamondSword,
               ] as string[]
             ).includes(item.typeId),
-          t`Алмазный предмет`,
+          i18n`Алмазный предмет`,
           (form, slot) => {
             form
               .product()
-              .name(t`Улучшить`)
+              .name(i18nShared`Улучшить`)
               .cost(new MultiCost().item(i.NetheriteIngot, 1).money(1000))
               .onBuy(() => this.upgradeDiamondSwordToNetherite(slot, player))
           },
         )
 
         .itemModifierSection(
-          t`Починить`,
+          i18n`Починить`,
           i => !!i.durability && i.durability.damage !== 0,
-          t`Любой поломанный предмет`,
+          i18n`Любой поломанный предмет`,
           (form, slot) => {
             const item = slot.getItem()
             if (!item?.durability) return false
@@ -56,12 +56,12 @@ export class Gunsmith extends ShopNpc {
             const repairCost = ((item.durability.damage / 1000) * enchantmentsLevels) / 5
             const cost =
               item.durability.damage === 0
-                ? ErrorCost(t.error`Предмет целый, выберите другой`)
+                ? ErrorCost(i18n.error`Предмет целый, выберите другой`)
                 : new MultiCost().xp(repairCost)
 
             form
               .product()
-              .name(t`Починить`)
+              .name(i18nShared`Починить`)
               .cost(cost)
               .onBuy(() => {
                 if (item.durability) item.durability.damage = 0

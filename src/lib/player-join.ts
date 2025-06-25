@@ -1,7 +1,7 @@
 import { Player, system, world } from '@minecraft/server'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { EventSignal } from 'lib/event-signal'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 import { util } from 'lib/util'
 import { Core } from './extensions/core'
@@ -17,8 +17,12 @@ class JoinBuilder {
       vars: { title: `${Core.name}§r§f` },
     },
     actionBar: '', // Optional
-    subtitle: t.nocolor`Добро пожаловать!`, // Optional
-    messages: { air: t.nocolor`§8Очнулся в воздухе`, ground: t.nocolor`§8Проснулся`, sound: 'break.amethyst_cluster' },
+    subtitle: i18n.nocolor`Добро пожаловать!`, // Optional
+    messages: {
+      air: i18n.nocolor`§8Очнулся в воздухе`,
+      ground: i18n.nocolor`§8Проснулся`,
+      sound: 'break.amethyst_cluster',
+    },
   }
 
   onMoveAfterJoin = new EventSignal<{ player: Player; joinTimes: number; firstJoin: boolean }>()
@@ -27,7 +31,7 @@ class JoinBuilder {
 
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-      if (!firstJoin) player.tell(t.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
+      if (!firstJoin) player.tell(i18n.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
     }, -1),
     playerSpawn: world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       if (!initialSpawn) return
@@ -83,7 +87,7 @@ class JoinBuilder {
                 fadeInDuration: 0,
                 fadeOutDuration: 20,
                 stayDuration: 40,
-                subtitle: Join.config.subtitle,
+                subtitle: Join.config.subtitle.toString(player.lang),
               })
             } else {
               // Player joined in air
@@ -102,7 +106,7 @@ class JoinBuilder {
     )
 
     new Command('join')
-      .setDescription(t`Имитирует первый вход`)
+      .setDescription(i18n`Имитирует первый вход`)
       .setPermissions('member')
       .executes(ctx => {
         const player = ctx.player
@@ -122,7 +126,7 @@ class JoinBuilder {
         role: getFullname(player, { name: false }),
         status: 'move',
         where,
-        print: t`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
+        print: noI18n.nocolor`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
       })
 
     for (const other of world.getPlayers()) {
@@ -140,10 +144,10 @@ class JoinBuilder {
     })
   }
 
-  settings = Settings.player(t`Вход\n§7Все действия, связанные со входом`, 'join', {
-    message: { name: t`Сообщение`, description: t`о входе других игроков`, value: true },
-    sound: { name: t`Звук`, description: t`при входе игроков`, value: true },
-    time: { name: t`Время`, description: t`при входе`, value: true },
+  settings = Settings.player(i18n`Вход\n§7Все действия, связанные со входом`, 'join', {
+    message: { name: i18n`Сообщение`, description: i18n`о входе других игроков`, value: true },
+    sound: { name: i18n`Звук`, description: i18n`при входе игроков`, value: true },
+    time: { name: i18n`Время`, description: i18n`при входе`, value: true },
   })
 
   emitFirstJoin(player: Player) {
@@ -153,24 +157,17 @@ class JoinBuilder {
 
 export const Join = new JoinBuilder()
 
-/**
- * Выводит строку времени
- *
- * @returns {string}
- */
-function timeNow(): string {
+/** Выводит строку времени */
+function timeNow(): Text {
   const time = new Date(Date()).getHours() + 3
-  if (time < 6) return t`§9Доброй ночи`
-  if (time < 12) return t`§6Доброе утро`
-  if (time < 18) return t`§bДобрый день`
-  return t`§3Добрый вечер`
+  if (time < 6) return i18n`§9Доброй ночи`
+  if (time < 12) return i18n`§6Доброе утро`
+  if (time < 18) return i18n`§bДобрый день`
+  return i18n`§3Добрый вечер`
 }
 
-/**
- * Выводит время в формате 00:00
- *
- * @returns {string}
- */
+// TODO Use date.toHHMMSS
+/** Выводит время в формате 00:00 */
 function shortTime(): string {
   const time = new Date(Date())
   time.setHours(time.getHours() + 3)

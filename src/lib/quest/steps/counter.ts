@@ -46,8 +46,8 @@ export class QSCounterBuilder extends QSBuilder<QSCounter> {
     return this
   }
 
-  description(desc: string | ((count: number) => string)) {
-    this.step.description = typeof desc === 'string' ? () => desc : () => desc(this.step.value)
+  description(desc: Text | ((count: number) => Text)) {
+    this.step.description = typeof desc === 'function' ? () => desc(this.step.value) : () => desc
     return this
   }
 }

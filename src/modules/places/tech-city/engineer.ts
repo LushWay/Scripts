@@ -1,7 +1,7 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { customItems, CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { isNewbie } from 'lib/rpg/newbie'
 import { Group } from 'lib/rpg/place'
@@ -13,12 +13,12 @@ import { MagicSlimeBall } from '../village-of-explorers/items'
 
 export const CircuitBoard = new ItemStack(Items.CircuitBoard).setInfo(
   undefined,
-  t`Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота`,
+  i18n`Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота`,
 )
 
 export const Chip = new ItemStack(Items.Chip).setInfo(
   undefined,
-  t`Используется для создания платы у Инжинера в Технограде`,
+  i18n`Используется для создания платы у Инжинера в Технограде`,
 )
 customItems.push(CircuitBoard, Chip)
 
@@ -38,10 +38,10 @@ export const NotNewbieCost = new (class NotNewbieCost extends Cost {
 
 export class Engineer extends ShopNpc {
   constructor(public group: Group) {
-    super(group.place('engineer').name(t`Инженер`))
+    super(group.place('engineer').name(i18nShared`Инженер`))
 
     this.shop.body(
-      () => t`Ну типа дай мне чертеж, a я те чета там наколупаю, да
+      () => i18n`Ну типа дай мне чертеж, a я те чета там наколупаю, да
 `,
     )
     this.shop.menu(menu => {
@@ -74,7 +74,7 @@ export class Engineer extends ShopNpc {
           .money(4500),
       )
 
-      menu.section(t`Все для редстоуна`, menu => {
+      menu.section(i18n`Все для редстоуна`, menu => {
         menu.itemStack(new ItemStack(i.Slime), new MultiCost().money(5))
         menu.itemStack(new ItemStack(i.HoneyBlock), new MultiCost().money(10))
         menu.itemStack(new ItemStack(i.Piston), new MultiCost().money(8))

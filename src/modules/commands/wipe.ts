@@ -14,7 +14,7 @@ import {
 } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { enterNewbieMode } from 'lib/rpg/newbie'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
@@ -63,11 +63,11 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
 
   try {
     if (player.database.inv !== 'anarchy') {
-      return player.fail(t.error`Вы не можете создать точку восстановления не находясь на анархии`)
+      return player.fail(i18n.error`Вы не можете создать точку восстановления не находясь на анархии`)
     }
 
     if (![GameMode.adventure, GameMode.survival].includes(player.getGameMode())) {
-      return player.fail(t.error`Вы не можете создать точку восстановления не находясь в выживании или приключении`)
+      return player.fail(i18n.error`Вы не можете создать точку восстановления не находясь в выживании или приключении`)
     }
 
     const playerDb = db.get(player.id)
@@ -80,9 +80,9 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
       db: pick(player.database, ['inv', 'survival', 'unlockedPortals', 'quests', 'achivs']),
     }
     wipeInventoryDatabase.saveFrom(player, { rewrite: true, key: id, keepInventory: true })
-    player.success(t`Restore point ${id} created`)
+    player.success(i18n`Restore point ${id} created`)
   } catch (e) {
-    player.fail(t.error`Creating restore point failed.`)
+    player.fail(i18n.error`Creating restore point failed.`)
     console.error(e)
   }
 }
@@ -100,43 +100,45 @@ function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
   player.teleport(point.location, { dimension: world[point.dimensionType] })
   InventoryStore.load({ to: player, from: wipeInventoryDatabase.get(id, { remove: false }) })
   player.database.restorePoint = [player.id, id]
-  player.success(t`Restore point ${id} loaded.`)
+  player.success(i18n`Restore point ${id} loaded.`)
 }
 
 new Command('wipe')
   .setAliases('save')
-  .setDescription(t`Очищает и сохраняет все данные (для тестов)`)
+  .setDescription(i18n`Очищает и сохраняет все данные (для тестов)`)
   .setPermissions('tester')
   .executes(ctx => {
     const player = ctx.player
     form(f => {
-      f.title(t`Сохранения`)
-      f.body(t`Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ`)
+      f.title(i18n`Сохранения`)
+      f.body(i18n`Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ`)
 
       f.ask(
-        t`§cПолный сброс`,
-        t`Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.`,
+        i18n`§cПолный сброс`,
+        i18n`Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.`,
         () => wipe(player),
       )
 
-      f.button(t`Создать точку восстановления`, BUTTON['+'], () => {
-        new ModalForm(t`Создать точку восстановления`)
+      f.button(i18n`Создать точку восстановления`, BUTTON['+'], () => {
+        new ModalForm(i18n`Создать точку восстановления`.toString(player.lang))
           .addTextField(
-            t`§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:`,
+            i18n`§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:`.toString(
+              player.lang,
+            ),
             '',
           )
           .show(player, (ctx, name) => {
             const id = generateId(name)
             if (db.get(player.id).restorePoints[id])
               return ctx.error(
-                t.error`Restore point ${id} already exists. Other existing points:\n${Object.keys(db.get(player.id).restorePoints).join('\n')}`,
+                noI18n.error`Restore point ${id} already exists. Other existing points:\n${Object.keys(db.get(player.id).restorePoints).join('\n')}`,
               )
 
             createRestorePoint(player, name)
           })
       })
 
-      f.button(t`Точки восстановления других игроков`, otherPlayerRestorePoints)
+      f.button(i18n`Точки восстановления других игроков`, otherPlayerRestorePoints)
 
       const playerDb = db.get(player.id)
       renderList(f, playerDb, player.id, player)
@@ -148,7 +150,7 @@ function otherPlayerRestorePoints(player: Player, back?: NewFormCallback) {
   new ArrayForm('Other players', players)
     .back(back)
     .button(([ownerId, db]) => {
-      const title = t`${Player.name(ownerId) ?? ownerId} (${sizeOf(db.restorePoints)})`
+      const title = i18n`${Player.name(ownerId) ?? ownerId} (${sizeOf(db.restorePoints)})`
       return [
         title,
         form(f => {
@@ -178,16 +180,16 @@ function restorePointMenu(player: Player, [ownerId, id]: RestorePointRef, restor
     f.body(id)
 
     if (isOwner) {
-      f.ask(t`Перезаписать`, t`Перезаписать точку восстановления`, () => {
+      f.ask(i18n`Перезаписать`, i18n`Перезаписать точку восстановления`, () => {
         createRestorePoint(player, restorePoint.name, id)
       })
     }
 
-    f.ask(t`Загрузиться`, t`Загрузиться`, () => {
+    f.ask(i18n`Загрузиться`, i18n`Загрузиться`, () => {
       loadRestorePoint(player, [ownerId, id])
     })
     if (is(player.id, 'techAdmin')) f.button('Log to the console', () => console.log(JSON.stringify(restorePoint)))
-    f.ask(t`§cУдалить`, t`удалить точку`, () => {
+    f.ask(i18n`§cУдалить`, i18n`удалить точку`, () => {
       Reflect.deleteProperty(db.get(player.id).restorePoints, id)
     })
   })

@@ -3,7 +3,7 @@ import { Vec, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ngettext } from 'lib/i18n/ngettext'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { stringify } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
@@ -402,7 +402,7 @@ export class WorldEdit {
         'блок',
         'блока',
         'блоков',
-      ])} за ${t.colors({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
+      ])} за ${i18n.colors({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
 
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyBlockWeights(replaceTargets)}`

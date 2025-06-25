@@ -1,5 +1,6 @@
 import { Entity, ShortcutDimensions, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { defaultLang } from 'lib/assets/lang'
 import { anyPlayerNear } from 'lib/player-move'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
@@ -21,7 +22,7 @@ export class FloatingText {
     if (this.entity?.isValid) this.entity.remove()
   }
 
-  update(location: Vector3, nameTag: string) {
+  update(location: Vector3, nameTag: SharedText | string) {
     if (!anyPlayerNear(location, this.dimensionType, 30)) return
 
     location = Vec.add(location, { x: 0.5, y: 0.7, z: 0.5 })
@@ -33,7 +34,7 @@ export class FloatingText {
 
     if (this.entity?.isValid) {
       this.entity.teleport(location)
-      this.entity.nameTag = nameTag
+      this.entity.nameTag = nameTag.toString(defaultLang) // TODO Use toRawText once supported
     } else {
       this.logger.warn('Entity is invalid')
       try {

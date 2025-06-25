@@ -1,6 +1,6 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Loot } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
@@ -15,7 +15,7 @@ import { createBossWither } from './wither.boss'
 
 class StoneQuarryBuilder extends City {
   constructor() {
-    super('StoneQuarry', t`Каменоломня`)
+    super('StoneQuarry', i18nShared`Каменоломня`)
     this.create()
   }
 
@@ -36,7 +36,7 @@ class StoneQuarryBuilder extends City {
   commonOvener = Furnacer.create()
     .group(this.group)
     .id('ovener')
-    .name(t`§6Печкин`)
+    .name(i18nShared`§6Печкин`)
     .furnaceTypeIds([
       MinecraftBlockTypes.BlastFurnace,
       MinecraftBlockTypes.LitBlastFurnace,
@@ -48,14 +48,14 @@ class StoneQuarryBuilder extends City {
   foodOvener = Furnacer.create()
     .group(this.group)
     .id('foodOvener')
-    .name(t`§6Баба валя`)
+    .name(i18nShared`§6Баба валя`)
     .furnaceTypeIds([MinecraftBlockTypes.Smoker, MinecraftBlockTypes.LitSmoker])
     .onlyInStoneQuarry(false)
 
   gunsmith = new Gunsmith(this.group)
 
-  guide = new GuideNpc(this.group, t`Ломщик`, (f, { lf }) => {
-    lf.question('wtfCity', t`А что за город`, t`Ну типа крутой камни ломаем вот да`)
+  guide = new GuideNpc(this.group, i18nShared`Ломщик`, (f, { lf }) => {
+    lf.question('wtfCity', i18n`А что за город`, i18n`Ну типа крутой камни ломаем вот да`)
   })
 
   private create() {

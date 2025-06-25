@@ -1,18 +1,18 @@
 import { system } from '@minecraft/server'
 import { actionGuard, ActionGuardOrder, Menu, Settings } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
 const playerSettings = Settings.player(...Menu.settings, {
   breakItemDurabilityNotify: {
-    name: t`Уведомлять о ломающемся предмете`,
-    description: t`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран`,
+    name: i18n`Уведомлять о ломающемся предмете`,
+    description: i18n`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран`,
     value: true,
   },
   // TODO Donut feature
   breakItemDurabilityCancel: {
-    name: t`Не давать ломать предмет`,
-    description: t`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.`,
+    name: i18n`Не давать ломать предмет`,
+    description: i18n`Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.`,
     value: true,
   },
 })
@@ -33,7 +33,7 @@ actionGuard((player, _, ctx) => {
   system.delay(() => {
     if (percent >= 90)
       player.onScreenDisplay.setActionBar(
-        t.error`§cИнструмент скоро сломается! ${damage}/${maxDurability} (${percent}%)`,
+        i18n.error`Инструмент скоро сломается! ${damage}/${maxDurability} (${percent}%)`.toString(player.lang),
         ActionbarPriority.Highest,
       )
   })

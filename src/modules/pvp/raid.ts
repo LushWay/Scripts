@@ -1,12 +1,12 @@
 import { Block, Entity, system, world } from '@minecraft/server'
 import { LockAction, ms, Region } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { BaseRegion } from 'modules/places/base/region'
 
-const notify = new Map<string, { time: number; reason: string }>()
+const notify = new Map<string, { time: number; reason: Text }>()
 const targetLockTime = ms.from('min', 8)
 const raiderLockTime = ms.from('min', 10)
 const objective = ScoreboardDB.objective('raid')
@@ -28,7 +28,7 @@ export function createBlockExplosionChecker() {
     if (ScheduleBlockPlace.has(block, block.dimension.type)) return true
     if (region instanceof BaseRegion) {
       if (!base) {
-        for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: t`вас рейдят` })
+        for (const id of region.permissions.owners) notify.set(id, { time: targetLockTime, reason: i18n`вас рейдят` })
         base = true
       }
       return true
@@ -38,17 +38,17 @@ export function createBlockExplosionChecker() {
   }
 
   function raidLock(source: undefined | Entity) {
-    if (base && source) notify.set(source.id, { time: raiderLockTime, reason: t`вы разрушили блок на базе` })
+    if (base && source) notify.set(source.id, { time: raiderLockTime, reason: i18n`вы разрушили блок на базе` })
   }
 
   return { canBlockExplode, raidLock }
 }
 
-const locktext = t`Вы находитесь в режиме рейдблока.`
+const locktext = i18n`Вы находитесь в режиме рейдблока.`
 new LockAction(player => {
   const raidLockTime = player.scores.raid
   if (raidLockTime > 0) {
-    return { lockText: t`${locktext} Осталось ${t.error.hhmmss(raidLockTime)}` }
+    return { lockText: i18n`${locktext} Осталось ${i18n.error.hhmmss(raidLockTime)}` }
   } else return false
 }, locktext)
 
@@ -61,7 +61,7 @@ system.runInterval(
       if (player) {
         if (player.scores.raid === 0) {
           player.tell(
-            t.error`§4§l> §r§cВы вошли в режим рейдблока, потому что ${reason}. Некоторые функции могут быть недоступны`,
+            i18n.error`§4§l> §r§cВы вошли в режим рейдблока, потому что ${reason}. Некоторые функции могут быть недоступны`,
           )
           player.playSound('mob.wolf.bark')
         }

@@ -1,32 +1,32 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
 import { ngettext } from 'lib/i18n/ngettext'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/utils/rewards'
 
 const command = new Command('mail')
-  .setDescription(t`Посмотреть входящие сообщения почты`)
+  .setDescription(i18n`Посмотреть входящие сообщения почты`)
   .setPermissions('member')
   .executes(ctx => mailMenu(ctx.player))
 
 const getSettings = Settings.player(...Menu.settings, {
   mailReadOnOpen: {
-    name: t`Читать письмо при открытии`,
-    description: t`Помечать ли письмо прочитанным при открытии`,
+    name: i18n`Читать письмо при открытии`,
+    description: i18n`Помечать ли письмо прочитанным при открытии`,
     value: true,
   },
   mailClaimOnDelete: {
-    name: t`Собирать награды при удалении`,
-    description: t`Собирать ли награды при удалении письма`,
+    name: i18n`Собирать награды при удалении`,
+    description: i18n`Собирать ли награды при удалении письма`,
     value: true,
   },
 })
 
 const getJoinSettings = Settings.player(...Join.settings.extend, {
   unreadMails: {
-    name: t`Почта`,
-    description: t`Показывать ли при входе сообщение с кол-вом непрочитанных`,
+    name: i18n`Почта`,
+    description: i18n`Показывать ли при входе сообщение с кол-вом непрочитанных`,
     value: true,
   },
 })
@@ -35,20 +35,20 @@ export function mailMenu(player: Player, back?: VoidFunction) {
   new ArrayForm(i18n`Почта`.badge(Mail.getUnreadMessagesCount(player.id)), Mail.getLetters(player.id))
     .filters({
       unread: {
-        name: t`Непрочитанные`,
-        description: t`Показывать только непрочитанные сообщения`,
+        name: i18n`Непрочитанные`,
+        description: i18n`Показывать только непрочитанные сообщения`,
         value: false,
       },
       unclaimed: {
-        name: t`Несобранные награды`,
-        description: t`У письма есть несобранные награды`,
+        name: i18n`Несобранные награды`,
+        description: i18n`У письма есть несобранные награды`,
         value: false,
       },
       sort: {
-        name: t`Соритровать по`,
+        name: i18n`Соритровать по`,
         value: [
-          ['date', t`Дате`],
-          ['name', t`Имени`],
+          ['date', i18n`Дате`],
+          ['name', i18n`Имени`],
         ],
       },
     })
@@ -85,6 +85,7 @@ function letterDetailsMenu(
 ) {
   const settings = getSettings(player)
   // TODO Fix collors
+  // TODO Rewrite to use new form
   const form = new ActionForm(
     letter.title,
     i18n`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString(player)}`.toString(
@@ -93,7 +94,7 @@ function letterDetailsMenu(
   ).addButtonBack(back)
 
   if (!letter.rewardsClaimed && letter.rewards.length)
-    form.button(t`Забрать награду`, () => {
+    form.button(i18n`Забрать награду`.toString(player.lang), () => {
       Mail.claimRewards(player, index)
       letterDetailsMenu(
         { letter, index },
@@ -104,22 +105,22 @@ function letterDetailsMenu(
     })
 
   if (!letter.read && !settings.mailReadOnOpen)
-    form.button(t`Пометить как прочитанное`, () => {
+    form.button(i18n`Пометить как прочитанное`.toString(player.lang), () => {
       Mail.readMessage(player.id, index)
       back()
     })
 
-  let deleteDescription = t`§cУдалить письмо?`
+  let deleteDescription = i18n`§cУдалить письмо?`.toString(player.lang)
   if (!letter.rewardsClaimed) {
     if (getSettings(player).mailClaimOnDelete) {
-      deleteDescription += t` Все награды будут собраны автоматически`
+      deleteDescription += i18n` Все награды будут собраны автоматически`.toString(player.lang)
     } else {
-      deleteDescription += t` Вы потеряете все награды, прикрепленные к письму!`
+      deleteDescription += i18n` Вы потеряете все награды, прикрепленные к письму!`.toString(player.lang)
     }
   }
 
-  form.button(t`§cУдалить письмо`, null, () => {
-    ask(player, deleteDescription, t`§cУдалить`, () => {
+  form.button(i18n.error`Удалить письмо`.toString(player.lang), null, () => {
+    ask(player, deleteDescription, i18n`Удалить`, () => {
       if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
       Mail.deleteMessage(player, index)
       back()
@@ -136,9 +137,9 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
   if (unreadCount === 0) return
 
   const messages = ngettext(unreadCount, [
-    t`У вас непрочитанное сообщение`,
-    t`У вас непрочитанных сообщения`,
-    t`У вас непрочитанных сообщений`,
+    noI18n`У вас непрочитанное сообщение`,
+    noI18n`У вас непрочитанных сообщения`,
+    noI18n`У вас непрочитанных сообщений`,
   ])
-  player.info(t`${t.header`Почта:`} ${messages}! Посмотреть: ${command}`)
+  player.info(i18n`${i18n.header`Почта:`} ${messages}! Посмотреть: ${command}`)
 })

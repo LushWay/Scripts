@@ -1,5 +1,5 @@
 import { Dimension, StructurePlaceOptions, StructureSaveMode, system, world } from '@minecraft/server'
-import { l } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { Cuboid } from './cuboid'
 
@@ -103,7 +103,7 @@ export class BigStructure extends Cuboid {
           if (errors > 0)
             reject(
               new Error(
-                l`§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
+                noI18n`§c${errors}§f/${total}§c не загружено. Возможно, часть области была непрогруженна. Попробуйте снова, перед этим встав в центр.`,
               ),
             )
 

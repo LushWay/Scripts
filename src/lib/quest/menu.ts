@@ -3,7 +3,7 @@ import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
 import { form } from 'lib/form/new'
-import { i18n, l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { noNullable } from 'lib/util'
 import { Vec } from 'lib/vector'
@@ -11,16 +11,16 @@ import { Quest } from './quest'
 
 const quest = new Command('q')
   .setAliases('quest')
-  .setDescription(t`Меню заданий`)
+  .setDescription(i18n`Меню заданий`)
   .setPermissions('member')
   .executes(ctx => questsMenu(ctx.player))
 
 quest
   .overload('exit')
-  .setDescription(t`Выйти`)
+  .setDescription(i18n`Выйти`)
   .executes(ctx => {
     const step = Quest.getCurrentStepOf(ctx.player)
-    if (!step) return ctx.error(t`У вас нет активных заданий!`)
+    if (!step) return ctx.error(i18n`У вас нет активных заданий!`)
 
     step.quest.exit(ctx.player)
     ctx.player.success()
@@ -32,7 +32,7 @@ quest
   .executes(
     form((f, { player }) => {
       f.title('Quests')
-      f.body(l`Select`)
+      f.body(noI18n`Select`)
       for (const [name, q] of Quest.quests.entries()) f.button(name, () => q.enter(player))
     }).command,
   )
@@ -41,13 +41,16 @@ export function questsMenu(player: Player, back?: VoidFunction) {
   const { quests } = player.database
   if (!quests)
     return new MessageForm(i18n.accent`Задания`.toString(player.lang), i18n.error`Нет заданий`.toString(player.lang))
-      .setButton1(back ? ActionForm.backText : i18n.accent`Закрыть`.toString(player.lang), back ?? (() => false))
+      .setButton1(
+        back ? ActionForm.backText.toString(player.lang) : i18n.accent`Закрыть`.toString(player.lang),
+        back ?? (() => false),
+      )
       .show(player)
 
   const self = () => questsMenu(player, back)
 
   new ArrayForm(i18n.accent`Задания`, quests.active)
-    .description(!quests.active.length ? t`Нет активных заданий.` : '')
+    .description(!quests.active.length ? i18n`Нет активных заданий.` : '')
     .addCustomButtonBeforeArray(f => {
       f.button(i18n.accent`Завершенные задания`.size(quests.completed.length).toString(player.lang), () =>
         completeQuestsMenu(player, self),
@@ -71,7 +74,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
   if (!quests) return
 
   new ArrayForm(i18n.accent`Завершенные задания`, quests.completed.map(e => Quest.quests.get(e)).filter(noNullable))
-    .description(t`Список завершенных заданий`)
+    .description(i18n`Список завершенных заданий`)
     .button(quest => [quest.name, () => manageQuestMenu({ quest }).show(player, self)] as const)
     .back(back)
     .show(player)
@@ -93,10 +96,10 @@ export const manageQuestMenu = form.withParams<{ quest: Quest }>((f, { player, b
   }
 
   f.title(quest.name)
-  f.body(t`Описание задания: ${quest.description}\n\n${currentDescription}`)
+  f.body(i18n`Описание задания: ${quest.description}\n\n${currentDescription}`)
 
   if (Quest.getCurrentStepOf(player) !== quest.getCurrentStep(player)) {
-    f.button(t`Сделать приоритетным`, () => {
+    f.button(i18n`Сделать приоритетным`, () => {
       if (!player.database.quests) return
 
       const active = quest.getDatabase(player)

@@ -2,7 +2,7 @@ import { Block, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { l } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 
 new Command('chunkload')
   .setPermissions('curator')
@@ -14,7 +14,7 @@ new Command('chunkload')
   .executes(async (ctx, from, to, tickDelay = 5, saveTickDelay = 40) => {
     const player = ctx.player
     from.y = to.y = 62
-    player.success(l`Loading chunks from ${Vec.fromVector3(from)} to ${Vec.fromVector3(to)}`)
+    player.success(noI18n`Loading chunks from ${Vec.fromVector3(from)} to ${Vec.fromVector3(to)}`)
 
     player.info('Calculating total chunk size, this might take a while...')
     const chunks: Vector3[] = []
@@ -27,7 +27,7 @@ new Command('chunkload')
 
             i++
             if (i % 500 === 0) {
-              player.info(l`Chunks: ${chunks.length + 1}`)
+              player.info(noI18n`Chunks: ${chunks.length + 1}`)
               yield
             }
             chunks.push({ x, y, z })
@@ -68,13 +68,13 @@ new Command('chunkload')
 
       await system.waitTicks(saveTickDelay)
 
-      const speedText = speed < 1000 ? l`${~~speed}ms/chunk` : l.time(speed)
+      const speedText = speed < 1000 ? noI18n`${~~speed}ms/chunk` : noI18n.time(speed)
 
       player.onScreenDisplay.setActionBar(
-        l`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nSpeed: ${speedText}/chunk, remaining: ${l.hhmmss(eta)} elapsed: ${l.hhmmss(took)}`,
+        noI18n`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nSpeed: ${speedText}/chunk, remaining: ${noI18n.hhmmss(eta)} elapsed: ${noI18n.hhmmss(took)}`,
         ActionbarPriority.Highest,
       )
     }
 
-    player.success(l`Loaded. Took ${l.time(Date.now() - start)}`)
+    player.success(noI18n`Loaded. Took ${noI18n.time(Date.now() - start)}`)
   })

@@ -4,13 +4,13 @@ import { Achievement } from 'lib/achievements/achievement'
 import { LoreForm } from 'lib/form/lore'
 import { form } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { showStats } from './stats'
 
 new Command('player')
   .setAliases('p', 'profile')
   .setPermissions('everybody')
-  .setDescription(t`Общее меню игрока`)
+  .setDescription(i18n`Общее меню игрока`)
   .executes(ctx => playerMenu({ targetId: ctx.player.id }).command(ctx))
 
 const playerMenu = form.withParams<{ targetId: string }>((f, { player, params: { targetId }, self }) => {
@@ -19,30 +19,30 @@ const playerMenu = form.withParams<{ targetId: string }>((f, { player, params: {
   f.title(db.name ?? targetId)
 
   if (moder) {
-    f.button(t`Другие игроки`, () => {
-      selectPlayer(player, t`открыть его меню`, self).then(target => {
+    f.button(i18n`Другие игроки`, () => {
+      selectPlayer(player, i18n`открыть его меню`.toString(player.lang), self).then(target => {
         playerMenu({ targetId: target.id }).show(player, self)
       })
     })
   }
-  f.button(t`Статистика`, () => showStats(player, targetId, self))
+  f.button(i18n`Статистика`, () => showStats(player, targetId, self))
 
   f.button(
-    t`Задания`,
+    i18n`Задания`,
     form(f => f.body(stringify(db.quests))),
   )
   f.button(
     form(f => {
       const all = Achievement.list.length
       const completed = db.achivs?.s.filter(e => !!e.r).length ?? 0
-      f.title(t`Достижения ${completed}/${all} (${((completed / all) * 100).toFixed(0)}%%)`)
+      f.title(i18n`Достижения ${completed}/${all} (${((completed / all) * 100).toFixed(0)}%%)`)
       f.body(stringify(db.achivs))
     }),
   )
   f.button(
     form(f => {
       const portals = db.unlockedPortals
-      f.title(t`Порталы ${portals?.length ?? 0}/${Portal.portals.size}`)
+      f.title(i18n`Порталы ${portals?.length ?? 0}/${Portal.portals.size}`)
       f.body(portals?.join('\n') ?? '')
     }),
   )

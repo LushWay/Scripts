@@ -1,16 +1,14 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
-import { Language } from 'lib/assets/lang'
+import { defaultLang, Language } from 'lib/assets/lang'
 import { Vec } from 'lib/vector'
 import { separateNumberWithDots } from '../util'
 import { stringify } from '../utils/inspect'
 import { ms } from '../utils/ms'
 import { intlRemaining } from './intl'
-import { I18nMessage, Message, ServerSideI18nMessage } from './message'
+import { I18nMessage, Message, ServerSideI18nMessage, SharedI18nMessage } from './message'
 
 export type Text = string | Message
 export type MaybeRawText = string | RawText
-
-type TSA = TemplateStringsArray
 
 export declare namespace Text {
   export type RawTextArg = string | RawText | RawMessage | Message | undefined | null
@@ -39,14 +37,14 @@ export declare namespace Text {
      * No runtime effect. Affects only messages extraction, making this message available for both site and resource
      * pack
      */
-    shared: Static<T>
+    shared: Static<T> & Fn<T>
 
     /** No runtime effect. Affects only messages extraction, making this message available for resource pack */
-    rp: Static<T>
+    rp: Static<T> & Fn<T>
   }
 
   /** "§7Some long text §fwith substring§7 and number §64§7" */
-  export type Fn<T> = (text: TSA, ...args: unknown[]) => T
+  export type Fn<T> = (text: TemplateStringsArray, ...args: unknown[]) => T
 
   interface Modifiers<T> {
     /** "§cSome long text §fwith substring§c and number §74§c" */
@@ -108,8 +106,7 @@ const styles = {
   disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
 }
 
-export const t = createStatic(undefined, undefined, simpleString)
-export const l = createStatic(undefined, undefined, simpleString) as Omit<Text.Chained<string>, 'shared' | 'rp'> &
+export const noI18n = createStatic(undefined, undefined, simpleString) as Omit<Text.Chained<string>, 'shared' | 'rp'> &
   Text.Fn<string>
 
 export const i18n = createStatic(undefined, undefined, colors => {
@@ -118,15 +115,21 @@ export const i18n = createStatic(undefined, undefined, colors => {
   }
 })
 
-export const tm = createStatic(undefined, undefined, colors => {
-  return function tm(template, ...args) {
+export const i18nShared = createStatic(undefined, undefined, colors => {
+  return function i18nShared(template, ...args) {
+    return new SharedI18nMessage(template, args, colors)
+  }
+})
+
+export const i18nJoin = createStatic(undefined, undefined, colors => {
+  return function i18nJoin(template, ...args) {
     return new Message(template, args, colors)
   }
 })
 
 function simpleString(colors: Text.Colors) {
   return function simpleStr(template, ...args) {
-    return Message.string(Language.ru_RU, template, args, colors)
+    return Message.string(defaultLang, template, args, colors)
   } as Text.Chained<string>
 }
 
@@ -185,9 +188,9 @@ export function textUnitColorize(
     case 'undefined':
       return ''
     case 'object':
-      if (v instanceof I18nMessage) {
+      if (v instanceof Message) {
         if (!lang) {
-          throw new TypeError(`Text unit colorize cannot translate I18nMessage '${v.id}' if no locale was given!`)
+          throw new TypeError(`Text unit colorize cannot translate Message '${v.id}' if no locale was given!`)
         }
 
         const vstring = v.toString(lang)
@@ -206,6 +209,6 @@ export function textUnitColorize(
     case 'bigint':
       return '§c<>'
     case 'boolean':
-      return (v ? i18n.nocolor`§fДа` : i18n.nocolor`§cНет`).toString(lang || Language.en_US)
+      return (v ? i18n.nocolor`§fДа` : i18n.nocolor`§cНет`).toString(lang || defaultLang)
   }
 }

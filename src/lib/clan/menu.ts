@@ -5,7 +5,7 @@ import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
-import { i18n, t, textTable } from 'lib/i18n/text'
+import { i18n, textTable } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/utils/rewards'
 import { Clan } from './clan'
@@ -35,8 +35,8 @@ function getInvites(playerId: string) {
 }
 
 function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
-  new ArrayForm(t`Выбор клана`, [...Clan.getAll()].reverse())
-    .description(t`Выберите клан, чтобы отправить заявку или создайте свой клан!`)
+  new ArrayForm(i18n`Выбор клана`, [...Clan.getAll()].reverse())
+    .description(i18n`Выберите клан, чтобы отправить заявку или создайте свой клан!`)
     .addCustomButtonBeforeArray(form => {
       const invitedTo = getInvites(player.id)
       if (invitedTo.length)
@@ -57,36 +57,44 @@ function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
     .back(back)
     .show(player)
 
-  function getClanName(clan: Clan, color = '§f'): string {
-    return t.nocolor`§7[${clan.db.shortname}] ${color}${clan.db.name}\nУчастники: ${clan.db.members.length}`
+  function getClanName(clan: Clan, color = '§f'): Text {
+    return i18n.nocolor`§7[${clan.db.shortname}] ${color}${clan.db.name}\nУчастники: ${clan.db.members.length}`
   }
 }
 function createClan(player: Player, back: VoidFunction, name?: string, shortname?: string) {
-  new ModalForm(t`Создать клан`)
-    .addTextField(t`Имя клана`, t`Ну, давай, придумай чета оригинальное`, name)
-    .addTextField(t`Краткое имя клана`, t`Чтобы блатными в чате выглядеть`, shortname)
+  new ModalForm(i18n`Создать клан`.toString(player.lang))
+    .addTextField(
+      i18n`Имя клана`.toString(player.lang),
+      i18n`Ну, давай, придумай чета оригинальное`.toString(player.lang),
+      name,
+    )
+    .addTextField(
+      i18n`Краткое имя клана`.toString(player.lang),
+      i18n`Чтобы блатными в чате выглядеть`.toString(player.lang),
+      shortname,
+    )
     .show(player, (_, name, shortname) => {
-      function err(reason: string) {
-        return new MessageForm(t`Ошибка`, reason)
-          .setButton1(t`Щас исправлю`, () => createClan(player, back, name, shortname))
-          .setButton2(t`Та ну я лучше вступлю куда-то`, back)
+      function err(reason: Text) {
+        return new MessageForm(i18n`Ошибка`.toString(player.lang), reason.toString(player.lang))
+          .setButton1(i18n`Щас исправлю`.toString(player.lang), () => createClan(player, back, name, shortname))
+          .setButton2(i18n`Та ну я лучше вступлю куда-то`.toString(player.lang), back)
           .show(player)
       }
 
-      if (name.includes('§')) return err(t`Имя не может содержать параграф`)
-      if (shortname.includes('§')) return err(t`Короткое имя не может содержать параграф`)
-      if (shortname.length > 5) return err(t`Короткое имя должно быть КОРОТКИМ, меньше 5 символов`)
+      if (name.includes('§')) return err(i18n`Имя не может содержать параграф`)
+      if (shortname.includes('§')) return err(i18n`Короткое имя не может содержать параграф`)
+      if (shortname.length > 5) return err(i18n`Короткое имя должно быть КОРОТКИМ, меньше 5 символов`)
       if (shortname.length < 2)
         return err(
-          t.error`Короткое имя не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '${shortname}'`,
+          i18n.error`Короткое имя не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '${shortname}'`,
         )
 
       for (const clan of Clan.getAll()) {
         if (clan.db.name === name)
           return err(
-            t.error`Клан с именем ${name} уже существует. Либо вступи туда, либо придумай что-то более оригильное`,
+            i18n.error`Клан с именем ${name} уже существует. Либо вступи туда, либо придумай что-то более оригильное`,
           )
-        if (clan.db.shortname === shortname) return err(t.error`Короткое имя ${shortname} уже занято.`)
+        if (clan.db.shortname === shortname) return err(i18n.error`Короткое имя ${shortname} уже занято.`)
       }
 
       const clan = Clan.create(player, name, shortname)
@@ -94,18 +102,18 @@ function createClan(player: Player, back: VoidFunction, name?: string, shortname
     })
 }
 const inClanMenu = form.withParams<{ clan: Clan }>((f, { self, player, params: { clan } }) => {
-  f.title(t`Меню клана`)
+  f.title(i18n`Меню клана`)
   f.body(
     textTable([
-      [t`Имя клана`, clan.db.name],
-      [t`Дата создания`, clan.createdAt.toYYYYMMDD(player.lang)],
+      [i18n`Имя клана`, clan.db.name],
+      [i18n`Дата создания`, clan.createdAt.toYYYYMMDD(player.lang)],
     ]).toString(player.lang),
   )
 
   const isOwner = clan.isOwner(player.id)
 
   f.button(i18n`Базы клана`.size(0), () => {
-    player.fail(t`СКОРО`)
+    player.fail(i18n`СКОРО`)
   })
 
   f.button(i18n`Участники`.size(clan.db.members.length), () => clanMembers(player, clan, self))
@@ -114,7 +122,7 @@ const inClanMenu = form.withParams<{ clan: Clan }>((f, { self, player, params: {
     f.button(i18n`Заявки на вступление`.badge(clan.db.joinRequests.length), () => clanJoinRequests(player, clan, self))
 
     f.button(i18n`Приглашения`.badge(clan.db.invites.length), () => clanInvites(player, clan, self))
-    f.ask(t.error`Удалить клан`, t.error`Удалить`, () => clan.delete())
+    f.ask(i18n.error`Удалить клан`, i18n.error`Удалить`, () => clan.delete())
   }
 })
 function clanJoinRequests(player: Player, clan: Clan, back?: VoidFunction) {
@@ -122,19 +130,22 @@ function clanJoinRequests(player: Player, clan: Clan, back?: VoidFunction) {
     clan.db.joinRequests = clan.db.joinRequests.filter(e => e !== id)
     clanJoinRequests(player, clan, back)
   }
-  new ArrayForm(t`Заявки на вступление`, clan.db.joinRequests)
+  new ArrayForm(i18n`Заявки на вступление`, clan.db.joinRequests)
     .button(id => {
       const name = Player.nameOrUnknown(id)
       return [
         name,
         () =>
-          new MessageForm(t`Выбор`, t`Принять игрока "${name}" в клан?`)
-            .setButton1(t`Принять!`, () => {
+          new MessageForm(
+            i18n`Выбор`.toString(player.lang),
+            i18n`Принять игрока "${name}" в клан?`.toString(player.lang),
+          )
+            .setButton1(i18n`Принять!`.toString(player.lang), () => {
               clan.add(id)
               proceed(id)
             })
-            .setButton2(t`Нет, не заслужил`, () => {
-              Mail.send(id, t`Вы НЕ приняты в клан ` + clan.db.name, t`Онет`, new Rewards())
+            .setButton2(i18n`Нет, не заслужил`.toString(player.lang), () => {
+              Mail.send(id, i18n`Вы НЕ приняты в клан ${clan.db.name}`, i18n`Онет`, new Rewards())
 
               proceed(id)
             })
@@ -145,9 +156,9 @@ function clanJoinRequests(player: Player, clan: Clan, back?: VoidFunction) {
     .show(player)
 }
 function clanInvites(player: Player, clan: Clan, back?: VoidFunction) {
-  new ArrayForm(t`Приглашения в клан '${clan.db.name}'`, clan.db.invites)
+  new ArrayForm(i18n`Приглашения в клан '${clan.db.name}'`, clan.db.invites)
     .addCustomButtonBeforeArray(form =>
-      form.button(t`§3Новое приглашение`, BUTTON['+'], () =>
+      form.button(i18n.accent`Новое приглашение`.toString(player.lang), BUTTON['+'], () =>
         inviteToClan(player, clan, () => clanInvites(player, clan, back)),
       ),
     )
@@ -158,8 +169,8 @@ function clanInvites(player: Player, clan: Clan, back?: VoidFunction) {
         () =>
           void ask(
             player,
-            t`отозвать приглашение?`,
-            t`Да, отозать`,
+            i18n`отозвать приглашение?`,
+            i18n`Да, отозать`,
             () => (clan.db.invites = clan.db.invites.filter(e => e !== id)),
           ),
       ]
@@ -168,15 +179,15 @@ function clanInvites(player: Player, clan: Clan, back?: VoidFunction) {
     .show(player)
 }
 function inviteToClan(player: Player, clan: Clan, back?: VoidFunction) {
-  selectPlayer(player, t`пригласить в клан`, back).then(({ id, name }) => {
+  selectPlayer(player, i18n`пригласить в клан`.toString(player.lang), back).then(({ id, name }) => {
     clan.invite(id)
-    player.success(t`Игрок ${name} успешно приглашен в клан!`)
+    player.success(i18n`Игрок ${name} успешно приглашен в клан!`)
     back?.()
   })
 }
 function clanMembers(player: Player, clan: Clan, back?: VoidFunction) {
   const self = () => clanMembers(player, clan, back)
-  new ArrayForm(t`Участники клана`, clan.db.members)
+  new ArrayForm(i18n`Участники клана`, clan.db.members)
     .back(back)
     .button(id => {
       const memberName = Player.nameOrUnknown(id)
@@ -186,7 +197,7 @@ function clanMembers(player: Player, clan: Clan, back?: VoidFunction) {
 }
 const clanMember = form.withParams<{ clan: Clan; member: string; memberName: string }>(
   (f, { player, self, params: { clan, member, memberName } }) => {
-    f.title(t`Участник`)
+    f.title(i18n`Участник`)
 
     const isOwner = clan.isOwner(player.id)
     const isMemberOwner = clan.isOwner(member)
@@ -194,19 +205,27 @@ const clanMember = form.withParams<{ clan: Clan; member: string; memberName: str
     if (isOwner) {
       f.button(isMemberOwner ? i18n`Понизить до участника` : i18n`Повысить до владельца`, () => {
         clan.setRole(member, isMemberOwner ? 'member' : 'owner')
-        player.success(t`Роль участника клана ${memberName} сменена успешно.`)
+        player.success(i18n`Роль участника клана ${memberName} сменена успешно.`)
 
-        const action = isMemberOwner ? t`понижены` : t`повышены`
-        Mail.send(member, t.nocolor`Вы были ${action}`, t`Вы были ${action} в клане '${clan.db.name}'`, new Rewards())
+        const action = isMemberOwner ? i18n`понижены` : i18n`повышены`
+        Mail.send(
+          member,
+          i18n.nocolor`Вы были ${action}`,
+          i18n`Вы были ${action} в клане '${clan.db.name}'`,
+          new Rewards(),
+        )
         self()
       }).button(i18n.error`Выгнать`, () => {
-        new ModalForm(t`Выгнать участника '${memberName}'`)
-          .addTextField(t`Причина`, t`Ничего не произойдет, если вы не укажете причину`)
+        new ModalForm(i18n`Выгнать участника '${memberName}'`.toString(player.lang))
+          .addTextField(
+            i18n`Причина`.toString(player.lang),
+            i18n`Ничего не произойдет, если вы не укажете причину`.toString(player.lang),
+          )
           .show(player, (_, reason) => {
             if (reason) {
               clan.kickMember(member, player.name, reason)
-              player.success(t`Участник ${memberName} успешно выгнан из клана ${clan.db.name}`)
-            } else player.info(t`Причина не была указана, участник остался в клане`)
+              player.success(i18n`Участник ${memberName} успешно выгнан из клана ${clan.db.name}`)
+            } else player.info(i18n`Причина не была указана, участник остался в клане`)
             self()
           })
       })

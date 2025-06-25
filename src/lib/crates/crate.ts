@@ -9,7 +9,7 @@ import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
-import { i18n, l, t } from '../i18n/text'
+import { i18n, i18nShared, noI18n } from '../i18n/text'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
 import CrateLootAnimation from './animation'
 
@@ -19,7 +19,7 @@ export class Crate {
   static getName(id: string, crate = Crate.crates.get(id)) {
     if (crate) {
       return `${crate.place.group.name} - ${crate.place.name}`
-    } else return l`Unknown`
+    } else return noI18n`Unknown`
   }
 
   static typeIds: string[] = [MinecraftBlockTypes.EnderChest, MinecraftBlockTypes.Chest]
@@ -50,7 +50,7 @@ export class Crate {
   }
 
   private onValidLocation(location: ValidLocation<Vector3>) {
-    this.floatingText.update(location, t`${this.place.name} ящик\n§7${this.place.group.name}`)
+    this.floatingText.update(location, i18nShared`${this.place.name} ящик\n§7${this.place.group.name}`)
     if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionType)
 
     try {
@@ -78,7 +78,7 @@ export class Crate {
       }
 
       if (storage.crate !== this.id) {
-        return player.fail(t.error`Ключ для ${Crate.getName(storage.crate)} не подходит к ящику ${this.name}`)
+        return player.fail(i18n.error`Ключ для ${Crate.getName(storage.crate)} не подходит к ящику ${this.name}`)
       }
 
       this.open(player, this.location)
@@ -88,7 +88,7 @@ export class Crate {
   }
 
   private open(player: Player, location: Vector3) {
-    player.success(t`Открыт ящик ${this.name}!`, false)
+    player.success(i18n`Открыт ящик ${this.name}!`, false)
     player.mainhand().setItem(undefined)
 
     this.animation.start(player, this.lootTable.generateOne(), location)
@@ -98,7 +98,7 @@ export class Crate {
     f.title(this.name)
       .body(i18n`Чтобы открыть этот сундук, возьмите в руки ключ`)
       .button(i18n`Купить ключ`, () => {
-        player.fail(l`Пока не работает.`)
+        player.fail(noI18n`Пока не работает.`)
       })
       .button(i18n`Посмотреть содержимое`, this.previewItems.show)
 
@@ -118,7 +118,7 @@ export class Crate {
 const schema = new ItemLoreSchema('crate')
   .property('crate', String)
 
-  .nameTag((_, storage) => t.header`Ключ для ящика ${Crate.getName(storage.crate)}`)
-  .lore(lore => [t`Используйте этот ключ, чтобы открыть ящик с лутом!`, ...lore])
+  .nameTag((_, storage) => i18n.header`Ключ для ящика ${Crate.getName(storage.crate)}`)
+  .lore(lore => [i18n`Используйте этот ключ, чтобы открыть ящик с лутом!`, ...lore])
 
   .build()

@@ -2,7 +2,7 @@ import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { ItemFilter, OnSelect, selectItemForm } from 'lib/form/select-item'
 import { translateEnchantment, translateTypeId } from 'lib/i18n/lang'
-import { Text, t } from 'lib/i18n/text'
+import { Text, i18n } from 'lib/i18n/text'
 import { Cost, MultiCost, ShouldHaveItemCost } from '../cost'
 import { ShopForm, ShopFormSection } from '../form'
 import { ProductName } from '../product'
@@ -113,14 +113,14 @@ function onSelect(
         // TODO Check lang for potions etc
 
         form.body = () =>
-          t`Зачарования:\n${item.enchantable
+          i18n`Зачарования:\n${item.enchantable
             ?.getEnchantments()
             .map(e => translateEnchantment(e, player.lang))
             .join('\n')}`
 
         const addSelectItem = () =>
           form.button(
-            t`Выбранный предмет: ${translateTypeId(item.typeId, player.lang)}\nНажмите, чтобы сменить`,
+            i18n`Выбранный предмет: ${translateTypeId(item.typeId, player.lang)}\nНажмите, чтобы сменить`,
             getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
             select,
           )

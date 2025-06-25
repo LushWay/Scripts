@@ -1,7 +1,7 @@
 import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { eqSlots } from 'lib/form/select-item'
 import { Message } from 'lib/i18n/message'
-import { Text, i18n, l } from 'lib/i18n/text'
+import { Text, i18n, noI18n } from 'lib/i18n/text'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
 import { CostType } from './cost'
@@ -90,7 +90,7 @@ export class ItemCost extends Cost {
     super.failed(player)
     const items = this.getItems(player)
 
-    return l.error`${this.amount - items.amount}/${this.amount} ${this.toString(player, false, false)}`
+    return noI18n.error`${this.amount - items.amount}/${this.amount} ${this.toString(player, false, false)}`
   }
 }
 

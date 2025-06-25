@@ -6,13 +6,13 @@ import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
-import { l, t, tm } from './i18n/text'
+import { i18n, i18nJoin, noI18n } from './i18n/text'
 import stringifyError from './utils/error'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace
 // TODO refactor(leaftail1880): Move everything into the lib/settings/ folder
 
-type DropdownSetting = [value: string, displayText: string]
+type DropdownSetting = [value: string, displayText: Text]
 
 /** Any setting value type */
 type SettingValue = string | boolean | number | DropdownSetting[]
@@ -20,12 +20,12 @@ type SettingValue = string | boolean | number | DropdownSetting[]
 export const SETTINGS_GROUP_NAME = Symbol('SettingGroupName')
 
 interface ConfigMeta {
-  [SETTINGS_GROUP_NAME]?: string
+  [SETTINGS_GROUP_NAME]?: Text
 }
 
 export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
   string,
-  { name: string; description?: string; value: T; onChange?: VoidFunction }
+  { name: Text; description?: Text; value: T; onChange?: VoidFunction }
 > &
   ConfigMeta
 
@@ -71,7 +71,7 @@ export class Settings {
    * @returns An function that returns object with properties that are getters and setters.
    */
   static player<const Config extends SettingsConfig<PlayerSettingValues>>(
-    groupName: string,
+    groupName: Text,
     groupId: string,
     config: Config,
   ) {
@@ -116,7 +116,7 @@ export class Settings {
    * @returns An object with properties that are getters and setters.
    */
   static world<const Config extends WorldSettingsConfig>(
-    groupName: string,
+    groupName: Text,
     groupId: string,
     config: Config,
   ): SettingsConfigParsed<Config> {
@@ -124,11 +124,11 @@ export class Settings {
     return this.parseConfig(Settings.worldDatabase, groupId, this.worldConfigs[groupId] as Config)
   }
 
-  static worldCommon = [t`Общие настройки мира\n§7Чат, спавн и тд`, 'common'] as const
+  static worldCommon = [i18n`Общие настройки мира\n§7Чат, спавн и тд`, 'common'] as const
 
   private static insertGroup(
     to: 'worldConfigs' | 'playerConfigs',
-    groupName: string,
+    groupName: Text,
     groupId: string,
     config: SettingsConfig,
   ) {
@@ -247,7 +247,7 @@ export function settingsGroupMenu(
   const store = Settings.parseConfig(storeSource, groupName, config, forRegularPlayer ? player : null)
   const buttons: [string, (input: string | boolean) => string][] = []
   const form = new ModalForm<(ctx: FormCallback<ModalForm>, ...options: (string | boolean)[]) => void>(
-    config[SETTINGS_GROUP_NAME] ?? groupName,
+    (config[SETTINGS_GROUP_NAME] ?? groupName).toString(player.lang),
   )
 
   for (const key in config) {
@@ -269,24 +269,32 @@ export function settingsGroupMenu(
     label += `§f§l${setting.name}§r§f` //§r
 
     if (setting.description) label += `§i - ${setting.description}`
-    if (isUnset) label += t.nocolor`§8(По умолчанию)\n`
+    if (isUnset) label += i18n.nocolor`§8(По умолчанию)\n`.toString(player.lang)
 
     if (isToggle) {
       form.addToggle(label, value)
     } else if (Settings.isDropdown(setting.value)) {
-      form.addDropdownFromObject(label, Object.fromEntries(setting.value), {
-        defaultValueIndex: Settings.isDropdown(value) ? undefined : value,
-      })
+      form.addDropdownFromObject(
+        label,
+        Object.fromEntries(setting.value.map(e => [e[0], e[1].toString(player.lang)])),
+        {
+          defaultValueIndex: Settings.isDropdown(value) ? undefined : value,
+        },
+      )
     } else {
       const isString = typeof value === 'string'
 
       if (!isString) {
-        label += t.nocolor`\n§7§lЗначение:§r ${stringify(value)}`
+        label += i18n.nocolor`\n§7§lЗначение:§r ${stringify(value)}`.toString(player.lang)
 
-        label += t.nocolor`\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`
+        label += i18n.nocolor`\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`.toString(player.lang)
       }
 
-      form.addTextField(label, t`Настройка не изменится`, isString ? value : JSON.stringify(value))
+      form.addTextField(
+        label,
+        i18n`Настройка не изменится`.toString(player.lang),
+        isString ? value : JSON.stringify(value),
+      )
     }
 
     buttons.push([
@@ -305,7 +313,7 @@ export function settingsGroupMenu(
                 break
               case 'number':
                 result = Number(input)
-                if (isNaN(result)) return t`§cВведите число!`
+                if (isNaN(result)) return i18n`§cВведите число!`.toString(player.lang)
                 break
               case 'object':
                 result = JSON.parse(input) as typeof result
@@ -320,7 +328,7 @@ export function settingsGroupMenu(
             store[key] = result
           }
 
-          return showHintAboutSavedStatus ? t`§aСохранено!` : ''
+          return showHintAboutSavedStatus ? i18n.success`Сохранено!`.toString(player.lang) : ''
         } catch (error: unknown) {
           logger.player(player).info`Changing ${displayType} setting '${groupName} > ${key}' error: ${error}`
 
@@ -358,24 +366,24 @@ export function settingsGroupMenu(
 }
 
 const settingTypes: Partial<
-  Record<'string' | 'number' | 'object' | 'boolean' | 'symbol' | 'bigint' | 'undefined' | 'function', string>
-> = { string: t`Строка`, number: t`Число`, object: t`JSON-Объект`, boolean: t`Переключатель` }
+  Record<'string' | 'number' | 'object' | 'boolean' | 'symbol' | 'bigint' | 'undefined' | 'function', Text>
+> = { string: i18n`Строка`, number: i18n`Число`, object: i18n`JSON-Объект`, boolean: i18n`Переключатель` }
 
 /** Opens player settings menu */
 export function playerSettingsMenu(player: Player, back?: VoidFunction) {
-  const form = new ActionForm(t`§dНастройки`)
+  const form = new ActionForm(i18n`§dНастройки`.toString(player.lang))
   if (back) form.addButtonBack(back)
 
   for (const groupName in Settings.playerConfigs) {
     const name = Settings.playerConfigs[groupName]?.[SETTINGS_GROUP_NAME]
-    if (name) form.button(name, () => settingsGroupMenu(player, groupName, true))
+    if (name) form.button(name.toString(player.lang), () => settingsGroupMenu(player, groupName, true))
   }
 
   form.show(player)
 }
 
 export function worldSettingsMenu(player: Player) {
-  const form = new ActionForm(l`§dНастройки мира`)
+  const form = new ActionForm(noI18n`§dНастройки мира`)
 
   for (const [groupId, group] of Object.entries(Settings.worldConfigs)) {
     const database = Settings.worldDatabase.get(groupId)
@@ -385,9 +393,12 @@ export function worldSettingsMenu(player: Player) {
       if (option.required && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.button(tm.nocolor`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).toString(player.lang), () => {
-      settingsGroupMenu(player, groupId, false)
-    })
+    form.button(
+      i18nJoin.nocolor`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).toString(player.lang),
+      () => {
+        settingsGroupMenu(player, groupId, false)
+      },
+    )
   }
 
   form.show(player)

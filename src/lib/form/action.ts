@@ -1,7 +1,8 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { defaultLang } from 'lib/assets/lang'
 import { ask } from 'lib/form/message'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'
@@ -18,7 +19,7 @@ interface IActionFormButton {
 export class ActionForm {
   // TODO Remove
   /** Text used by back button */
-  static backText = t`§l§b< §r§3Назад`
+  static backText = i18n`§l§b< §r§3Назад`
 
   /** The buttons this form has */
   private buttons: IActionFormButton[] = []
@@ -87,7 +88,7 @@ export class ActionForm {
    */
   addButtonBack(backCallback: NewFormCallback | undefined) {
     if (!backCallback) return this
-    else return this.button(t`§r§3Назад`, BUTTON['<'], backCallback)
+    else return this.button(i18n`§r§3Назад`.toString(defaultLang), BUTTON['<'], backCallback)
   }
 
   /**
@@ -106,10 +107,16 @@ export class ActionForm {
    * @param noText - Function that will be called when no button was pressed
    * @param texture - Button texture
    */
-  ask(text: string, yesText: string, yesAction: VoidFunction, noText = t`Отмена`, texture: string | null = null) {
+  ask(
+    text: string,
+    yesText: string,
+    yesAction: VoidFunction,
+    noText: Text = i18n`Отмена`,
+    texture: string | null = null,
+  ) {
     // TODO Fix
     return this.button(text, texture, p =>
-      ask(p, t`§cВы уверены, что хотите ` + text + '?', yesText, yesAction, noText, () => this.show(p)),
+      ask(p, i18n`§cВы уверены, что хотите ${text}?`, yesText, yesAction, noText, () => this.show(p)),
     )
   }
 
@@ -119,7 +126,7 @@ export class ActionForm {
    * @param player Player to show form to
    */
   async show(player: Player): Promise<boolean> {
-    if (!this.buttons.length) this.button(l`Empty`, () => this.show(player))
+    if (!this.buttons.length) this.button(noI18n`Empty`, () => this.show(player))
 
     const response = await showForm(this.form, player)
 

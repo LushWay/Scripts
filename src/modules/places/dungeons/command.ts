@@ -6,7 +6,7 @@ import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { DungeonRegion } from 'modules/places/dungeons/dungeon'
 import { CustomDungeonRegion } from './custom-dungeon'
@@ -15,7 +15,7 @@ import { Dungeon } from './loot'
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
   .property('type', String)
   .display('Тип данжа', t => Dungeon.names[t] ?? t)
-  .nameTag((_, s) => t`§7Создает данж ${getDungeonName(s.type)}`)
+  .nameTag((_, s) => i18n`§7Создает данж ${getDungeonName(s.type)}`)
   .lore('§7Используй, чтобы создать данж')
   .build()
 
@@ -39,7 +39,7 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
     .button(structureId => {
       return [
         structureId in Dungeon.customNames
-          ? t`(Без структуры) ${Dungeon.customNames[structureId]}`
+          ? noI18n`(Без структуры) ${Dungeon.customNames[structureId]}`
           : (Dungeon.names[structureId] ?? structureId),
         () => {
           const hand = ctx.player.mainhand()
@@ -82,7 +82,7 @@ function getDungeon(player: Player, rotation: StructureRotation) {
       )
 
   if (!region.configureSize()) {
-    player.onScreenDisplay.setActionBar(t.error`Неизвестный данж: ${storage.type}`)
+    player.onScreenDisplay.setActionBar(noI18n.error`Неизвестный данж: ${storage.type}`)
     return
   }
   return region
@@ -100,7 +100,7 @@ world.afterEvents.itemUse.subscribe(event => {
     DungeonRegion.create(dungeon.area, { structureId: dungeon.structureId, rotation })
   }
 
-  player.success(t`Данж создан на ${Vec.string(dungeon.area.center, true)}`)
+  player.success(noI18n`Данж создан на ${Vec.string(dungeon.area.center, true)}`)
 })
 
 system.runPlayerInterval(
@@ -117,7 +117,7 @@ system.runPlayerInterval(
     }
 
     player.onScreenDisplay.setActionBar(
-      t`rotation: ${rotation} size: ${Vec.subtract(from, to)}\nfrom: ${from} to: ${to}`,
+      noI18n`rotation: ${rotation} size: ${Vec.subtract(from, to)}\nfrom: ${from} to: ${to}`,
       ActionbarPriority.Highest,
     )
   },

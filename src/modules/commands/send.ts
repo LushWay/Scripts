@@ -3,6 +3,7 @@
 import { Player, ScoreName, world } from '@minecraft/server'
 import { ActionForm, Mail, ModalForm } from 'lib'
 import { createSelectPlayerMenu } from 'lib/form/select-player'
+import { i18nJoin } from 'lib/i18n/text'
 import { Rewards } from 'lib/utils/rewards'
 
 interface SendState {
@@ -79,8 +80,8 @@ export function sendMenu(player: Player, back?: VoidFunction, state?: SendState)
   form.button('Отправить', () =>
     Mail.sendMultiple(
       state.recipients.length == 0 ? [...Player.database.keys()] : state.recipients.map(p => p.id),
-      state.title,
-      state.contents,
+      i18nJoin`${state.title}`,
+      i18nJoin`${state.contents}`,
       state.rewards,
     ),
   )

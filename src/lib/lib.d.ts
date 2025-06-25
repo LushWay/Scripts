@@ -45,6 +45,8 @@ declare global {
 
   /** Text that can be displayed on player screen and should support translation */
   type Text = import('lib/i18n/text').Text
+
+  type SharedText = import('lib/i18n/message').SharedI18nMessage
   // type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
 
   type MaybePromise<T> = T | Promise<T>

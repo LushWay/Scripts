@@ -5,7 +5,7 @@ import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
 import { UnknownTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
 new Command('db')
@@ -16,7 +16,7 @@ new Command('db')
 function selectTable(player: Player, firstCall?: true) {
   const form = new ActionForm('Таблицы данных')
   for (const [tableId, table] of Object.entries(getProvider().tables)) {
-    const name = t`${tableId} ${`§7${table.size}`} ${getProvider().getRawTableData(tableId).length / (256 * 1024)}§r`
+    const name = noI18n`${tableId} ${`§7${table.size}`} ${getProvider().getRawTableData(tableId).length / (256 * 1024)}§r`
 
     form.button(name, () => showTable(player, tableId, table))
   }
@@ -42,7 +42,7 @@ function showTable(player: Player, tableId: string, table: UnknownTable) {
       let name = key
       if (tableId === 'player') {
         const playerDatabase = table as typeof Player.database
-        name = `${playerDatabase.get(key).name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
+        name = `${playerDatabase.get(key).name} ${(ROLES[getRole(key)] as Text | undefined)?.toString(player.lang) ?? '§7Без роли'}\n§8(${key})`
       } else {
         name += `\n§7${JSON.stringify(table.get(key)).slice(0, 200).replace(/"/g, '')}`
       }
@@ -84,9 +84,9 @@ function tableProperty(key: string, table: UnknownTable, player: Player, back: V
     .button('Переименовать', () => {
       new ModalForm('Переименовать').addTextField('Ключ', 'останется прежним', key).show(player, (ctx, newKey) => {
         if (newKey) {
-          player.success(t`Renamed ${key} -> ${newKey}`)
+          player.success(i18n`Renamed ${key} -> ${newKey}`)
           table.set(newKey, table.get(key))
-        } else player.info(t`Key ${key} left as is`)
+        } else player.info(i18n`Key ${key} left as is`)
       })
     })
     .button('§cУдалить§r', () => {

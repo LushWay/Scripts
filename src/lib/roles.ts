@@ -2,7 +2,7 @@ import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/s
 import { EventSignal } from 'lib/event-signal'
 import { isKeyof } from 'lib/util'
 import { Core } from './extensions/core'
-import { t } from './i18n/text'
+import { i18n } from './i18n/text'
 
 declare global {
   /** Any known role */
@@ -11,18 +11,18 @@ declare global {
 
 /** The roles that are in this server */
 export const ROLES = {
-  creator: t.nocolor`§aРуководство`,
-  curator: t.nocolor`§6Куратор`,
-  techAdmin: t.nocolor`§cТех. Админ`,
-  chefAdmin: t.nocolor`§dГл. Админ`,
-  admin: t.nocolor`§5Админ`,
-  moderator: t.nocolor`§6Модератор`,
-  helper: t.nocolor`§eПомошник`,
-  grandBuilder: t.nocolor`§bГл. Строитель`,
-  builder: t.nocolor`§3Строитель`,
-  member: t.nocolor`§fУчастник`,
-  spectator: t.nocolor`§9Наблюдатель`,
-  tester: t.nocolor`§9Тестер`,
+  creator: i18n.nocolor`§aРуководство`,
+  curator: i18n.nocolor`§6Куратор`,
+  techAdmin: i18n.nocolor`§cТех. Админ`,
+  chefAdmin: i18n.nocolor`§dГл. Админ`,
+  admin: i18n.nocolor`§5Админ`,
+  moderator: i18n.nocolor`§6Модератор`,
+  helper: i18n.nocolor`§eПомошник`,
+  grandBuilder: i18n.nocolor`§bГл. Строитель`,
+  builder: i18n.nocolor`§3Строитель`,
+  member: i18n.nocolor`§fУчастник`,
+  spectator: i18n.nocolor`§9Наблюдатель`,
+  tester: i18n.nocolor`§9Тестер`,
 }
 
 export const DEFAULT_ROLE: Role = 'member'

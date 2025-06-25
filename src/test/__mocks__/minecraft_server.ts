@@ -511,6 +511,8 @@ export class Player extends Entity {
     return { x: 0, y: 0 }
   }
 
+  sendMessage = vi.fn()
+
   location = { x: 0, y: 0, z: 0 }
 
   private properties: Record<string, any> = {}

@@ -68,7 +68,7 @@ export class PlaceAction {
   }
 }
 
-type LockActionFunction = (player: Player) => boolean | { lockText: string }
+type LockActionFunction = (player: Player) => boolean | { lockText: Text }
 
 export interface LockActionCheckOptions {
   ignore?: LockAction[]
@@ -85,10 +85,8 @@ export class LockAction {
    * Checks if player is locked by any LockerAction and returns first lockText from it
    *
    * @param {Player} player - Player to check
-   * @param {object} o
    * @param {LockAction[]} [o.ignore] - Which LockerActions ignore
    * @param {LockAction[]} [o.accept] - Which LockerActions only accept
-   * @param {boolean} [o.tell]
    * @param {boolean} [o.returnText] - Return lock text instead of boolean
    */
   static locked(player: Player, { ignore, accept, tell = true, returnText }: LockActionCheckOptions = {}) {
@@ -112,7 +110,7 @@ export class LockAction {
     /** Function that checks if player is being locked */
     readonly isLocked: LockActionFunction,
     /** Text that returns when player is locked */
-    readonly lockText: string,
+    readonly lockText: Text,
   ) {
     LockAction.instances.push(this)
   }

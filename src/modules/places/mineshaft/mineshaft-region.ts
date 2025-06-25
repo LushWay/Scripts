@@ -1,6 +1,6 @@
 import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { ActionForm, ms, registerRegionType, Vec } from 'lib'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
@@ -51,18 +51,18 @@ export class MineshaftRegion extends MineareaRegion {
   }
 
   get displayName() {
-    return t.nocolor`§7Шахта`
+    return i18n.nocolor`§7Шахта`
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.button(l`Убрать все руды и сохранить структуру`, () => {
+    form.button(noI18n`Убрать все руды и сохранить структуру`, () => {
       player.info('Start')
       this.removeAllOresAndResaveStructure()
-        .then(e => player.info(t`End ${e}`))
-        .catch((e: unknown) => player.fail(t.error`${e}`))
+        .then(e => player.info(i18n`End ${e}`))
+        .catch((e: unknown) => player.fail(i18n.error`${e}`))
     })
   }
 }
 
 registerSaveableRegion('mine', MineshaftRegion)
-registerRegionType(l`Шахты`, MineshaftRegion)
+registerRegionType(noI18n`Шахты`, MineshaftRegion)

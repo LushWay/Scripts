@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 import { Sounds as CustomSounds, Sounds } from 'lib/assets/custom-sounds'
 import { Message } from 'lib/i18n/message'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 
 export enum CostType {
   /** Cost with this type removes item from inv, changes score etc */
@@ -19,7 +19,7 @@ export abstract class Cost<T = unknown> {
     const text = typeof product === 'function' ? product(canBuy) : product
 
     // TODO Fix colors
-    return { text, productName: t.colors({ unit })`§l${text}§r\n${cost.toString(player, canBuy)}` }
+    return { text, productName: i18n.colors({ unit })`§l${text}§r\n${cost.toString(player, canBuy)}` }
   }
 
   get type(): CostType {

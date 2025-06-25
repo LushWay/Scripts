@@ -1,9 +1,10 @@
+import { Player } from '@minecraft/server'
 import { BUTTON } from 'lib'
 import { achievementsForm, achievementsFormName } from 'lib/achievements/command'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { form } from 'lib/form/new'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { questsMenu } from 'lib/quest/menu'
@@ -15,10 +16,17 @@ import { wiki } from 'modules/wiki/wiki'
 import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
 
-function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', text = t`Спавн`, extra = '') {
+function tp(
+  player: Player,
+  place: InventoryTypeName,
+  inv: InventoryTypeName,
+  color = '§9',
+  text = i18n`Спавн`,
+  extra: Text = '',
+) {
   const here = inv === place
-  if (here) extra = t`${extra ? extra + ' ' : ''}§8Вы тут`
-  if (extra) extra = '\n' + extra
+  if (here) extra = i18n`${extra ? extra.toString(player.lang) + ' ' : ''}§8Вы тут`.toString(player.lang)
+  if (extra) extra = '\n' + extra.toString(player.lang)
   const prefix = here ? '§7' : color
   return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
 }
@@ -26,30 +34,30 @@ function tp(place: InventoryTypeName, inv: InventoryTypeName, color = '§9', tex
 Menu.form = form((f, { player, self }) => {
   const inv = player.database.inv
   f.title(Core.name, '§c§u§s§r')
-  f.button(tp('spawn', inv, '§9', t`Спавн`), 'textures/ui/worldsIcon', () => {
+  f.button(tp(player, 'spawn', inv, '§9', i18n`Спавн`), 'textures/ui/worldsIcon', () => {
     Spawn.portal?.teleport(player)
   })
-    .button(tp('anarchy', inv, '§c', t`Анархия`), 'textures/blocks/tnt_side', () => {
+    .button(tp(player, 'anarchy', inv, '§c', i18n`Анархия`), 'textures/blocks/tnt_side', () => {
       Anarchy.portal?.teleport(player)
     })
-    .button(tp('mg', inv, `§6`, t`Миниигры`, t`§7СКОРО!`), 'textures/blocks/bedrock', self)
+    .button(tp(player, 'mg', inv, `§6`, i18n`Миниигры`, i18n`§7СКОРО!`), 'textures/blocks/bedrock', self)
     .button(i18n`Задания`.badge(player.database.quests?.active.length), 'textures/ui/sidebar_icons/genre', () =>
       questsMenu(player, self),
     )
 
   if (player.database.inv === 'anarchy') {
-    f.button(t`База`, 'textures/blocks/barrel_side', baseMenu({}))
+    f.button(i18n`База`, 'textures/blocks/barrel_side', baseMenu({}))
     const [clanText, clan] = clanMenu(player, self)
     f.button(clanText, 'textures/ui/FriendsIcon', clan)
   }
 
-  f.button(t.nocolor`§6Донат\n§7СКОРО!`, 'textures/ui/permissions_op_crown', self)
+  f.button(i18n.nocolor`§6Донат\n§7СКОРО!`, 'textures/ui/permissions_op_crown', self)
     .button(i18n.nocolor`§fПочта`.badge(Mail.getUnreadMessagesCount(player.id)), 'textures/ui/feedIcon', () =>
       mailMenu(player, self),
     )
-    .button(t.nocolor`§bВики`, BUTTON.search, wiki.show)
+    .button(i18n.nocolor`§bВики`, BUTTON.search, wiki.show)
     .button(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
-    .button(t.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, self))
+    .button(i18n.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, self))
 })
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {

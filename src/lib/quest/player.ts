@@ -30,7 +30,7 @@ export class PlayerQuest {
 
   breakCounter = this.wrapStep(QSBreakCounterBuilder, QSBreakCounter)
 
-  failed = (reason: string, exit = false) => {
+  failed = (reason: Text, exit = false) => {
     return this.dynamic(reason).activate(ctx => {
       ctx.error(reason)
       if (exit) this.quest.exit(this.player)

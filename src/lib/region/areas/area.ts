@@ -1,5 +1,5 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { t, TextTable } from 'lib/i18n/text'
+import { i18n, TextTable } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
@@ -36,7 +36,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
     const area = Area.areas.find(e => e.type === a.t)
     if (!area) {
-      console.warn(t`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
+      console.warn(i18n`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
       return
     }
 
@@ -64,7 +64,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   abstract isNear(point: AbstractPoint, distance: number): boolean
 
   toString() {
-    return t`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
+    return i18n`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
   }
 
   abstract getFormDescription(): TextTable

@@ -1,7 +1,8 @@
 import { Player } from '@minecraft/server'
 import { InventoryInterval, ScoreboardDB } from 'lib'
+import { defaultLang } from 'lib/assets/lang'
 import { form } from 'lib/form/new'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { BaseItem } from 'modules/places/base/base'
 
 export enum SpeedRunTarget {
@@ -12,19 +13,19 @@ export enum SpeedRunTarget {
   MillionOfMoney = 'MillionOfMoney',
 }
 
-const speedRunNames: Record<SpeedRunTarget, string> = {
-  [SpeedRunTarget.AllAchievements]: t`Все достижения`,
-  [SpeedRunTarget.GetBaseItem]: t`Получить базу`,
-  [SpeedRunTarget.AllQuests]: t`Все задания`,
-  [SpeedRunTarget.MillionOfMoney]: t`1.000.000 монет`,
-  [SpeedRunTarget.FullNetheriteArmor]: t`Полная незеритовая броня`,
+const speedRunNames: Record<SpeedRunTarget, Text> = {
+  [SpeedRunTarget.AllAchievements]: i18n`Все достижения`,
+  [SpeedRunTarget.GetBaseItem]: i18n`Получить базу`,
+  [SpeedRunTarget.AllQuests]: i18n`Все задания`,
+  [SpeedRunTarget.MillionOfMoney]: i18n`1.000.000 монет`,
+  [SpeedRunTarget.FullNetheriteArmor]: i18n`Полная незеритовая броня`,
 }
 
 const objectives: Record<SpeedRunTarget, ScoreboardDB> = Object.fromEntries(
   Object.entriesStringKeys(speedRunNames).map(([target, name]) => {
     const key = `${target[0]?.toLowerCase()}${target.slice(1)}SpeedRun`
-    ScoreboardDB.defineName(key, name)
-    return [target, new ScoreboardDB(key, name)]
+    ScoreboardDB.defineName(key, name.toString(defaultLang))
+    return [target, new ScoreboardDB(key, name.toString(defaultLang))]
   }),
 )
 
@@ -39,12 +40,14 @@ function finishSpeedRun(player: Player, target: SpeedRunTarget) {
   if (previous === 0 || took < previous) {
     objectives[target].set(player, took)
     if (previous === 0) {
-      player.success(t`Ваш первый рекорд ${name} поставлен! Это заняло ${t.hhmmss(took)}`)
+      player.success(i18n`Ваш первый рекорд ${name} поставлен! Это заняло ${i18n.hhmmss(took)}`)
     } else {
-      player.success(t`Вы побили ваш предыдущий рекорд ${name}! ${t.hhmmss(took)} -> ${t.hhmmss(previous)}`)
+      player.success(i18n`Вы побили ваш предыдущий рекорд ${name}! ${i18n.hhmmss(took)} -> ${i18n.hhmmss(previous)}`)
     }
   } else {
-    player.fail(t`Вы не смогли побить ваш предыдущий рекорд ${name}! ${t.hhmmss(took)} -> ${t.hhmmss(previous)}`)
+    player.fail(
+      i18n`Вы не смогли побить ваш предыдущий рекорд ${name}! ${i18n.hhmmss(took)} -> ${i18n.hhmmss(previous)}`,
+    )
   }
 }
 

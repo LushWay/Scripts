@@ -1,6 +1,6 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { stringifyError } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { selectByChance } from 'lib/rpg/random'
 
 export class Ore {
@@ -17,7 +17,7 @@ export class Ore {
     for (const typeId of typeIds) {
       if (!typeId.includes('deepslate') && ![''].includes(typeId)) {
         console.warn(
-          t.warn`Ore ${this.types.join(' ')} included a deeplsate typeid (${typeId}) that does not have deeplsate inside.\n${stringifyError.stack.get(1)}`,
+          i18n.warn`Ore ${this.types.join(' ')} included a deeplsate typeid (${typeId}) that does not have deeplsate inside.\n${stringifyError.stack.get(1)}`,
         )
       }
     }

@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { MemoryTable } from 'lib/database/abstract'
-import { i18n, l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import {
   Settings,
   SETTINGS_GROUP_NAME,
@@ -44,7 +44,7 @@ export class ArrayForm<
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
-  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: l`Empty filters` } as C }
+  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: noI18n`Empty filters` } as C }
 
   constructor(
     private title: Text,
@@ -62,7 +62,7 @@ export class ArrayForm<
   }
 
   filters<const V extends SettingsConfig>(filters: V) {
-    this.config.filters = { [SETTINGS_GROUP_NAME]: t`Фильтры`, ...(filters as unknown as C) }
+    this.config.filters = { [SETTINGS_GROUP_NAME]: i18n`Фильтры`, ...(filters as unknown as C) }
     return this as unknown as ArrayForm<T, V>
   }
 
@@ -121,11 +121,17 @@ export class ArrayForm<
     this.config.addCustomButtonBeforeArray?.(form, filters, selfback)
 
     // Array item buttons & navigation
-    if (paginator.canGoBack) form.button(t`§r§3Предыдущая`, BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
+    if (paginator.canGoBack)
+      form.button(i18n.accent`Предыдущая`.toString(player.lang), BUTTON['<'], () =>
+        this.show(player, fromPage - 1, ...args),
+      )
 
     this.addButtons(player, paginator.array, form, filters, selfback)
 
-    if (paginator.canGoNext) form.button(t`§3Следующая`, BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
+    if (paginator.canGoNext)
+      form.button(i18n.accent`Следующая`.toString(player.lang), BUTTON['>'], () =>
+        this.show(player, fromPage + 1, ...args),
+      )
 
     return form.show(player)
   }
@@ -148,11 +154,19 @@ export class ArrayForm<
     filtersDatabase: SettingsDatabase,
     parsedFilters: F,
   ) {
-    form.button(!searchQuery ? t`§3Поиск` : t`§3Результаты поиска по запросу\n${searchQuery}`, BUTTON.search, () => {
-      new ModalForm(t`Поиск`).addTextField(t`Запрос`, t`Ничего не произойдет`).show(player, (ctx, query) => {
-        this.show(player, fromPage, filtersDatabase, parsedFilters, query)
-      })
-    })
+    form.button(
+      !searchQuery
+        ? i18n.accent`Поиск`.toString(player.lang)
+        : i18n.accent`Результаты поиска по запросу\n${searchQuery}`.toString(player.lang),
+      BUTTON.search,
+      () => {
+        new ModalForm(i18n`Поиск`.toString(player.lang))
+          .addTextField(i18n`Запрос`.toString(player.lang), i18n`Ничего не произойдет`.toString(player.lang))
+          .show(player, (ctx, query) => {
+            this.show(player, fromPage, filtersDatabase, parsedFilters, query)
+          })
+      },
+    )
   }
 
   private addFilterButton(
@@ -175,7 +189,7 @@ export class ArrayForm<
     if (size === 1 && Settings.isDropdown(firstFilterConfig.value)) {
       const values = firstFilterConfig.value
       let i = values.findIndex(e => filters[key] === e[0])
-      form.button(l.accent`${firstFilterConfig.name}: ${values[i]?.[1]}`, () => {
+      form.button(noI18n.accent`${firstFilterConfig.name}: ${values[i]?.[1]}`, () => {
         if (i >= values.length - 1) i = 0
         else i++
 

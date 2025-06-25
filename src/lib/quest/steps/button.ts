@@ -1,5 +1,5 @@
 import { form } from 'lib/form/new'
-import { i18n, t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Rewards } from 'lib/utils/rewards'
 import { QS, QSBuilder } from '../step'
 
@@ -11,7 +11,7 @@ export class QSButton extends QS {
 
 export class QSButtonBuilder extends QSBuilder<QSButton> {
   create([text]: [text: QS.TextT, ...args: unknown[]] | []) {
-    super.create(text ? [text] : [t`Заберите награду`])
+    super.create(text ? [text] : [i18n`Заберите награду`])
   }
 
   reward(reward: Rewards) {

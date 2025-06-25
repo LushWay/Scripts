@@ -1,7 +1,7 @@
 import { ItemStack, Player, ScoreName } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { emoji } from 'lib/assets/emoji'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { itemNameXCount } from './item-name-x-count'
 
 export namespace Rewards {
@@ -15,7 +15,7 @@ export namespace Rewards {
         type: 'item'
         count: number
         id: string
-        name?: string
+        name?: Text
       }
 }
 
@@ -51,7 +51,7 @@ export class Rewards {
    * @param name The item name
    * @param count The item count
    */
-  item(id: MinecraftItemTypes | string, count: number, name?: string): Rewards {
+  item(id: MinecraftItemTypes | string, count: number, name?: Text): Rewards {
     this.entries.push({ type: 'item', id, name, count })
     return this
   }
@@ -62,7 +62,7 @@ export class Rewards {
    * @param {Rewards.DatabaseEntry} reward The reward to remove
    */
   remove(reward: Rewards.DatabaseEntry) {
-    this.entries = this.entries.filter(entry => entry != reward)
+    this.entries = this.entries.filter(entry => entry !== reward)
   }
 
   /**
@@ -75,7 +75,7 @@ export class Rewards {
     if (reward.type === 'item' && reward.id) {
       if (!player.container) return
       const item = new ItemStack(reward.id, reward.count)
-      if (reward.name) item.nameTag = reward.name
+      if (reward.name) item.nameTag = reward.name.toString(player.lang)
       player.container.addItem(item)
     } else if (reward.type === 'scores') {
       player.scores[reward.score] += reward.count
@@ -89,14 +89,14 @@ export class Rewards {
    */
   give(player: Player, tell = true): Rewards {
     for (const reward of this.entries) Rewards.giveOne(player, reward)
-    if (tell) player.success(t`Вы получили награды!`)
+    if (tell) player.success(i18n`Вы получили награды!`)
     return this
   }
 
   /**
    * Serializes the object into an array
    *
-   * @returns {Rewards.DatabaseEntry[]} The array of rewards
+   * The array of rewards
    */
   serialize(): Rewards.DatabaseEntry[] {
     return this.entries
@@ -115,12 +115,12 @@ export class Rewards {
       else text = `${reward.score} x${reward.count}`
     } else if ((reward.type as string) === 'item')
       text = itemNameXCount(
-        { nameTag: reward.name, amount: reward.count, typeId: reward.id },
+        { nameTag: reward.name?.toString(player.lang), amount: reward.count, typeId: reward.id },
         undefined,
         undefined,
         player,
       )
-    else text = l`Unknown reward ${reward.type}`
+    else text = noI18n`Unknown reward ${reward.type}`
 
     return text
   }

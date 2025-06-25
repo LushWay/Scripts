@@ -3,7 +3,7 @@ import { BlockStateSuperset } from '@minecraft/vanilla-data'
 import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { WEeditBlockStatesMenu } from '../menu'
 
@@ -28,7 +28,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       .show(player, (_, mode) => {
         storage.mode = mode
         this.saveStorage(slot, storage)
-        player.info(t`Mode is set to ${mode}`)
+        player.info(i18n`Mode is set to ${mode}`)
       })
   }
 
@@ -84,7 +84,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     stateName: string,
   ) {
     const nextStateName = player.isSneaking ? nextValue(stateNames, stateName) : stateName
-    return l`${Vec.string(block, true)} ${block.typeId}\n${Object.entries(allStates)
+    return noI18n`${Vec.string(block, true)} ${block.typeId}\n${Object.entries(allStates)
       .map(([key, value]) => `${(key === stateName ? '§b' : key === nextStateName ? '§9' : '§7') + key}: ${value}`)
       .join('\n')}`
   }
@@ -98,7 +98,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     if (player.isSneaking) {
       if (stateNames.length === 1)
         return player.onScreenDisplay.setActionBar(
-          l.error`Block ${block.typeId} has only one state`,
+          noI18n.error`Block ${block.typeId} has only one state`,
           ActionbarPriority.Highest,
         )
 
@@ -120,7 +120,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
 
   private noStatesToChangeWarning(player: Player, block: Block) {
     return player.onScreenDisplay.setActionBar(
-      t.error`Block ${block.typeId} has no states to change`,
+      noI18n.error`Block ${block.typeId} has no states to change`,
       ActionbarPriority.PvP,
     )
   }

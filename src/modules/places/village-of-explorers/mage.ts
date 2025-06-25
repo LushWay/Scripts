@@ -11,7 +11,7 @@ import {
 import { addNamespace, doNothing, Enchantments, getAuxOrTexture } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { translateEnchantment, translateTypeId } from 'lib/i18n/lang'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'
@@ -25,17 +25,17 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 
 export class Mage extends ShopNpc {
   constructor(group: Group) {
-    super(group.place('mage').name(t`Маг`))
+    super(group.place('mage').name(i18nShared`Маг`))
 
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
 
-    this.shop.body(() => t`Чего пожелаешь?`)
+    this.shop.body(() => i18n`Чего пожелаешь?`)
     this.shop.menu((form, player) => {
       form.itemModifierSection(
-        t`Улучшить меч`,
+        i18n`Улучшить меч`,
         item => ['sword'].some(e => item.typeId.endsWith(e)),
-        t`любой меч`,
+        i18n`любой меч`,
         (form, slot, item) => {
           const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
@@ -48,9 +48,9 @@ export class Mage extends ShopNpc {
       )
 
       form.itemModifierSection(
-        t`Улучшить лук`,
+        i18n`Улучшить лук`,
         item => item.typeId.endsWith('bow'),
-        t`любой лук`,
+        i18n`любой лук`,
         (form, slot, item) => {
           const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
@@ -63,9 +63,9 @@ export class Mage extends ShopNpc {
       )
 
       form.itemModifierSection(
-        t`Улучшить броню`,
+        i18n`Улучшить броню`,
         item => ['chestplate', 'leggings', 'boots', 'helmet'].some(e => item.typeId.endsWith(e)),
-        t`любой элемент брони`,
+        i18n`любой элемент брони`,
         (form, slot, item) => {
           const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
@@ -78,9 +78,9 @@ export class Mage extends ShopNpc {
       )
 
       form.itemModifierSection(
-        t`Улучшить инструмент`,
+        i18n`Улучшить инструмент`,
         item => ['shovel', 'pickaxe', 'axe', 'hoe'].some(e => item.typeId.endsWith(e)),
-        t`любые топор, кирка, мотыга или лопата`,
+        i18n`любые топор, кирка, мотыга или лопата`,
         (form, slot, item) => {
           const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
@@ -92,7 +92,7 @@ export class Mage extends ShopNpc {
       )
 
       form.itemModifierSection(
-        t`Использовать книгу чар`,
+        i18n`Использовать книгу чар`,
         item => item.typeId === MinecraftItemTypes.EnchantedBook,
         translateTypeId(MinecraftItemTypes.EnchantedBook, player.lang),
         (bookForm, book, bookItem) => {
@@ -101,21 +101,21 @@ export class Mage extends ShopNpc {
           if (!bookEnch || !type)
             return bookForm
               .product()
-              .name(t`Нет зачарований`)
+              .name(i18nShared`Нет зачарований`)
               .cost(Incompatible)
               .onBuy(doNothing)
 
           bookForm.itemModifierSection(
-            t`Предмет`,
+            i18n`Предмет`,
             item => item.typeId !== MinecraftItemTypes.EnchantedBook && this.updateEnchatnment(item, type, 1, true).can,
-            t`Предмет для зачарования`,
+            i18n`Предмет для зачарования`,
             (itemForm, target, targetItem, _, addSelectItem) => {
               const enchs = targetItem.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
               const level = targetItem.enchantable?.getEnchantment(new EnchantmentType(type))?.level ?? 0
 
               itemForm
                 .product()
-                .name(t`Выбранная книга: ${translateEnchantment(bookEnch, player.lang)}`)
+                .name(i18nShared`Выбранная книга: ${translateEnchantment(bookEnch, player.lang)}`)
                 .cost(FreeCost)
                 .onBuy(() => bookForm.show())
                 .setTexture(getAuxOrTexture(MinecraftItemTypes.EnchantedBook))
@@ -124,7 +124,7 @@ export class Mage extends ShopNpc {
 
               itemForm
                 .product()
-                .name(t`Зачаровать`)
+                .name(i18nShared`Зачаровать`)
                 .cost(
                   level >= bookEnch.level
                     ? level === bookEnch.level
@@ -144,11 +144,11 @@ export class Mage extends ShopNpc {
         },
       )
 
-      form.section(t`Оружие со способностями`, (form, player) => {
+      form.section(i18n`Оружие со способностями`, (form, player) => {
         const cost = new MultiCost().item(i.DiamondSword).item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10000)
         form
           .product()
-          .name(t.nocolor`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`)
+          .name(i18nShared.nocolor`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`)
           .cost(cost)
           .onBuy(player => {
             if (!player.container) return
@@ -160,14 +160,14 @@ export class Mage extends ShopNpc {
           })
       })
 
-      form.section(t`Все для магии`, form =>
+      form.section(i18n`Все для магии`, form =>
         form
-          .section(t`Грибы`, form =>
+          .section(i18n`Грибы`, form =>
             form
               .itemStack(new ItemStack(i.MushroomStew), new MoneyCost(200))
               .itemStack(new ItemStack(i.RedMushroom), new MoneyCost(200)),
           )
-          .section(t`Зелья`, form => {
+          .section(i18n`Зелья`, form => {
             form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Strength)
             form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Healing)
             form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Swiftness)
@@ -180,10 +180,10 @@ export class Mage extends ShopNpc {
       )
 
       form.itemModifier(
-        t`Отсортировать чарки`,
+        i18n`Отсортировать чарки`,
         FreeCost,
         item => !!item.enchantable,
-        t`любой зачарованный предмет`,
+        i18n`любой зачарованный предмет`,
         (slot, item) => {
           if (!item.enchantable) return
           const prior = [
@@ -195,7 +195,7 @@ export class Mage extends ShopNpc {
           for (const p of prior) {
             const ench = item.enchantable.getEnchantment(p)
             if (!ench) continue
-            if (ench.level > ench.type.maxLevel) return player.fail(t`С чарками такого уровня не работаю, слетят`)
+            if (ench.level > ench.type.maxLevel) return player.fail(i18n`С чарками такого уровня не работаю, слетят`)
 
             item.enchantable.removeEnchantment(ench.type)
             item.enchantable.addEnchantment(ench)
@@ -271,7 +271,7 @@ export class Mage extends ShopNpc {
   }
 }
 
-const LevelIsHigher = ErrorCost(t.error`Уровень зачара предмета уже выше книжки`)
-const LevelIsSame = ErrorCost(t.error`Уровень зачара предмета как у книжки`)
-const MaxLevel = ErrorCost(t.error`Максимальный уровень`)
-const Incompatible = ErrorCost(t`§8Зачарование несовместимо`)
+const LevelIsHigher = ErrorCost(i18n.error`Уровень зачара предмета уже выше книжки`)
+const LevelIsSame = ErrorCost(i18n.error`Уровень зачара предмета как у книжки`)
+const MaxLevel = ErrorCost(i18n.error`Максимальный уровень`)
+const Incompatible = ErrorCost(i18n`§8Зачарование несовместимо`)

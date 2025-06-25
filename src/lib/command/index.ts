@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { l, t } from 'lib/i18n/text'
+import { defaultLang } from 'lib/assets/lang'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
@@ -48,7 +49,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     const parsed = parseCommand(event.message, 1)
     if (!parsed) {
       this.logger.player(event.sender).error`Unable to parse: ${event.message}`
-      return event.sender.fail(l`Failed to parse command`)
+      return event.sender.fail(noI18n`Failed to parse command`)
     } else this.logger.player(event.sender).info`Command ${event.message}`
 
     const { cmd, args, input } = parsed
@@ -88,7 +89,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   static commands: Command[] = []
 
   static getHelpForCommand(command: Command, ctx: CommandContext) {
-    return ctx.error(l`Help is disabled`)
+    return ctx.error(noI18n`Help is disabled`)
   }
 
   [stringifySymbol]() {
@@ -105,7 +106,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     for (const command of this.commands) {
       if (!command.sys.parent && command.sys.name === name) {
         Command.logger
-          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? t.warn`And:\n${command.stack}` : ''}`
+          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? i18n.warn`And:\n${command.stack}` : ''}`
         return
       }
     }
@@ -128,7 +129,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
      * @example
      *   'Bans the player'
      */
-    description: '',
+    description: '' as Text,
 
     /**
      * A function that will determine if a player has permission to use this command
@@ -202,7 +203,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @example
    *   'Bans a player'
    */
-  setDescription(string: string) {
+  setDescription(string: Text) {
     this.sys.description = string
     return this
   }
@@ -404,7 +405,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     const base = command.sys.callback ? [`${type}${description ? `§7§o - ${description}` : ''}`] : []
     return base.concat(
       command.sys.children
-        .map(e => this.getHelp(e, e.sys.description || command.sys.description))
+        .map(e => this.getHelp(e, (e.sys.description || command.sys.description).toString(defaultLang)))
         .flat()
         .map(e => type + ' ' + e),
     )

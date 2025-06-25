@@ -10,7 +10,7 @@ import {
 } from '@minecraft/server'
 import { Command, inspect, isKeyof, noBoolean, stringify, util } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { l, t } from 'lib/i18n/text'
+import { noI18n, textUnitColorize } from 'lib/i18n/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { worldEditPlayerSettings } from '../settings'
 
@@ -170,11 +170,11 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
           ? stringifyBlocksSetRef(value as BlocksSetRef)
           : stringify(value)
 
-        return t`${'§7' + translatedKey}: ${fullValue}`
+        return `§7${translatedKey}: ${textUnitColorize(fullValue, undefined, false)}`
       })
       .filter(noBoolean)
 
-    slot.setLore([' ', ...table.map(e => `§r${l`${e[0]}: ${e[1]}`.slice(0, 48)}`)])
+    slot.setLore([' ', ...table.map(e => `§r${noI18n`${e[0]}: ${e[1]}`.slice(0, 48)}`)])
   }
 
   /** @deprecated */

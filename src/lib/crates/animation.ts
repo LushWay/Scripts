@@ -2,7 +2,7 @@ import { Entity, ItemStack, Player, ShortcutDimensions, TicksPerSecond, system, 
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { StructureRootId } from 'lib/assets/structures'
 import { Cooldown } from '../cooldown'
-import { t } from '../i18n/text'
+import { i18n } from '../i18n/text'
 import { Vec } from '../vector'
 
 export default class ChestLootAnimation {
@@ -48,7 +48,7 @@ export default class ChestLootAnimation {
     })[0]
 
     if (typeof entity === 'undefined') {
-      console.warn(t.error`Unable to spawn armor stand for ${this.id}, location ${Vec.string(location, true)}`)
+      console.warn(i18n.error`Unable to spawn armor stand for ${this.id}, location ${Vec.string(location, true)}`)
       return
     }
 
@@ -106,7 +106,7 @@ export default class ChestLootAnimation {
     if (this.current.entity.isValid) this.current.entity.remove()
     if (this.current.player.isValid) {
       this.current.player.container?.addItem(this.current.item)
-      this.current.player.info(t`Вы получили свою награду!`)
+      this.current.player.info(i18n`Вы получили свою награду!`)
     }
 
     delete this.current

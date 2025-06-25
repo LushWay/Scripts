@@ -4,7 +4,7 @@ import { GameMode } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { is, isNotPlaying, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 function fastGamemode(mode: GameMode, shorname: string) {
@@ -12,7 +12,7 @@ function fastGamemode(mode: GameMode, shorname: string) {
     .setDescription('Переключает режим на ' + mode)
     .setPermissions('builder')
     .executes(ctx => {
-      ctx.player.success(t`${shorname}: ${ctx.player.getGameMode()} -> ${mode}`)
+      ctx.player.success(i18n`${shorname}: ${ctx.player.getGameMode()} -> ${mode}`)
       ctx.player.setGameMode(mode)
     })
 }
@@ -62,9 +62,9 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
         const current = ctx.player.getEffect(effect)
         const effectname = Object.entries(MinecraftEffectTypes).find(e => e[1] === effect)?.[0]
         if (current) {
-          ctx.player.success(t`${'§c-'} ${effectname} ${current.amplifier}`)
+          ctx.player.success(i18n`${'§c-'} ${effectname} ${current.amplifier}`)
         } else {
-          ctx.player.success(t`${'§a+'} ${effectname} ${amplifier}`)
+          ctx.player.success(i18n`${'§a+'} ${effectname} ${amplifier}`)
         }
       }
     })
@@ -115,7 +115,7 @@ new Command('hpi')
               if (typeof hit === 'undefined') return
 
               ctx.player.onScreenDisplay.setActionBar(
-                t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
+                noI18n`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
                 ActionbarPriority.Highest,
               )
             },

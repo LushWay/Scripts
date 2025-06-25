@@ -1,6 +1,6 @@
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { Airdrop, isNotPlaying, Loot, Vec } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../pvp/cannon'
 import { randomLocationInAnarchy } from './random-location-in-anarchy'
@@ -84,8 +84,8 @@ export async function requestAirdrop(isPowerfull: boolean) {
       world.say(
         '§l§a>§r ' +
           (isPowerfull
-            ? t`Усиленный аирдроп скоро упадет на ${location}!`
-            : t`Обычный аирдроп скоро упадет на ${location}!`),
+            ? i18n`Усиленный аирдроп скоро упадет на ${location}!`
+            : i18n`Обычный аирдроп скоро упадет на ${location}!`),
       )
       return airdrop
     } catch (e) {

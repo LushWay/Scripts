@@ -1,7 +1,7 @@
 import { location, LootTable } from 'lib'
 import { Crate } from 'lib/crates/crate'
 import { Cutscene } from 'lib/cutscene'
-import { t } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { DailyQuest } from 'lib/quest/quest'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { Npc } from 'lib/rpg/npc'
@@ -13,9 +13,9 @@ export abstract class City extends SafePlace {
   protected createKits(normalLoot: LootTable, donutLoot: LootTable) {
     normalLoot.id = `§7${this.group.id}§f Normal Crate`
     donutLoot.id = `§7${this.group.id}§f Donut Crate`
-    const normal = new Crate(this.group.place('normal kit').name(t`§7Обычный`), normalLoot)
-    const donut = new Crate(this.group.place('donut kit').name(t`§bУсиленный`), donutLoot)
-    const storageLocationpoint = this.group.place('storage text').name(t`§9Хранилище`)
+    const normal = new Crate(this.group.place('normal kit').name(i18nShared`§7Обычный`), normalLoot)
+    const donut = new Crate(this.group.place('donut kit').name(i18nShared`§bУсиленный`), donutLoot)
+    const storageLocationpoint = this.group.place('storage text').name(i18nShared`§9Хранилище`)
     const storageLocation = location(storageLocationpoint)
     const storageFloatingText = new FloatingText(storageLocationpoint.id, this.group.dimensionType)
     storageLocation.onLoad.subscribe(location => {
@@ -30,7 +30,7 @@ export abstract class City extends SafePlace {
 
   donutCrate?: Crate
 
-  cutscene = new Cutscene(this.group.id, t`Исследование ${this.name}`)
+  cutscene = new Cutscene(this.group.id, i18n`Исследование ${this.name}`)
 
   jeweler = new Jeweler(this.group)
 
@@ -39,8 +39,8 @@ export abstract class City extends SafePlace {
   abstract guide: Npc
 
   visitCityQuest = new DailyQuest(
-    this.group.place('visit').name(t`Посети город`),
-    t`Сходи в город, сделай запланированые покупки`,
+    this.group.place('visit').name(i18nShared`Посети город`),
+    i18n`Сходи в город, сделай запланированые покупки`,
     q => {
       if (this.safeArea) q.reachRegion(this.safeArea, `0/1`)
     },

@@ -1,7 +1,7 @@
 import { Loot, LootTable } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
@@ -46,18 +46,18 @@ const defaultLoot = new Loot('dungeon_default_loot')
 
 const d = StructureDungeonsId
 
-const names: Record<string, string> = {
-  [d.GasStation1]: t`Заправка 1`,
-  [d.GasStation2]: t`Заправка 2`,
-  [d.GasStation3]: t`Заправка 3`,
-  [d.GasStation4]: t`Заправка 4`,
-  [d.GasStationGarage]: t`Гараж`,
-  [d.Avanpost]: t`§cАванпост`,
-} satisfies Record<StructureDungeonsId, string>
+const names: Record<string, Text> = {
+  [d.GasStation1]: i18n`Заправка 1`,
+  [d.GasStation2]: i18n`Заправка 2`,
+  [d.GasStation3]: i18n`Заправка 3`,
+  [d.GasStation4]: i18n`Заправка 4`,
+  [d.GasStationGarage]: i18n`Гараж`,
+  [d.Avanpost]: i18n`§cАванпост`,
+} satisfies Record<StructureDungeonsId, Text>
 
-const customNames: Record<string, string> = {
-  bunker: t`§4Бункер`,
-  avanpostTent: t`§cПалатка аванпоста`,
+const customNames: Record<string, Text> = {
+  bunker: i18n`§4Бункер`,
+  avanpostTent: i18n`§cПалатка аванпоста`,
 }
 
 const powerfullLoot: Record<string, LootTable | undefined> = {

@@ -1,6 +1,6 @@
 import { Block, Player, system, world } from '@minecraft/server'
 import { actionGuard, ActionGuardOrder, LockAction, Region, Vec } from 'lib'
-import { t } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { askForExitingNewbieMode, isNewbie } from 'lib/rpg/newbie'
 import { BaseItem, baseLogger } from '../base'
@@ -31,8 +31,8 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   if (isNewbie(player)) {
     event.cancel = true
     return system.delay(() =>
-      askForExitingNewbieMode(player, t`решили создать базу`, () =>
-        player.success(t`Теперь вы можете свободно создать базу!`),
+      askForExitingNewbieMode(player, i18n`решили создать базу`, () =>
+        player.success(i18n`Теперь вы можете свободно создать базу!`),
       ),
     )
   }
@@ -40,7 +40,7 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const underLimit = 62
   if (block.y < underLimit) {
     event.cancel
-    return player.fail(t.error`Нельзя создать базу на высоте ниже ${underLimit}!`)
+    return player.fail(i18n.error`Нельзя создать базу на высоте ниже ${underLimit}!`)
   }
 
   const region = BaseRegion.getAll().find(e => e.getMemberRole(player))
@@ -48,14 +48,14 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
     event.cancel = true
     const isOwner = region.getMemberRole(player) === 'owner'
     return player.fail(
-      t.nocolor`§cВы уже ${isOwner ? t`владеете базой` : t`состоите в базе игрока '${region.ownerName}'`}!`,
+      i18n.nocolor`§cВы уже ${isOwner ? i18n`владеете базой` : i18n`состоите в базе игрока '${region.ownerName}'`}!`,
     )
   }
 
   const nearRegions = Region.getNear(block, 50)
   if (nearRegions.length) {
     event.cancel = true
-    return player.fail(t.error`Рядом есть другие регионы!`)
+    return player.fail(i18n.error`Рядом есть другие регионы!`)
   }
 
   system.delay(() => createBase(block, player))
@@ -79,5 +79,5 @@ function createBase(block: Block, player: Player) {
       owners: [player.id],
     },
   })
-  player.success(t`База успешно создана! Чтобы открыть меню базы используйте команду ${baseCommand}`)
+  player.success(i18n`База успешно создана! Чтобы открыть меню базы используйте команду ${baseCommand}`)
 }

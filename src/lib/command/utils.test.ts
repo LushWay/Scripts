@@ -22,22 +22,7 @@ describe('command utils', () => {
     expect(tell.mock.calls).toMatchInlineSnapshot(`
       [
         [
-          {
-            "rawtext": [
-              {
-                "text": "§c",
-              },
-              {
-                "translate": "commands.generic.unknown",
-                "with": [
-                  "bbb",
-                ],
-              },
-            ],
-          },
-        ],
-        [
-          "§cВы имели ввиду §f§f§c§fbbc§c (§750§c%%)§c, §f§c§fbbd§c (§750§c%%)§c или §f§c§fbbe§c (§750§c%%)§c§c?",
+          "§cВы имели ввиду §f§fbbc (50%%)§c, §fbbd (50%%)§c или §fbbe (50%%)§c§c?",
         ],
         [
           "§cСписок всех доступных вам команд: §f.help",

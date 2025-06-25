@@ -1,7 +1,7 @@
 import { GameMode, Player } from '@minecraft/server'
 import { EventSignal, InventoryStore, Portal, ValidLocation, Vec, location } from 'lib'
 import { consoleLang } from 'lib/assets/lang'
-import { l, t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { createLogger } from 'lib/utils/logger'
@@ -26,9 +26,9 @@ class AnarchyBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location(Spawn.group.place('anarchy center').name(l`центр анархии`))
+  centerLocation = location(Spawn.group.place('anarchy center').name(noI18n`центр анархии`))
 
-  portalLocation = location(Spawn.group.place('anarchy portal').name(l`портал на анархию`))
+  portalLocation = location(Spawn.group.place('anarchy portal').name(noI18n`портал на анархию`))
 
   inventoryStore = new InventoryStore('anarchy')
 
@@ -41,10 +41,10 @@ class AnarchyBuilder extends AreaWithInventory {
       this.zone = new RadioactiveZone(centerLocation, 2000)
 
       new Command('radius')
-        .setDescription(t`Выдает радиус границы анархии сейчас`)
+        .setDescription(i18n`Выдает радиус границы анархии сейчас`)
         .setGroup('public')
         .setPermissions('member')
-        .executes(ctx => ctx.player.info(t`Радиус границы анархии сейчас: ${this.zone?.radius}`))
+        .executes(ctx => ctx.player.info(i18n`Радиус границы анархии сейчас: ${this.zone?.radius}`))
     })
 
     this.portalLocation.onLoad.subscribe(portalLocation => this.createPortal(portalLocation))
@@ -54,7 +54,7 @@ class AnarchyBuilder extends AreaWithInventory {
     this.portal = new Portal('anarchy', ...Vec.around(portalLocation, 0, 1, 1), player => {
       if (isNotPlaying(player)) return tpMenuOnce(player)
       if (player.database.inv === this.inventoryName) {
-        return player.fail(t.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)
+        return player.fail(i18n.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)
       }
 
       if (!Portal.canTeleport(player)) return
@@ -83,16 +83,16 @@ class AnarchyBuilder extends AreaWithInventory {
       }
     })
 
-    const command = this.portal.createCommand().setDescription(t`§bПеремещает на анархию`)
+    const command = this.portal.createCommand().setDescription(i18n`§bПеремещает на анархию`)
 
     command
       .overload('clearpos')
       .setDescription(
-        t`Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку`,
+        i18n`Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку`,
       )
       .executes(ctx => {
         delete ctx.player.database.survival.anarchy
-        ctx.player.success(t`Успех! Теперь вы можете использовать ${command} для перемещения на случайную позицию.`)
+        ctx.player.success(i18n`Успех! Теперь вы можете использовать ${command} для перемещения на случайную позицию.`)
       })
   }
 

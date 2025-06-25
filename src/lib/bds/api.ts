@@ -1,4 +1,4 @@
-import { t } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { inspect } from 'lib/util'
 import './events'
 import { ServerModules } from './modules'
@@ -15,7 +15,7 @@ export async function request<Path extends keyof ScriptServerRpc.OutgoingRoutes>
   path: Path,
   body: ScriptServerRpc.OutgoingRoutes[Path]['req'],
 ): Promise<ScriptServerRpc.OutgoingRoutes[Path]['res']> {
-  console.info(t`request(${path}, ${body})`)
+  console.info(i18n`request(${path}, ${body})`)
 
   if (ServerModules.Net) {
     const { http, HttpRequest, HttpRequestMethod } = ServerModules.Net
@@ -41,7 +41,7 @@ export async function request<Path extends keyof ScriptServerRpc.OutgoingRoutes>
       return (response.body ? JSON.parse(response.body) : undefined) as ScriptServerRpc.OutgoingRoutes[Path]['res']
     } catch (error) {
       throw new RequestError(
-        t.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
+        noI18n.error`request(${path}): Failed to parse NodeServer response.body(${inspect(response.body)}): ${error}`,
       )
     }
   } else console.error('NET MODULE IS DISABLED, SKIPPING')
