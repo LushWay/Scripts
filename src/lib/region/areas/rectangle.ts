@@ -1,5 +1,4 @@
 import { Vector3 } from '@minecraft/server'
-import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { Area } from './area'
@@ -44,7 +43,7 @@ class Rectangle extends Area<RectangleDatabase> {
     return [this.database.from, this.database.to]
   }
 
-  getFormDescription(): TextTable {
+  getFormDescription(): Text.Table {
     return [
       ['From', Vec.string(this.database.from, true)],
       ['To', Vec.string(this.database.to, true)],

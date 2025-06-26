@@ -1,4 +1,3 @@
-import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vec, VecXZ } from 'lib/vector'
 import { Area } from './area'
@@ -37,7 +36,7 @@ class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radiu
     this.database.center = c
   }
 
-  getFormDescription(): TextTable {
+  getFormDescription(): Text.Table {
     return [
       ['Center', Vec.string(this.center, true)],
       ['Radius', this.radius],

@@ -35,7 +35,7 @@ export class Group {
 
   constructor(
     readonly id: string,
-    readonly name?: SharedText,
+    readonly name?: Text,
   ) {
     const existing = Group.groups.get(id)
     if (existing) return existing

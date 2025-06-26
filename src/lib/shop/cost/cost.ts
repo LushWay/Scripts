@@ -19,7 +19,7 @@ export abstract class Cost<T = unknown> {
     const text = typeof product === 'function' ? product(canBuy) : product
 
     // TODO Fix colors
-    return { text, productName: i18n.colors({ unit })`§l${text}§r\n${cost.toString(player, canBuy)}` }
+    return { text, productName: i18n.restyle({ unit })`§l${text}§r\n${cost.toString(player, canBuy)}` }
   }
 
   get type(): CostType {

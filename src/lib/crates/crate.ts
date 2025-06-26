@@ -1,6 +1,7 @@
 import { LocationInUnloadedChunkError, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { form } from 'lib/form/new'
+import { SharedI18nMessage } from 'lib/i18n/message'
 import { is } from 'lib/roles'
 import { customItems } from 'lib/rpg/custom-item'
 import { FloatingText } from 'lib/rpg/floating-text'
@@ -50,8 +51,8 @@ export class Crate {
   }
 
   private onValidLocation(location: ValidLocation<Vector3>) {
-    console.log('on valid location')
-    this.floatingText.update(location, i18nShared`${this.place.name} ящик\n§7${this.place.group.name}`)
+    const groupName = this.place.group.name instanceof SharedI18nMessage ? this.place.group.name : 'noname'
+    this.floatingText.update(location, i18nShared`${this.place.name} ящик\n§7${groupName}`)
     if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionType)
 
     try {

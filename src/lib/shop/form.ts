@@ -10,7 +10,7 @@ import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
 import { Message } from 'lib/i18n/message'
-import { i18n, i18nJoin, Text } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Cost } from 'lib/shop/cost'
 import { isKeyof } from 'lib/util'
 import { itemNameXCount } from '../utils/item-name-x-count'
@@ -198,7 +198,7 @@ export class ShopForm {
     // TODO Fix colors
     const actionForm = new ActionForm(
       Message.translate(player.lang, form.title()),
-      i18nJoin`${message}${message ? '\n\n' : ''}${form.body()}`.toString(player.lang),
+      i18n.join`${message}${message ? '\n\n' : ''}${form.body()}`.toString(player.lang),
     )
     if (back) actionForm.addButtonBack(back)
 
@@ -207,7 +207,7 @@ export class ShopForm {
         // Section
         const { name, onOpen, texture } = button
 
-        actionForm.button(i18nJoin`${name}`.color(i18nJoin.accent).toString(player.lang), texture, () => {
+        actionForm.button(i18n.join`${name}`.color(i18n.accent).toString(player.lang), texture, () => {
           ShopForm.showSection(name, form, this.shop, player, this.show, onOpen)
         })
       } else {

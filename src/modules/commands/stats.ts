@@ -9,7 +9,7 @@ import {
   Settings,
 } from 'lib'
 import { NewFormCallback } from 'lib/form/new'
-import { i18n, TextTable, textTable } from 'lib/i18n/text'
+import { i18n, textTable } from 'lib/i18n/text'
 
 new Command('stats').setDescription(i18n`Показывает статистику по игре`).executes(ctx => showStats(ctx.player))
 
@@ -67,7 +67,7 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
 }
 
 function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreName, getN: (n: Text) => string) {
-  const table: TextTable[number][] = []
+  const table: Text.Table[number][] = []
   for (const key of scoreboardObjectiveNames.stats) {
     const k = getKey(key)
     table.push([getN(scoreboardDisplayNames[k]), s[k]])
@@ -75,5 +75,5 @@ function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreNa
     if (key === 'damageGive')
       table.push([getN(i18n`Нанесено/Получено`), s[getKey('damageGive')] / s[getKey('damageRecieve')]])
   }
-  return table satisfies TextTable
+  return table satisfies Text.Table
 }

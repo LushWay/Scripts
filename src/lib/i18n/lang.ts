@@ -117,5 +117,3 @@ export function rawMessageToString(rawMessage: RawMessage, lang: Language) {
 
   return result
 }
-
-import './plural'

@@ -7,7 +7,7 @@ import { ArrayForm } from 'lib/form/array'
 import { ChestButtonOptions, ChestForm } from 'lib/form/chest'
 import { ask } from 'lib/form/message'
 import { translateTypeId } from 'lib/i18n/lang'
-import { i18nJoin } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { weRandomizerTool } from 'modules/world-edit/tools/randomizer'
 import {
@@ -34,7 +34,7 @@ export function WEmenu(player: Player, body = '') {
   const we = WorldEdit.forPlayer(player)
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  form.button(i18nJoin.accent`Наборы блоков`.size(getOwnBlocksSetsCount(player.id)).toString(player.lang), () =>
+  form.button(i18n.accent.join`Наборы блоков`.size(getOwnBlocksSetsCount(player.id)).toString(player.lang), () =>
     WEblocksSetsMenu(player),
   )
 
@@ -44,10 +44,10 @@ export function WEmenu(player: Player, body = '') {
 
   addToForm(activeTools)
 
-  form.button(i18nJoin.accent`Отмена действий`.size(we.history.length).toString(player.lang), () =>
+  form.button(i18n.accent.join`Отмена действий`.size(we.history.length).toString(player.lang), () =>
     WEundoRedoMenu(player),
   )
-  form.button(i18nJoin.accent`Создать сундук блоков из набора`.toString(player.lang), () =>
+  form.button(i18n.accent.join`Создать сундук блоков из набора`.toString(player.lang), () =>
     WEChestFromBlocksSet(player),
   )
 
@@ -195,7 +195,7 @@ function WEotherPlayersBlockSetsMenu(player: Player, back: VoidFunction) {
       const name = Player.name(otherPlayerId) ?? otherPlayerId
 
       return [
-        filters.blockCount ? i18nJoin.nocolor`${name}`.size(Object.keys(blocksSets).length) : name,
+        filters.blockCount ? i18n.nocolor.join`${name}`.size(Object.keys(blocksSets).length) : name,
         () => {
           WEplayerBlockSetMenu(player, otherPlayerId, blocksSets, () => WEotherPlayersBlockSetsMenu(player, back))
         },

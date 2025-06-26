@@ -10,7 +10,7 @@ export class XPCost extends Cost {
   }
 
   toString(_: Player, canBuy?: boolean): string {
-    return noI18n.colors({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' })`${this.levels.toString()}lvl`
+    return noI18n.restyle({ text: canBuy ? '§7' : '§4', unit: canBuy ? '§a' : '§c' })`${this.levels.toString()}lvl`
   }
 
   has(player: Player): boolean {

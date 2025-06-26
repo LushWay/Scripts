@@ -81,7 +81,7 @@ export function suggest(player: Pick<Player, 'tell' | 'lang'>, input: string, op
 
   player.tell(
     i18n.error`Вы имели ввиду ${intlListFormat(
-      i18n.error.currentColors,
+      i18n.error.style,
       player.lang,
       'or',
       search.slice(0, settings.maxSuggestionsCount).map(e => noI18n.nocolor`${e[0]} (${~~(e[1] * 100)}%%)`),

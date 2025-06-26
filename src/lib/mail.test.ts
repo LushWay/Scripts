@@ -3,7 +3,7 @@ import 'lib/extensions/player'
 import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/utils/rewards'
 import { TEST_clearDatabase } from 'test/utils'
-import { i18nJoin } from './i18n/text'
+import { i18n } from './i18n/text'
 
 describe('mail', () => {
   beforeEach(() => {
@@ -12,13 +12,13 @@ describe('mail', () => {
   })
 
   it('should send mail', () => {
-    Mail.send('playerId', i18nJoin`Some mail`, i18nJoin`Content`, new Rewards())
+    Mail.send('playerId', i18n.join`Some mail`, i18n.join`Content`, new Rewards())
 
     expect(Mail.getUnreadMessagesCount('playerId')).toBe(1)
   })
 
   it('should send serializeable mail', () => {
-    Mail.send('playerId', i18nJoin`Some mail`, i18nJoin`Content`, new Rewards())
+    Mail.send('playerId', i18n.join`Some mail`, i18n.join`Content`, new Rewards())
 
     expect(Mail.getLetters('playerId')).toMatchInlineSnapshot(`
       [

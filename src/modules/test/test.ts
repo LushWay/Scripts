@@ -40,7 +40,7 @@ import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
-import { i18n, i18nJoin, noI18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
@@ -526,14 +526,14 @@ const tests: Record<
   },
 
   mail(ctx) {
-    Mail.send(ctx.player.id, i18nJoin`Zolkin`, i18nJoin`Привет, мир!`, new Rewards())
+    Mail.send(ctx.player.id, i18n.join`Zolkin`, i18n.join`Привет, мир!`, new Rewards())
   },
   mailr(ctx) {
     ctx.player.id
     Mail.send(
       ctx.player.id,
-      i18nJoin`Bugrock`,
-      i18nJoin`это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст`,
+      i18n.join`Bugrock`,
+      i18n.join`это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст`,
       new Rewards().score('money', 50).score('leafs', 100).item(MinecraftItemTypes.Diamond, 12),
     )
   },

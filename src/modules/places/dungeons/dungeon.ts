@@ -12,7 +12,7 @@ import {
   Vec,
 } from 'lib'
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
-import { i18n, noI18n, TextTable } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
@@ -149,7 +149,7 @@ export class DungeonRegion extends Region {
     })
   }
 
-  customFormDescription(player: Player): TextTable {
+  customFormDescription(player: Player): Text.Table {
     return [
       ...super.customFormDescription(player),
       ['Rotation', this.ldb.rotation],

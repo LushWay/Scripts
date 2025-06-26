@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { disableAdventureNear } from 'lib'
-import { i18n, noI18n, TextTable } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
@@ -68,7 +68,7 @@ export class BaseRegion extends RegionWithStructure {
     state: RottingState.No,
   }
 
-  customFormDescription(player: Player): TextTable {
+  customFormDescription(player: Player): Text.Table {
     return [
       ...super.customFormDescription(player),
       ['Level', RottingState[this.ldb.level]],

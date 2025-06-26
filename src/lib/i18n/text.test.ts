@@ -4,9 +4,9 @@ import { Player } from '@minecraft/server'
 import { ms } from 'lib'
 import { Language } from 'lib/assets/lang'
 import { TEST_createPlayer } from 'test/utils'
-import { Message } from './message'
+import { Message, ServerSideI18nMessage } from './message'
 import './text'
-import { i18n, textTable } from './text'
+import { i18n, i18nShared, textTable } from './text'
 
 let player: Player
 beforeEach(() => {
@@ -19,7 +19,9 @@ describe('i18n', () => {
       `"§7Some string with §f3 seconds§7 and§7 §7(§630§7)"`,
     )
 
-    expect(i18n`Гробовщику посвящается`.toString(Language.en_US)).toMatchInlineSnapshot(`"Dedicated to the gravedigger"`)
+    expect(i18n`Гробовщику посвящается`.toString(Language.en_US)).toMatchInlineSnapshot(
+      `"Dedicated to the gravedigger"`,
+    )
 
     expect(i18n`Вы были выгнаны из клана игроком '${1}'. Причина: ${2}`.toString(Language.en_US)).toMatchInlineSnapshot(
       `"§7You were kicked from the clan by player '§61§7'. Reason: §62§7"`,
@@ -44,7 +46,7 @@ describe('text', () => {
   })
 
   it('should apply options', () => {
-    expect(i18n.colors({ unit: '§g', text: '§4' })`Все должно работать ${player}`).toMatchInlineSnapshot(
+    expect(i18n.restyle({ unit: '§g', text: '§4' })`Все должно работать ${player}`).toMatchInlineSnapshot(
       `"§4Все должно работать §gTest player name§4"`,
     )
 
@@ -157,12 +159,12 @@ describe('text', () => {
     expect(i18n.hhmmss(3000)).toMatchInlineSnapshot(`"00:00:03"`)
     expect(i18n.hhmmss(ms.from('hour', 4) + ms.from('min', 32) + ms.from('sec', 1))).toMatchInlineSnapshot(`"04:32:01"`)
     expect((i18n.hhmmss(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
-      `"100 дней, 00:00:03"`,
+      `"§7§6100§7 д. §f00:00:03§7"`,
     )
 
     expect(i18n.error.hhmmss(3000)).toMatchInlineSnapshot(`"00:00:03"`)
     expect((i18n.error.hhmmss(ms.from('day', 100) + 3000) as Message).toString(lang)).toMatchInlineSnapshot(
-      `"100 дней, 00:00:03"`,
+      `"§c§7100§c д. §f00:00:03§c"`,
     )
   })
 
@@ -178,6 +180,16 @@ describe('text', () => {
     expect(i18n.nocolor`Size`.size(0).toString(lang)).toMatchInlineSnapshot(`"Size"`)
     expect(i18n.error`Size`.size(3).toString(lang)).toMatchInlineSnapshot(`"§cSize§c §c(§73§c)"`)
     expect(i18n.error`Size`.size(0).toString(lang)).toMatchInlineSnapshot(`"§cSize"`)
+  })
+
+  it('should error', () => {
+    // @ts-expect-error
+    i18nShared`${i18n`аааа`}`
+  })
+
+  it('should join i18n values', () => {
+    const tr = new ServerSideI18nMessage(i18n.style, () => 'msg')
+    expect(i18n.join`(${tr}) ${tr}`.toString(Language.en_US)).toMatchInlineSnapshot(`"§7(§fmsg§7) §fmsg§7"`)
   })
 })
 

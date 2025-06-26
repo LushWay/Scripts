@@ -6,7 +6,7 @@ import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
-import { i18n, i18nJoin, noI18n } from './i18n/text'
+import { i18n, noI18n } from './i18n/text'
 import stringifyError from './utils/error'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace
@@ -394,7 +394,7 @@ export function worldSettingsMenu(player: Player) {
     }
 
     form.button(
-      i18nJoin.nocolor`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).toString(player.lang),
+      i18n.nocolor.join`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).toString(player.lang),
       () => {
         settingsGroupMenu(player, groupId, false)
       },

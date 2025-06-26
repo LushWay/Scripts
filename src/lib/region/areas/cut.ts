@@ -1,4 +1,3 @@
-import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { Area, AreaAsJson } from './area'
@@ -59,7 +58,7 @@ class Cut extends Area<CutDatabase> {
     if (this.parent instanceof SphereArea || this.parent instanceof CylinderArea) this.parent.center = c
   }
 
-  getFormDescription(): TextTable {
+  getFormDescription(): Text.Table {
     return [['Cut', this.database.cut], ...(this.parent?.getFormDescription() ?? [])]
   }
 }

@@ -2,7 +2,7 @@ import { EntityDamageCause, world } from '@minecraft/server'
 import { isKeyof } from 'lib'
 import { defaultLang } from 'lib/assets/lang'
 import { ItemLoreSchema } from 'lib/database/item-stack'
-import { i18n, i18nJoin, noI18n } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { rollChance } from 'lib/rpg/random'
 
 export enum Ability {
@@ -12,14 +12,14 @@ export enum Ability {
 }
 
 const names = {
-  [Ability.Vampire]: i18n`Вампиризм`,
-  [Ability.ExtraDamage]: i18n`Дополнительный урон`,
-  [Ability.Nothing]: i18n`Неизвестная`,
-} satisfies Record<Ability, Text>
+  [Ability.Vampire]: i18nShared`Вампиризм`,
+  [Ability.ExtraDamage]: i18nShared`Дополнительный урон`,
+  [Ability.Nothing]: i18nShared`Неизвестная`,
+} satisfies Record<Ability, SharedText>
 
 const descriptions = {
-  [Ability.Vampire]: i18n`Восстанавливает вам половину наносимого этим мечом урона`,
-  [Ability.ExtraDamage]: i18n`10% шанс сделать двойной урон`,
+  [Ability.Vampire]: i18nShared`Восстанавливает вам половину наносимого этим мечом урона`,
+  [Ability.ExtraDamage]: i18nShared`10% шанс сделать двойной урон`,
   [Ability.Nothing]: '',
 }
 
@@ -27,7 +27,7 @@ export const schema = new ItemLoreSchema('item-ability')
   .property('ability', String)
   .display(i18n`Способность`, p =>
     isKeyof(p, descriptions)
-      ? i18nJoin`${names[p]}\n\n${descriptions[p]}`.toString(defaultLang)
+      ? i18n.join`${names[p]}\n\n${descriptions[p]}`.toString(defaultLang)
       : names[Ability.Nothing].toString(defaultLang),
   )
   .build()

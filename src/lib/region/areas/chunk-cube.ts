@@ -1,5 +1,4 @@
 import { Vector3 } from '@minecraft/server'
-import { TextTable } from 'lib/i18n/text'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { VecXZ } from 'lib/vector'
 import { Area } from './area'
@@ -44,7 +43,7 @@ class ChunkCube extends Area<ChunkCubeDatabase> {
     return { x, y: this.centerY, z }
   }
 
-  getFormDescription(): TextTable {
+  getFormDescription(): Text.Table {
     return [
       ['From', `${this.database.from.x} ${this.database.from.z}`],
       ['To', `${this.database.to.x} ${this.database.to.z}`],

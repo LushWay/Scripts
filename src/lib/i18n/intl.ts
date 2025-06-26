@@ -3,7 +3,7 @@ import 'lib/assets/intl'
 
 import { defaultLang, IntlLanguage, Language, supportedLanguages } from 'lib/assets/lang'
 import { ms } from 'lib/utils/ms'
-import { Text, textUnitColorize } from './text'
+import { textUnitColorize } from './text'
 
 function intlCreate<T>(creator: (intlLocale: string) => T) {
   const locales = Object.fromEntries(supportedLanguages.map(e => [e, creator(IntlLanguage[e])]))
@@ -22,10 +22,8 @@ export function intlListFormat(colors: Text.Colors, language: Language, type: 'o
 
 const plural = intlCreate(e => new Intl.PluralRules(e, { type: 'cardinal', localeMatcher: 'lookup' }))
 
-// TODO Figure out how to generate plurals
 export function intlPlural(language: Language, n: number) {
- return plural(language).select(n)
-  
+  return plural(language).select(n)
 }
 
 declare global {

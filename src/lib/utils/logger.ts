@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { type Text, noI18n } from '../i18n/text'
+import { noI18n } from '../i18n/text'
 
 /** Creates new logger that will use name as prefix and will output info to the console */
 export function createLogger(name: string) {
@@ -28,12 +28,12 @@ type Logger = ReturnType<typeof createLogger>
 
 const playerLoggers = new WeakPlayerMap<Logger>()
 
-const debug = noI18n.colors({ unit: '§l§6', text: '§f' })
+const debug = noI18n.restyle({ unit: '§l§6', text: '§f' })
 const info = noI18n
 const warn = noI18n.warn
 const error = noI18n.error
 
-function createLevel(name: string, level: 'debug' | 'error' | 'info' | 'warn', text: Text.Fn<string>) {
+function createLevel(name: string, level: 'debug' | 'error' | 'info' | 'warn', text: Text.Fn<string, unknown>) {
   return (t: unknown, ...args: unknown[]) => {
     if (isTemplateStringsArray(t)) {
       console[level](name, text(t, ...args))

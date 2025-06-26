@@ -1,4 +1,30 @@
 {
+  "\u0000 д. \u0000": [
+    "",
+    " д. ",
+    ""
+  ],
+  "Телепорт к игроку...": "Teleport to player...",
+  "\u0000 игроков": {
+    "one": [
+      "",
+      " player"
+    ],
+    "other": [
+      "",
+      " players"
+    ]
+  },
+  "У вас \u0000 непрочитанных сообщений!": {
+    "one": [
+      "You have ",
+      " unread message!"
+    ],
+    "other": [
+      "You have ",
+      " unread messages!"
+    ]
+  },
   "Достижение получено: \u0000! Заберите награды, используя \u0000": [
     "Achievement unlocked: ",
     "! Claim your rewards using ",

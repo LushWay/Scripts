@@ -1,5 +1,5 @@
 import { Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
-import { i18n, noI18n, TextTable } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
   actionGuard,
@@ -128,7 +128,7 @@ export class MineareaRegion extends RegionWithStructure {
     return this.newbie ? i18n.nocolor`§bЗона добычи новичков` : i18n.nocolor`§7Зона добычи`
   }
 
-  customFormDescription(player: Player): TextTable {
+  customFormDescription(player: Player): Text.Table {
     return [
       ['Building', this.building],
       ['Restoring structure', this.restoringStructureProgress],

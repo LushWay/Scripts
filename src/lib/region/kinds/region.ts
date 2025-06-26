@@ -2,7 +2,7 @@ import { Player, world } from '@minecraft/server'
 import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
 import { removeDefaults, setDefaults } from 'lib/database/defaults'
 import { ActionForm } from 'lib/form/action'
-import { noI18n, TextTable } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
@@ -304,7 +304,7 @@ export class Region {
   }
 
   /** Can be overriden to add custom description */
-  customFormDescription(player: Player): TextTable {
+  customFormDescription(player: Player): Text.Table {
     return [[noI18n`Приоритет`, this.priority]]
   }
 }

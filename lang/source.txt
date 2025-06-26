@@ -185,6 +185,11 @@ file:///.//src/lib/form/action.ts
 §cВы уверены, что хотите {0}?
 
 
+file:///.//src/lib/form/message.ts
+Отмена
+Вы уверены?
+
+
 file:///.//src/lib/form/array.ts
 Фильтры
 Предыдущая
@@ -200,11 +205,6 @@ file:///.//src/lib/form/array.ts
 file:///.//src/lib/form/lore.ts
 Хорошо, назад
 История
-
-
-file:///.//src/lib/form/message.ts
-Отмена
-Вы уверены?
 
 
 file:///.//src/lib/form/modal.ts
@@ -237,19 +237,10 @@ file:///.//src/lib/get-fullname.ts
 §bНовичок
 
 
-file:///.//src/lib/i18n/plural.ts
-There is {0} unread messageв
-{0} unread messageв
-
-
 file:///.//src/lib/i18n/text.ts
+{0} д. {0}
 §fДа
 §cНет
-
-
-file:///.//src/lib/mail.ts
-{0}: {0}, просмотреть: .mail
-Почта
 
 
 file:///.//src/lib/player-join.ts
@@ -269,6 +260,11 @@ file:///.//src/lib/player-join.ts
 §6Доброе утро
 §bДобрый день
 §3Добрый вечер
+
+
+file:///.//src/lib/mail.ts
+{0}: {0}, просмотреть: .mail
+Почта
 
 
 file:///.//src/lib/portals.ts
@@ -362,20 +358,12 @@ file:///.//src/lib/region/command.ts
 Удалить
 
 
-file:///.//src/lib/region/index.ts
-Нельзя сражаться в мирной зоне
-
-
 file:///.//src/lib/region/kinds/boss-arena.ts
 §cБосс §6{0}
 
 
-file:///.//src/lib/region/kinds/minearea.ts
-§bЗона добычи новичков
-§7Зона добычи
-Вы не можете добывать блоки в зоне добычи новичков
-Регион сохраняется
-Регион создается. {0}%%
+file:///.//src/lib/region/index.ts
+Нельзя сражаться в мирной зоне
 
 
 file:///.//src/lib/region/kinds/road.ts
@@ -411,16 +399,16 @@ file:///.//src/lib/rpg/custom-item.ts
 С помощью него вы можете сделать предмет у инженера
 
 
-file:///.//src/lib/rpg/loot-table-preview.ts
-Содержимое
-Просмотр содержимого таблиц лута
-
-
 file:///.//src/lib/rpg/leaderboard.ts
 к
 млн
 млрд
 трлн
+
+
+file:///.//src/lib/rpg/loot-table-preview.ts
+Содержимое
+Просмотр содержимого таблиц лута
 
 
 file:///.//src/lib/rpg/menu.ts
@@ -469,17 +457,17 @@ JSON-Объект
 §dНастройки
 
 
+file:///.//src/lib/shop/buttons/item-modifier.ts
+Зачарования:\n{0}
+Выбранный предмет: {0}\nНажмите, чтобы сменить
+
+
 file:///.//src/lib/shop/buttons/sellable-item.ts
 Товара на складе: {0}/{0}, {0}%%
 Продать
 Купить
 Склад переполнен
 Товар закончился
-
-
-file:///.//src/lib/shop/buttons/item-modifier.ts
-Зачарования:\n{0}
-Выбранный предмет: {0}\nНажмите, чтобы сменить
 
 
 file:///.//src/lib/shop/cost/item-cost.ts
@@ -493,18 +481,6 @@ file:///.//src/lib/shop/cost/multi-cost.ts
 
 file:///.//src/lib/shop/cost/xp.ts
 Нужно уровней опыта: {0}, {0}/{0}
-
-
-file:///.//src/lib/shop/shop.ts
-Магазин\n§7Внутриигровой магазин
-Подтверждение покупки
-Определяет, включено ли подтверждение перед покупкой.
-Показывать счет
-Показывать ли счет в меню (монеты, листья)
-Продаваемые предметы
-Сразу открывать меню покупки
-Подтверждение перед покупкой
-Ваш баланс
 
 
 file:///.//src/lib/shop/product.ts
@@ -523,14 +499,26 @@ file:///.//src/lib/shop/product.ts
 При покупке произошла ошибка. {0}
 
 
-file:///.//src/lib/utils/item-name-x-count.ts
- (долгое)
-
-
 file:///.//src/lib/shop/sell-buy-errors.ts
 Покупка невозможна
 Продажа невозможна
 Нет места в инвентаре (нужно еще {0})
+
+
+file:///.//src/lib/shop/shop.ts
+Магазин\n§7Внутриигровой магазин
+Подтверждение покупки
+Определяет, включено ли подтверждение перед покупкой.
+Показывать счет
+Показывать ли счет в меню (монеты, листья)
+Продаваемые предметы
+Сразу открывать меню покупки
+Подтверждение перед покупкой
+Ваш баланс
+
+
+file:///.//src/lib/utils/item-name-x-count.ts
+ (долгое)
 
 
 file:///.//src/lib/utils/rewards.ts
@@ -588,8 +576,8 @@ file:///.//src/modules/commands/mail.ts
  Вы потеряете все награды, прикрепленные к письму!
 Удалить письмо
 Удалить
-{0} {0}! Посмотреть: {0}
 Почта:
+У вас {0} непрочитанных сообщений!
 
 
 file:///.//src/modules/commands/name.ts
@@ -608,6 +596,17 @@ TPS сервера {0}§f: {0}
 §aхороший
 §gнормальный
 §cплохой
+
+
+file:///.//src/modules/commands/player.ts
+Общее меню игрока
+Другие игроки
+открыть его меню
+Статистика
+Задания
+Достижения {0}/{0} ({0}%%)
+Порталы {0}/{0}
+Лор прочитан
 
 
 file:///.//src/modules/commands/role.ts
@@ -637,17 +636,6 @@ file:///.//src/modules/commands/role.ts
 Роль сменена успешно
 
 
-file:///.//src/modules/commands/player.ts
-Общее меню игрока
-Другие игроки
-открыть его меню
-Статистика
-Задания
-Достижения {0}/{0} ({0}%%)
-Порталы {0}/{0}
-Лор прочитан
-
-
 file:///.//src/modules/commands/rtp.ts
 Вы телепортируетесь!
 Вы не телепортируетесь!
@@ -656,15 +644,15 @@ file:///.//src/modules/commands/rtp.ts
 Отменяет телепортацию
 
 
+file:///.//src/modules/commands/settings.ts
+Настройки
+Настройки мира
+
+
 file:///.//src/modules/commands/sit.ts
 Присаживает вас
 Вы не можете сесть в падении!
 Вы сели. Чтобы встать, крадитесь
-
-
-file:///.//src/modules/commands/settings.ts
-Настройки
-Настройки мира
 
 
 file:///.//src/modules/commands/tp.ts
@@ -672,13 +660,10 @@ file:///.//src/modules/commands/tp.ts
 Команда доступна только тестерам, наблюдателям и администраторам.
 Выберите локацию
 Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!
+{0} игроков
 Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.
-
-
-file:///.//src/modules/commands/version.ts
-Версия сервера
-Версия майнкрафта
-Версия сервера
+Телепорт к игроку...
+Телепорт к игроку...
 
 
 file:///.//src/modules/commands/wipe.ts
@@ -701,6 +686,12 @@ file:///.//src/modules/commands/wipe.ts
 удалить точку
 
 
+file:///.//src/modules/commands/version.ts
+Версия сервера
+Версия майнкрафта
+Версия сервера
+
+
 file:///.//src/modules/features/break-item-durability-notify.ts
 Уведомлять о ломающемся предмете
 Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран
@@ -711,20 +702,6 @@ file:///.//src/modules/features/break-item-durability-notify.ts
 
 file:///.//src/modules/features/break-place-outside-of-region.ts
 Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи
-
-
-file:///.//src/modules/commands/stats.ts
-Показывает статистику по игре
-Показывать относительную дату
-Показывать относительную дату на экране статистики
-{0} дней
-{0} часов
-{0} минут
-{0} секунд
-Статистика игрока {0}
-Анархия {0}
-Убийств/Смертей
-Нанесено/Получено
 
 
 file:///.//src/modules/indicator/pvp.ts
@@ -811,22 +788,12 @@ file:///.//src/modules/places/base/base-menu.ts
 Меню базы
 
 
-file:///.//src/modules/places/base/region.ts
-(гниет)
-(разрушена)
-§6Ваша база {0}
-
-
 file:///.//src/modules/places/base/base.ts
 §6База
 Поставьте эту бочку и она станет базой.
 
 
 file:///.//src/modules/places/dungeons/custom-dungeon.ts
-Данж
-
-
-file:///.//src/modules/places/dungeons/dungeon.ts
 Данж
 
 
@@ -1197,6 +1164,10 @@ file:///.//src/modules/survival/death-quest-and-gravestone.ts
 Поздравляем! В будущем постарайтесь быть осторожнее.
 
 
+file:///.//src/modules/survival/locked-features.ts
+Я не знаю что мне делать с этим, стоит спросить {0}
+
+
 file:///.//src/modules/survival/menu.ts
 Спавн
 {0}§8Вы тут
@@ -1225,10 +1196,6 @@ file:///.//src/modules/survival/sidebar.ts
 Миниигра
 Спавн
 Мирная зона{0}
-
-
-file:///.//src/modules/survival/locked-features.ts
-Я не знаю что мне делать с этим, стоит спросить {0}
 
 
 file:///.//src/modules/survival/speedrun/target.ts

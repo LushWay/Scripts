@@ -1,7 +1,6 @@
 import { Player } from '@minecraft/server'
 import { ActionForm, ArrayForm, Mail, Menu, Settings, ask } from 'lib'
-import { i18nPlural } from 'lib/i18n/plural'
-import { i18n, i18nJoin } from 'lib/i18n/text'
+import { i18n, i18nPlural } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Rewards } from 'lib/utils/rewards'
 
@@ -136,5 +135,5 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
   const unreadCount = Mail.getUnreadMessagesCount(player.id)
   if (unreadCount === 0) return
 
-  player.info(i18nJoin`${i18n.header`Почта:`} ${i18nPlural`У вас ${unreadCount} непрочитанных сообщений!`} ${command}`)
+  player.info(i18n.join`${i18n.header`Почта:`} ${i18nPlural`У вас ${unreadCount} непрочитанных сообщений!`} ${command}`)
 })

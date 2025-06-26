@@ -16,7 +16,7 @@ actionGuard((player, region, ctx) => {
   if (!npcs) return
 
   player.fail(
-    i18n.error`Я не знаю что мне делать с этим, стоит спросить ${intlListFormat(i18n.error.currentColors, player.lang, 'or', npcs)}`,
+    i18n.error`Я не знаю что мне делать с этим, стоит спросить ${intlListFormat(i18n.error.style, player.lang, 'or', npcs)}`,
   )
   return false
 }, ActionGuardOrder.Permission)

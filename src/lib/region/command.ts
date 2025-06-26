@@ -6,7 +6,7 @@ import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { form, NewFormCreator } from 'lib/form/new'
 import { BUTTON, FormCallback } from 'lib/form/utils'
-import { i18n, i18nJoin, noI18n, textTable } from 'lib/i18n/text'
+import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { Region } from 'lib/region/kinds/region'
 import { inspect } from 'lib/util'
 import { Vec } from 'lib/vector'
@@ -112,7 +112,7 @@ function regionForm(player: Player) {
     }
 
     for (const type of regionTypes) {
-      f.button(i18nJoin`${type.name}`.size(type.region.getAll().length), () =>
+      f.button(i18n.join`${type.name}`.size(type.region.getAll().length), () =>
         regionList(player, type.region, type.creatable, type.displayName),
       )
     }

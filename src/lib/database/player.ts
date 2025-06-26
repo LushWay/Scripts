@@ -59,13 +59,15 @@ expand(Player, {
   },
 })
 
-Object.defineProperty(Player.prototype, 'database', {
-  enumerable: true,
-  configurable: false,
-  get(this: Player) {
-    return Player.database.get(this.id)
-  },
-})
+if (typeof Player.prototype.database === 'undefined') {
+  Object.defineProperty(Player.prototype, 'database', {
+    enumerable: true,
+    configurable: false,
+    get(this: Player) {
+      return Player.database.get(this.id)
+    },
+  })
+}
 
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   if (!initialSpawn) return

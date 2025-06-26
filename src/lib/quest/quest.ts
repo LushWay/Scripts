@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { i18n, i18nShared } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Compass } from 'lib/rpg/menu'
 import { Group, Place } from 'lib/rpg/place'
@@ -249,7 +249,7 @@ export class Quest {
   }
 
   get group() {
-    return new Group(`quest: ${this.id}`, i18nShared`Задание: ${this.name}\n§7${this.description}`)
+    return new Group(`quest: ${this.id}`, i18n`Задание: ${this.name}\n§7${this.description}`)
   }
 
   button = new QuestButton(this)

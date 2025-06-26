@@ -1,7 +1,7 @@
 import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { eqSlots } from 'lib/form/select-item'
 import { Message } from 'lib/i18n/message'
-import { Text, i18n, noI18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
 import { CostType } from './cost'

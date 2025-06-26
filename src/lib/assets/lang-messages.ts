@@ -26,8 +26,6 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Время первого входа на анархию": "script.shared.время_первого_входа_на_анархию",
   "Последний раз онлайн на анархии": "script.shared.последний_раз_онлайн_на_анархии",
   "Последний раз онлайн": "script.shared.последний_раз_онлайн",
-  "There is \u0000 unread messageв": "script.shared.there_is_$_unread_messageв.other",
-  "\u0000 unread messageв": "script.shared.$_unread_messageв.other",
   "Задание: \u0000\\n§7\u0000": "script.shared.задание___$_$",
   "\u0000\\nДо появления\\nосталось \u0000": "script.shared.$_до_появления_осталось_$",
   "к": "script.shared.к",
@@ -35,6 +33,12 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "млрд": "script.shared.млрд",
   "трлн": "script.shared.трлн",
   "§r§l§6Цель\\n§r§7(use)": "script.shared.цель___use__",
+  "У вас \u0000 непрочитанное сообщение!": "script.shared.у_вас_$_непрочитанных_сообщений__.one",
+  "У вас \u0000 непрочитанных сообщения!": "script.shared.у_вас_$_непрочитанных_сообщений__.few",
+  "У вас \u0000 непрочитанных сообщений!": "script.shared.у_вас_$_непрочитанных_сообщений__.other",
+  "\u0000 игрок": "script.shared.$_игроков.one",
+  "\u0000 игрока": "script.shared.$_игроков.few",
+  "\u0000 игроков": "script.shared.$_игроков.other",
   "§7Обычный": "script.shared.обычный",
   "§bУсиленный": "script.shared.усиленный",
   "§9Хранилище": "script.shared.хранилище",
@@ -87,6 +91,9 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
 
 export const extractedTranslatedMessages: Record<Language, Record<MessageId, readonly string[]>> = {
   "en_US": {
+    "Телепорт к игроку...": [
+      "Teleport to player..."
+    ],
     "Достижение получено: \u0000! Заберите награды, используя \u0000": [
       "Achievement unlocked: ",
       "! Claim your rewards using ",
@@ -2709,6 +2716,14 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, rea
     ]
   },
   "ru_RU": {
+    "\u0000 д. \u0000": [
+      "",
+      " д. ",
+      ""
+    ],
+    "Телепорт к игроку...": [
+      "Телепорт к игроку..."
+    ],
     "Достижение получено: \u0000! Заберите награды, используя \u0000": [
       "Достижение получено: ",
       "! Заберите награды, используя ",
@@ -5332,64 +5347,64 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, rea
   }
 }
 
-export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, string[]>>>>> = {
+export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, readonly string[]>>>>> = {
   "en_US": {
-    "\u0000 unread messageв": {
+    "\u0000 игроков": {
       "one": [
         "",
-        " unread messageв"
+        " player"
       ],
       "other": [
         "",
-        " unread messageв"
+        " players"
       ]
     },
-    "There is \u0000 unread messageв": {
+    "У вас \u0000 непрочитанных сообщений!": {
       "one": [
-        "There is ",
-        " unread messageв"
+        "You have ",
+        " unread message!"
       ],
       "other": [
-        "There is ",
-        " unread messageв"
+        "You have ",
+        " unread messages!"
       ]
     }
   },
   "ru_RU": {
-    "\u0000 unread messageв": {
+    "\u0000 игроков": {
       "one": [
         "",
-        " unread messageв"
+        " игрок"
       ],
       "few": [
         "",
-        " unread messageв"
+        " игрока"
       ],
       "many": [
         "",
-        " unread messageв"
+        " игроков"
       ],
       "other": [
         "",
-        " unread messageв"
+        " игроков"
       ]
     },
-    "There is \u0000 unread messageв": {
+    "У вас \u0000 непрочитанных сообщений!": {
       "one": [
-        "There is ",
-        " unread messageв"
+        "У вас ",
+        " непрочитанное сообщение!"
       ],
       "few": [
-        "There is ",
-        " unread messageв"
+        "У вас ",
+        " непрочитанных сообщения!"
       ],
       "many": [
-        "There is ",
-        " unread messageв"
+        "У вас ",
+        " непрочитанных сообщений!"
       ],
       "other": [
-        "There is ",
-        " unread messageв"
+        "У вас ",
+        " непрочитанных сообщений!"
       ]
     }
   }

@@ -1,9 +1,9 @@
-import { RawText } from '@minecraft/server'
+import { RawMessage, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
 import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
-import { Text, textUnitColorize } from './text'
+import { textUnitColorize } from './text'
 
-export type RawTextArg = number | object | boolean | string | RawText | SharedI18nMessage | undefined | null
+export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
 
 export class Message {
   static translate(lang: Language, msg: Text) {
@@ -45,8 +45,8 @@ export class Message {
     this.id = Message.templateToId(template)
   }
 
-  color(c: Text.Colors | Pick<Text.Static<never, never>, 'currentColors'>) {
-    this.colors = 'currentColors' in c ? c.currentColors : c
+  color(c: Text.Colors | Pick<Text.Static<never>, 'style'>) {
+    this.colors = 'style' in c ? c.style : c
     for (const arg of this.args) if (arg instanceof Message) arg.color(c)
     return this
   }
@@ -116,6 +116,18 @@ export class SharedI18nMessage extends I18nMessage {
 
   protected isRawText(arg: unknown): arg is RawText {
     return typeof arg === 'object' && arg !== null && 'rawtext' in arg
+  }
+}
+
+export class SharedI18nMessageJoin extends SharedI18nMessage {
+  toRawText(): RawText {
+    const rawtext: RawMessage[] = []
+    const args = [...this.argumentsToRawText()]
+    for (const [i, text] of this.template.entries()) {
+      rawtext.push({ text })
+      if (args[i]) rawtext.push(args[i])
+    }
+    return { rawtext }
   }
 }
 

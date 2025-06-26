@@ -3,8 +3,7 @@ import { Vec } from 'lib'
 import { form } from 'lib/form/new'
 import { debounceMenu } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
-import { i18nPlural } from 'lib/i18n/plural'
-import { i18n, i18nJoin, noI18n } from 'lib/i18n/text'
+import { i18n, i18nPlural, noI18n } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { VectorInDimension } from 'lib/utils/point'
 import { SafePlace } from 'modules/places/lib/safe-place'
@@ -46,7 +45,7 @@ const tpMenu = form((f, { player }) => {
     locations[noI18n`Спавн`] = location({ safeArea: Spawn.region, portalTeleportsTo: Spawn.location }, '', players)
 
   for (const [name, { location, players }] of Object.entries(locations)) {
-    f.button(i18nJoin`${name} §7(${i18nPlural`${players} игроков`})`, () => {
+    f.button(i18n.join`${name} §7(${i18nPlural`${players} игроков`})`, () => {
       if (player.database.inv !== 'anarchy' && !isNotPlaying(player)) {
         return player.fail(
           i18n`Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.`,

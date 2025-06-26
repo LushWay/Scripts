@@ -120,7 +120,7 @@ export const dailyQuestsForm = form((f, { player }) => {
     f.button(
       (completed
         ? playerDb.takenToday
-          ? i18n.colors({ text: '§8', unit: '§7', num: '§7' })
+          ? i18n.restyle({ text: '§8', unit: '§7', num: '§7' })
           : i18n
         : i18n.error)`${playerDb.today}/${dailyQuests} Награда: ключ от сундука\n${name}`,
       () => {

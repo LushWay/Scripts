@@ -75,7 +75,7 @@ export class Product<T extends Cost = any> {
 
   /** Name of this product. Includes cost. */
   // TODO Fix colors
-  text = i18n.colors({
+  text = i18n.restyle({
     unit: this.canBuy ? '§f' : '§7',
   })`§l${this.name}§r\n${this.cost.toString(this.player, this.canBuy)}`
 

@@ -200,7 +200,6 @@ function templateToSharedId(template) {
 export function addTranslation(id, template, shared, plural) {
   const templ = template.length === 1 ? template[0] : template
   const prev = messagesJson.storage[sourceCodeLang][id]
-  if (plural) console.log(id, template, shared, templ, prev)
 
   const defaultTranslation = insertTranslation(plural, templ, prev, id, sourceCodeLang)
 
@@ -255,7 +254,7 @@ function insertTranslation(plural, template, prev, id, lang = sourceCodeLang) {
   if (!plural) t = template
   else {
     const p = Object.fromEntries(plurals[lang].map(e => [e, template]))
-    t = { ...(typeof prev === 'object' && !Array.isArray(prev) ? prev : {}), ...p }
+    t = { ...p, ...(typeof prev === 'object' && !Array.isArray(prev) ? prev : {}) }
   }
 
   if (!prev) {

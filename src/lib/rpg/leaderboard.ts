@@ -11,7 +11,7 @@ import {
 } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { scoreboardDisplayNames } from 'lib/database/scoreboard'
-import { i18n, i18nJoin, i18nShared } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { isKeyof } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
@@ -173,5 +173,5 @@ function toMetricNumbers(value: number) {
   if (exp === 0) return value.toString()
 
   const scaled = value / Math.pow(10, exp * 3)
-  return i18nJoin`${scaled.toFixed(1)}${exp > 5 ? `E${exp}` : types[exp]}`
+  return i18nShared`${scaled.toFixed(1)}${exp > 5 ? `E${exp}` : types[exp]}`
 }

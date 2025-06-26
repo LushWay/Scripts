@@ -1,5 +1,5 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { i18n, TextTable } from 'lib/i18n/text'
+import { i18n } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
@@ -67,7 +67,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return i18n`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
   }
 
-  abstract getFormDescription(): TextTable
+  abstract getFormDescription(): Text.Table
 
   protected isOurDimension(dimensionType: DimensionType) {
     return this.dimensionType === dimensionType
