@@ -1,9 +1,9 @@
 import { Enchantment, RawMessage, RawText } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
+import { blockItemsLangJson, langs } from 'lib/assets/lang-big'
 import { addNamespace, inspect } from 'lib/util'
 import { Language } from '../assets/lang'
 import { sprintf } from './sprintf'
-import { blockItemsLangJson, langs } from 'lib/assets/lang-big'
 
 /**
  * Gets lang token of type id and translates it server side based on providen language
@@ -117,3 +117,5 @@ export function rawMessageToString(rawMessage: RawMessage, lang: Language) {
 
   return result
 }
+
+import './plural'

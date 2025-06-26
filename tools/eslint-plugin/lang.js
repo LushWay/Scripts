@@ -48,7 +48,7 @@ class LangWriter {
         const expected = this.storage[sourceCodeLang][key]
         if (
           !(
-            value === expected ||
+            (typeof value === 'string' && typeof expected === 'string') ||
             (Array.isArray(value) && Array.isArray(expected)) ||
             (typeof value === 'object' && typeof expected === 'object')
           )
@@ -118,6 +118,27 @@ export async function readMessages() {
   await messagesJson.readAll()
 }
 
+/**
+ * @template {Record<string, unknown>} T
+ * @template {string} K2
+ * @template V2
+ * @param {T} object
+ * @param {(key: keyof T, value: Required<T>[keyof T], object: NoInfer<T>) => [K2, V2] | false} mapper
+ * @returns {NoInfer<Record<K2, V2>>}
+ */
+function map(object, mapper) {
+  /** @type {Record<string, unknown>} */
+  const result = {}
+
+  for (const key of Object.getOwnPropertyNames(object)) {
+    // @ts-expect-error ahahah
+    const mapped = mapper(key, object[key], object)
+    if (mapped) result[mapped[0]] = mapped[1]
+  }
+  // @ts-expect-error ahahah
+  return result
+}
+
 export async function writeMessages() {
   await sharedMessages.writeAll()
   await messagesJson.writeAll()
@@ -132,16 +153,25 @@ export async function writeMessages() {
 type Language = string
 type MessageId = string
 
-export const extractedSharedMessagesIds: Record<MessageId, string> = ${JSON.stringify(Object.fromEntries(Object.entries(sharedMessages.storage[sourceCodeLang]).map(e => [e[1], templateToSharedId(e[0].split('\x00'))])))}
+export const extractedSharedMessagesIds: Record<MessageId, string> = ${JSON.stringify(Object.fromEntries(Object.entries(sharedMessages.storage[sourceCodeLang]).map(e => [e[1], templateToSharedId(e[0].split('\x00'))])), null, 2)}
 
-export const extractedTranslatedMessages: Record<Language, Record<MessageId, readonly string[]>> = ${JSON.stringify(Object.fromEntries(Object.entries(messagesJson.storage).map(e => [e[0], Array.isArray(e[1]) ? e[1] : [e[1]]])))}
+export const extractedTranslatedMessages: Record<Language, Record<MessageId, readonly string[]>> = ${JSON.stringify(
+      map(messagesJson.storage, (k, v) => [
+        k,
+        map(
+          v,
+          (k, v) =>
+            (typeof v === 'string' || (typeof v === 'object' && Array.isArray(v))) && [k, Array.isArray(v) ? v : [v]],
+        ),
+      ]),
+      null,
+      2,
+    )}
 
 export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, string>>>>> = ${JSON.stringify(
-      Object.fromEntries(
-        Object.entries(messagesJson.storage)
-          .filter(e => typeof e[1] === 'object' && !Array.isArray(e[1]))
-          .map(e => [e[0], Array.isArray(e[1]) ? e[1] : [e[1]]]),
-      ),
+      map(messagesJson.storage, (k, v) => [k, map(v, (k, v) => typeof v === 'object' && !Array.isArray(v) && [k, v])]),
+      null,
+      2,
     )}`,
   )
 }
@@ -165,19 +195,25 @@ function templateToSharedId(template) {
  */
 export function addTranslation(id, template, shared, plural) {
   const templ = template.length === 1 ? template[0] : template
-  /** @type {Message} */
-  let t
-  if (!plural) t = templ
-  else {
-    const prev = messagesJson.storage[sourceCodeLang][id]
-    t = getPluralForms(prev, sourceCodeLang, templ)
+  const prev = messagesJson.storage[sourceCodeLang][id]
+  if (plural) console.log(id, template, shared, templ, prev)
+
+  const defaultTranslation = insertTranslation(plural, templ, prev, id, sourceCodeLang)
+
+  // Special case handling to add all needed forms of plural to each lang
+  if (plural) {
+    for (const lang of supportedLanguages) {
+      const prev = messagesJson.storage[lang][id]
+      if (prev === undefined || (typeof prev === 'object' && !Array.isArray(prev))) {
+        insertTranslation(true, template, prev, id, lang)
+      } else throw new Error(`Failed to extract plural ${template}: Non plural key already exists`)
+    }
   }
-  messagesJson.storage[sourceCodeLang][id] = t
 
   // Add to shared messages
   if (shared || plural) {
     for (const lang of supportedLanguages) {
-      const translation = messagesJson.storage[lang][id] ?? t
+      const translation = messagesJson.storage[lang][id] ?? defaultTranslation
 
       /** @param {string[] | string} t */
       function toStr(t) {
@@ -201,14 +237,26 @@ export function addTranslation(id, template, shared, plural) {
 const plurals = Object.fromEntries(
   supportedLanguages.map(e => [e, new Intl.PluralRules(e.replace('_', '-')).resolvedOptions().pluralCategories]),
 )
-
 /**
- * @param {Message} prev
+ * @param {boolean} plural
+ * @param {string[] | string} template
+ * @param {Message | undefined} prev
+ * @param {string} id
  * @param {string} lang
- * @param {string | string[]} fill
- * @returns {Record<string, string | string[]>}
+ * @returns {Message}
  */
-function getPluralForms(prev, lang, fill) {
-  const p = Object.fromEntries(plurals[lang].map(e => [e, fill]))
-  return { ...(typeof prev === 'object' && !Array.isArray(prev) ? prev : {}), ...p }
+function insertTranslation(plural, template, prev, id, lang = sourceCodeLang) {
+  /** @type {Message} */
+  let t
+  if (!plural) t = template
+  else {
+    const p = Object.fromEntries(plurals[lang].map(e => [e, template]))
+    t = { ...(typeof prev === 'object' && !Array.isArray(prev) ? prev : {}), ...p }
+  }
+
+  if (!prev) {
+    // Insert at the start
+    messagesJson.storage[lang] = { [id]: t, ...messagesJson.storage[lang] }
+  } else messagesJson.storage[lang][id] = t
+  return t
 }

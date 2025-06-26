@@ -4,6 +4,6 @@ export function i18nPlural(template: TemplateStringsArray, n: number): SharedI18
   throw new Error('not implemented')
 }
 
-i18nPlural`There is ${1} unread message`
+const a = i18nPlural`There is ${1} unread messageв`
 
-i18nPlural`${3} unread message`
+const b = i18nPlural`${3} unread messageв`
