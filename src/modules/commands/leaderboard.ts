@@ -54,7 +54,7 @@ function editLeaderboard(
   }
 
   const form = new ActionForm('Таблица лидеров', lb ? info(lb) : '')
-    .addButtonBack(() => leaderboardMenu(player))
+    .addButtonBack(() => leaderboardMenu(player), player.lang)
     .button(action + 'целевую таблицу' + warn('displayName', 'objective'), () => {
       new ModalForm('Изменение целевой таблицы')
         .addDropdownFromObject(

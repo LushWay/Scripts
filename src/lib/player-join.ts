@@ -31,11 +31,10 @@ class JoinBuilder {
 
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-      if (!firstJoin) player.tell(i18n.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`.toString(player.lang))
+      if (!firstJoin) player.tell(i18n.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
     }, -1),
     playerSpawn: world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       if (!initialSpawn) return
-      if (player.scores.joinDate === 0) player.scores.joinDate = ~~(Date.now() / 1000)
       this.setPlayerJoinPosition(player)
       EventSignal.emit(this.onFirstTimeSpawn, player)
     }),
@@ -87,7 +86,7 @@ class JoinBuilder {
                 fadeInDuration: 0,
                 fadeOutDuration: 20,
                 stayDuration: 40,
-                subtitle: Join.config.subtitle.toString(player.lang),
+                subtitle: Join.config.subtitle.to(player.lang),
               })
             } else {
               // Player joined in air
@@ -134,7 +133,7 @@ class JoinBuilder {
 
       const settings = this.settings(other)
       if (settings.sound) other.playSound(Join.config.messages.sound)
-      if (settings.message) other.tell(`§7${player.name} ${message}`)
+      if (settings.message) other.tell(i18n.nocolor.join`§7${player.name} ${message}`)
     }
 
     EventSignal.emit(this.onMoveAfterJoin, {

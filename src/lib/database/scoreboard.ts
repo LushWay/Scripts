@@ -124,7 +124,7 @@ export class ScoreboardDB {
               if (typeof p === 'symbol')
                 throw new Error(`Symbol objectives to set are not accepted, recieved ${p.description}`)
 
-              ScoreboardDB.objective(p, untypedDisplayNames[p]?.toString(defaultLang)).setScore(
+              ScoreboardDB.objective(p, untypedDisplayNames[p]?.to(defaultLang)).setScore(
                 playerId,
                 Math.round(newValue),
               )
@@ -135,7 +135,7 @@ export class ScoreboardDB {
                 throw new Error(`Symbol objectives to get are not accepted, recieved ${p.description}`)
 
               try {
-                return ScoreboardDB.objective(p, untypedDisplayNames[p]?.toString(defaultLang)).getScore(playerId) ?? 0
+                return ScoreboardDB.objective(p, untypedDisplayNames[p]?.to(defaultLang)).getScore(playerId) ?? 0
               } catch (e) {
                 return 0
               }

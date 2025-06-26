@@ -33,7 +33,7 @@ actionGuard((player, _, ctx) => {
   system.delay(() => {
     if (percent >= 90)
       player.onScreenDisplay.setActionBar(
-        i18n.error`Инструмент скоро сломается! ${damage}/${maxDurability} (${percent}%)`.toString(player.lang),
+        i18n.error`Инструмент скоро сломается! ${damage}/${maxDurability} (${percent}%)`.to(player.lang),
         ActionbarPriority.Highest,
       )
   })

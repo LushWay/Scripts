@@ -35,12 +35,12 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
       const hours = i18n`${Math.floor(secsTotal / 3600) % 24} часов`
       const mins = i18n`${Math.floor(secsTotal / 60) % 60} минут`
       const secs = i18n`${secsTotal % 60} секунд`
-      return `${days} ${hours} ${mins} ${secs}`
+      return i18n.join`${days} ${hours} ${mins} ${secs}`
     }
   }
 
   new ActionForm(
-    i18n.header`Статистика игрока ${Player.name(targetId)}`.toString(player.lang),
+    i18n.header`Статистика игрока ${Player.name(targetId)}`.to(player.lang),
     textTable([
       [scoreboardDisplayNames.totalOnlineTime, formatDate(scores.totalOnlineTime)],
       [scoreboardDisplayNames.anarchyOnlineTime, formatDate(scores.anarchyOnlineTime)],
@@ -51,18 +51,18 @@ export function showStats(player: Player, targetId = player.id, back?: NewFormCa
       ...statsTable(
         scores,
         key => key,
-        n => n.toString(player.lang),
+        n => n.to(player.lang),
       ),
       ['   ', ''],
       ...statsTable(
         scores,
         key => `anarchy${capitalize(key)}`,
-        n => i18n`Анархия ${n}`.toString(player.lang),
+        n => i18n`Анархия ${n}`.to(player.lang),
       ),
-    ]).toString(player.lang),
+    ]).to(player.lang),
   )
     .button('OK', () => null)
-    .addButtonBack(back)
+    .addButtonBack(back, player.lang)
     .show(player)
 }
 

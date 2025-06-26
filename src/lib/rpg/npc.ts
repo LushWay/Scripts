@@ -2,6 +2,8 @@ import {
   Entity,
   LocationInUnloadedChunkError,
   PlayerInteractWithEntityBeforeEvent,
+  RawMessage,
+  RawText,
   system,
   world,
 } from '@minecraft/server'
@@ -116,9 +118,14 @@ export class Npc {
           const npc = Npc.npcs.find(e => e.entity?.id === event.target.id)
           const component = event.target.getComponent('npc')
           const npcName = component ? component.name : event.target.nameTag
+          let nameParsed: RawText | RawMessage | string = { text: npcName }
+          try {
+            nameParsed = JSON.parse(npcName) as RawText
+          } catch {}
 
           if (!npc || !(npc.onQuestInteraction(event) || npc.onInteract(event))) {
-            return event.player.fail(i18n.error`${npcName}: Я не могу с вами говорить. Приходите позже.`)
+            const text = i18n.error`Я не могу с вами говорить. Приходите позже.`.to(event.player.lang)
+            return event.player.sendMessage({ rawtext: [nameParsed, { text: ': ' + text }] })
           }
         } catch (e) {
           event.player.warn(i18n.warn`Не удалось открыть диалог. ${developersAreWarned}`)

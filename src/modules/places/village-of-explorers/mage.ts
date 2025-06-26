@@ -155,7 +155,7 @@ export class Mage extends ShopNpc {
 
             cost.take(player)
             player.container.addItem(
-              ItemAbility.schema.create({ ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
+              ItemAbility.schema.create(player.lang, { ability: ItemAbility.Ability.Vampire }, i.DiamondSword).item,
             )
           })
       })

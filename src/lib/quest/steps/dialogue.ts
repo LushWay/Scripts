@@ -27,7 +27,7 @@ export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = i18n.noco
           .target(npc.location.toPoint())
           .activate(ctx => {
             const show = () => {
-              const form = new ActionForm(npc.name.toString(this.player.lang), body)
+              const form = new ActionForm(npc.name.to(this.player.lang), body)
 
               for (const [text, callback] of buttons) {
                 form.button(text, callback.bind(null, ctx, show))

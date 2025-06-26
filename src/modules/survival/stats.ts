@@ -22,6 +22,11 @@ function count(player: Player, stat: ScoreNames.Stat, add = 1) {
   if (player.database.inv === 'anarchy') player.scores[`anarchy${capitalize(stat)}`] += add
 }
 
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+  if (!initialSpawn) return
+  if (player.scores.joinDate === 0) player.scores.joinDate = ~~(Date.now() / 1000)
+})
+
 world.afterEvents.playerPlaceBlock.subscribe(({ player }) => {
   count(player, 'blocksPlaced')
 })

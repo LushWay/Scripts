@@ -108,13 +108,13 @@ export class ShouldHaveItemCost extends ItemCost {
   private text: Text = ''
 
   toString(player: Player) {
-    return Message.translate(player.lang, this.text)
+    return this.text.to(player.lang)
   }
 
   failed(player: Player) {
     // TODO Fix colors
     const message = this.text ? i18n.error`В инвентаре нет ${this.text}` : i18n.error`Нет предмета`
-    return Message.translate(player.lang, message)
+    return message.to(player.lang)
   }
 
   take(player: Player): void {

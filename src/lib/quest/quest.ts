@@ -2,7 +2,7 @@ import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { i18n } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Compass } from 'lib/rpg/menu'
 import { Group, Place } from 'lib/rpg/place'
@@ -46,7 +46,7 @@ export class Quest {
 
         step.playerQuest.updateListeners.add(showSidebar)
 
-        const text = `§l${step.quest.name.toString(player.lang)}:§r§6 ${step.text().toString(player.lang)}`
+        const text = `§l${step.quest.name.to(player.lang)}:§r§6 ${step.text().to(player.lang)}`
         const cached = textCache.get(player)
 
         if (cached?.step !== step) {
@@ -112,8 +112,8 @@ export class Quest {
 
   get name() {
     return this.place.group.name && this.place.name
-      ? `${this.place.group.name} - ${this.place.name}`
-      : this.place.name || (this.place.group.name ?? '')
+      ? i18nShared.join`${this.place.group.sharedName} - ${this.place.name}`
+      : (this.place.sharedName ?? this.place.group.sharedName)
   }
 
   /**
@@ -202,15 +202,15 @@ export class Quest {
     if (Quest.playerSettings(player).messageForEachStep) {
       const text = step.description?.()
       // TODO Fix colors
-      if (text) player.success(`§f§l${this.name}: §r§6${text}`)
+      if (text) player.success(i18n.nocolor`§f§l${this.name}: §r§6${text}`)
     }
 
     if (i === 0 && !restore) {
       system.runTimeout(
         () => {
           // TODO Fix colors
-          player.onScreenDisplay.setHudTitle('§6' + this.name.toString(player.lang), {
-            subtitle: this.description.toString(player.lang),
+          player.onScreenDisplay.setHudTitle('§6' + this.name.to(player.lang), {
+            subtitle: this.description.to(player.lang),
             fadeInDuration: 0,
             stayDuration: 20 * 8,
             fadeOutDuration: 0,
@@ -249,7 +249,7 @@ export class Quest {
   }
 
   get group() {
-    return new Group(`quest: ${this.id}`, i18n`Задание: ${this.name}\n§7${this.description}`)
+    return new Group(`quest: ${this.id}`, noI18n`Задание: ${this.name}\n§7${this.description}`)
   }
 
   button = new QuestButton(this)

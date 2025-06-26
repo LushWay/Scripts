@@ -20,7 +20,7 @@ export class XPCost extends Cost {
   failed(player: Player): string {
     const xp = player.level
     const lvl = this.levels
-    return i18n.error`Нужно уровней опыта: ${lvl - xp}, ${xp}/${lvl}`.toString(player.lang)
+    return i18n.error`Нужно уровней опыта: ${lvl - xp}, ${xp}/${lvl}`.to(player.lang)
   }
 
   take(player: Player) {

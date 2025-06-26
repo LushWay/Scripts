@@ -1,5 +1,3 @@
- 
-
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Language } from 'lib/assets/lang'
 import { util } from '../util'
@@ -40,6 +38,10 @@ declare global {
       mapper: (key: keyof T, value: Required<T>[keyof T], object: NoInfer<T>) => [K2, V2] | false,
     ): NoInfer<Record<K2, V2>>
   }
+}
+
+String.prototype.to = function () {
+  return this as string
 }
 
 /** Common JavaScript objects */

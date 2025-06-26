@@ -8,6 +8,7 @@ import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
 import { i18n, noI18n } from './i18n/text'
 import stringifyError from './utils/error'
+import { Message } from './i18n/message'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace
 // TODO refactor(leaftail1880): Move everything into the lib/settings/ folder
@@ -203,7 +204,9 @@ export class Settings {
     return (
       Array.isArray(v) &&
       v.length > 0 &&
-      v.every(e => Array.isArray(e) && typeof e[1] === 'string' && typeof e[0] === 'string')
+      v.every(
+        e => Array.isArray(e) && (typeof e[1] === 'string' || e[1] instanceof Message) && typeof e[0] === 'string',
+      )
     )
   }
 }
@@ -247,7 +250,7 @@ export function settingsGroupMenu(
   const store = Settings.parseConfig(storeSource, groupName, config, forRegularPlayer ? player : null)
   const buttons: [string, (input: string | boolean) => string][] = []
   const form = new ModalForm<(ctx: FormCallback<ModalForm>, ...options: (string | boolean)[]) => void>(
-    (config[SETTINGS_GROUP_NAME] ?? groupName).toString(player.lang),
+    (config[SETTINGS_GROUP_NAME] ?? groupName).to(player.lang),
   )
 
   for (const key in config) {
@@ -266,35 +269,26 @@ export function settingsGroupMenu(
     label += hints[key] ? `${hints[key]}\n` : ''
 
     if (isRequired) label += '§c(!) '
-    label += `§f§l${setting.name}§r§f` //§r
+    label += `§f§l${setting.name.to(player.lang)}§r§f` //§r
 
-    if (setting.description) label += `§i - ${setting.description}`
-    if (isUnset) label += i18n.nocolor`§8(По умолчанию)\n`.toString(player.lang)
+    if (setting.description) label += `§i - ${setting.description.to(player.lang)}`
+    if (isUnset) label += i18n.nocolor`§8(По умолчанию)\n`.to(player.lang)
 
     if (isToggle) {
       form.addToggle(label, value)
     } else if (Settings.isDropdown(setting.value)) {
-      form.addDropdownFromObject(
-        label,
-        Object.fromEntries(setting.value.map(e => [e[0], e[1].toString(player.lang)])),
-        {
-          defaultValueIndex: Settings.isDropdown(value) ? undefined : value,
-        },
-      )
+      form.addDropdownFromObject(label, Object.fromEntries(setting.value.map(e => [e[0], e[1].to(player.lang)])), {
+        defaultValueIndex: Settings.isDropdown(value) ? undefined : value,
+      })
     } else {
       const isString = typeof value === 'string'
 
       if (!isString) {
-        label += i18n.nocolor`\n§7§lЗначение:§r ${stringify(value)}`.toString(player.lang)
-
-        label += i18n.nocolor`\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`.toString(player.lang)
+        label += i18n.nocolor`\n§7§lЗначение:§r ${stringify(value)}`.to(player.lang)
+        label += i18n.nocolor`\n§7§lТип: §r§f${settingTypes[typeof value] ?? typeof value}`.to(player.lang)
       }
 
-      form.addTextField(
-        label,
-        i18n`Настройка не изменится`.toString(player.lang),
-        isString ? value : JSON.stringify(value),
-      )
+      form.addTextField(label, i18n`Настройка не изменится`.to(player.lang), isString ? value : JSON.stringify(value))
     }
 
     buttons.push([
@@ -313,7 +307,7 @@ export function settingsGroupMenu(
                 break
               case 'number':
                 result = Number(input)
-                if (isNaN(result)) return i18n.error`Введите число!`.toString(player.lang)
+                if (isNaN(result)) return i18n.error`Введите число!`.to(player.lang)
                 break
               case 'object':
                 result = JSON.parse(input) as typeof result
@@ -328,7 +322,7 @@ export function settingsGroupMenu(
             store[key] = result
           }
 
-          return showHintAboutSavedStatus ? i18n.success`Сохранено!`.toString(player.lang) : ''
+          return showHintAboutSavedStatus ? i18n.success`Сохранено!`.to(player.lang) : ''
         } catch (error: unknown) {
           logger.player(player).info`Changing ${displayType} setting '${groupName} > ${key}' error: ${error}`
 
@@ -371,12 +365,12 @@ const settingTypes: Partial<
 
 /** Opens player settings menu */
 export function playerSettingsMenu(player: Player, back?: VoidFunction) {
-  const form = new ActionForm(i18n`§dНастройки`.toString(player.lang))
-  if (back) form.addButtonBack(back)
+  const form = new ActionForm(i18n`§dНастройки`.to(player.lang))
+  if (back) form.addButtonBack(back, player.lang)
 
   for (const groupName in Settings.playerConfigs) {
     const name = Settings.playerConfigs[groupName]?.[SETTINGS_GROUP_NAME]
-    if (name) form.button(name.toString(player.lang), () => settingsGroupMenu(player, groupName, true))
+    if (name) form.button(name.to(player.lang), () => settingsGroupMenu(player, groupName, true))
   }
 
   form.show(player)
@@ -393,12 +387,9 @@ export function worldSettingsMenu(player: Player) {
       if (option.required && typeof database[key] === 'undefined') unsetCount++
     }
 
-    form.button(
-      i18n.nocolor.join`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).toString(player.lang),
-      () => {
-        settingsGroupMenu(player, groupId, false)
-      },
-    )
+    form.button(i18n.nocolor.join`${group[SETTINGS_GROUP_NAME] ?? groupId}`.badge(unsetCount).to(player.lang), () => {
+      settingsGroupMenu(player, groupId, false)
+    })
   }
 
   form.show(player)

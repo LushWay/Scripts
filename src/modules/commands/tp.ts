@@ -35,10 +35,10 @@ const tpMenu = form((f, { player }) => {
   )
 
   const locations: Record<string, ReturnType<typeof location>> = {
-    [VillageOfMiners.name.toString(player.lang)]: location(VillageOfMiners, '136 71 13457 140 -10', players),
-    [VillageOfExplorers.name.toString(player.lang)]: location(VillageOfExplorers, '-35 75 13661 0 20', players),
-    [StoneQuarry.name.toString(player.lang)]: location(StoneQuarry, '-1300 76 14800 -90 5', players),
-    [TechCity.name.toString(player.lang)]: location(TechCity, '-1288 64 13626 90 -10', players),
+    [VillageOfMiners.name.to(player.lang)]: location(VillageOfMiners, '136 71 13457 140 -10', players),
+    [VillageOfExplorers.name.to(player.lang)]: location(VillageOfExplorers, '-35 75 13661 0 20', players),
+    [StoneQuarry.name.to(player.lang)]: location(StoneQuarry, '-1300 76 14800 -90 5', players),
+    [TechCity.name.to(player.lang)]: location(TechCity, '-1288 64 13626 90 -10', players),
   }
 
   if (Spawn.region)

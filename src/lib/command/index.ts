@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { defaultLang } from 'lib/assets/lang'
+import { defaultLang, Language } from 'lib/assets/lang'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
@@ -400,12 +400,12 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     return this
   }
 
-  static getHelp(command: Command, description?: string): string[] {
+  static getHelp(lang: Language, command: Command, description?: string): string[] {
     const type = command.sys.type.toString()
     const base = command.sys.callback ? [`${type}${description ? `§7§o - ${description}` : ''}`] : []
     return base.concat(
       command.sys.children
-        .map(e => this.getHelp(e, (e.sys.description || command.sys.description).toString(defaultLang)))
+        .map(e => this.getHelp(lang, e, (e.sys.description || command.sys.description).to(lang)))
         .flat()
         .map(e => type + ' ' + e),
     )

@@ -34,7 +34,7 @@ export function WEmenu(player: Player, body = '') {
   const we = WorldEdit.forPlayer(player)
   const form = new ActionForm('§dWorld§6Edit', body)
 
-  form.button(i18n.accent.join`Наборы блоков`.size(getOwnBlocksSetsCount(player.id)).toString(player.lang), () =>
+  form.button(i18n.accent.join`Наборы блоков`.size(getOwnBlocksSetsCount(player.id)).to(player.lang), () =>
     WEblocksSetsMenu(player),
   )
 
@@ -44,12 +44,8 @@ export function WEmenu(player: Player, body = '') {
 
   addToForm(activeTools)
 
-  form.button(i18n.accent.join`Отмена действий`.size(we.history.length).toString(player.lang), () =>
-    WEundoRedoMenu(player),
-  )
-  form.button(i18n.accent.join`Создать сундук блоков из набора`.toString(player.lang), () =>
-    WEChestFromBlocksSet(player),
-  )
+  form.button(i18n.accent.join`Отмена действий`.size(we.history.length).to(player.lang), () => WEundoRedoMenu(player))
+  form.button(i18n.accent.join`Создать сундук блоков из набора`.to(player.lang), () => WEChestFromBlocksSet(player))
 
   addToForm(inactiveTools)
 
@@ -224,7 +220,7 @@ function WEplayerBlockSetMenu(
   const name = Player.name(otherPlayerId) ?? otherPlayerId
   const pform = new ActionForm(name, '§3Наборы блоков:')
 
-  pform.button(ActionForm.backText.toString(player.lang), onBack)
+  pform.button(ActionForm.backText.to(player.lang), onBack)
 
   for (const setName of Object.keys(blockSets)) {
     pform.button(setName, () =>
@@ -339,7 +335,7 @@ function WEeditBlocksSetMenu(o: {
       },
       '<': {
         icon: BUTTON['<'],
-        nameTag: ActionForm.backText.toString(player.lang),
+        nameTag: ActionForm.backText.to(player.lang),
         callback: back,
       },
       'x': empty,
@@ -554,9 +550,9 @@ export function WEeditBlockStatesMenu(
   return new Promise<Record<string, string | boolean | number>>(resolve => {
     const form = new ActionForm('Редактировать свойства блока')
 
-    form.button(backText.toString(player.lang), () => resolve(states))
+    form.button(backText.to(player.lang), () => resolve(states))
 
-    if (edited) form.button(ActionForm.backText.toString(player.lang) + ' без сохранения', back)
+    if (edited) form.button(ActionForm.backText.to(player.lang) + ' без сохранения', back)
 
     form.ask('§cУдалить все свойства блока', 'Да', () => resolve({}), 'Отмена')
 
@@ -575,7 +571,7 @@ export function WEeditBlockStatesMenu(
 
             editStateForm.addButtonBack(() => {
               resolve(WEeditBlockStatesMenu(player, states, back))
-            })
+            }, player.lang)
 
             editStateForm.button('§cУдалить значение', () => {
               Reflect.deleteProperty(states, stateName)
@@ -627,7 +623,7 @@ export function WEundoRedoMenu(
         player.id !== source ? `\n§3Показаны действия игрока §f§l${Player.name(source) ?? '<Без имени>'}` : ''
       }`,
   )
-  form.addButtonBack(back)
+  form.addButtonBack(back, player.lang)
 
   form.button(mode === 'undo' ? '§3Вернуть отмененное (redo)' : '§3Отмены (undo)', () =>
     WEundoRedoMenu(player, back, mode === 'undo' ? 'redo' : 'undo', [source, we]),
@@ -653,7 +649,7 @@ export function WEundoRedoMenu(
 }
 
 function WEundoRedoOtherPlayersMenu(player: Player, back: VoidFunction) {
-  const form = new ActionForm('Выбрать игрока...').addButtonBack(back)
+  const form = new ActionForm('Выбрать игрока...').addButtonBack(back, player.lang)
 
   for (const [playerId, we] of WorldEdit.instances.entries()) {
     const name = Player.name(playerId) ?? '<Без имени>'

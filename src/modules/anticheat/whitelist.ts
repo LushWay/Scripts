@@ -1,5 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { DEFAULT_ROLE, is, ROLES, Settings } from 'lib'
+import { defaultLang } from 'lib/assets/lang'
 import { noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 
@@ -16,7 +17,7 @@ system.delay(() => {
     },
     allowedRole: {
       name: 'Разрешенная роль',
-      description: `Минимальная роль, с которой игрок может зайти на сервер. Роль по умолчанию при входе: ${ROLES[DEFAULT_ROLE]}`,
+      description: `Минимальная роль, с которой игрок может зайти на сервер. Роль по умолчанию при входе: ${ROLES[DEFAULT_ROLE].to(defaultLang)}`,
       value: Object.entriesStringKeys(ROLES),
     },
     kickText: {

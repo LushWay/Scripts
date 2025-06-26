@@ -218,19 +218,19 @@ function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => 
 function editRegion(player: Player, region: Region, displayName: boolean, back: () => void) {
   const selfback = () => editRegion(player, region, displayName, back)
   const form = new ActionForm(
-    (displayName ? (region.displayName ?? region.creator.name) : region.name).toString(player.lang),
+    (displayName ? (region.displayName ?? region.creator.name) : region.name).to(player.lang),
     textTable([
       [i18n`Тип региона`, region.creator.name],
       [i18n`Тип зоны`, Area.areas.find(e => e.type === region.area.type)?.name ?? region.area.type],
       ...region.area.getFormDescription(),
       ...region.customFormDescription(player),
-    ]).toString(player.lang),
+    ]).to(player.lang),
   )
-    .button(ActionForm.backText.toString(player.lang), back)
-    .button(i18n`Участники`.toString(player.lang), () =>
+    .button(ActionForm.backText.to(player.lang), back)
+    .button(i18n`Участники`.to(player.lang), () =>
       manageRegionMembers({ region, isOwner: true }).show(player, selfback),
     )
-    .button(i18n`Разрешения`.toString(player.lang), () =>
+    .button(i18n`Разрешения`.to(player.lang), () =>
       editRegionPermissions(player, region, { back: selfback, extendedEditPermissions: true }),
     )
 
@@ -315,48 +315,48 @@ export function editRegionPermissions(
       radius?: number,
       center?: string,
     ) => void
-  > = new ModalForm(i18n`Разрешения региона`.toString(player.lang))
+  > = new ModalForm(i18n`Разрешения региона`.to(player.lang))
     .addToggle(
-      i18n`Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.`.toString(player.lang),
+      i18n`Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.`.to(player.lang),
       region.permissions.doors,
     )
     .addToggle(
-      i18n`Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.`.toString(
+      i18n`Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.`.to(
         player.lang,
       ),
       region.permissions.switches,
     )
     .addToggle(
-      i18n`Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.`.toString(player.lang),
+      i18n`Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.`.to(player.lang),
       region.permissions.trapdoors,
     )
     .addToggle(
-      i18n`Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)`.toString(
+      i18n`Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)`.to(
         player.lang,
       ),
       region.permissions.openContainers,
     )
     .addToggle(
-      i18n`Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.`.toString(player.lang),
+      i18n`Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.`.to(player.lang),
       region.permissions.gates,
     )
 
   if (extendedEditPermissions) {
     form = form.addDropdownFromObject(
-      i18n`Сражение\n§7Определяет, смогут ли игроки сражаться в регионе`.toString(player.lang),
+      i18n`Сражение\n§7Определяет, смогут ли игроки сражаться в регионе`.to(player.lang),
       {
-        true: i18n`Да`.toString(player.lang),
-        pve: i18n`Только с сущностями (pve)`.toString(player.lang),
-        false: i18n`Нет`.toString(player.lang),
+        true: i18n`Да`.to(player.lang),
+        pve: i18n`Только с сущностями (pve)`.to(player.lang),
+        false: i18n`Нет`.to(player.lang),
       },
       { defaultValueIndex: String(region.permissions.pvp) },
     )
 
     if (region.area instanceof SphereArea)
       form
-        .addSlider(i18n`Радиус\n§7Определяет радиус региона`.toString(player.lang), 1, 100, 1, region.area.radius)
+        .addSlider(i18n`Радиус\n§7Определяет радиус региона`.to(player.lang), 1, 100, 1, region.area.radius)
         .addTextField(
-          i18n`Центр региона`.toString(player.lang),
+          i18n`Центр региона`.to(player.lang),
           Vec.string(region.area.center),
           Vec.string(region.area.center),
         )
@@ -416,8 +416,7 @@ export const manageRegionMembers = form.params<{
       const name = Player.nameOrUnknown(memberId)
 
       f.button(
-        // TODO Fix colors
-        `${i === 0 ? i18n`§7Владелец > ` : ''}§f${name}`,
+        i === 0 ? i18n`Владелец > ${name}` : name,
         form(f => {
           f.title(name)
           f.body(i18n`Управление участником региона`)

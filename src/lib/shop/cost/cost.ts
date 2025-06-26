@@ -87,7 +87,7 @@ export function ErrorCost(message: Text): Cost {
     }
 
     toString(player: Player): string {
-      return Message.translate(player.lang, message)
+      return message.to(player.lang)
     }
 
     has() {

@@ -22,9 +22,9 @@ export function itemNameXCount(
     const token = langToken(`minecraft:${liquid.id}_${effect.id}_potion`)
     const modifierIndex = modifier.id === PotionModifiers.Normal ? 0 : modifier.id === PotionModifiers.Long ? 1 : 2
     const time = potionModifierToTime[effect.id]?.[modifierIndex]
-    const modifierS = modifierIndexToS[modifierIndex]
+    const modifierS = modifierIndexToS[modifierIndex]?.to(locale) ?? ''
 
-    return `${c}${item.nameTag ?? translateToken(token, locale)}${modifierS ?? ''}${time ? ` §7${time}` : ''}`
+    return `${c}${item.nameTag ?? translateToken(token, locale)}${modifierS}${time ? ` §7${time}` : ''}`
   }
 
   return `${c}${item.nameTag ? (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') : translateToken(langToken(item), locale)}${amount && item.amount ? ` §r§f${c}x${item.amount}` : ''}`

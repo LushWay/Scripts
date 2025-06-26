@@ -16,7 +16,7 @@ export class Portal {
         fadeInDuration: 0,
         stayDuration: time * TicksPerSecond,
         fadeOutDuration: 0,
-        subtitle: i18n.nocolor`§2Перемещение...`.toString(player.lang),
+        subtitle: i18n.nocolor`§2Перемещение...`.to(player.lang),
         priority: 100,
       })
     }

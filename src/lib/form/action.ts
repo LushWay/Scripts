@@ -1,6 +1,6 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { defaultLang } from 'lib/assets/lang'
+import { defaultLang, Language } from 'lib/assets/lang'
 import { ask } from 'lib/form/message'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
@@ -86,9 +86,9 @@ export class ActionForm {
    *
    * @param backCallback - Callback function that will be called when back button is pressed.
    */
-  addButtonBack(backCallback: NewFormCallback | undefined) {
+  addButtonBack(backCallback: NewFormCallback | undefined, lang: Language) {
     if (!backCallback) return this
-    else return this.button(i18n`§r§3Назад`.toString(defaultLang), BUTTON['<'], backCallback)
+    else return this.button(i18n`§r§3Назад`.to(lang), BUTTON['<'], backCallback)
   }
 
   /**

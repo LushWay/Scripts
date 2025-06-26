@@ -107,11 +107,11 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 
   const promise = new Promise<SelectedBlock>(resolve => {
     const base = new ActionForm('Выбери блок/набор блоков')
-      .button(ActionForm.backText.toString(player.lang), back)
+      .button(ActionForm.backText.to(player.lang), back)
       .button(selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков', () => {
         const blocksSets = getAllBlocksSets(player.id)
 
-        const form = new ActionForm('Наборы блоков').button(ActionForm.backText.toString(player.lang), () =>
+        const form = new ActionForm('Наборы блоков').button(ActionForm.backText.to(player.lang), () =>
           base.show(player),
         )
 
@@ -227,7 +227,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 function selectBlockByIdModal(player: Player, resolve: (v: SelectedBlock) => void, error = '') {
   new ModalForm('Введи айди блока').addTextField(`${error}ID блока`, 'например, stone').show(player, (_, id) => {
     let error = ''
-    if (!blockIsAvaible(id, { tell: m => (error += m.toString(player.lang)), lang: player.lang }))
+    if (!blockIsAvaible(id, { tell: m => (error += m.to(player.lang)), lang: player.lang }))
       return selectBlockByIdModal(player, resolve, `${error}\n`)
 
     resolve({ permutations: [BlockPermutation.resolve(id)] })

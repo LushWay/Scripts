@@ -214,7 +214,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
 
   if (damagingEntity instanceof Player) {
     damagingEntity.onScreenDisplay.setActionBar(
-      i18n.error`Нельзя сражаться в мирной зоне`.toString(damagingEntity.lang),
+      i18n.error`Нельзя сражаться в мирной зоне`.to(damagingEntity.lang),
       ActionbarPriority.Highest,
     )
   }

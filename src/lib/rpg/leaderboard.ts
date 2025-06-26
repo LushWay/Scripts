@@ -10,6 +10,7 @@ import {
   world,
 } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { defaultLang } from 'lib/assets/lang'
 import { scoreboardDisplayNames } from 'lib/database/scoreboard'
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { isKeyof } from 'lib/util'
@@ -103,7 +104,14 @@ export class Leaderboard {
     )
   }
 
-  get name(): RawText | RawMessage {
+  get name(): string {
+    const id = this.objective?.id
+    if (!id) return 'noname'
+    if (isKeyof(id, scoreboardDisplayNames)) return scoreboardDisplayNames[id].to(defaultLang)
+    return this.scoreboard.displayName.toString()
+  }
+
+  get nameRawText(): RawText | RawMessage {
     const id = this.objective?.id
     if (!id) return { text: 'noname' }
     if (isKeyof(id, scoreboardDisplayNames)) return scoreboardDisplayNames[id].toRawText()
@@ -113,8 +121,8 @@ export class Leaderboard {
   updateLeaderboard() {
     if (!this.entity.isValid) return
 
-    const npc = this.entity.getComponent(EntityComponentTypes.Npc)
-    if (!npc) return
+    // const npc = this.entity.getComponent(EntityComponentTypes.Npc)
+    // if (!npc) return
 
     const scoreboard = this.scoreboard
     const id = this.scoreboard.id
@@ -122,23 +130,29 @@ export class Leaderboard {
     const style = Leaderboard.untypedStyles[this.info.style] ?? Leaderboard.styles.gray
     const filler = `§${style.fill1}-§${style.fill2}-`.repeat(10)
 
-    const rawtext: RawMessage[] = [{ text: `§l${style.objName}` }, name, { text: `\n§l${filler}§r\n` }]
-    let leaderboard = ``
+    // const rawtext: RawMessage[] = [{ text: `§l${style.objName}` }, name, { text: `\n§l${filler}§r\n` }]
+    let leaderboard = `§l§${style.objName}${name}\n§l${filler}§r\n`
     for (const [i, scoreInfo] of scoreboard
       .getScores()
       .sort(id.endsWith('SpeedRun') ? smallest : biggest)
+      .slice(0, 10)
       .entries()) {
-      if (i >= 10) continue
       const { pos: t, nick: n, score: s } = style
 
       const name = Player.nameOrUnknown(scoreInfo.participant.displayName)
 
-      rawtext.push({ text: `§${t}#${i + 1}§r §${n}${name}§r §${s}` })
-      leaderboard += `§${t}#${i + 1}§r §${n}${name}§r §${s}${Leaderboard.formatScore(id, scoreInfo.score, true)}§r\n`
-      rawtext.push({ text: '§r\n' })
+      // rawtext.push({ text: `§${t}#${i + 1}§r §${n}${name}§r §${s}` })
+      const score = Leaderboard.formatScore(id, scoreInfo.score, true)
+      leaderboard += `§${t}#${i + 1}§r §${n}${name}§r §${s}${typeof score === 'number' ? score : score.to(defaultLang)}§r\n`
+      // rawtext.push(
+      // typeof score === 'string' || typeof score === 'number' ? { text: score.toString() } : score.toRawText(),
+      // )
+      // rawtext.push({ text: '§r\n' })
     }
 
-    npc.name = JSON.stringify({ rawtext })
+    this.entity.nameTag = leaderboard
+    // npc.name = ''
+    // npc.name = JSON.stringify({ rawtext })
   }
 }
 
@@ -173,5 +187,5 @@ function toMetricNumbers(value: number) {
   if (exp === 0) return value.toString()
 
   const scaled = value / Math.pow(10, exp * 3)
-  return i18nShared`${scaled.toFixed(1)}${exp > 5 ? `E${exp}` : types[exp]}`
+  return i18nShared.nocolor.join`${scaled.toFixed(1)}${exp > 5 ? `E${exp}` : types[exp]}`
 }

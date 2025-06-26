@@ -11,4 +11,5 @@ export enum CustomEntityTypes {
   Loot = 'lw:loot',
   Sit = 'lw:sit',
   FloatingText = 'f:t',
+  FloatingTextNpc = 'f:t_npc',
 }

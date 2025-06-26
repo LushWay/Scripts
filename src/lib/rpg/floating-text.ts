@@ -8,7 +8,15 @@ import { Vec } from 'lib/vector'
 export class FloatingText {
   private static readonly dynamicProperty = 'floatingText'
 
-  private static readonly typeId = CustomEntityTypes.FloatingText
+  private static readonly typeId = CustomEntityTypes.FloatingTextNpc
+
+  static {
+    // system.delay(() => {
+    //   world.overworld
+    //     .getEntities({ type: CustomEntityTypes.FloatingText })
+    //     .forEach(e => e.getDynamicProperty(FloatingText.dynamicProperty) && e.remove())
+    // })
+  }
 
   constructor(
     private id: string,
@@ -38,7 +46,7 @@ export class FloatingText {
       if (npc) {
         if (typeof nameTag === 'string') npc.name = nameTag
         else npc.name = JSON.stringify(nameTag.toRawText())
-      } else this.entity.nameTag = nameTag.toString(defaultLang)
+      } else this.entity.nameTag = nameTag.to(defaultLang)
     } else {
       this.logger.warn('Entity is invalid')
       try {

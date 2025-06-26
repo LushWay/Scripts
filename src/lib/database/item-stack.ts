@@ -1,6 +1,6 @@
 import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
-import { defaultLang } from 'lib/assets/lang'
+import { Language } from 'lib/assets/lang'
 import { i18n, textUnitColorize } from 'lib/i18n/text'
 import { noBoolean, wrapLore } from 'lib/util'
 
@@ -63,24 +63,24 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   build() {
     return new ItemLoreSchemaCompiled<T>(
       this.properties,
-      (i, s) => this.prepareItem(i, s),
+      (l, i, s) => this.prepareItem(l, i, s),
       this.itemTypeId,
       this.schemaId,
     )
   }
 
-  private prepareItem(itemStack: Item, storage: ParsedSchema<T>) {
-    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage).toString(defaultLang)
+  private prepareItem(lang: Language, itemStack: Item, storage: ParsedSchema<T>) {
+    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage).to(lang)
     itemStack.setLore(
-      this.prepareLore(this.prepareProperties(storage), itemStack, storage)
-        .map(e => wrapLore(e.toString(defaultLang)))
+      this.prepareLore(this.prepareProperties(lang, storage), itemStack, storage)
+        .map(e => wrapLore(e.to(lang)))
         .flat(),
     )
   }
 
   private prepareLore: PrepareLore<T> = properties => properties
 
-  private prepareProperties(storage: Partial<ParsedSchema<T>>): string[] {
+  private prepareProperties(lang: Language, storage: Partial<ParsedSchema<T>>): string[] {
     return Object.entries(this.properties)
       .map(([key, { text, prepareProperty }]) => {
         if (!text) return false
@@ -88,7 +88,7 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
         const unit = prepareProperty ? prepareProperty(storage[key], key) : storage[key]
         if (unit === false) return false
 
-        return `§7${text}: ${textUnitColorize(unit, undefined, false)}`
+        return `§7${text.to(lang)}: ${textUnitColorize(unit, undefined, lang)}`
       })
       .filter(noBoolean)
   }
@@ -99,23 +99,23 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
 
   constructor(
     private properties: Schema,
-    private prepareItem: (itemStack: Item, storage: ParsedSchema<T>) => void,
+    private prepareItem: (lang: Language, itemStack: Item, storage: ParsedSchema<T>) => void,
     private readonly itemTypeId: string,
     private readonly lsid: string,
   ) {}
 
-  create(config: ParsedSchema<T>, typeId = this.itemTypeId) {
+  create(lang: Language, config: ParsedSchema<T>, typeId = this.itemTypeId) {
     const item = new ItemStack(typeId)
     item.setDynamicProperty(ItemLoreSchemaCompiled.loreSchemaId, this.lsid)
 
-    const storage = this.parse(item, config)
+    const storage = this.parse(lang, item, config)
     if (!storage) throw new Error('Unable to create item using schema')
 
     for (const [key, value] of Object.entriesStringKeys(config)) storage[key] = value
     return { item, storage }
   }
 
-  parse(itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}, prepare = true) {
+  parse(lang: Language, itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}, prepare = true) {
     try {
       if (itemStack.isStackable) return
     } catch (e) {
@@ -141,7 +141,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {
           itemStack.setDynamicProperty(key, v === defaultValue ? undefined : JSON.stringify(v))
-          this.prepareItem(itemStack, storage)
+          this.prepareItem(lang, itemStack, storage)
         },
 
         get() {
@@ -155,7 +155,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
       })
     }
 
-    if (prepare) this.prepareItem(itemStack, storage)
+    if (prepare) this.prepareItem(lang, itemStack, storage)
 
     return storage
   }

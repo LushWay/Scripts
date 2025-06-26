@@ -25,7 +25,7 @@ export function selectItemForm(
 ) {
   const { container } = player
   if (!container) return
-  const chestForm = new ChestForm('45').title(Message.translate(player.lang, text)).pattern([0, 0], ['<-     -?'], {
+  const chestForm = new ChestForm('45').title(text.to(player.lang)).pattern([0, 0], ['<-     -?'], {
     '<': {
       icon: BUTTON['<'],
       callback: back,

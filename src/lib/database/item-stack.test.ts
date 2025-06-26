@@ -1,6 +1,7 @@
 import 'lib/extensions/enviroment'
 
 import { ItemLoreSchema } from './item-stack'
+import { defaultLang } from 'lib/assets/lang'
 
 describe('item stack', () => {
   it('should create item', () => {
@@ -18,7 +19,7 @@ describe('item stack', () => {
 
       .build()
 
-    const { item, storage } = keyLore.create({
+    const { item, storage } = keyLore.create(defaultLang, {
       key: 'defaultkey',
       owner: 'Имя',
       owned: true,
@@ -51,7 +52,7 @@ describe('item stack', () => {
   it('should create item with array property', () => {
     const key = new ItemLoreSchema('test 2').property('keys', [String]).display('Ключи').build()
 
-    const { item, storage } = key.create({ keys: ['string', 'string2'] })
+    const { item, storage } = key.create(defaultLang, { keys: ['string', 'string2'] })
     if (!storage) throw new TypeError('Storage is empty!')
 
     expectTypeOf(storage.keys).toBeArray()

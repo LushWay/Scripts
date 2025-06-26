@@ -87,8 +87,8 @@ export class SafePlace {
     })
     RegionEvents.onEnter(this.safeArea, player => {
       if (this.showOnEnterTitle(player)) {
-        player.onScreenDisplay.setHudTitle(`§f${this.name}`, {
-          subtitle: i18n.success`Мирная зона`.toString(player.lang),
+        player.onScreenDisplay.setHudTitle(`§f${this.name.to(player.lang)}`, {
+          subtitle: i18n.success`Мирная зона`.to(player.lang),
           fadeInDuration: 0.5 * TicksPerSecond,
           stayDuration: 1 * TicksPerSecond,
           fadeOutDuration: 1 * TicksPerSecond,
@@ -140,7 +140,7 @@ const portalMenuOnce = debounceMenu(function portalMenu(
           if (place.location.valid) Portal.teleport(player, place.location, { title: '' })
 
           system.runTimeout(
-            () => Portal.showHudTitle(player, place.group.name?.toString(player.lang), 3),
+            () => Portal.showHudTitle(player, place.group.name?.to(player.lang), 3),
             'teleport title',
             10,
           )

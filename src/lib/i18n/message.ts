@@ -6,10 +6,6 @@ import { textUnitColorize } from './text'
 export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
 
 export class Message {
-  static translate(lang: Language, msg: Text) {
-    return typeof msg === 'string' ? msg : msg.toString(lang)
-  }
-
   static concatTemplateStringsArray(
     language: Language,
     template: readonly string[],
@@ -74,17 +70,23 @@ export class Message {
   }
 
   // Name is not toString to avoid unexpected behavior related to js builtin toString
-  toString(language: Language) {
+  to(language: Language) {
     return Message.concatTemplateStringsArray(language, this.template, this.args, this.colors, this.postfixes)
   }
 
   protected toJSON() {
-    return this.toString(defaultLang)
+    return this.to(defaultLang)
+  }
+}
+
+declare global {
+  interface String {
+    to(): string
   }
 }
 
 export class I18nMessage extends Message {
-  toString(language: Language): string {
+  to(language: Language): string {
     const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
     return Message.concatTemplateStringsArray(language, translated, this.args, this.colors, this.postfixes)
   }
@@ -93,36 +95,52 @@ export class I18nMessage extends Message {
 export class SharedI18nMessage extends I18nMessage {
   toRawText(): RawText {
     const token = extractedSharedMessagesIds[this.id]
-    if (!token)
-      throw new Error(`RawText is not supported for '${this.id.replaceAll('\\x00', '%s').replaceAll('\n', '\\n')}'`)
+    if (!token) {
+      console.warn(
+        `RawText is not supported for '${this.id.replaceAll('\x00', '\\u0000').replaceAll('\n', '\\n')}'. Please run i18n:extract`,
+      )
 
-    return { rawtext: [{ translate: token, with: { rawtext: [...this.argumentsToRawText()] } }] }
+      return { rawtext: [{ text: '§cTRANSLATION BROKEN, REPORT' }] }
+    }
+
+    if (!this.args.length) return { rawtext: [{ translate: token }] }
+
+    return { rawtext: [{ translate: token, with: { rawtext: this.argsToRawText() } }] }
   }
 
-  protected *argumentsToRawText() {
+  protected argsToRawText() {
+    const argsRawtext: RawText[] = []
     const args = this.args as RawTextArg[]
     for (const [i, arg] of args.entries()) {
-      if (arg === '' || arg === undefined || arg === null) continue
-      if (this.isRawText(arg)) {
-        yield { text: this.colors.unit }
-        if (Array.isArray(arg.rawtext)) yield* arg.rawtext
-        else yield arg
-      } else if (arg instanceof SharedI18nMessage) yield arg.toRawText()
-      else yield { text: textUnitColorize(arg, this.colors, false) }
+      if (arg === '' || arg === undefined || arg === null) {
+        argsRawtext.push({ rawtext: [{ text: '' }] })
+        continue
+      }
 
-      if (args[i + 1]) yield { text: this.colors.text }
+      let messages: RawMessage[] = []
+      if (arg instanceof SharedI18nMessage) {
+        messages = arg.toRawText().rawtext ?? []
+      } else if (isRawText(arg)) {
+        messages.push({ text: this.colors.unit }, arg)
+      } else messages.push({ text: textUnitColorize(arg, this.colors, false) })
+
+      const textNext = this.template[i + 1]
+      if (textNext) messages.push({ text: this.colors.text })
+
+      argsRawtext.push({ rawtext: messages })
     }
+    return argsRawtext
   }
+}
 
-  protected isRawText(arg: unknown): arg is RawText {
-    return typeof arg === 'object' && arg !== null && 'rawtext' in arg
-  }
+function isRawText(arg: unknown): arg is RawText {
+  return typeof arg === 'object' && arg !== null && 'rawtext' in arg
 }
 
 export class SharedI18nMessageJoin extends SharedI18nMessage {
   toRawText(): RawText {
     const rawtext: RawMessage[] = []
-    const args = [...this.argumentsToRawText()]
+    const args = this.argsToRawText()
     for (const [i, text] of this.template.entries()) {
       rawtext.push({ text })
       if (args[i]) rawtext.push(args[i])
@@ -139,7 +157,7 @@ export class ServerSideI18nMessage extends I18nMessage {
     super([], [], colors)
   }
 
-  toString(language: Language): string {
+  to(language: Language): string {
     return this.generate(language)
   }
 }

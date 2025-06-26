@@ -7,12 +7,12 @@ import { util } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
+import { Language } from 'lib/assets/lang'
 
 export class Menu {
   static settings: [Text, string] = [i18n`Меню\n§7Разные настройки интерфейсов и меню в игре`, 'menu']
 
   static createItem(typeId: string = Items.Menu, name?: SharedText) {
-    if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
     const item = new ItemStack(typeId).setInfo(
       name,
       i18n.nocolor`§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu`,
@@ -25,7 +25,7 @@ export class Menu {
 
   static itemStack = this.createItem()
 
-  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), i18n`меню`)
+  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), i18n`меню`, false)
 
   static {
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -67,7 +67,7 @@ export class Compass {
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(`${Items.CompassPrefix}${i}`, i18nShared.nocolor`§r§l§6Цель\n§r§7(use)`)
+    return Menu.createItem(`${Items.CompassPrefix}${i}`)
   })
 
   /** Map of player as key and compass target as value */
@@ -136,8 +136,9 @@ export class Compass {
 export function createPublicGiveItemCommand(
   name: string,
   itemStack: ItemStack,
-  is = itemStack.is.bind(itemStack),
-  itemNameTag: Text | undefined = itemStack.nameTag?.split('\n')[0],
+  is: ItemStack['is'],
+  itemNameTag: Text,
+  setNameTag = true,
 ) {
   /** Gives player an item */
   function give(player: Player, { mode = 'tell' }: { mode?: 'tell' | 'ensure' } = {}) {
@@ -151,17 +152,29 @@ export function createPublicGiveItemCommand(
       .concat([{ item: offhand?.getItem(), remove: () => offhand?.setItem(void 0) }])
       .filter(({ item }) => item && is(item))
 
+    const getItem = () => {
+      const item = itemStack.clone()
+      if (setNameTag) item.nameTag = itemNameTag.to(player.lang)
+      item.setInfo(
+        undefined,
+        i18n.accent`Используйте ${'.' + name} чтобы убрать этот предмет из инвентаря или получить его снова`.to(
+          player.lang,
+        ),
+      )
+      return item
+    }
+
     if (mode === 'tell') {
       if (items.length) {
         items.forEach(e => e.remove())
-        player.info(`§c-${itemNameTag}`)
+        player.info(i18n.join`§c-${itemNameTag}`)
       } else {
-        container.addItem(itemStack)
-        player.info(`§a+${itemNameTag}`)
+        container.addItem(getItem())
+        player.info(i18n.join`§a+${itemNameTag}`)
       }
     } else {
       if (!items.length) {
-        container.addItem(itemStack)
+        container.addItem(getItem())
       }
     }
   }

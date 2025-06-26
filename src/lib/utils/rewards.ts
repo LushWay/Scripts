@@ -75,7 +75,7 @@ export class Rewards {
     if (reward.type === 'item' && reward.id) {
       if (!player.container) return
       const item = new ItemStack(reward.id, reward.count)
-      if (reward.name) item.nameTag = reward.name.toString(player.lang)
+      if (reward.name) item.nameTag = reward.name.to(player.lang)
       player.container.addItem(item)
     } else if (reward.type === 'scores') {
       player.scores[reward.score] += reward.count
@@ -115,7 +115,7 @@ export class Rewards {
       else text = `${reward.score} x${reward.count}`
     } else if ((reward.type as string) === 'item')
       text = itemNameXCount(
-        { nameTag: reward.name?.toString(player.lang), amount: reward.count, typeId: reward.id },
+        { nameTag: reward.name?.to(player.lang), amount: reward.count, typeId: reward.id },
         undefined,
         undefined,
         player,

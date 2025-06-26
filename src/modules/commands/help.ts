@@ -23,17 +23,18 @@ help
 
     const cv = colors[getRole(ctx.player.id)]
 
-    ctx.reply(noI18n.nocolor`§ы${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
+    ctx.reply(noI18n.nocolor`${cv}─═─═─═─═─═ §r${page}/${maxPages} ${cv}═─═─═─═─═─═─`)
 
     for (const command of path) {
       const q = '§f.'
 
-      const c = `${cv}§r ${q}${command.sys.name} §o§7- ${
-        command.sys.description ? command.sys.description : i18n` Пусто` //§r
-      }`
-      ctx.reply(noI18n.nocolor`§ы` + c)
+      const c = i18n.nocolor`${cv}§r ${q}${command.sys.name} §o§7- ${
+        command.sys.description ? command.sys.description.to(ctx.player.lang) : i18n`Пусто` //§r
+      }`.to(ctx.player.lang)
+
+      ctx.reply(c)
     }
-    ctx.reply(i18n`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
+    ctx.reply(i18n.nocolor`${cv}─═─═─═§f Доступно: ${avaibleCommands.length}/${Command.commands.length} ${cv}═─═─═─═─`)
   })
 
 function helpForCommand(player: Player, commandName: string) {
@@ -45,14 +46,14 @@ function helpForCommand(player: Player, commandName: string) {
 
   const d = cmd.sys
   const aliases = d.aliases.length > 0 ? i18n` (также ${d.aliases.join(', ')})` : ''
-  const overview = i18n`   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
+  const overview = i18n.nocolor`   §fКоманда §6.${d.name}${aliases}§7§o - ${d.description}`
 
   player.tell(' ')
   player.tell(overview)
   player.tell(' ')
 
   let child = false
-  for (const subcommand of Command.getHelp(cmd)) {
+  for (const subcommand of Command.getHelp(player.lang, cmd)) {
     child = true
     player.tell(`§7   §f.${subcommand}`)
   }
@@ -69,5 +70,5 @@ new CmdLet('help').setDescription(i18n`Выводит справку о кома
 })
 
 const colors: Record<Role, string> = Object.fromEntries(
-  Object.entriesStringKeys(ROLES).map(([role, display]) => [role, display.toString(defaultLang).slice(0, 2)]),
+  Object.entriesStringKeys(ROLES).map(([role, display]) => [role, display.to(defaultLang).slice(0, 2)]),
 )

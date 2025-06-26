@@ -40,7 +40,7 @@ export class CmdLet {
       event.sender.fail(
         i18n.error`Неизвестный аргумент: ${cmdlets.join(
           '§c, §f',
-        )}.\nДоступные командлеты: \n${CmdLet.list.map(e => `\n  §f${e.name} §7§o- ${e.description}`)}\n `,
+        )}.\nДоступные командлеты: \n${CmdLet.list.map(e => i18n.nocolor.join`\n  §f${e.name} §7§o- ${e.description}`.to(event.sender.lang)).join('')}\n `,
       )
       return 'stop'
     }

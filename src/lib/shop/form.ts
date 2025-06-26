@@ -197,22 +197,22 @@ export class ShopForm {
 
     // TODO Fix colors
     const actionForm = new ActionForm(
-      Message.translate(player.lang, form.title()),
-      i18n.join`${message}${message ? '\n\n' : ''}${form.body()}`.toString(player.lang),
+      form.title().to(player.lang),
+      i18n.join`${message}${message ? '\n\n' : ''}${form.body()}`.to(player.lang),
     )
-    if (back) actionForm.addButtonBack(back)
+    if (back) actionForm.addButtonBack(back, player.lang)
 
     for (const button of form.buttons) {
       if ('onOpen' in button) {
         // Section
         const { name, onOpen, texture } = button
 
-        actionForm.button(i18n.join`${name}`.color(i18n.accent).toString(player.lang), texture, () => {
+        actionForm.button(i18n.join`${name}`.color(i18n.accent).to(player.lang), texture, () => {
           ShopForm.showSection(name, form, this.shop, player, this.show, onOpen)
         })
       } else {
         // Common button
-        actionForm.button(button.text.toString(player.lang), button.texture, button.callback)
+        actionForm.button(button.text.to(player.lang), button.texture, button.callback)
       }
     }
 

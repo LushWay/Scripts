@@ -24,8 +24,8 @@ const speedRunNames: Record<SpeedRunTarget, Text> = {
 const objectives: Record<SpeedRunTarget, ScoreboardDB> = Object.fromEntries(
   Object.entriesStringKeys(speedRunNames).map(([target, name]) => {
     const key = `${target[0]?.toLowerCase()}${target.slice(1)}SpeedRun`
-    ScoreboardDB.defineName(key, name.toString(defaultLang))
-    return [target, new ScoreboardDB(key, name.toString(defaultLang))]
+    ScoreboardDB.defineName(key, name.to(defaultLang))
+    return [target, new ScoreboardDB(key, name.to(defaultLang))]
   }),
 )
 
@@ -84,7 +84,7 @@ const speedrunForm = form((f, { player }) => {
         target,
         finished: false,
       }
-      player.info(i18n`Спидран '${name}' начат. Для сброса времени воспользуйтесь .wipe`.toString(player.lang))
+      player.info(i18n`Спидран '${name}' начат. Для сброса времени воспользуйтесь .wipe`.to(player.lang))
     })
   }
 })

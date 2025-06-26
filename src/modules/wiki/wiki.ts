@@ -30,7 +30,7 @@ export const wikiOres = form((f, { player }) => {
       const chance = getChance(entry.weight, nowAvailableChance)
       return { entry, text: oreName(entry.item, chance, ' '), chance }
     })
-    f.button(i18n`Руды на y: ${y}:\n${ores.map(e => e.text).join(', ')}`, wikiOresAtY(ores, y))
+    f.button(i18n`Руды на y: ${y}:\n${ores.map(e => e.text.to(player.lang)).join(', ')}`, wikiOresAtY(ores, y))
   } else {
     f.button(i18n`На этой высоте руд нет`, wikiOres)
   }

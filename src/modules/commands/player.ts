@@ -20,7 +20,7 @@ const playerMenu = form.params<{ targetId: string }>((f, { player, params: { tar
 
   if (moder) {
     f.button(i18n`Другие игроки`, () => {
-      selectPlayer(player, i18n`открыть его меню`.toString(player.lang), self).then(target => {
+      selectPlayer(player, i18n`открыть его меню`.to(player.lang), self).then(target => {
         playerMenu({ targetId: target.id }).show(player, self)
       })
     })

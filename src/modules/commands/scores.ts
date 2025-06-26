@@ -5,6 +5,7 @@ import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'
 import { selectPlayer } from 'lib/form/select-player'
+import { i18n, noI18n } from 'lib/i18n/text'
 
 new Command('scores')
   .setDescription('Управляет счетом игроков (монеты, листья)')
@@ -75,7 +76,7 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
       if (!name) return false
 
       return [
-        `${name}§r §6${Leaderboard.formatScore(objective.id, scoreboard.get(p.displayName))}`,
+        i18n.nocolor.join`${name}§r §6${Leaderboard.formatScore(objective.id, scoreboard.get(p.displayName))}`,
         () => editPlayerScore(player, objective, p.displayName, name),
       ]
     })
@@ -110,7 +111,7 @@ function editPlayerScore(
   const self = () => editPlayerScore(player, scoreboard, targetId, targetName, back)
   const description = getScoreDescription(targetId, targetName, manager)
   new ActionForm(scoreboard.displayName, description)
-    .addButtonBack(back)
+    .addButtonBack(back, player.lang)
     .button('Добавить к счету', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'add'))
     .button('Установить значение', () => addOrSetPlayerScore(player, targetId, targetName, manager, self, 'set'))
     .show(player)
@@ -119,10 +120,10 @@ function editPlayerScore(
 function getScoreDescription(targetId: string, targetName: string, manager: ScoreboardDB) {
   const converted = Leaderboard.formatScore(manager.scoreboard.id, manager.get(targetId))
   const raw = manager.get(targetId)
-  return `
+  return noI18n`
 §l§7Игрок: §r§f${targetName}§r
 §l§7Значение:§r §f${raw}
-${converted !== raw ? `§l§7Конвертированный счет: §r§f${converted}` : ''}`.trim()
+${converted !== raw ? noI18n`§l§7Конвертированный счет: §r§f${converted}` : ''}`.trim()
 }
 
 function addOrSetPlayerScore(

@@ -25,10 +25,10 @@ function tp(
   extra: Text = '',
 ) {
   const here = inv === place
-  if (here) extra = i18n`${extra ? extra.toString(player.lang) + ' ' : ''}§8Вы тут`.toString(player.lang)
-  if (extra) extra = '\n' + extra.toString(player.lang)
+  if (here) extra = i18n`${extra ? extra.to(player.lang) + ' ' : ''}§8Вы тут`.to(player.lang)
+  if (extra) extra = '\n' + extra.to(player.lang)
   const prefix = here ? '§7' : color
-  return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text} ${prefix}<${extra}`
+  return `${prefix}> ${inv === place ? '§7' : '§r§f'}${text.to(player.lang)} ${prefix}<${extra}`
 }
 
 Menu.form = form((f, { player, self }) => {

@@ -94,7 +94,7 @@ export class Gunsmith extends ShopNpc {
         if (!lost && rollChance(3)) {
           lost = true
           player.warn(
-            i18n.warn`Онет, кажется, зачарование ${translateTypeId(ench.type.id, player.lang)} уровнем ${ench.level.toString()} потерялось...`.toString(
+            i18n.warn`Онет, кажется, зачарование ${translateTypeId(ench.type.id, player.lang)} уровнем ${ench.level.toString()} потерялось...`.to(
               player.lang,
             ),
           )

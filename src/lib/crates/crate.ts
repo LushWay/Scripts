@@ -13,13 +13,14 @@ import { ItemLoreSchema } from '../database/item-stack'
 import { i18n, i18nShared, noI18n } from '../i18n/text'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
 import CrateLootAnimation from './animation'
+import { defaultLang } from 'lib/assets/lang'
 
 export class Crate {
   static crates = new Map<string, Crate>()
 
   static getName(id: string, crate = Crate.crates.get(id)) {
     if (crate) {
-      return `${crate.place.group.name} - ${crate.place.name}`
+      return i18nShared.join`${crate.place.group.sharedName} - ${crate.place.name}`
     } else return noI18n`Unknown`
   }
 
@@ -47,12 +48,12 @@ export class Crate {
   }
 
   createKeyItemStack() {
-    return schema.create({ crate: this.id }).item
+    // TODO Use player.lang
+    return schema.create(defaultLang, { crate: this.id }).item
   }
 
   private onValidLocation(location: ValidLocation<Vector3>) {
-    const groupName = this.place.group.name instanceof SharedI18nMessage ? this.place.group.name : 'noname'
-    this.floatingText.update(location, i18nShared`${this.place.name} ящик\n§7${groupName}`)
+    this.floatingText.update(location, i18nShared`${this.place.name} ящик`)
     if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionType)
 
     try {
@@ -74,7 +75,7 @@ export class Crate {
     system.delay(() => {
       if (!this.location.valid) return
 
-      const storage = schema.parse(player.mainhand())
+      const storage = schema.parse(player.lang, player.mainhand())
       if (!storage) {
         return this.preview.show(player)
       }

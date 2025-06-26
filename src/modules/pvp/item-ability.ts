@@ -27,8 +27,8 @@ export const schema = new ItemLoreSchema('item-ability')
   .property('ability', String)
   .display(i18n`Способность`, p =>
     isKeyof(p, descriptions)
-      ? i18n.join`${names[p]}\n\n${descriptions[p]}`.toString(defaultLang)
-      : names[Ability.Nothing].toString(defaultLang),
+      ? i18n.join`${names[p]}\n\n${descriptions[p]}`.to(defaultLang)
+      : names[Ability.Nothing].to(defaultLang),
   )
   .build()
 
@@ -45,7 +45,7 @@ new Command('itemability')
   .array('sword type', ['diamond', 'iron', 'netherite'])
   .array('ability', [Ability.Vampire, Ability.ExtraDamage])
   .executes((ctx, type, ability) => {
-    const { item } = schema.create({ ability }, `minecraft:${type}_sword`)
+    const { item } = schema.create(ctx.player.lang, { ability }, `minecraft:${type}_sword`)
     ctx.player.container?.addItem(item)
   })
 
@@ -54,7 +54,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
 
   const mainhand = damagingEntity.mainhand()
   const item = mainhand.isValid && mainhand.getItem()
-  const storage = item && schema.parse(item)
+  const storage = item && schema.parse(damagingEntity.lang, item)
   if (!storage) return
 
   switch (storage.enchant) {

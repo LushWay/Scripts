@@ -11,6 +11,7 @@ import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
+import { defaultLang } from 'lib/assets/lang'
 
 const furnaceExpireTime = ms.from('hour', 1)
 const furnaceExpireTimeText = i18n`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
@@ -68,7 +69,7 @@ export class Furnacer extends ShopNpc {
         i => FurnaceKeyItem.schema.is(i),
         i18n`Ключ от печки`,
         (slot, _, text) => {
-          const parsed = FurnaceKeyItem.schema.parse(slot)
+          const parsed = FurnaceKeyItem.schema.parse(player.lang, slot)
           if (!parsed) return
 
           const key = FurnaceKeyItem.db.entries().find(e => e[1]?.code === parsed.code)?.[0]
@@ -86,7 +87,7 @@ export class Furnacer extends ShopNpc {
   }
 
   createItemKey(player?: Player) {
-    return FurnaceKeyItem.schema.create({
+    return FurnaceKeyItem.schema.create(player?.lang ?? defaultLang, {
       status: 'notUsed',
       furnacer: this.id,
       code: (Date.now() - 1700000000000).toString(32).toUpperCase(),
@@ -113,7 +114,7 @@ actionGuard((player, region, ctx) => {
   }
 
   const tryItem = (slot: ContainerSlot) => {
-    const lore = FurnaceKeyItem.schema.parse(slot, undefined, false)
+    const lore = FurnaceKeyItem.schema.parse(player.lang, slot, undefined, false)
     if (!lore) return notAllowed()
 
     if (lore.furnacer !== furnacer.id) return notAllowed(i18n`Этот ключ используется для других печек!`)

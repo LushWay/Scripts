@@ -34,7 +34,7 @@ describe('rectangle', () => {
 
     flts.center = { x: 10, y: 10, z: 10 }
 
-    expect(textTable(flts.getFormDescription()).toString(consoleLang)).toMatchInlineSnapshot(`
+    expect(textTable(flts.getFormDescription()).to(consoleLang)).toMatchInlineSnapshot(`
       "§7Center: §f§c10 §a10 §b10
       §7Radius: §612
       §7YRadius: §620"

@@ -395,7 +395,10 @@ export class WorldEdit {
         })(),
       )
 
-      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3за ${i18n.restyle({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
+      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3за ${i18n
+        .restyle({ unit: '§f', text: '§3' })
+        .time(Date.now() - startTime)
+        .to(player.lang)}.`
 
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyBlockWeights(replaceTargets)}`

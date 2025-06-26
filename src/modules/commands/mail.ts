@@ -87,38 +87,38 @@ function letterDetailsMenu(
   // TODO Rewrite to use new form
   const form = new ActionForm(
     letter.title,
-    i18n`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString(player)}`.toString(
+    i18n`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString(player)}`.to(
       player.lang,
     ),
-  ).addButtonBack(back)
+  ).addButtonBack(back, player.lang)
 
   if (!letter.rewardsClaimed && letter.rewards.length)
-    form.button(i18n`Забрать награду`.toString(player.lang), () => {
+    form.button(i18n`Забрать награду`.to(player.lang), () => {
       Mail.claimRewards(player, index)
       letterDetailsMenu(
         { letter, index },
         player,
         back,
-        message + i18n.success`Награда успешно забрана!\n\n`.toString(player.lang),
+        message + i18n.success`Награда успешно забрана!\n\n`.to(player.lang),
       )
     })
 
   if (!letter.read && !settings.mailReadOnOpen)
-    form.button(i18n`Пометить как прочитанное`.toString(player.lang), () => {
+    form.button(i18n`Пометить как прочитанное`.to(player.lang), () => {
       Mail.readMessage(player.id, index)
       back()
     })
 
-  let deleteDescription = i18n.error`Удалить письмо?`.toString(player.lang)
+  let deleteDescription = i18n.error`Удалить письмо?`.to(player.lang)
   if (!letter.rewardsClaimed) {
     if (getSettings(player).mailClaimOnDelete) {
-      deleteDescription += i18n` Все награды будут собраны автоматически`.toString(player.lang)
+      deleteDescription += i18n` Все награды будут собраны автоматически`.to(player.lang)
     } else {
-      deleteDescription += i18n` Вы потеряете все награды, прикрепленные к письму!`.toString(player.lang)
+      deleteDescription += i18n` Вы потеряете все награды, прикрепленные к письму!`.to(player.lang)
     }
   }
 
-  form.button(i18n.error`Удалить письмо`.toString(player.lang), null, () => {
+  form.button(i18n.error`Удалить письмо`.to(player.lang), null, () => {
     ask(player, deleteDescription, i18n`Удалить`, () => {
       if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
       Mail.deleteMessage(player, index)

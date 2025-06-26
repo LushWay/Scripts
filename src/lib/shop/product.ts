@@ -106,11 +106,11 @@ export class Product<T extends Cost = any> {
     const costString = this.cost.toString(player, true)
 
     new MessageForm(
-      i18n.header`Подтверждение`.toString(player.lang),
-      (sell ? i18n`Продать ${costString} за ${name}?` : i18n`Купить ${name} за ${costString}?`).toString(player.lang),
+      i18n.header`Подтверждение`.to(player.lang),
+      (sell ? i18n`Продать ${costString} за ${name}?` : i18n`Купить ${name} за ${costString}?`).to(player.lang),
     )
-      .setButton1((sell ? i18n`Продать!` : i18n`Купить!`).toString(player.lang), this.buy)
-      .setButton2(i18n.error`Отмена`.toString(player.lang), () =>
+      .setButton1((sell ? i18n`Продать!` : i18n`Купить!`).to(player.lang), this.buy)
+      .setButton2(i18n.error`Отмена`.to(player.lang), () =>
         backForm(sell ? i18n.error`Продажа отменена` : i18n.error`Покупка отменена`),
       )
       .show(player)
@@ -145,8 +145,8 @@ function wrapWithCatch<T extends (...args: any[]) => unknown>(func: T, player: P
       return func(...(args as Parameters<T>)) as ReturnType<T>
     } catch (e) {
       new MessageForm(
-        i18n`Ошибка`.toString(player.lang),
-        i18n`При покупке произошла ошибка. ${developersAreWarned}`.toString(player.lang),
+        i18n`Ошибка`.to(player.lang),
+        i18n`При покупке произошла ошибка. ${developersAreWarned}`.to(player.lang),
       ).show(player)
 
       throw e

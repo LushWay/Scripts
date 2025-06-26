@@ -207,7 +207,7 @@ export class Boss {
     if (typeof this.options.place.name === 'string')
       throw new TypeError(`Boss ${this.id} name is string, expected I18nSharedMessage`)
 
-    return this.options.place.name.toString(defaultLang)
+    return this.options.place.name.to(defaultLang)
 
     // TODO add once supported
     // return this.options.place.name.toRawText()

@@ -33,12 +33,12 @@ class Form {
 
   title(title: Text, prefix = '§c§o§m§m§o§n§r§f') {
     this.currentTitle = title
-    this.form.title(`${prefix}${Message.translate(this.player.lang, title)}`)
+    this.form.title(`${prefix}${title.to(this.player.lang)}`)
     return this as NewFormCreator
   }
 
   body(body: Text) {
-    this.form.body(body.toString(this.player.lang))
+    this.form.body(body.to(this.player.lang))
     return this as NewFormCreator
   }
 
@@ -97,7 +97,7 @@ class Form {
     const finalCallback = callback instanceof ShowForm ? callback.show : callback
     if (!finalCallback) throw new TypeError(`No callback`)
 
-    this.form.button(Message.translate(this.player.lang, text), icon ?? undefined)
+    this.form.button(text.to(this.player.lang), icon ?? undefined)
     this.buttons.push(finalCallback)
     return this
   }

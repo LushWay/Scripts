@@ -92,7 +92,7 @@ export function textTable(table: Text.Table): Message {
     return table
       .map(
         ([key, value], i) =>
-          `${i % 2 === 0 && long ? '§f' : '§7'}${key.toString(lang)}: ${textUnitColorize(value, undefined, lang)}`,
+          `${i % 2 === 0 && long ? '§f' : '§7'}${key.to(lang)}: ${textUnitColorize(value, undefined, lang)}`,
       )
       .join('\n')
   })
@@ -207,7 +207,7 @@ export function textUnitColorize(
           throw new TypeError(`Text unit colorize cannot translate Message '${v.id}' if no locale was given!`)
         }
 
-        const vstring = v.toString(lang)
+        const vstring = v.to(lang)
         return vstring.startsWith('§') ? vstring : unit + vstring
       }
       if (v instanceof Player) {
@@ -223,6 +223,6 @@ export function textUnitColorize(
     case 'bigint':
       return '§c<>'
     case 'boolean':
-      return (v ? i18n.nocolor`§fДа` : i18n.nocolor`§cНет`).toString(lang || defaultLang)
+      return (v ? i18n.nocolor`§fДа` : i18n.nocolor`§cНет`).to(lang || defaultLang)
   }
 }

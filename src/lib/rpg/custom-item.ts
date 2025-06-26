@@ -26,14 +26,14 @@ class CustomItem {
   protected _nameTag: string | undefined
 
   nameTag(nameTag: Text) {
-    this._nameTag = nameTag.toString(defaultLang)
+    this._nameTag = nameTag.to(defaultLang)
     return this
   }
 
   private _description: string | undefined
 
   lore(desc: Text) {
-    this._description = desc.toString(defaultLang)
+    this._description = desc.to(defaultLang)
     return this
   }
 
@@ -70,10 +70,10 @@ export class CustomItemWithBlueprint extends CustomItem {
 
   get blueprint() {
     return new ItemStack(Items.Blueprint).setInfo(
-      i18n`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, defaultLang) : this._bprintName)}`.toString(
+      i18n`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, defaultLang) : this._bprintName)}`.to(
         defaultLang,
       ),
-      i18n`С помощью него вы можете сделать предмет у инженера`.toString(defaultLang),
+      i18n`С помощью него вы можете сделать предмет у инженера`.to(defaultLang),
     )
   }
 }

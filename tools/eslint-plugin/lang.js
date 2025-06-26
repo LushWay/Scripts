@@ -176,7 +176,7 @@ export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Read
       map(messagesJson.storage, (k, v) => [k, map(v, (k, v) => typeof v === 'object' && !Array.isArray(v) && [k, v])]),
       null,
       2,
-    )}`,
+    )}`.replaceAll('\\\\n', '\\n'),
   )
 }
 

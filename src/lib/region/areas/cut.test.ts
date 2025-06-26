@@ -1,8 +1,8 @@
+import { consoleLang } from 'lib/assets/lang'
 import { textTable } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { CutArea } from './cut'
 import { SphereArea } from './sphere'
-import { consoleLang } from 'lib/assets/lang'
 
 describe('sphere', () => {
   it('should detect if vector is in region', () => {
@@ -25,7 +25,7 @@ describe('sphere', () => {
       { x: 1, y: 1, z: 1 },
     ])
 
-    expect(textTable(cut.getFormDescription()).toString(consoleLang)).toMatchInlineSnapshot(`
+    expect(textTable(cut.getFormDescription()).to(consoleLang)).toMatchInlineSnapshot(`
       "§7Cut: {
         axis: §2\`y\`§r,
         to: §60§r

@@ -97,7 +97,7 @@ export function suggest(player: Pick<Player, 'tell' | 'lang'>, input: string, op
 export function commandNoPermissions(player: Player, command: import('./index').Command): void {
   let additional = ''
   if (!__RELEASE__ && typeof command.sys.role !== 'undefined') {
-    additional += i18n.error`\nКоманда доступна начиная с роли ${ROLES[command.sys.role]}`.toString(player.lang)
+    additional += i18n.error`\nКоманда доступна начиная с роли ${ROLES[command.sys.role]}`.to(player.lang)
   }
   player.fail(
     i18n.error`У вас нет разрешения для использования команды ${command.sys.name}${additional}\nСписок всех доступных вам команд: §f.help`,

@@ -46,12 +46,12 @@ export function createSelectPlayerMenu(
       })
       .addCustomButtonBeforeArray(form => {
         if (selected.length) {
-          form.button(i18n.accent`Убрать выделение`.size(selected.length).toString(player.lang), BUTTON['-'], () => {
+          form.button(i18n.accent`Убрать выделение`.size(selected.length).to(player.lang), BUTTON['-'], () => {
             selected.splice(0, selected.length)
             callback()
           })
         } else {
-          form.button(i18n.accent`Выбрать всех`.size(players.length).toString(player.lang), BUTTON['+'], () => {
+          form.button(i18n.accent`Выбрать всех`.size(players.length).to(player.lang), BUTTON['+'], () => {
             selected.splice(0, selected.length, ...getAllPlayersSelected())
             callback()
           })

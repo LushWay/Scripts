@@ -40,9 +40,9 @@ quest
 export function questsMenu(player: Player, back?: VoidFunction) {
   const { quests } = player.database
   if (!quests)
-    return new MessageForm(i18n.accent`Задания`.toString(player.lang), i18n.error`Нет заданий`.toString(player.lang))
+    return new MessageForm(i18n.accent`Задания`.to(player.lang), i18n.error`Нет заданий`.to(player.lang))
       .setButton1(
-        back ? ActionForm.backText.toString(player.lang) : i18n.accent`Закрыть`.toString(player.lang),
+        back ? ActionForm.backText.to(player.lang) : i18n.accent`Закрыть`.to(player.lang),
         back ?? (() => false),
       )
       .show(player)
@@ -52,7 +52,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
   new ArrayForm(i18n.accent`Задания`, quests.active)
     .description(!quests.active.length ? i18n`Нет активных заданий.` : '')
     .addCustomButtonBeforeArray(f => {
-      f.button(i18n.accent`Завершенные задания`.size(quests.completed.length).toString(player.lang), () =>
+      f.button(i18n.accent`Завершенные задания`.size(quests.completed.length).to(player.lang), () =>
         completeQuestsMenu(player, self),
       )
     })
@@ -61,7 +61,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
       const step = quest?.getCurrentStep(player, dbquest.i)
       if (!step || !quest) return false
 
-      return [`${quest.name}\n§7${step.text()}`, manageQuestMenu({ quest }).show]
+      return [i18n.nocolor.join`${quest.name}\n§7${step.text()}`, manageQuestMenu({ quest }).show]
     })
     .back(back)
     .show(player)
@@ -85,14 +85,14 @@ export const manageQuestMenu = form.params<{ quest: Quest }>((f, { player, back,
   let currentDescription = ''
   if (current) {
     currentDescription =
-      i18n`Текущее действие: ${current.text()}\nОписание действия: ${current.description?.() ?? ''}\nЛокация: ${current.target ? Vec.string(current.target.location, true) : ''}`.toString(
+      i18n`Текущее действие: ${current.text()}\nОписание действия: ${current.description?.() ?? ''}\nЛокация: ${current.target ? Vec.string(current.target.location, true) : ''}`.to(
         player.lang,
       )
     if (current.target?.dimensionType !== 'overworld') {
-      currentDescription += i18n`\nИзмерение: ${current.target?.dimensionType}`.toString(player.lang)
+      currentDescription += i18n`\nИзмерение: ${current.target?.dimensionType}`.to(player.lang)
     }
   } else if (quest.isCompleted(player)) {
-    currentDescription = i18n.success`Задание завершено!`.toString(player.lang)
+    currentDescription = i18n.success`Задание завершено!`.to(player.lang)
   }
 
   f.title(quest.name)

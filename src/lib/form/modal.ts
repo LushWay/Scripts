@@ -57,7 +57,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       defaultValueIndex = 0,
       defaultValue,
       none,
-      noneText = ModalForm.arrayDefaultNone.toString(defaultLang),
+      noneText = ModalForm.arrayDefaultNone.to(defaultLang),
     }: {
       defaultValueIndex?: number
       defaultValue?: T[number]
@@ -97,7 +97,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       defaultValueIndex: defaultValueIndexInput,
       defaultValue,
       none,
-      noneText = ModalForm.arrayDefaultNone.toString(defaultLang),
+      noneText = ModalForm.arrayDefaultNone.to(defaultLang),
       noneSelected = false,
     }: {
       defaultValueIndex?: number | string

@@ -10,7 +10,6 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
-import { defaultLang } from 'lib/assets/lang'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { RegionEvents } from 'lib/region/events'
@@ -144,9 +143,7 @@ class Learning {
 
               if (!airdrop.chest) {
                 player.onScreenDisplay.setActionBar(
-                  i18n.error`Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение`.toString(
-                    player.lang,
-                  ),
+                  i18n.error`Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение`.to(player.lang),
                   ActionbarPriority.Highest,
                 )
               } else {
@@ -262,12 +259,12 @@ class Learning {
 
   craftingTableLocation = location(this.quest.group.place('crafting table').name(noI18n`Верстак`))
 
-  startAxe = new ItemStack(MinecraftItemTypes.WoodenAxe).setInfo(
-    i18n`§r§6Начальный топор`.toString(defaultLang),
-    undefined,
+  startAxeGiveCommand = createPublicGiveItemCommand(
+    'startwand',
+    new ItemStack(MinecraftItemTypes.WoodenAxe),
+    s => s.typeId === MinecraftItemTypes.WoodenAxe && s.getDynamicProperty('startwand') === true,
+    i18n`§r§6Начальный топор`,
   )
-
-  startAxeGiveCommand = createPublicGiveItemCommand('startwand', this.startAxe)
 
   blockedOre = new WeakPlayerMap<string[]>()
 
@@ -347,12 +344,12 @@ class Learning {
       return new Promise<boolean>(resolve => {
         sent.add(player)
         new ActionForm(
-          i18n`Режим Перерождение`.toString(player.lang),
-          i18n`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`.toString(
+          i18n`Режим Перерождение`.to(player.lang),
+          i18n`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`.to(
             player.lang,
           ),
         )
-          .button(i18n`Вперед!`.toString(player.lang), () => {
+          .button(i18n`Вперед!`.to(player.lang), () => {
             if (!this.learningLocation.valid) return
 
             logger.player(player).info`Teleporting to ${this.learningLocation}`
@@ -364,7 +361,7 @@ class Learning {
               this.quest.enter(player)
             })
           })
-          .addButtonBack(toSpawn)
+          .addButtonBack(toSpawn, player.lang)
           .show(player)
           .then(shown => (shown && toSpawn(), false))
           .finally(() => sent.delete(player))

@@ -61,6 +61,7 @@ export const INTERACTABLE_ENTITIES: string[] = [
 export const NOT_MOB_ENTITIES = [
   CustomEntityTypes.Database,
   CustomEntityTypes.FloatingText,
+  CustomEntityTypes.FloatingTextNpc,
   CustomEntityTypes.Sit,
   CustomEntityTypes.Grave,
   CustomEntityTypes.Loot,

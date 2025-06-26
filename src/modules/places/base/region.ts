@@ -49,7 +49,7 @@ export class BaseRegion extends RegionWithStructure {
     if (this.ldb.state === RottingState.NoMaterials) text = i18n.error`(гниет)`
     if (this.ldb.state === RottingState.Destroyed) text = i18n.error`(разрушена)`
     if (this.ldb.state === RottingState.No) text = getSafeFromRottingTime(this)
-    return i18n.nocolor`§6Ваша база ${text}`.toString(player.lang)
+    return i18n.nocolor`§6Ваша база ${text}`.to(player.lang)
   }
 
   updateRadius() {

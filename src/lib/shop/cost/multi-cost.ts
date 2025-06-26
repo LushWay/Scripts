@@ -52,7 +52,7 @@ export class MultiCost<T extends Cost[]> extends Cost {
       }
     }
 
-    return messages || i18n.error`Недостаточно средств.`.toString(player.lang)
+    return messages || i18n.error`Недостаточно средств.`.to(player.lang)
   }
 
   item = this.createCostAlias(ItemCost)

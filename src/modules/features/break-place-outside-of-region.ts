@@ -18,7 +18,7 @@ function youCannot(player: Player) {
   if (textCooldown.isExpired(player)) {
     system.delay(() =>
       player.onScreenDisplay.setActionBar(
-        i18n.error`Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`.toString(
+        i18n.error`Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`.to(
           player.lang,
         ),
         ActionbarPriority.Highest,

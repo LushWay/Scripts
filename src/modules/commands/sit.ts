@@ -19,7 +19,7 @@ new Command('sit')
 
     system.delay(() => {
       ctx.player.onScreenDisplay.setActionBar(
-        i18n.accent`Вы сели. Чтобы встать, крадитесь`.toString(ctx.player.lang),
+        i18n.accent`Вы сели. Чтобы встать, крадитесь`.to(ctx.player.lang),
         ActionbarPriority.Highest,
       )
     })

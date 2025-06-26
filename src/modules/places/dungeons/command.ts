@@ -44,11 +44,11 @@ new Command('dungeon').setPermissions('techAdmin').executes(ctx => {
         () => {
           const hand = ctx.player.mainhand()
           if (toolSchema.is(hand)) {
-            const schema = toolSchema.parse(hand)
+            const schema = toolSchema.parse(ctx.player.lang, hand)
             if (schema) schema.type = structureId
             else ctx.error('Создайте новый предмет, старый сломался')
           } else {
-            hand.setItem(toolSchema.create({ type: structureId }).item)
+            hand.setItem(toolSchema.create(ctx.player.lang, { type: structureId }).item)
           }
         },
       ]
@@ -66,7 +66,7 @@ function getStructureRotation(player: Player) {
 
 function getDungeon(player: Player, rotation: StructureRotation) {
   const mainhand = player.mainhand()
-  const storage = toolSchema.parse(mainhand)
+  const storage = toolSchema.parse(player.lang, mainhand)
   if (!storage) return
 
   const region = isKeyof(storage.type, Dungeon.names)

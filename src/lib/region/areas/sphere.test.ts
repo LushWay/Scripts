@@ -1,7 +1,7 @@
+import { consoleLang } from 'lib/assets/lang'
 import { textTable } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { SphereArea } from './sphere'
-import { consoleLang } from 'lib/assets/lang'
 
 describe('sphere', () => {
   it('should detect if vector is in region', () => {
@@ -22,7 +22,7 @@ describe('sphere', () => {
     sphere.center = { x: 10, y: 10, z: 10 }
     expect(sphere.center).toEqual({ x: 10, y: 10, z: 10 })
 
-    expect(textTable(sphere.getFormDescription()).toString(consoleLang)).toMatchInlineSnapshot(`
+    expect(textTable(sphere.getFormDescription()).to(consoleLang)).toMatchInlineSnapshot(`
       "§7Center: §f§c10 §a10 §b10
       §7Radius: §610"
     `)

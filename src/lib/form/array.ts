@@ -122,26 +122,22 @@ export class ArrayForm<
 
     // Array item buttons & navigation
     if (paginator.canGoBack)
-      form.button(i18n.accent`Предыдущая`.toString(player.lang), BUTTON['<'], () =>
-        this.show(player, fromPage - 1, ...args),
-      )
+      form.button(i18n.accent`Предыдущая`.to(player.lang), BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
 
     this.addButtons(player, paginator.array, form, filters, selfback)
 
     if (paginator.canGoNext)
-      form.button(i18n.accent`Следующая`.toString(player.lang), BUTTON['>'], () =>
-        this.show(player, fromPage + 1, ...args),
-      )
+      form.button(i18n.accent`Следующая`.to(player.lang), BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
 
     return form.show(player)
   }
 
   private createForm(player: Player, fromPage: number, maxPages: number) {
     const form = new ActionForm(
-      this.title.toString(player.lang).replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
-      this.config.description?.toString(player.lang),
+      this.title.to(player.lang).replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
+      this.config.description?.to(player.lang),
     )
-    if (this.config.back) form.addButtonBack(this.config.back)
+    if (this.config.back) form.addButtonBack(this.config.back, player.lang)
 
     return form
   }
@@ -156,12 +152,12 @@ export class ArrayForm<
   ) {
     form.button(
       !searchQuery
-        ? i18n.accent`Поиск`.toString(player.lang)
-        : i18n.accent`Результаты поиска по запросу\n${searchQuery}`.toString(player.lang),
+        ? i18n.accent`Поиск`.to(player.lang)
+        : i18n.accent`Результаты поиска по запросу\n${searchQuery}`.to(player.lang),
       BUTTON.search,
       () => {
-        new ModalForm(i18n`Поиск`.toString(player.lang))
-          .addTextField(i18n`Запрос`.toString(player.lang), i18n`Ничего не произойдет`.toString(player.lang))
+        new ModalForm(i18n`Поиск`.to(player.lang))
+          .addTextField(i18n`Запрос`.to(player.lang), i18n`Ничего не произойдет`.to(player.lang))
           .show(player, (ctx, query) => {
             this.show(player, fromPage, filtersDatabase, parsedFilters, query)
           })
@@ -189,7 +185,7 @@ export class ArrayForm<
     if (size === 1 && Settings.isDropdown(firstFilterConfig.value)) {
       const values = firstFilterConfig.value
       let i = values.findIndex(e => filters[key] === e[0])
-      form.button(noI18n.accent`${firstFilterConfig.name}: ${values[i]?.[1]}`, () => {
+      form.button(i18n.accent.join`${firstFilterConfig.name}: ${values[i]?.[1]}`.to(player.lang), () => {
         if (i >= values.length - 1) i = 0
         else i++
 
@@ -201,7 +197,7 @@ export class ArrayForm<
     } else {
       const propertyName = 'filters'
       const applied = Object.keys(database.get(propertyName)).length
-      form.button(i18n.accent`Фильтры`.size(applied).toString(player.lang), BUTTON.settings, () =>
+      form.button(i18n.accent`Фильтры`.size(applied).to(player.lang), BUTTON.settings, () =>
         settingsGroupMenu(
           player,
           propertyName,
@@ -226,7 +222,7 @@ export class ArrayForm<
         const button = this.config.button(item, filters, empty, back)
 
         if (button) {
-          const buttonText = button[0].toString(player.lang)
+          const buttonText = button[0].to(player.lang)
           sorted.push({ button, search: stringSimilarity(searchQuery, buttonText), item })
         }
       }
@@ -242,7 +238,7 @@ export class ArrayForm<
     for (const item of array) {
       const button = this.config.button(item, filters, form, back)
 
-      if (button) form.button(button[0].toString(player.lang), button[1])
+      if (button) form.button(button[0].to(player.lang), button[1])
     }
   }
 }

@@ -35,6 +35,10 @@ export class QuestButton {
     }
 
     // TODO Fix colors
-    return [`§l${this.quest.name}§r\n§6${step.text()}`, undefined, manageQuestMenu({ quest: this.quest })]
+    return [
+      i18n.nocolor.join`§l${this.quest.name}§r\n§6${step.text()}`,
+      undefined,
+      manageQuestMenu({ quest: this.quest }),
+    ]
   }
 }

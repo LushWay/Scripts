@@ -1,3 +1,5 @@
+import { SharedI18nMessage } from 'lib/i18n/message'
+import { i18nShared } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 
 export class Group {
@@ -33,9 +35,11 @@ export class Group {
     }
   }
 
+  sharedName: SharedText = i18nShared`Внешнее пространство`
+
   constructor(
     readonly id: string,
-    readonly name?: Text,
+    readonly name?: string | SharedText,
   ) {
     const existing = Group.groups.get(id)
     if (existing) return existing
@@ -45,6 +49,7 @@ export class Group {
     if (name) {
       // Define settings group name
       Settings.world(name, id, {})
+      if (name instanceof SharedI18nMessage) this.sharedName = name
     }
   }
 
@@ -78,6 +83,8 @@ export class Place {
   /** Example: StoneQuarry foodOvener */
   readonly id: string
 
+  readonly sharedName?: SharedText
+
   constructor(
     readonly group: Group,
     /** Example: 'foodOvener' */
@@ -87,6 +94,7 @@ export class Place {
   ) {
     // Trim start needed for empty point
     this.id = `${group.id} ${this.shortId}`.trimStart()
+    if (typeof name !== 'string') this.sharedName = name
   }
 }
 

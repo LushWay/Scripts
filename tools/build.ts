@@ -28,13 +28,13 @@ const entities: [string, string][] = (
   // its json with comments so to not mess with libs we have to use regex
   // its bad. sorry.
   .map(e => e.match(/"identifier":\s*"([^\"]+)"/)?.[1] ?? '')
-  .filter(e => e !== 'f:t' && !e.startsWith('minecraft:'))
+  .filter(e => !e.startsWith('f:') && !e.startsWith('minecraft:'))
   .map(e => [e.replace('lw:', '').replace('rubedo:', ''), e])
 
 await injectAsset(
   'custom-entity-types.ts',
   'tools/build.ts',
-  injectEnum('CustomEntityTypes', [...entities, ['FloatingText', 'f:t']]),
+  injectEnum('CustomEntityTypes', [...entities, ['FloatingText', 'f:t'], ['FloatingTextNpc', 'f:t_npc']]),
 )
 
 const args = buildArgumentsWithDist('scripts')

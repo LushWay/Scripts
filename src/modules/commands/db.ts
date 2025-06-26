@@ -42,7 +42,7 @@ function showTable(player: Player, tableId: string, table: UnknownTable) {
       let name = key
       if (tableId === 'player') {
         const playerDatabase = table as typeof Player.database
-        name = `${playerDatabase.get(key).name} ${(ROLES[getRole(key)] as Text | undefined)?.toString(player.lang) ?? '§7Без роли'}\n§8(${key})`
+        name = `${playerDatabase.get(key).name} ${(ROLES[getRole(key)] as Text | undefined)?.to(player.lang) ?? '§7Без роли'}\n§8(${key})`
       } else {
         name += `\n§7${JSON.stringify(table.get(key)).slice(0, 200).replace(/"/g, '')}`
       }
@@ -89,11 +89,11 @@ function tableProperty(key: string, table: UnknownTable, player: Player, back: V
         } else player.info(i18n`Key ${key} left as is`)
       })
     })
-    .button('§cУдалить§r', () => {
+    .button(noI18n.error`Удалить`, () => {
       table.delete(key)
       system.delay(back)
     })
-    .addButtonBack(back)
+    .addButtonBack(back, player.lang)
     .show(player)
 }
 

@@ -42,7 +42,7 @@ export function achievementsForm(player: Player, back?: NewFormCallback) {
       if (filters.hideUnknown) array = array.filter(e => e.isDone(player))
 
       if (filters.sortMode === 'alphabet') {
-        array = array.slice().sort((a, b) => b.name.toString(player.lang).localeCompare(a.name.toString(player.lang)))
+        array = array.slice().sort((a, b) => b.name.to(player.lang).localeCompare(a.name.to(player.lang)))
       } else array = array.slice().sort((a, b) => (b.getDatabase(player).d ?? 0) - (a.getDatabase(player).d ?? 0))
 
       const notTaken = array.filter(e => e.isDone(player) && !e.isRewardTaken(player))

@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
+import { intlListFormat } from 'lib/i18n/intl'
 import { i18n, textTable } from 'lib/i18n/text'
 import { DailyQuest } from 'lib/quest/quest'
 import { RecurringEvent } from 'lib/recurring-event'
@@ -78,11 +79,9 @@ function hasAccessToDaily(player: Player, tell = true) {
   const completed = CityInvestigating.list.filter(e => e.quest.hadEntered(player))
   if (completed.length !== CityInvestigating.list.length) {
     if (tell) {
+      const notVisited = CityInvestigating.list.filter(e => !completed.includes(e)).map(e => e.city.group.sharedName)
       player.fail(
-        i18n.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${CityInvestigating.list
-          .filter(e => !completed.includes(e))
-          .map(e => e.city.group.name)
-          .join(', ')}`,
+        i18n.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${intlListFormat(i18n.error.style, player.lang, 'and', notVisited)}`,
       )
     }
     return false

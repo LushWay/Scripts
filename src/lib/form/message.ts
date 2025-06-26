@@ -99,12 +99,12 @@ export function ask(
   noAction?: VoidFunction,
 ) {
   return new Promise<boolean>(resolve => {
-    new MessageForm(i18n`Вы уверены?`.toString(player.lang), text.toString(player.lang))
-      .setButton1(yesText.toString(player.lang), () => {
+    new MessageForm(i18n`Вы уверены?`.to(player.lang), text.to(player.lang))
+      .setButton1(yesText.to(player.lang), () => {
         yesAction?.()
         resolve(true)
       })
-      .setButton2(noText.toString(player.lang), () => {
+      .setButton2(noText.to(player.lang), () => {
         noAction?.()
         resolve(false)
       })

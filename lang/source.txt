@@ -114,16 +114,16 @@ file:///.//src/lib/command/utils.ts
 При выполнении команды произошла ошибка. {0}
 
 
-file:///.//src/lib/cooldown.ts
-Не так быстро! Попробуй через {0}
-
-
 file:///.//src/lib/crates/animation.ts
 Вы получили свою награду!
 
 
+file:///.//src/lib/cooldown.ts
+Не так быстро! Попробуй через {0}
+
+
 file:///.//src/lib/crates/crate.ts
-{0} ящик\n§7{0}
+{0} ящик
 Ключ для {0} не подходит к ящику {0}
 Открыт ящик {0}!
 Чтобы открыть этот сундук, возьмите в руки ключ
@@ -185,11 +185,6 @@ file:///.//src/lib/form/action.ts
 §cВы уверены, что хотите {0}?
 
 
-file:///.//src/lib/form/message.ts
-Отмена
-Вы уверены?
-
-
 file:///.//src/lib/form/array.ts
 Фильтры
 Предыдущая
@@ -207,6 +202,11 @@ file:///.//src/lib/form/lore.ts
 История
 
 
+file:///.//src/lib/form/message.ts
+Отмена
+Вы уверены?
+
+
 file:///.//src/lib/form/modal.ts
 Никакой
 
@@ -214,6 +214,14 @@ file:///.//src/lib/form/modal.ts
 file:///.//src/lib/form/new.ts
 Отмена
 Вы уверены, что хотите {0}?
+
+
+file:///.//src/lib/form/utils.ts
+Ошибка
+Назад
+Закрыть
+Закрой чат!
+Не удалось открыть форму. Закрой чат или другое меню и попробуй снова
 
 
 file:///.//src/lib/form/select-player.ts
@@ -225,14 +233,6 @@ file:///.//src/lib/form/select-player.ts
 Дате входа
 
 
-file:///.//src/lib/form/utils.ts
-Ошибка
-Назад
-Закрыть
-Закрой чат!
-Не удалось открыть форму. Закрой чат или другое меню и попробуй снова
-
-
 file:///.//src/lib/get-fullname.ts
 §bНовичок
 
@@ -241,6 +241,11 @@ file:///.//src/lib/i18n/text.ts
 {0} д. {0}
 §fДа
 §cНет
+
+
+file:///.//src/lib/mail.ts
+{0}: {0}, просмотреть: .mail
+Почта
 
 
 file:///.//src/lib/player-join.ts
@@ -262,18 +267,8 @@ file:///.//src/lib/player-join.ts
 §3Добрый вечер
 
 
-file:///.//src/lib/mail.ts
-{0}: {0}, просмотреть: .mail
-Почта
-
-
 file:///.//src/lib/portals.ts
 §2Перемещение...
-
-
-file:///.//src/lib/quest/button.ts
-{0}\nЗавершен!
-Взять задание
 
 
 file:///.//src/lib/quest/menu.ts
@@ -298,12 +293,16 @@ file:///.//src/lib/quest/menu.ts
 Назад
 
 
+file:///.//src/lib/quest/button.ts
+{0}\nЗавершен!
+Взять задание
+
+
 file:///.//src/lib/quest/quest.ts
 Задания
 §7Настройки игровых заданий
 Сообщение в чат при каждом шаге
 Отправлять ли сообщение в чат при каждом новом разделе задания
-Задание: {0}\n§7{0}
 
 
 file:///.//src/lib/quest/step.ts
@@ -349,7 +348,7 @@ file:///.//src/lib/region/command.ts
 Вы можете только посмотреть их
 Добавить!
 Добавить участника
-§7Владелец > 
+Владелец > {0}
 Управление участником региона
 Передать права владельца региона
 Назначить владельцем региона
@@ -358,12 +357,20 @@ file:///.//src/lib/region/command.ts
 Удалить
 
 
+file:///.//src/lib/region/index.ts
+Нельзя сражаться в мирной зоне
+
+
 file:///.//src/lib/region/kinds/boss-arena.ts
 §cБосс §6{0}
 
 
-file:///.//src/lib/region/index.ts
-Нельзя сражаться в мирной зоне
+file:///.//src/lib/region/kinds/minearea.ts
+§bЗона добычи новичков
+§7Зона добычи
+Вы не можете добывать блоки в зоне добычи новичков
+Регион сохраняется
+Регион создается. {0}%%
 
 
 file:///.//src/lib/region/kinds/road.ts
@@ -415,7 +422,7 @@ file:///.//src/lib/rpg/menu.ts
 Меню\n§7Разные настройки интерфейсов и меню в игре
 §r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu
 меню
-§r§l§6Цель\n§r§7(use)
+Используйте {0} чтобы убрать этот предмет из инвентаря или получить его снова
 Выдает или убирает {0} из инвентаря
 
 
@@ -438,8 +445,12 @@ file:///.//src/lib/rpg/newbie.ts
 
 
 file:///.//src/lib/rpg/npc.ts
-{0}: Я не могу с вами говорить. Приходите позже.
+Я не могу с вами говорить. Приходите позже.
 Не удалось открыть диалог. {0}
+
+
+file:///.//src/lib/rpg/place.ts
+Внешнее пространство
 
 
 file:///.//src/lib/settings.ts
@@ -540,7 +551,7 @@ file:///.//src/modules/commands/camera.ts
 
 file:///.//src/modules/commands/help.ts
 Выводит список команд
- Пусто
+Пусто
 {0}─═─═─═§f Доступно: {0}/{0} {0}═─═─═─═─
  (также {0})
    §fКоманда §6.{0}{0}§7§o - {0}
@@ -549,6 +560,11 @@ file:///.//src/modules/commands/help.ts
 
 file:///.//src/modules/commands/kill.ts
 Убивает вас. Используйте, если застряли где-то
+
+
+file:///.//src/modules/commands/name.ts
+Меняет имя
+Изменено на {0}
 
 
 file:///.//src/modules/commands/mail.ts
@@ -578,11 +594,6 @@ file:///.//src/modules/commands/mail.ts
 Удалить
 Почта:
 У вас {0} непрочитанных сообщений!
-
-
-file:///.//src/modules/commands/name.ts
-Меняет имя
-Изменено на {0}
 
 
 file:///.//src/modules/commands/pid.ts
@@ -629,9 +640,9 @@ file:///.//src/modules/commands/role.ts
 Роль
 Причина смены роли
 Например, "чел дурной, пол технограда снес"
-Ваша роль сменена c {0} §3на {0}{0}{0}
-§3 игроком §r{0}
-\n§r§3Причина: §r{0}
+Ваша роль сменена c {0} на {0}{0}{0}
+ игроком {0}
+\nПричина: {0}
 Роль игрока {0} сменена успешно
 Роль сменена успешно
 
@@ -655,6 +666,20 @@ file:///.//src/modules/commands/sit.ts
 Вы сели. Чтобы встать, крадитесь
 
 
+file:///.//src/modules/commands/stats.ts
+Показывает статистику по игре
+Показывать относительную дату
+Показывать относительную дату на экране статистики
+{0} дней
+{0} часов
+{0} минут
+{0} секунд
+Статистика игрока {0}
+Анархия {0}
+Убийств/Смертей
+Нанесено/Получено
+
+
 file:///.//src/modules/commands/tp.ts
 Открывает меню телепортации
 Команда доступна только тестерам, наблюдателям и администраторам.
@@ -664,6 +689,12 @@ file:///.//src/modules/commands/tp.ts
 Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.
 Телепорт к игроку...
 Телепорт к игроку...
+
+
+file:///.//src/modules/commands/version.ts
+Версия сервера
+Версия майнкрафта
+Версия сервера
 
 
 file:///.//src/modules/commands/wipe.ts
@@ -684,12 +715,6 @@ file:///.//src/modules/commands/wipe.ts
 Загрузиться
 Удалить
 удалить точку
-
-
-file:///.//src/modules/commands/version.ts
-Версия сервера
-Версия майнкрафта
-Версия сервера
 
 
 file:///.//src/modules/features/break-item-durability-notify.ts
@@ -793,7 +818,17 @@ file:///.//src/modules/places/base/base.ts
 Поставьте эту бочку и она станет базой.
 
 
+file:///.//src/modules/places/base/region.ts
+(гниет)
+(разрушена)
+§6Ваша база {0}
+
+
 file:///.//src/modules/places/dungeons/custom-dungeon.ts
+Данж
+
+
+file:///.//src/modules/places/dungeons/dungeon.ts
 Данж
 
 

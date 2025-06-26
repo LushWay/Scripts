@@ -86,7 +86,7 @@ const survivalSidebar = new Sidebar(
     [names.region]: (player, settings) => {
       const regions = Region.getManyAt(player)
       const region = regions[0] as Region | undefined
-      const base = '§l' + inventoryDisplay[player.database.inv].toString(player.lang) + '§r§f'
+      const base = '§l' + inventoryDisplay[player.database.inv].to(player.lang) + '§r§f'
       let text = base
       if (player.database.inv === 'anarchy') {
         if (region instanceof BaseRegion) {
@@ -95,9 +95,9 @@ const survivalSidebar = new Sidebar(
           } else text = base
         } else if (region) {
           text = ''
-          const displayName = region.displayName?.toString(player.lang)
+          const displayName = region.displayName?.to(player.lang)
           if (!region.permissions.pvp)
-            text = i18n.success`Мирная зона${displayName ? ' ' + displayName : ''}`.toString(player.lang)
+            text = i18n.success`Мирная зона${displayName ? ' ' + displayName : ''}`.to(player.lang)
           else if (displayName) text = displayName
         }
       }

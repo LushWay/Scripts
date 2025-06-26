@@ -70,51 +70,46 @@ function roleMenu(player: Player) {
       const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
 
       if (button)
-        form.button(
-          i18n`§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)`.toString(player.lang),
-          button[1],
-        )
+        form.button(i18n`§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)`.to(player.lang), button[1])
     })
     .button(([id, { role, name: dbname }], _, form) => {
       const target = players.find(e => e.id === id) ?? id
       const name = typeof target === 'string' ? (dbname ?? i18n`Без имени`) : target.name
 
       return [
-        `${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${
+        i18n.nocolor.join`${name}§r§f - ${ROLES[role]} ${typeof target === 'string' ? '§c(offline)' : ''}${
           canChange(prole, role) ? '' : i18n.error` §4Не сменить`
         }`,
         () => {
           const self = player.id === id
           if (!canChange(prole, role, self)) {
             return new FormCallback(form, player).error(
-              i18n.error`У игрока ${name} роль выше или такая же как у вас, вы не можете ее сменить.`.toString(
-                player.lang,
-              ),
+              i18n.error`У игрока ${name} роль выше или такая же как у вас, вы не можете ее сменить.`.to(player.lang),
             )
           }
           const filteredRoles = Object.fromEntries(
             Object.entriesStringKeys(ROLES)
               .filter(([key]) => canChange(prole, key, self))
               .reverse()
-              .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key]}`]),
+              .map(([key]) => [key, `${role === key ? '> ' : ''}${ROLES[key].to(player.lang)}`]),
           )
-          new ModalForm(name.toString(player.lang))
-            .addToggle(i18n`Уведомлять`.toString(player.lang), true)
-            .addToggle(i18n`Показать Ваш ник в уведомлении`.toString(player.lang), true)
-            .addDropdownFromObject(i18n`Роль`.toString(player.lang), filteredRoles, {
+          new ModalForm(name.to(player.lang))
+            .addToggle(i18n`Уведомлять`.to(player.lang), true)
+            .addToggle(i18n`Показать Ваш ник в уведомлении`.to(player.lang), true)
+            .addDropdownFromObject(i18n`Роль`.to(player.lang), filteredRoles, {
               defaultValueIndex: Object.keys(filteredRoles).findIndex(e => e === role),
             })
             .addTextField(
-              i18n`Причина смены роли`.toString(player.lang),
-              i18n`Например, "чел дурной, пол технограда снес"`.toString(player.lang),
+              i18n`Причина смены роли`.to(player.lang),
+              i18n`Например, "чел дурной, пол технограда снес"`.to(player.lang),
             )
             .show(player, (_, notify, showName, newrole, message) => {
               if (target instanceof Player) {
                 if (notify && target instanceof Player)
                   target.info(
-                    i18n`Ваша роль сменена c ${ROLES[role]} §3на ${ROLES[newrole]}${
-                      showName ? i18n`§3 игроком §r${player.name}` : ''
-                    }${message ? i18n`\n§r§3Причина: §r${message}` : ''}`,
+                    i18n.accent`Ваша роль сменена c ${ROLES[role]} на ${ROLES[newrole]}${
+                      showName ? i18n.accent` игроком ${player.name}` : ''
+                    }${message ? i18n.accent`\nПричина: ${message}` : ''}`,
                   )
 
                 player.success(i18n`Роль игрока ${target.name} сменена успешно`)

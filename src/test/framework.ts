@@ -97,7 +97,7 @@ function expandPlayer(player: GameTest.SimulatedPlayer, test: GameTest.ExtendedT
     },
 
     tell(message) {
-      this.sendMessage(message.toString(this.lang))
+      this.sendMessage(message.to(this.lang))
     },
 
     sendMessage(message) {

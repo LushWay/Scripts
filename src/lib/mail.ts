@@ -47,8 +47,8 @@ export class Mail {
 
       .push({
         read: false,
-        title: title.toString(defaultLang),
-        content: content.toString(defaultLang),
+        title: title.to(defaultLang),
+        content: content.to(defaultLang),
         rewards: rewards.serialize(),
         rewardsClaimed: false,
       })
@@ -78,8 +78,8 @@ export class Mail {
 
     // TODO Use player offline lang once added
     this.dbGlobal.set(id, {
-      title: title.toString(defaultLang),
-      content: content.toString(defaultLang),
+      title: title.to(defaultLang),
+      content: content.to(defaultLang),
       rewards: rewards.serialize(),
     })
 

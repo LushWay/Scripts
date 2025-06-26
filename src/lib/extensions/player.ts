@@ -140,7 +140,7 @@ function prefix(
     system.delay(() => {
       if (!this.isValid || !message) return
       if (playSound) this.playSound(sound)
-      this.tell(pref + message.toString(this.lang))
+      this.tell(pref + message.to(this.lang))
     })
   }
 }
@@ -175,7 +175,7 @@ expand(Player.prototype, {
   info: prefix('§b§l> §r§3', Sounds.Success),
 
   tell(msg) {
-    return this.sendMessage(msg.toString(this.lang))
+    return this.sendMessage(msg.to(this.lang))
   },
 
   applyDash(target, horizontalStrength, verticalStrength) {

@@ -35,9 +35,9 @@ export class FormCallback<Form extends ShowForm | BaseForm = BaseForm> {
    * @param message Error message to show
    */
   error(message: string): void {
-    new MessageForm(i18n.error`Ошибка`.toString(this.player.lang), message)
-      .setButton1(i18n`Назад`.toString(this.player.lang), this.back)
-      .setButton2(i18n.error`Закрыть`.toString(this.player.lang), () => {
+    new MessageForm(i18n.error`Ошибка`.to(this.player.lang), message)
+      .setButton1(i18n`Назад`.to(this.player.lang), this.back)
+      .setButton2(i18n.error`Закрыть`.to(this.player.lang), () => {
         // Do nothing
       })
       .show(this.player)

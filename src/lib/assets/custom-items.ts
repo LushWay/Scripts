@@ -22,4 +22,4 @@ export enum Items {
   CompassPrefix = 'lw:compass',
 }
   
-  export const totalCustomItems = 47
+  export const totalCustomItems = 15

@@ -24,7 +24,7 @@ customItems.push(CircuitBoard, Chip)
 
 export const NotNewbieCost = new (class NotNewbieCost extends Cost {
   toString(player: Player, canBuy?: boolean): string {
-    return canBuy ? '' : i18n.error`Вы не можете купить это в режиме новичка`.toString(player.lang)
+    return canBuy ? '' : i18n.error`Вы не можете купить это в режиме новичка`.to(player.lang)
   }
 
   has(player: Player): boolean {
