@@ -71,7 +71,7 @@ export function getSafeFromRottingTime(base: BaseRegion) {
   return i18n.hhmmss(time * takeMaterialsTime)
 }
 
-const baseRottingMenu = form.withParams<{ base: BaseRegion }>((f, { params: { base }, player }) => {
+const baseRottingMenu = form.params<{ base: BaseRegion }>((f, { params: { base }, player }) => {
   const barrel = base.dimension.getBlock(base.area.center)
   if (barrel?.isValid) reviseMaterials(base, barrel)
 

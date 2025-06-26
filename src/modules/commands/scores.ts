@@ -75,7 +75,7 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
       if (!name) return false
 
       return [
-        `${name}§r §6${Leaderboard.parseCustomScore(objective.id, scoreboard.get(p.displayName))}`,
+        `${name}§r §6${Leaderboard.formatScore(objective.id, scoreboard.get(p.displayName))}`,
         () => editPlayerScore(player, objective, p.displayName, name),
       ]
     })
@@ -117,7 +117,7 @@ function editPlayerScore(
 }
 
 function getScoreDescription(targetId: string, targetName: string, manager: ScoreboardDB) {
-  const converted = Leaderboard.parseCustomScore(manager.scoreboard.id, manager.get(targetId))
+  const converted = Leaderboard.formatScore(manager.scoreboard.id, manager.get(targetId))
   const raw = manager.get(targetId)
   return `
 §l§7Игрок: §r§f${targetName}§r

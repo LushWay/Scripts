@@ -5,7 +5,7 @@ import { baseRottingButton } from './actions/rotting'
 import { baseUpgradeButton } from './actions/upgrade'
 import { BaseRegion } from './region'
 
-export const baseMenu = form.withParams<{ base?: BaseRegion; message?: Text }>(
+export const baseMenu = form.params<{ base?: BaseRegion; message?: Text }>(
   (f, { player, back, params: { base = BaseRegion.getAll().find(r => r.getMemberRole(player)), message } }) => {
     f.title(i18n`Меню базы`)
 

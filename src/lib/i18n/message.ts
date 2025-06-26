@@ -1,29 +1,27 @@
-import { RawMessage, RawText } from '@minecraft/server'
+import { RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
-import { Text, textUnitColorize } from './text'
 import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
-type I18nMessages = Record<string, Record<string, string | readonly string[]>>
+import { Text, textUnitColorize } from './text'
 
-const extractedMessageIdsToLangTokes: Record<string, string> = extractedSharedMessagesIds
-
-const extractedCompiledMessages: I18nMessages = extractedTranslatedMessages
-
-export type RawTextArg = string | RawText | Message | undefined | null
+export type RawTextArg = number | object | boolean | string | RawText | SharedI18nMessage | undefined | null
 
 export class Message {
   static translate(lang: Language, msg: Text) {
     return typeof msg === 'string' ? msg : msg.toString(lang)
   }
 
-  static string(
+  static concatTemplateStringsArray(
     language: Language,
     template: readonly string[],
     args: readonly unknown[],
     colors: Text.Colors,
     postfixes: string[] = [],
   ) {
+    if (typeof language !== 'string')
+      throw new TypeError(`Message.string ${template.join('$')} must be called with language`)
+
     if (template.length === 1 && template[0] && args.length === 0 && postfixes.length === 0 && colors.text === '§7')
-      return template[0] // Return as is, without any colors if string has no args
+      return template[0] // Return as is, without any colors if string has no args nor postfixes
 
     let v = ''
     for (const [i, t] of [...template, ...postfixes].entries()) {
@@ -43,15 +41,9 @@ export class Message {
     this.id = template.join('\x00')
   }
 
-  color(c: Text.Colors | Pick<Text.Static<unknown>, 'currentColors'>) {
-    // if (this.postfixes.length) {
-    //   console.warn(`Color modificator for message ${this.id} will not be applied for postfixes ${this.postfixes}`)
-    // }
-
+  color(c: Text.Colors | Pick<Text.Static<never, never>, 'currentColors'>) {
     this.colors = 'currentColors' in c ? c.currentColors : c
-    for (const arg of this.args) {
-      if (arg instanceof Message) arg.color(c)
-    }
+    for (const arg of this.args) if (arg instanceof Message) arg.color(c)
     return this
   }
 
@@ -79,42 +71,27 @@ export class Message {
 
   // Name is not toString to avoid unexpected behavior related to js builtin toString
   toString(language: Language) {
+    return Message.concatTemplateStringsArray(language, this.template, this.args, this.colors, this.postfixes)
+  }
+
+  protected stringify(language: Language, template = this.template) {
     if (typeof language !== 'string') throw new TypeError(`Message.toString ${this.id} must be called with language`)
-    return Message.string(language, this.template, this.args, this.colors, this.postfixes)
-  }
 
-  toRawText(): RawText {
-    const template = this.template.slice()
-    const rawtext: RawMessage[] = template[0] ? [{ text: this.colors.text }] : []
+    if (
+      template.length === 1 &&
+      template[0] &&
+      this.args.length === 0 &&
+      this.postfixes.length === 0 &&
+      this.colors.text === '§7'
+    )
+      return template[0] // Return as is, without any colors if string has no args nor postfixes
 
-    for (const [i, t] of template.entries()) {
-      const arg = this.args[i]
-      if (t) rawtext.push({ text: t }) // Do not add empty texts
-
-      rawtext.push(...this.argToRawText(arg, template[i + 1]))
+    let v = ''
+    for (const [i, t] of [...template, ...this.postfixes].entries()) {
+      v += this.colors.text + t
+      if (i in this.args) v += textUnitColorize(this.args[i], this.colors, language)
     }
-
-    return { rawtext }
-  }
-
-  protected isRawText(arg: unknown): arg is RawText {
-    return typeof arg === 'object' && arg !== null && 'rawtext' in arg
-  }
-
-  protected *argToRawText(arg: unknown, nextText = ''): Generator<RawMessage> {
-    if (arg === '' || arg === undefined || arg === null) return
-
-    if (arg instanceof Message) yield arg.toRawText()
-    else if (this.isRawText(arg)) {
-      yield { text: this.colors.unit }
-
-      if (Array.isArray(arg.rawtext)) yield* arg.rawtext
-      else yield arg
-
-      //
-    } else yield { text: textUnitColorize(arg, this.colors, false) }
-
-    if (nextText) yield { text: this.colors.text }
+    return v
   }
 
   protected toJSON() {
@@ -124,8 +101,8 @@ export class Message {
 
 export class I18nMessage extends Message {
   toString(language: Language): string {
-    const translated = extractedCompiledMessages[language]?.[this.id]
-    return Message.string(
+    const translated = extractedTranslatedMessages[language]?.[this.id]
+    return Message.concatTemplateStringsArray(
       language,
       translated ? (Array.isArray(translated) ? translated : [translated]) : this.template,
       this.args,
@@ -133,25 +110,35 @@ export class I18nMessage extends Message {
       this.postfixes,
     )
   }
-
-  toRawText(): RawText {
-    const token = extractedMessageIdsToLangTokes[this.id]
-    if (!token) throw new Error(`RawText is not supported for ${this.id}`)
-
-    return { rawtext: [{ translate: token, with: this.argsToRawText() }] }
-  }
-
-  protected argsToRawText(): RawMessage['with'] {
-    if (!this.args.length) return
-
-    const rawtext: RawText[] = []
-    for (const arg of this.args) rawtext.push(...this.argToRawText(arg))
-    return { rawtext }
-  }
 }
 
 export class SharedI18nMessage extends I18nMessage {
-  shared = true
+  toRawText(): RawText {
+    const token = extractedSharedMessagesIds[this.id]
+    if (!token)
+      throw new Error(`RawText is not supported for '${this.id.replaceAll('\\x00', '%s').replaceAll('\n', '\\n')}'`)
+
+    return { rawtext: [{ translate: token, with: { rawtext: [...this.argumentsToRawText()] } }] }
+  }
+
+  protected *argumentsToRawText() {
+    const args = this.args as RawTextArg[]
+    for (const [i, arg] of args.entries()) {
+      if (arg === '' || arg === undefined || arg === null) continue
+      if (this.isRawText(arg)) {
+        yield { text: this.colors.unit }
+        if (Array.isArray(arg.rawtext)) yield* arg.rawtext
+        else yield arg
+      } else if (arg instanceof SharedI18nMessage) yield arg.toRawText()
+      else yield { text: textUnitColorize(arg, this.colors, false) }
+
+      if (args[i + 1]) yield { text: this.colors.text }
+    }
+  }
+
+  protected isRawText(arg: unknown): arg is RawText {
+    return typeof arg === 'object' && arg !== null && 'rawtext' in arg
+  }
 }
 
 export class ServerSideI18nMessage extends I18nMessage {
@@ -164,9 +151,5 @@ export class ServerSideI18nMessage extends I18nMessage {
 
   toString(language: Language): string {
     return this.generate(language)
-  }
-
-  toRawText(): RawText {
-    throw new TypeError('ServerSideI18nMessage does not support toRawText!')
   }
 }

@@ -80,7 +80,7 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
     .show(player)
 }
 
-export const manageQuestMenu = form.withParams<{ quest: Quest }>((f, { player, back, params: { quest } }) => {
+export const manageQuestMenu = form.params<{ quest: Quest }>((f, { player, back, params: { quest } }) => {
   const current = quest.getCurrentStep(player)
   let currentDescription = ''
   if (current) {

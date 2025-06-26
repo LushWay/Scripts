@@ -1,4 +1,4 @@
-import { Entity, ShortcutDimensions, world } from '@minecraft/server'
+import { Entity, EntityComponentTypes, ShortcutDimensions, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { defaultLang } from 'lib/assets/lang'
 import { anyPlayerNear } from 'lib/player-move'
@@ -34,7 +34,11 @@ export class FloatingText {
 
     if (this.entity?.isValid) {
       this.entity.teleport(location)
-      this.entity.nameTag = nameTag.toString(defaultLang) // TODO Use toRawText once supported
+      const npc = this.entity.getComponent(EntityComponentTypes.Npc)
+      if (npc) {
+        if (typeof nameTag === 'string') npc.name = nameTag
+        else npc.name = JSON.stringify(nameTag.toRawText())
+      } else this.entity.nameTag = nameTag.toString(defaultLang)
     } else {
       this.logger.warn('Entity is invalid')
       try {

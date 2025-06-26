@@ -15,7 +15,7 @@ export function baseUpgradeButton(base: BaseRegion, player: Player, back: (messa
   return Product.create()
     .form(back)
     .player(player)
-    .name(i18nShared`Улучшить базу: ${levelText}`)
+    .name(i18n`Улучшить базу: ${levelText}`)
     .cost(upgrade.cost)
     .onBuy(() => {
       base.ldb.level = upgradeLevel

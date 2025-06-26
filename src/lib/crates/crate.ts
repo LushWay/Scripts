@@ -50,6 +50,7 @@ export class Crate {
   }
 
   private onValidLocation(location: ValidLocation<Vector3>) {
+    console.log('on valid location')
     this.floatingText.update(location, i18nShared`${this.place.name} ящик\n§7${this.place.group.name}`)
     if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionType)
 

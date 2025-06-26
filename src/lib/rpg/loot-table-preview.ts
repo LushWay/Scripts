@@ -9,11 +9,11 @@ import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { LootTable } from './loot-table'
 
 // TODO Fix colors
-export const lootTablePreview = form.withParams<{ lootTable: LootTable; name?: I18nMessage; one?: boolean }>(
+export const lootTablePreview = form.params<{ lootTable: LootTable; name?: I18nMessage; one?: boolean }>(
   (f, { player, params: { lootTable, name = i18n.header`Содержимое`, one = false } }) => {
     f.title(name)
 
-    const itemForm = form.withParams<{ item: (typeof lootTable.items)[number] }>((f, { player, params: { item } }) => {
+    const itemForm = form.params<{ item: (typeof lootTable.items)[number] }>((f, { player, params: { item } }) => {
       const i = typeof item.itemStack === 'function' ? item.itemStack() : item.itemStack
       f.title(itemNameXCount(i, '', false, player))
     })

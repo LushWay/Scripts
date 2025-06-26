@@ -45,7 +45,7 @@ function selectCutsceneMenu(player: Player) {
     .show(player)
 }
 
-const manageCutsceneMenu = form.withParams<{ cutscene: Cutscene }>((f, { player, params: { cutscene } }) => {
+const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, params: { cutscene } }) => {
   const dots = cutscene.sections.reduce((count, section) => (section ? count + section.points.length : count), 0)
 
   f.title(cutscene.id)

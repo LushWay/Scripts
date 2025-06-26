@@ -383,7 +383,7 @@ export function editRegionPermissions(
 
 // TODO Migrate to settingsMenu after its refactor
 
-export const manageRegionMembers = form.withParams<{
+export const manageRegionMembers = form.params<{
   region: Region
   isOwner?: boolean
   member?: ReturnType<Region['getMemberRole']>

@@ -1,8 +1,18 @@
-/* i18n-ignore */
-
-import { Entity, Player, ScoreboardObjective, ScoreboardScoreInfo, system, world } from '@minecraft/server'
+import {
+  Entity,
+  EntityComponentTypes,
+  Player,
+  RawMessage,
+  RawText,
+  ScoreboardObjective,
+  ScoreboardScoreInfo,
+  system,
+  world,
+} from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { i18n } from 'lib/i18n/text'
+import { scoreboardDisplayNames } from 'lib/database/scoreboard'
+import { i18n, i18nJoin, i18nShared } from 'lib/i18n/text'
+import { isKeyof } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 
@@ -24,18 +34,12 @@ export class Leaderboard {
 
   static entityId = CustomEntityTypes.FloatingText
 
-  static parseCustomScore(scoreboardId: string, score: number, convertToMetricNumbers = false) {
-    if (scoreboardId.endsWith('SpeedRun')) {
-      return i18n.hhmmss(score)
-    } else if (scoreboardId.endsWith('Time')) {
-      return i18n.hhmmss(score * 2.5)
-    } else if (scoreboardId.endsWith('Date')) {
-      return new Date(score * 1000).format()
-    }
-
-    if (convertToMetricNumbers) {
-      return toMetricNumbers(score)
-    } else return score
+  static formatScore(objectiveId: string, score: number, convertToMetricNumbers = false) {
+    if (objectiveId.endsWith('SpeedRun')) return i18n.hhmmss(score)
+    if (objectiveId.endsWith('Time')) return i18n.hhmmss(score * 2.5)
+    if (objectiveId.endsWith('Date')) return new Date(score * 1000).format()
+    if (convertToMetricNumbers) return toMetricNumbers(score)
+    else return score
   }
 
   static styles = {
@@ -43,6 +47,8 @@ export class Leaderboard {
     white: { objName: 'f', fill1: 'f', fill2: 'f', pos: 'f', nick: 'f', score: 'f' },
     green: { objName: 'a', fill1: '2', fill2: '3', pos: 'a', nick: 'f', score: 'a' },
   }
+
+  private static untypedStyles = this.styles as Record<string, ValueOf<(typeof Leaderboard)['styles']>>
 
   static all = new Map<string, Leaderboard>()
 
@@ -54,7 +60,7 @@ export class Leaderboard {
     displayName = objective,
   }: LeaderboardInfo) {
     const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vec.floor(location))
-    entity.nameTag = 'Updating...'
+    entity.nameTag = 'updating...'
     entity.addTag(Leaderboard.tag)
 
     return new Leaderboard(entity, { style, objective, location, dimension, displayName })
@@ -97,19 +103,26 @@ export class Leaderboard {
     )
   }
 
+  get name(): RawText | RawMessage {
+    const id = this.objective?.id
+    if (!id) return { text: 'noname' }
+    if (isKeyof(id, scoreboardDisplayNames)) return scoreboardDisplayNames[id].toRawText()
+    return { text: this.scoreboard.displayName.toString() }
+  }
+
   updateLeaderboard() {
     if (!this.entity.isValid) return
 
-    type Nullable<T> = T | null
+    const npc = this.entity.getComponent(EntityComponentTypes.Npc)
+    if (!npc) return
 
     const scoreboard = this.scoreboard
-    const dname = scoreboard.displayName.toString()
     const id = this.scoreboard.id
-    const name = dname.charAt(0).toUpperCase() + dname.slice(1)
-    const style =
-      (Leaderboard.styles[this.info.style] as Nullable<ValueOf<typeof Leaderboard.styles>>) ?? Leaderboard.styles.gray
+    const name = this.name
+    const style = Leaderboard.untypedStyles[this.info.style] ?? Leaderboard.styles.gray
     const filler = `§${style.fill1}-§${style.fill2}-`.repeat(10)
 
+    const rawtext: RawMessage[] = [{ text: `§l${style.objName}` }, name, { text: `\n§l${filler}§r\n` }]
     let leaderboard = ``
     for (const [i, scoreInfo] of scoreboard
       .getScores()
@@ -118,16 +131,14 @@ export class Leaderboard {
       if (i >= 10) continue
       const { pos: t, nick: n, score: s } = style
 
-      const name =
-        ((Player.name(scoreInfo.participant.displayName) ?? scoreInfo.participant.displayName) as string | undefined) ??
-        '§8<Unknown player>'
+      const name = Player.nameOrUnknown(scoreInfo.participant.displayName)
 
-      leaderboard += `§ы§${t}#${i + 1}§r `
-      leaderboard += `§${n}${name}§r `
-      leaderboard += `§${s}${Leaderboard.parseCustomScore(id, scoreInfo.score, true)}§r\n`
+      rawtext.push({ text: `§${t}#${i + 1}§r §${n}${name}§r §${s}` })
+      leaderboard += `§${t}#${i + 1}§r §${n}${name}§r §${s}${Leaderboard.formatScore(id, scoreInfo.score, true)}§r\n`
+      rawtext.push({ text: '§r\n' })
     }
 
-    this.entity.nameTag = `§ы§l§${style.objName}${name}\n§ы§l${filler}§r\n${leaderboard}`
+    npc.name = JSON.stringify({ rawtext })
   }
 }
 
@@ -153,21 +164,14 @@ system.runInterval(
   40,
 )
 
-/**
- * This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc...
- *
- * @example
- *   metricNumbers(15000)
- *
- * @param {number} value The number you want to convert
- * @returns {string}
- */
-function toMetricNumbers(value: number): string {
-  const types = ['', 'к', 'млн', 'млрд', 'трлн']
+const types = ['', i18nShared`к`, i18nShared`млн`, i18nShared`млрд`, i18nShared`трлн`]
+
+/** This will display in text in thousands, millions and etc... For ex: "1400 -> "1.4k", "1000000" -> "1M", etc... */
+function toMetricNumbers(value: number) {
   const exp = (Math.log10(value) / 3) | 0
 
   if (exp === 0) return value.toString()
 
   const scaled = value / Math.pow(10, exp * 3)
-  return `${scaled.toFixed(1)}${exp > 5 ? `e${exp}` : types[exp]}`
+  return i18nJoin`${scaled.toFixed(1)}${exp > 5 ? `E${exp}` : types[exp]}`
 }

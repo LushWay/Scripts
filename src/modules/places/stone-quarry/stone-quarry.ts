@@ -23,7 +23,7 @@ class StoneQuarryBuilder extends City {
 
   woodman = new Woodman(this.group)
 
-  auntzine = new AuntZina(this.group)
+  auntzina = new AuntZina(this.group)
 
   barman = new Barman(this.group)
 
@@ -36,7 +36,7 @@ class StoneQuarryBuilder extends City {
   commonOvener = Furnacer.create()
     .group(this.group)
     .id('ovener')
-    .name(i18nShared`§6Печкин`)
+    .name(i18nShared`Печкин`)
     .furnaceTypeIds([
       MinecraftBlockTypes.BlastFurnace,
       MinecraftBlockTypes.LitBlastFurnace,
@@ -48,7 +48,7 @@ class StoneQuarryBuilder extends City {
   foodOvener = Furnacer.create()
     .group(this.group)
     .id('foodOvener')
-    .name(i18nShared`§6Баба валя`)
+    .name(i18nShared`Баба валя`)
     .furnaceTypeIds([MinecraftBlockTypes.Smoker, MinecraftBlockTypes.LitSmoker])
     .onlyInStoneQuarry(false)
 

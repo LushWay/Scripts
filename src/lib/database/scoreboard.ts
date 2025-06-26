@@ -35,7 +35,7 @@ declare module '@minecraft/server' {
   }
 }
 
-export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, Text> = {
+export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, SharedText> = {
   leafs: i18nShared`§aЛистья`,
   money: i18nShared`§6Монеты`,
   kills: i18nShared`Убийств`,
@@ -65,7 +65,7 @@ export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreNam
   anarchyLastSeenDate: i18nShared`Последний раз онлайн на анархии`,
 
   lastSeenDate: i18nShared`Последний раз онлайн`,
-  pvp: 'PVP',
+  pvp: i18nShared`PVP`,
 }
 
 const statScores: Record<ScoreNames.Stat, string> = {

@@ -7,7 +7,6 @@ import {
 } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { defaultLang } from 'lib/assets/lang'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
 import { i18n } from 'lib/i18n/text'
@@ -94,8 +93,13 @@ export class Npc {
 
     entity.setDynamicProperty(Npc.dynamicPropertyName, this.id)
 
-    // TODO Use toRawText once supported
-    npc.name = '§6§l' + this.point.name.toString(defaultLang)
+    if (typeof this.point.name === 'string') {
+      npc.name = this.point.name
+    } else {
+      const name = this.point.name.toRawText()
+      if (name.rawtext) name.rawtext.unshift({ text: '§l§6' })
+      npc.name = JSON.stringify(name)
+    }
     if (this.location.valid) entity.teleport(this.location)
   }
 

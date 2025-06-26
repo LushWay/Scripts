@@ -13,7 +13,7 @@ new Command('player')
   .setDescription(i18n`Общее меню игрока`)
   .executes(ctx => playerMenu({ targetId: ctx.player.id }).command(ctx))
 
-const playerMenu = form.withParams<{ targetId: string }>((f, { player, params: { targetId }, self }) => {
+const playerMenu = form.params<{ targetId: string }>((f, { player, params: { targetId }, self }) => {
   const moder = is(player.id, 'moderator')
   const db = Player.database.getImmutable(targetId)
   f.title(db.name ?? targetId)

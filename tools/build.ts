@@ -28,7 +28,7 @@ const entities: [string, string][] = (
   // its json with comments so to not mess with libs we have to use regex
   // its bad. sorry.
   .map(e => e.match(/"identifier":\s*"([^\"]+)"/)?.[1] ?? '')
-  .filter(e => e !== 'f:t' && e)
+  .filter(e => e !== 'f:t' && !e.startsWith('minecraft:'))
   .map(e => [e.replace('lw:', '').replace('rubedo:', ''), e])
 
 await injectAsset(

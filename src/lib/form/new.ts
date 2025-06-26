@@ -157,7 +157,7 @@ export function form(create: CreateForm) {
   return new ShowForm(create, undefined)
 }
 
-form.withParams = <T extends FormParams>(create: CreateForm<T>) => {
+form.params = <T extends FormParams>(create: CreateForm<T>) => {
   return (params: T) => new ShowForm<T>(create, params) as unknown as ShowForm
 }
 

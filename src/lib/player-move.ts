@@ -31,7 +31,8 @@ export function anyPlayerNearRegion(region: Region, radius: number) {
   return false
 }
 
-jobInterval()
+// Do it sync on first run because some of the funcs above use it sync. It will start interval too
+for (const _ of jobPlayerPosition()) void 0
 
 function jobInterval() {
   system.delay(() => system.runJob(jobPlayerPosition()))

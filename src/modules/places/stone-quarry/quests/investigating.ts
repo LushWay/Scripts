@@ -6,7 +6,7 @@ export const stoneQuarryInvestigating = new CityInvestigating(StoneQuarry, (plac
 
   q.dialogue(place.barman.npc)
 
-  q.dialogue(place.auntzine.npc)
+  q.dialogue(place.auntzina.npc)
 
   q.dialogue(place.coachman.npc)
 

@@ -16,11 +16,12 @@ export async function injectAsset(
   caller: string,
   code: string | (() => Promise<string> | string),
   base = '.',
+  p = path.join(base, 'src', 'lib', 'assets', asset),
 ) {
   try {
     if (typeof code === 'function') code = await code()
 
-    await writeFile(path.join(base, 'src', 'lib', 'assets', asset), injectCode(caller, code))
+    await writeFile(p, injectCode(caller, code))
   } catch (e) {
     console.error(`Unable to write asset ${asset}:`, e)
   }

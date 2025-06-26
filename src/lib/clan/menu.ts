@@ -101,7 +101,7 @@ function createClan(player: Player, back: VoidFunction, name?: string, shortname
       clanInvites(player, clan, () => clanMenu(player)[1]())
     })
 }
-const inClanMenu = form.withParams<{ clan: Clan }>((f, { self, player, params: { clan } }) => {
+const inClanMenu = form.params<{ clan: Clan }>((f, { self, player, params: { clan } }) => {
   f.title(i18n`Меню клана`)
   f.body(
     textTable([
@@ -195,7 +195,7 @@ function clanMembers(player: Player, clan: Clan, back?: VoidFunction) {
     })
     .show(player)
 }
-const clanMember = form.withParams<{ clan: Clan; member: string; memberName: string }>(
+const clanMember = form.params<{ clan: Clan; member: string; memberName: string }>(
   (f, { player, self, params: { clan, member, memberName } }) => {
     f.title(i18n`Участник`)
 

@@ -1,19 +1,17 @@
-import { Player, RawMessage, RawText } from '@minecraft/server'
+import { Player, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
 import { Vec } from 'lib/vector'
 import { separateNumberWithDots } from '../util'
 import { stringify } from '../utils/inspect'
 import { ms } from '../utils/ms'
 import { intlRemaining } from './intl'
-import { I18nMessage, Message, ServerSideI18nMessage, SharedI18nMessage } from './message'
+import { I18nMessage, Message, RawTextArg, ServerSideI18nMessage, SharedI18nMessage } from './message'
 
 export type Text = string | Message
 export type MaybeRawText = string | RawText
 
 export declare namespace Text {
-  export type RawTextArg = string | RawText | RawMessage | Message | undefined | null
-
-  export interface Static<T> {
+  export interface Static<T, Arg> {
     /**
      * @example
      *   t.time(3000) -> "3 секунды"
@@ -29,46 +27,37 @@ export declare namespace Text {
      */
     hhmmss(time: number): Message | string
 
-    colors: (colors: Partial<Text.Colors>) => Chained<T>
+    colors: (colors: Partial<Text.Colors>) => Chained<T, Arg>
 
     currentColors: Text.Colors
-
-    /**
-     * No runtime effect. Affects only messages extraction, making this message available for both site and resource
-     * pack
-     */
-    shared: Static<T> & Fn<T>
-
-    /** No runtime effect. Affects only messages extraction, making this message available for resource pack */
-    rp: Static<T> & Fn<T>
   }
 
   /** "§7Some long text §fwith substring§7 and number §64§7" */
-  export type Fn<T> = (text: TemplateStringsArray, ...args: unknown[]) => T
+  export type Fn<T, Arg = unknown> = (text: TemplateStringsArray, ...args: Arg[]) => T
 
-  interface Modifiers<T> {
+  interface Modifiers<T, Arg> {
     /** "§cSome long text §fwith substring§c and number §74§c" */
-    error: Fn<T> & Static<T>
+    error: Fn<T, Arg> & Static<T, Arg>
 
     /** "§eSome long text §fwith substring§e and number §64§e" */
-    warn: Fn<T> & Static<T>
+    warn: Fn<T, Arg> & Static<T, Arg>
 
     /** "§aSome long text §fwith substring§a and number §64§a" */
-    success: Fn<T> & Static<T>
+    success: Fn<T, Arg> & Static<T, Arg>
 
     /** "§3Some long text §fwith substring§3 and number §64§3" */
-    accent: Fn<T> & Static<T>
+    accent: Fn<T, Arg> & Static<T, Arg>
 
     /** "§8Some long text §7with substring§8 and number §74§8" */
-    disabled: Fn<T> & Static<T>
+    disabled: Fn<T, Arg> & Static<T, Arg>
 
     /** "§r§6Some long text §f§lwith substring§r§6 and number §f4§r§6" */
-    header: Fn<T> & Static<T>
+    header: Fn<T, Arg> & Static<T, Arg>
 
     /** "Some long text with substring and number 4" */
-    nocolor: Fn<T> & Static<T>
+    nocolor: Fn<T, Arg> & Static<T, Arg>
   }
-  export type Chained<T> = Fn<T> & Static<T> & Modifiers<T>
+  export type Chained<T, Arg> = Fn<T, Arg> & Static<T, Arg> & Modifiers<T, Arg>
   export interface Colors {
     unit: string
     num: string
@@ -106,8 +95,11 @@ const styles = {
   disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
 }
 
-export const noI18n = createStatic(undefined, undefined, simpleString) as Omit<Text.Chained<string>, 'shared' | 'rp'> &
-  Text.Fn<string>
+export const noI18n = createStatic(undefined, undefined, colors => {
+  return function simpleStr(template, ...args) {
+    return Message.concatTemplateStringsArray(defaultLang, template, args, colors)
+  }
+})
 
 export const i18n = createStatic(undefined, undefined, colors => {
   return function i18n(template, ...args) {
@@ -115,7 +107,7 @@ export const i18n = createStatic(undefined, undefined, colors => {
   }
 })
 
-export const i18nShared = createStatic(undefined, undefined, colors => {
+export const i18nShared = createStatic<SharedI18nMessage, RawTextArg>(undefined, undefined, colors => {
   return function i18nShared(template, ...args) {
     return new SharedI18nMessage(template, args, colors)
   }
@@ -127,25 +119,17 @@ export const i18nJoin = createStatic(undefined, undefined, colors => {
   }
 })
 
-function simpleString(colors: Text.Colors) {
-  return function simpleStr(template, ...args) {
-    return Message.string(defaultLang, template, args, colors)
-  } as Text.Chained<string>
-}
-
 function defaultColors(colors: Partial<Text.Colors> = {}): Required<Text.Colors> {
   return { unit: colors.unit ?? '§f', text: colors.text ?? '§7', num: colors.num ?? '§6' }
 }
 
-function createStatic<T = string>(
+function createStatic<T = string, Arg = unknown>(
   colors: Partial<Text.Colors> = {},
   modifier = false,
   createFn: FnCreator<T>,
-): Text.Chained<T> {
+): Text.Chained<T, Arg> {
   const dcolors = defaultColors(colors)
-  const fn = createFn(dcolors) as Text.Chained<T>
-  fn.shared = fn
-  fn.rp = fn
+  const fn = createFn(dcolors) as Text.Chained<T, Arg>
   fn.currentColors = dcolors
   fn.time = createTime(dcolors)
   fn.hhmmss = createTimeHHMMSS(dcolors)
@@ -164,7 +148,7 @@ function createStatic<T = string>(
 }
 
 const dayMs = ms.from('day', 1)
-function createTimeHHMMSS(colors: Text.Colors): Text.Static<unknown>['hhmmss'] {
+function createTimeHHMMSS(colors: Text.Colors): Text.Static<never, never>['hhmmss'] {
   return n => {
     const date = new Date(n)
     if (n >= dayMs) {
@@ -173,7 +157,7 @@ function createTimeHHMMSS(colors: Text.Colors): Text.Static<unknown>['hhmmss'] {
   }
 }
 
-function createTime(colors: Text.Colors): Text.Static<Message>['time'] {
+function createTime(colors: Text.Colors): Text.Static<never, never>['time'] {
   return ms => new ServerSideI18nMessage(colors, l => intlRemaining(l, ms))
 }
 
