@@ -3,7 +3,6 @@ import { Block, BlockPermutation, ContainerSlot, Player, system, world } from '@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { is, ModalForm, util, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
-import { ngettext } from 'lib/i18n/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import {
   BlocksSetRef,
@@ -165,10 +164,7 @@ export async function smoothVoxelData(
           }
         }
 
-        if (radius > 5)
-          player.info(
-            prefix + `Будет заполнено §6${toFill.length} §f${ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
-          )
+        if (radius > 5) player.info(prefix + `Будет заполнено §6${toFill.length}`)
 
         for (const toFillBlock of toFill) {
           const block = world.overworld.getBlock(toFillBlock.location)

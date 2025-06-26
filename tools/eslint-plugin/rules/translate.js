@@ -62,8 +62,6 @@ const translateRule = createRule({
             const shared = name === 'i18nShared'
             const plural = name === 'i18nPlural'
 
-            if (plural) console.log(name, template.join('{}'))
-
             addTranslation(id, template, shared, plural)
           } else if (!isInsideWorldSettings(node)) {
             context.report({

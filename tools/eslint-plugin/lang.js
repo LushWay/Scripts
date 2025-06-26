@@ -34,6 +34,8 @@ class LangWriter {
     return Promise.all(supportedLanguages.map(e => this.write(e)))
   }
 
+  unsedWarn = new Set()
+
   /**
    * @param {string} lang
    * @param {Record<string, T>} data
@@ -41,9 +43,11 @@ class LangWriter {
   write(lang, data = { ...this.storage[sourceCodeLang], ...this.storage[lang] }) {
     for (const key in data) {
       const value = data[key]
-      if (!(key in this.storage[sourceCodeLang]) && !key.startsWith('__UNUSED__')) {
-        delete data[key]
-        data['__UNUSED__' + key] = value
+      if (!(key in this.storage[sourceCodeLang])) {
+        if (!this.unsedWarn.has(key)) {
+          this.unsedWarn.add(key)
+          console.warn(this.prefix, lang, 'Unused key', key)
+        }
       } else {
         const expected = this.storage[sourceCodeLang][key]
         if (
@@ -168,7 +172,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, rea
       2,
     )}
 
-export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, string>>>>> = ${JSON.stringify(
+export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, readonly string[]>>>>> = ${JSON.stringify(
       map(messagesJson.storage, (k, v) => [k, map(v, (k, v) => typeof v === 'object' && !Array.isArray(v) && [k, v])]),
       null,
       2,

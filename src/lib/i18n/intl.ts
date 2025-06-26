@@ -23,10 +23,9 @@ export function intlListFormat(colors: Text.Colors, language: Language, type: 'o
 const plural = intlCreate(e => new Intl.PluralRules(e, { type: 'cardinal', localeMatcher: 'lookup' }))
 
 // TODO Figure out how to generate plurals
-export function intlPlural(language: Language, n: number, plurals: Partial<Record<Intl.LDMLPluralRule, string>>) {
-  const v = plural(language).select(n)
-  if (!plurals[v]) throw new TypeError(`Unknown plural form ${v} for ${language}`)
-  return plurals[v]
+export function intlPlural(language: Language, n: number) {
+ return plural(language).select(n)
+  
 }
 
 declare global {

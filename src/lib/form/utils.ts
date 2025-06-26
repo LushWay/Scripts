@@ -12,7 +12,7 @@ import {
 import { i18n } from 'lib/i18n/text'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { MessageForm } from './message'
-import { ShowForm } from './new'
+import { NewFormCallback, ShowForm } from './new'
 
 interface BaseForm {
   show(player: Player, ...args: unknown[]): void
@@ -106,14 +106,16 @@ export const BUTTON = {
   'settings': 'textures/ui/custom/settings',
 }
 
-export function debounceMenu<T extends (player: Player, ...args: any[]) => Promise<any>>(menu: T): T {
+type FormShow = (player: Player, ...args: any[]) => Promise<any>
+
+export function debounceMenu<T extends NewFormCallback | FormShow>(menu: T): T {
   const sent = new WeakPlayerSet()
 
-  return (async (player: Player, ...args) => {
+  return (async (player: Player, ...args: Parameters<T>) => {
     if (sent.has(player)) return
 
     sent.add(player)
-    await menu(player, ...(args as Parameters<T>))
+    await menu(player, ...args)
     system.runTimeout(() => sent.delete(player), 'debounceMenu reset', 40)
   }) as T
 }

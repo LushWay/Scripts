@@ -5332,7 +5332,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, rea
   }
 }
 
-export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, string>>>>> = {
+export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, string[]>>>>> = {
   "en_US": {
     "\u0000 unread messageв": {
       "one": [

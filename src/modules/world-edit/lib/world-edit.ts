@@ -2,7 +2,6 @@ import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, syste
 import { Vec, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
-import { ngettext } from 'lib/i18n/ngettext'
 import { i18n } from 'lib/i18n/text'
 import { stringify } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
@@ -193,9 +192,7 @@ export class WorldEdit {
         this.loadBackup(history, backup)
       }
 
-      this.player.info(
-        `§3Успешно ${history === this.history ? 'отменить' : 'восстановить'} §f${amount} §3${ngettext(amount, ['действие', 'действия', 'действий'])}!`,
-      )
+      this.player.info(`§3Успешно ${history === this.history ? 'отменено' : 'восстановлено'} §f${amount} §3действ!`)
     } catch (error) {
       this.failedTo('отменить', error)
     }
@@ -398,11 +395,7 @@ export class WorldEdit {
         })(),
       )
 
-      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3${ngettext(selection.size, [
-        'блок',
-        'блока',
-        'блоков',
-      ])} за ${i18n.colors({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
+      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3за ${i18n.colors({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
 
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyBlockWeights(replaceTargets)}`

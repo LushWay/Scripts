@@ -31,6 +31,10 @@ export class Message {
     return v
   }
 
+  static templateToId(template: readonly string[]) {
+    return template.join('\x00')
+  }
+
   readonly id: string
 
   constructor(
@@ -38,7 +42,7 @@ export class Message {
     protected readonly args: readonly unknown[],
     protected colors: Text.Colors,
   ) {
-    this.id = template.join('\x00')
+    this.id = Message.templateToId(template)
   }
 
   color(c: Text.Colors | Pick<Text.Static<never, never>, 'currentColors'>) {
@@ -74,26 +78,6 @@ export class Message {
     return Message.concatTemplateStringsArray(language, this.template, this.args, this.colors, this.postfixes)
   }
 
-  protected stringify(language: Language, template = this.template) {
-    if (typeof language !== 'string') throw new TypeError(`Message.toString ${this.id} must be called with language`)
-
-    if (
-      template.length === 1 &&
-      template[0] &&
-      this.args.length === 0 &&
-      this.postfixes.length === 0 &&
-      this.colors.text === '§7'
-    )
-      return template[0] // Return as is, without any colors if string has no args nor postfixes
-
-    let v = ''
-    for (const [i, t] of [...template, ...this.postfixes].entries()) {
-      v += this.colors.text + t
-      if (i in this.args) v += textUnitColorize(this.args[i], this.colors, language)
-    }
-    return v
-  }
-
   protected toJSON() {
     return this.toString(defaultLang)
   }
@@ -101,14 +85,8 @@ export class Message {
 
 export class I18nMessage extends Message {
   toString(language: Language): string {
-    const translated = extractedTranslatedMessages[language]?.[this.id]
-    return Message.concatTemplateStringsArray(
-      language,
-      translated ? (Array.isArray(translated) ? translated : [translated]) : this.template,
-      this.args,
-      this.colors,
-      this.postfixes,
-    )
+    const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
+    return Message.concatTemplateStringsArray(language, translated, this.args, this.colors, this.postfixes)
   }
 }
 
