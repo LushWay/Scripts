@@ -7,8 +7,9 @@ declare global {
 
 globalThis.loaded = Date.now()
 
-//@ts-expect-error Define global
-globalThis.Intl = {}
+//@ts-expect-error Define global intl if not defined
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+globalThis.Intl ??= {}
 
 const reasons: Record<WatchdogTerminateReason, string> = {
   Hang: 'Скрипт завис',

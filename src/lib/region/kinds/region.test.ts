@@ -6,9 +6,12 @@ import { SphereArea } from '../areas/sphere'
 import { Region } from './region'
 
 describe('Region', () => {
-  beforeEach(() => {
+  beforeAll(() => {
     Region.regions = []
     TEST_clearDatabase(RegionDatabase)
+  })
+
+  beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date(0))
   })
