@@ -87,18 +87,18 @@ export const scoreboardObjectiveNames = {
     .concat(scoreboardStatNames) as ScoreNames.GameModesStat[],
 }
 
-const untypedDisplayNames: Record<string, Text> = scoreboardDisplayNames
+const untypedDisplayNames: Record<string, SharedText> = scoreboardDisplayNames
 
 expand(ScoreboardObjective.prototype, {
   get displayName() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return (untypedDisplayNames[this.id] ?? super.displayName) as string
+    return (untypedDisplayNames[this.id ?? '']?.to(defaultLang) ?? super.displayName) as string
   },
 })
 
 const players: Record<string, { proxy: Player['scores'] }> = {}
 Reflect.defineProperty(Player.prototype, 'scores', {
-  configurable: false,
+  configurable: true,
   enumerable: true,
   get() {
     const player = this as Player
@@ -107,7 +107,12 @@ Reflect.defineProperty(Player.prototype, 'scores', {
 })
 
 export class ScoreboardDB {
-  static defineName(id: string, name: string) {
+  static getName(o: ScoreboardObjective | string) {
+    const id = typeof o === 'string' ? o : o.id
+    return untypedDisplayNames[id] ?? (o instanceof ScoreboardObjective ? o.displayName : id)
+  }
+
+  static defineName(id: string, name: SharedText) {
     untypedDisplayNames[id] = name
   }
 

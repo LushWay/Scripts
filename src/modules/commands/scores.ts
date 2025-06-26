@@ -1,11 +1,12 @@
 /* i18n-ignore */
 
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
-import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
+import { ActionForm, BUTTON, Leaderboard, ModalForm, noBoolean } from 'lib'
+import { defaultLang } from 'lib/assets/lang'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'
 import { selectPlayer } from 'lib/form/select-player'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { i18n, noI18n, textTable } from 'lib/i18n/text'
 
 new Command('scores')
   .setDescription('Управляет счетом игроков (монеты, листья)')
@@ -18,13 +19,23 @@ alias('leafs')
 alias('money')
 
 function alias(name = 'leafs') {
-  new Command(name)
+  const cmd = new Command(name)
     .setDescription('Управляет счетом игроков (' + name + ')')
     .setPermissions('chefAdmin')
     .executes(ctx => {
       const obj = world.scoreboard.getObjective(name)
       if (obj) scoreboardMenu(ctx.player, obj)
     })
+
+  cmd.int('add').executes((ctx, add) => {
+    const obj = world.scoreboard.getObjective(name)
+    if (obj) {
+      const proxy = new ScoreboardDB(obj.id)
+      const been = proxy.get(ctx.player)
+      proxy.add(ctx.player, add)
+      ctx.player.tell(`${ScoreboardDB.getName(name).to(ctx.player.lang)} ${been} -> ${proxy.get(ctx.player)}`)
+    }
+  })
 }
 
 function scoreManagerMenu(player: Player) {
@@ -37,7 +48,7 @@ function scoreManagerMenu(player: Player) {
     if (a1) return -1
     return 1
   })) {
-    form.button(scoreboard.displayName, () => {
+    form.button(ScoreboardDB.getName(scoreboard).to(player.lang), () => {
       scoreboardMenu(player, scoreboard)
     })
   }
@@ -48,7 +59,7 @@ function scoreManagerMenu(player: Player) {
 function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
   const scoreboard = new ScoreboardDB(objective.id)
 
-  new ArrayForm(objective.displayName + '§r§f $page/$max', objective.getParticipants())
+  new ArrayForm(ScoreboardDB.getName(objective).to(player.lang) + '§r§f $page/$max', objective.getParticipants())
     .filters({
       online: {
         name: 'Онлайн',
@@ -83,8 +94,8 @@ function scoreboardMenu(player: Player, objective: ScoreboardObjective) {
     .addCustomButtonBeforeArray(form => {
       form.button('§3Добавить', BUTTON['+'], () => addTargetToScoreboardMenu(player, objective))
       form.ask(
-        '§cУдалить таблицу',
-        '§cУдалить',
+        noI18n.error`Удалить таблицу`,
+        noI18n.error`Удалить`,
         () => world.scoreboard.removeObjective(objective.id),
         undefined,
         'textures/ui/trash_light',
@@ -120,10 +131,15 @@ function editPlayerScore(
 function getScoreDescription(targetId: string, targetName: string, manager: ScoreboardDB) {
   const converted = Leaderboard.formatScore(manager.scoreboard.id, manager.get(targetId))
   const raw = manager.get(targetId)
-  return noI18n`
-§l§7Игрок: §r§f${targetName}§r
-§l§7Значение:§r §f${raw}
-${converted !== raw ? noI18n`§l§7Конвертированный счет: §r§f${converted}` : ''}`.trim()
+  return textTable(
+    (
+      [
+        ['Игрок', targetName],
+        ['Значение', raw],
+        converted !== raw ? (['Конвертированное', converted] as const) : false,
+      ] as const
+    ).filter(noBoolean),
+  ).to(defaultLang)
 }
 
 function addOrSetPlayerScore(
@@ -135,7 +151,7 @@ function addOrSetPlayerScore(
   mode: 'add' | 'set' = 'add',
 ) {
   const action = mode === 'add' ? 'Добавить' : 'Установить'
-  new ModalForm(manager.scoreboard.displayName + '§r§7 / §f' + action)
+  new ModalForm(ScoreboardDB.getName(manager.scoreboard).to(player.lang) + '§r§7 / §f' + action)
     .addTextField(
       `${getScoreDescription(targetId, targetName, manager)}\n§l§7${action}:§r`,
       'Ничего не произойдет',
@@ -148,9 +164,9 @@ function addOrSetPlayerScore(
         manager[mode](targetId, parseInt(value))
 
         Player.getById(targetId)?.info(
-          `§7Игрок §f${player.name}§r§7 ${mode === 'add' ? 'начислил вам' : 'установил значение счета'} §f${
-            manager.scoreboard.displayName
-          }§r§7 ${mode === 'set' ? 'на ' : ''}§f§l${value}`,
+          noI18n`Игрок ${player.name} ${mode === 'add' ? 'начислил вам' : 'установил значение счета'} ${ScoreboardDB.getName(
+            manager.scoreboard,
+          ).to(defaultLang)}: ${value}`,
         )
       } // If no value then do nothing
 
