@@ -8,6 +8,7 @@ import { is } from 'lib/roles'
 import { noNullable } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { Quest } from './quest'
+import { EventSignal } from 'lib'
 
 const quest = new Command('q')
   .setAliases('quest')
@@ -37,6 +38,8 @@ quest
     }).command,
   )
 
+export const questMenuCustomButtons = new EventSignal<{ player: Player; form: ActionForm }>()
+
 export function questsMenu(player: Player, back?: VoidFunction) {
   const { quests } = player.database
   if (!quests)
@@ -55,6 +58,7 @@ export function questsMenu(player: Player, back?: VoidFunction) {
       f.button(i18n.accent`Завершенные задания`.size(quests.completed.length).to(player.lang), () =>
         completeQuestsMenu(player, self),
       )
+      EventSignal.emit(questMenuCustomButtons, { player, form: f })
     })
     .button(dbquest => {
       const quest = Quest.quests.get(dbquest.id)

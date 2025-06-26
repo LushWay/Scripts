@@ -1,9 +1,10 @@
 import { Player } from '@minecraft/server'
-import { noNullable } from 'lib'
+import { doNothing, noNullable } from 'lib'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { intlListFormat } from 'lib/i18n/intl'
 import { i18n, textTable } from 'lib/i18n/text'
+import { questMenuCustomButtons } from 'lib/quest/menu'
 import { DailyQuest } from 'lib/quest/quest'
 import { RecurringEvent } from 'lib/recurring-event'
 import later from 'lib/utils/later'
@@ -75,12 +76,12 @@ new RecurringEvent(
   { runAfterOffline: true },
 )
 
-function hasAccessToDaily(player: Player, tell = true) {
+function hasAccessToDaily(player: Player, tell = true, fn = (t: Text) => player.tell(t)) {
   const completed = CityInvestigating.list.filter(e => e.quest.hadEntered(player))
   if (completed.length !== CityInvestigating.list.length) {
     if (tell) {
       const notVisited = CityInvestigating.list.filter(e => !completed.includes(e)).map(e => e.city.group.sharedName)
-      player.fail(
+      fn(
         i18n.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${intlListFormat(i18n.error.style, player.lang, 'and', notVisited)}`,
       )
     }
@@ -104,6 +105,17 @@ new Command('daily').setDescription(i18n`Ежедневные задания`).e
   if (!hasAccessToDaily(ctx.player)) return
 
   dailyQuestsForm.show(ctx.player)
+})
+
+questMenuCustomButtons.subscribe(({ player, form }) => {
+  if (
+    hasAccessToDaily(player, true, error => {
+      form.button(i18n.join`${i18n.disabled`Ежедневные задания`}\n${error}`.to(player.lang), () => player.fail(error))
+    })
+  ) {
+    const playerDb = db.get(player.id)
+    form.button(i18n.accent`Ежедневные задания`.badge(dailyQuests - playerDb.today).to(player.lang), dailyQuestsForm.show)
+  }
 })
 
 export const dailyQuestsForm = form((f, { player }) => {
