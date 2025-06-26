@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { InventoryInterval, ScoreboardDB } from 'lib'
 import { defaultLang } from 'lib/assets/lang'
 import { form } from 'lib/form/new'
-import { i18n } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { BaseItem } from 'modules/places/base/base'
 
 export enum SpeedRunTarget {
@@ -13,18 +13,18 @@ export enum SpeedRunTarget {
   MillionOfMoney = 'MillionOfMoney',
 }
 
-const speedRunNames: Record<SpeedRunTarget, Text> = {
-  [SpeedRunTarget.AllAchievements]: i18n`Все достижения`,
-  [SpeedRunTarget.GetBaseItem]: i18n`Получить базу`,
-  [SpeedRunTarget.AllQuests]: i18n`Все задания`,
-  [SpeedRunTarget.MillionOfMoney]: i18n`1.000.000 монет`,
-  [SpeedRunTarget.FullNetheriteArmor]: i18n`Полная незеритовая броня`,
+const speedRunNames: Record<SpeedRunTarget, SharedText> = {
+  [SpeedRunTarget.AllAchievements]: i18nShared`Все достижения`,
+  [SpeedRunTarget.GetBaseItem]: i18nShared`Получить базу`,
+  [SpeedRunTarget.AllQuests]: i18nShared`Все задания`,
+  [SpeedRunTarget.MillionOfMoney]: i18nShared`1.000.000 монет`,
+  [SpeedRunTarget.FullNetheriteArmor]: i18nShared`Полная незеритовая броня`,
 }
 
 const objectives: Record<SpeedRunTarget, ScoreboardDB> = Object.fromEntries(
   Object.entriesStringKeys(speedRunNames).map(([target, name]) => {
     const key = `${target[0]?.toLowerCase()}${target.slice(1)}SpeedRun`
-    ScoreboardDB.defineName(key, name.to(defaultLang))
+    ScoreboardDB.defineName(key, name)
     return [target, new ScoreboardDB(key, name.to(defaultLang))]
   }),
 )
@@ -72,7 +72,7 @@ InventoryInterval.slots.subscribe(({ player, slot }) => {
   }
 })
 
-const speedrunForm = form((f, { player }) => {
+export const speedrunForm = form((f, { player }) => {
   f.title('Speedrun')
   f.body(
     i18n`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${i18n.hhmmss(player.scores.anarchyOnlineTime * 2.5)}`,

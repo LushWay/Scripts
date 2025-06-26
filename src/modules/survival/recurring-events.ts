@@ -1,7 +1,10 @@
-import { TicksPerSecond, world } from '@minecraft/server'
+import { Player, TicksPerSecond, world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEffectTypesUnion } from '@minecraft/vanilla-data'
-import { ms } from 'lib'
+import { doNothing, ms, RoadRegion } from 'lib'
+import { form } from 'lib/form/new'
+import { i18n } from 'lib/i18n/text'
 import { DurationalRecurringEvent } from 'lib/recurring-event'
+import { RegionEvents } from 'lib/region/events'
 import later from 'lib/utils/later'
 
 // TODO Add settings for players to not apply effects on them
@@ -10,30 +13,61 @@ import later from 'lib/utils/later'
 // TODO Add menu to the survival menu
 // TODO Add chat notification
 
-for (const { effectType, startingOn } of [
-  { effectType: 'Haste', startingOn: 1 },
-  { effectType: 'HealthBoost', startingOn: 4 },
-] satisfies {
-  effectType: MinecraftEffectTypesUnion
-  startingOn: number
-}[]) {
-  new DurationalRecurringEvent(
-    `effect${effectType}`,
-    later.parse.recur().every(5).hour().startingOn(startingOn),
-    ms.from('min', 10),
-    () => ({}),
-    (_, ctx) => {
-      ctx.temp.system.runInterval(
-        () => {
-          for (const player of world.getAllPlayers())
-            player.addEffect(MinecraftEffectTypes[effectType], TicksPerSecond * 3, {
-              amplifier: 2,
-              showParticles: false,
-            })
-        },
-        `effect${effectType}`,
-        TicksPerSecond * 2,
-      )
-    },
-  )
+class RecurringEffect {
+  static all: RecurringEffect[] = []
+
+  readonly event: DurationalRecurringEvent
+
+  constructor(
+    readonly effectType: MinecraftEffectTypesUnion,
+    readonly startingOn: number,
+    filter?: (p: Player) => boolean,
+    readonly amplifier = 2,
+  ) {
+    RecurringEffect.all.push(this)
+    this.event = new DurationalRecurringEvent(
+      `effect${effectType}`,
+      later.parse.recur().every(5).hour().startingOn(startingOn),
+      ms.from('min', 10),
+      () => ({}),
+      (_, ctx) => {
+        for (const player of world.getAllPlayers()) {
+          player.success(i18n.success`Событие! ${effectType} силой ${amplifier} на ${10} минут`)
+        }
+        ctx.temp.system.runInterval(
+          () => {
+            for (const player of world.getAllPlayers()) {
+              if (filter && !filter(player)) continue
+
+              player.addEffect(MinecraftEffectTypes[effectType], TicksPerSecond * 3, {
+                amplifier,
+                showParticles: false,
+              })
+            }
+          },
+          `effect${effectType}`,
+          TicksPerSecond * 2,
+        )
+      },
+    )
+  }
 }
+
+new RecurringEffect('Haste', 1)
+new RecurringEffect('HealthBoost', 2)
+new RecurringEffect(
+  'Speed',
+  3,
+  p => RegionEvents.playerInRegionsCache.get(p)?.some(e => e instanceof RoadRegion) ?? false,
+  4,
+)
+
+export const recurForm = form(f => {
+  f.title(i18n`События`)
+  for (const event of RecurringEffect.all) {
+    f.button(
+      event.effectType + ' ' + (event.amplifier + 1) + '\n' + event.event.getNextOccurances(1)[0]?.toHHMM(),
+      doNothing,
+    )
+  }
+})

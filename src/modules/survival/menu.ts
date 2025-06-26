@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { BUTTON } from 'lib'
+import { BUTTON, doNothing } from 'lib'
 import { achievementsForm, achievementsFormName } from 'lib/achievements/command'
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
@@ -15,6 +15,8 @@ import { baseMenu } from 'modules/places/base/base-menu'
 import { wiki } from 'modules/wiki/wiki'
 import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
+import { speedrunForm } from './speedrun/target'
+import { recurForm } from './recurring-events'
 
 function tp(
   player: Player,
@@ -58,6 +60,14 @@ Menu.form = form((f, { player, self }) => {
     .button(i18n.nocolor`§bВики`, BUTTON.search, wiki.show)
     .button(achievementsFormName(player), 'textures/blocks/gold_block', achievementsForm)
     .button(i18n.nocolor`§7Настройки`, BUTTON.settings, () => playerSettingsMenu(player, self))
+    .button(i18n`Еще`, BUTTON['>'], secondPage)
+})
+
+const secondPage = form(f => {
+  f.title(Core.name, '§c§u§s§r')
+  f.button(i18n`Цели`, BUTTON['?'], speedrunForm)
+  f.button(i18n`Лидеры`, BUTTON['?'], doNothing)
+  f.button(i18n`События`, BUTTON['?'], recurForm)
 })
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {

@@ -4,7 +4,7 @@ import { Clan } from './clan/clan'
 import { i18n } from './i18n/text'
 import { getRole, ROLES } from './roles'
 import { EquippmentLevel } from './rpg/equipment-level'
-
+// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class
 /**
  * Gets displayable the role of this player
  *
