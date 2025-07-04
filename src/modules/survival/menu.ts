@@ -63,14 +63,21 @@ Menu.form = form((f, { player, self }) => {
 			tp(player, "mg", inv, `§6`, i18n`Миниигры`, i18n`§7СКОРО!`),
 			"textures/blocks/bedrock",
 			self
-		)
-		.button(
+		);
+
+	if (player.database.inv === "anarchy") {
+		f.button(
 			i18n`Задания`.badge(player.database.quests?.active.length),
 			"textures/ui/sidebar_icons/genre",
 			() => questsMenu(player, self)
 		);
 
-	if (player.database.inv === "anarchy") {
+		f.button(
+			achievementsFormName(player),
+			"textures/blocks/gold_block",
+			achievementsForm
+		);
+
 		f.button(i18n`База`, "textures/blocks/barrel_side", baseMenu({}));
 		const [clanText, clan] = clanMenu(player, self);
 		f.button(clanText, "textures/ui/FriendsIcon", clan);
@@ -87,11 +94,7 @@ Menu.form = form((f, { player, self }) => {
 			() => mailMenu(player, self)
 		)
 		.button(i18n.nocolor`§bВики`, BUTTON.search, wiki.show)
-		.button(
-			achievementsFormName(player),
-			"textures/blocks/gold_block",
-			achievementsForm
-		)
+
 		.button(i18n.nocolor`§7Настройки`, BUTTON.settings, () =>
 			playerSettingsMenu(player, self)
 		)
