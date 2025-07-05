@@ -100,7 +100,7 @@ const survivalSidebar = new Sidebar(
                 text = displayName
                 break
               case 'pve':
-                text = `${emoji.shield.green} ${displayName}`
+                text = `${emoji.shield.yellow} ${displayName}`
                 break
               case false:
                 text = `${emoji.shield.green} ${displayName}`
