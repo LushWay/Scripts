@@ -90,9 +90,7 @@ const survivalSidebar = new Sidebar(
       let text = base
       if (player.database.inv === 'anarchy') {
         if (region instanceof BaseRegion) {
-          if (region.getMemberRole(player.id)) {
-            text = region.baseMemberText(player)
-          } else text = base
+          if (region.getMemberRole(player.id)) text = region.baseMemberText(player)
         } else if (region) {
           text = ''
           const displayName = region.displayName?.to(player.lang)
@@ -102,10 +100,10 @@ const survivalSidebar = new Sidebar(
                 text = displayName
                 break
               case 'pve':
-                text = `${emoji.shield.green}${displayName}`
+                text = `${emoji.shield.green} ${displayName}`
                 break
               case false:
-                text = `${emoji.shield.green}${displayName}`
+                text = `${emoji.shield.green} ${displayName}`
             }
           }
         }
