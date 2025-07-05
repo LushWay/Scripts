@@ -14,6 +14,7 @@ import {
   Vector3Radius,
 } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { emoji } from 'lib/assets/emoji'
 import { SharedI18nMessage } from 'lib/i18n/message'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
@@ -88,7 +89,7 @@ export class SafePlace {
     RegionEvents.onEnter(this.safeArea, player => {
       if (this.showOnEnterTitle(player)) {
         player.onScreenDisplay.setHudTitle(`§f${this.name.to(player.lang)}`, {
-          subtitle: i18n.success`Мирная зона`.to(player.lang),
+          subtitle: i18n.success`${emoji.shield.green} Мирная зона`.to(player.lang),
           fadeInDuration: 0.5 * TicksPerSecond,
           stayDuration: 1 * TicksPerSecond,
           fadeOutDuration: 1 * TicksPerSecond,

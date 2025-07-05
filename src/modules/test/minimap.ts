@@ -59,6 +59,8 @@ system.afterEvents.scriptEventReceive.subscribe(
       MinecraftBlockTypes.Smoker,
       MinecraftBlockTypes.LitSmoker,
       MinecraftBlockTypes.FletchingTable,
+      MinecraftBlockTypes.ShortDryGrass,
+      MinecraftBlockTypes.TallDryGrass,
       ...bricks.map(e => e[1]),
     ]
 
@@ -74,6 +76,9 @@ system.afterEvents.scriptEventReceive.subscribe(
       [MinecraftBlockTypes.StructureBlock]: 'rgba(0, 0, 0, 255)',
       [MinecraftBlockTypes.Frame]: 'rgba(0, 0, 0, 255)',
       [MinecraftBlockTypes.IronBars]: 'rgba(0, 0, 0, 255)',
+      [MinecraftBlockTypes.FlowerPot]: 'rgba(0, 0, 0, 255)',
+      [MinecraftBlockTypes.WitherSkeletonSkull]: 'rgba(0, 0, 0, 255)',
+      [MinecraftBlockTypes.EndRod]: 'rgba(0, 0, 0, 255)',
     }
 
     const colorModifiers: Record<string, { lighten?: number; darken?: number } | undefined> = {

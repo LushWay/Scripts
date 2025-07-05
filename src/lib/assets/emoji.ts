@@ -7,6 +7,10 @@ export const emoji = {
   pickaxe: '',
   minecoin: '',
   token: '',
+  shield: {
+    green: '',
+    yellow: '',
+  },
   custom: {
     socials: {
       discord: String.fromCharCode(0xe110),
