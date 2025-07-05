@@ -1,79 +1,81 @@
-import { Player, ScoreName, ScoreNames } from '@minecraft/server'
+import { Player, ScoreName, ScoreNames } from "@minecraft/server";
 import {
-  ActionForm,
-  capitalize,
-  Menu,
-  ScoreboardDB,
-  scoreboardDisplayNames,
-  scoreboardObjectiveNames,
-  Settings,
-} from 'lib'
-import { NewFormCallback } from 'lib/form/new'
-import { i18n, textTable } from 'lib/i18n/text'
+	capitalize,
+	ScoreboardDB,
+	scoreboardDisplayNames,
+	scoreboardObjectiveNames,
+} from "lib";
+import { form } from "lib/form/new";
+import { i18n, textTable } from "lib/i18n/text";
 
-new Command('stats').setDescription(i18n`Показывает статистику по игре`).executes(ctx => showStats(ctx.player))
+new Command("stats")
+	.setDescription(i18n`Показывает статистику по игре`)
+	.executes((ctx) => statsForm({}).command(ctx));
 
-const getSettings = Settings.player(...Menu.settings, {
-  statsRelative: {
-    name: i18n`Показывать относительную дату`,
-    description: i18n`Показывать относительную дату на экране статистики`,
-    value: true,
-  },
-})
+export const statsForm = form.params<{ targetId?: string }>(
+	(f, { player, params: { targetId = player.id } }) => {
+		const scores = ScoreboardDB.getOrCreateProxyFor(targetId);
 
-export function showStats(player: Player, targetId = player.id, back?: NewFormCallback) {
-  const settings = getSettings(player)
-  const scores = ScoreboardDB.getOrCreateProxyFor(targetId)
+		f.title(i18n.header`Статистика игрока ${Player.nameOrUnknown(targetId)}`);
+		f.body(
+			textTable([
+				[
+					scoreboardDisplayNames.totalOnlineTime,
+					formatDate(scores.totalOnlineTime),
+				],
+				[
+					scoreboardDisplayNames.anarchyOnlineTime,
+					formatDate(scores.anarchyOnlineTime),
+				],
+				"",
+				[
+					scoreboardDisplayNames.lastSeenDate,
+					i18n.time(Date.now() - scores.lastSeenDate * 1000),
+				],
+				[
+					scoreboardDisplayNames.anarchyLastSeenDate,
+					i18n.time(Date.now() - scores.anarchyLastSeenDate * 1000),
+				],
+				"",
+				...statsTable(
+					scores,
+					(key) => key,
+					(n) => n.to(player.lang)
+				),
+				"",
+				...statsTable(
+					scores,
+					(key) => `anarchy${capitalize(key)}`,
+					(n) => i18n`Анархия ${n}`.to(player.lang)
+				),
+			])
+		);
+	}
+);
 
-  function formatDate(date: number) {
-    if (settings.statsRelative) {
-      return i18n.hhmmss(date)
-    } else {
-      const secsTotal = Math.floor(date / 1000)
-
-      const days = i18n`${Math.floor(secsTotal / 86400)} дней`
-      const hours = i18n`${Math.floor(secsTotal / 3600) % 24} часов`
-      const mins = i18n`${Math.floor(secsTotal / 60) % 60} минут`
-      const secs = i18n`${secsTotal % 60} секунд`
-      return i18n.join`${days} ${hours} ${mins} ${secs}`
-    }
-  }
-
-  new ActionForm(
-    i18n.header`Статистика игрока ${Player.name(targetId)}`.to(player.lang),
-    textTable([
-      [scoreboardDisplayNames.totalOnlineTime, formatDate(scores.totalOnlineTime)],
-      [scoreboardDisplayNames.anarchyOnlineTime, formatDate(scores.anarchyOnlineTime)],
-      [' ', ''],
-      [scoreboardDisplayNames.lastSeenDate, i18n.time(Date.now() - scores.lastSeenDate * 1000)],
-      [scoreboardDisplayNames.anarchyLastSeenDate, i18n.time(Date.now() - scores.anarchyLastSeenDate * 1000)],
-      ['  ', ''],
-      ...statsTable(
-        scores,
-        key => key,
-        n => n.to(player.lang),
-      ),
-      ['   ', ''],
-      ...statsTable(
-        scores,
-        key => `anarchy${capitalize(key)}`,
-        n => i18n`Анархия ${n}`.to(player.lang),
-      ),
-    ]).to(player.lang),
-  )
-    .button('OK', () => null)
-    .addButtonBack(back, player.lang)
-    .show(player)
+function formatDate(date: number) {
+	return i18n.hhmmss(date);
 }
 
-function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreName, getN: (n: Text) => string) {
-  const table: Text.Table[number][] = []
-  for (const key of scoreboardObjectiveNames.stats) {
-    const k = getKey(key)
-    table.push([getN(scoreboardDisplayNames[k]), s[k]])
-    if (key === 'kills') table.push([getN(i18n`Убийств/Смертей`), s[getKey('kills')] / s[getKey('deaths')]])
-    if (key === 'damageGive')
-      table.push([getN(i18n`Нанесено/Получено`), s[getKey('damageGive')] / s[getKey('damageRecieve')]])
-  }
-  return table satisfies Text.Table
+function statsTable(
+	s: Player["scores"],
+	getKey: (k: ScoreNames.Stat) => ScoreName,
+	getN: (n: Text) => string
+) {
+	const table: Text.Table[number][] = [];
+	for (const key of scoreboardObjectiveNames.stats) {
+		const k = getKey(key);
+		table.push([getN(scoreboardDisplayNames[k]), s[k]]);
+		if (key === "kills")
+			table.push([
+				getN(i18n`Убийств/Смертей`),
+				s[getKey("kills")] / s[getKey("deaths")],
+			]);
+		if (key === "damageGive")
+			table.push([
+				getN(i18n`Нанесено/Получено`),
+				s[getKey("damageGive")] / s[getKey("damageRecieve")],
+			]);
+	}
+	return table satisfies Text.Table;
 }

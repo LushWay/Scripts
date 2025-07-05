@@ -44,7 +44,7 @@ exclude_patterns = [
   "tools/**",
   "*.config.ts",
   "src/modules/world-edit/**",
-  "src/lib/utils/sprintf.ts",
+  "src/lib/i18n/sprintf.ts",
   "src/lib/utils/later.ts",
   "src/lib/vector.ts",
   "items/**",

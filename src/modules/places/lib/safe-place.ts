@@ -20,7 +20,8 @@ import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
-import { MoneyCost } from 'lib/shop/cost'
+import { MultiCost } from 'lib/shop/cost'
+import { ErrorCost } from 'lib/shop/cost/cost'
 import { Product } from 'lib/shop/product'
 
 export class SafePlace {
@@ -72,13 +73,17 @@ export class SafePlace {
       if (!Portal.canTeleport(player)) return
 
       player.database.unlockedPortals ??= []
-      if (!player.database.unlockedPortals.includes(this.groupId)) {
+      if (!this.isUnlocked(player)) {
         player.success(i18n`Открыт новый портал! [Когда-нибудь здесь будет анимация...]`)
         player.database.unlockedPortals.push(this.groupId)
       }
 
       portalMenuOnce(player, undefined, this.group, start, end)
     })
+  }
+
+  isUnlocked(player: Player) {
+    return player.database.unlockedPortals?.includes(this.groupId)
   }
 
   private createSafeArea(location: Vector3Radius) {
@@ -89,7 +94,7 @@ export class SafePlace {
     RegionEvents.onEnter(this.safeArea, player => {
       if (this.showOnEnterTitle(player)) {
         player.onScreenDisplay.setHudTitle(`§f${this.name.to(player.lang)}`, {
-          subtitle: i18n.success`${emoji.shield.green} Мирная зона`.to(player.lang),
+          subtitle: i18n.join`${emoji.shield.green} ${i18n.success`Мирная зона`}`.to(player.lang),
           fadeInDuration: 0.5 * TicksPerSecond,
           stayDuration: 1 * TicksPerSecond,
           fadeOutDuration: 1 * TicksPerSecond,
@@ -117,6 +122,8 @@ system.delay(() => {
   }, ActionGuardOrder.Feature)
 })
 
+const notUnlockedPortalCost = ErrorCost(i18n`Портал в это поселение не разблокирован`)
+
 const portalMenuOnce = debounceMenu(function portalMenu(
   player: Player,
   message?: Text,
@@ -127,16 +134,21 @@ const portalMenuOnce = debounceMenu(function portalMenu(
   return new ArrayForm(
     i18n`Перемещение...`,
     SafePlace.places
-      .map(e => ({ location: e.portalTeleportsTo, group: e.group }))
+      .map(e => ({
+        location: e.portalTeleportsTo,
+        group: e.group,
+        unlocked: e.isUnlocked(player),
+      }))
       .filter(e => e.location.valid && e.group.id !== group?.id),
   )
     .description(message)
     .button(place => {
+      const cost = place.unlocked ? new MultiCost().money(1000) : notUnlockedPortalCost
       const [name, , callback] = Product.create()
         .form(message => portalMenu(player, message, group, from, to))
         .player(player)
         .name(place.group.name ?? 'Unknown')
-        .cost(new MoneyCost(1000))
+        .cost(cost)
         .onBuy(() => {
           if (place.location.valid) Portal.teleport(player, place.location, { title: '' })
 
