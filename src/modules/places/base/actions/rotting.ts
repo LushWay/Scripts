@@ -109,7 +109,7 @@ export function baseRottingButton(base: BaseRegion, player: Player, back?: VoidF
 }
 
 async function startRotting(base: BaseRegion, state: RottingState) {
-  if (base.ldb.state === state) return
+  if (typeof base.ldb === 'undefined' || base.ldb.state === state) return
 
   base.ldb.state = state
   base.save()
