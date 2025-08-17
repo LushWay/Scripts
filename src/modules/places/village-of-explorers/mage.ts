@@ -236,17 +236,17 @@ export class Mage extends ShopNpc {
   ): { can: boolean; level: number; enchantment: Enchantment } {
     const item = slot instanceof ItemStack ? slot.clone() : slot.getItem()?.clone()
     const current = item?.enchantable?.getEnchantment(type)?.level ?? 0
-    const enchantment: Enchantment = { type: new EnchantmentType(type), level: current }
+    const level = current + up
+    const enchantmentCurrent: Enchantment = { type: new EnchantmentType(type), level: current }
+    const enchantment: Enchantment = { type: enchantmentCurrent.type, level }
 
     if (item?.enchantable) {
       const { maxLevel: max } = enchantment.type
-      const level = current + up
 
       if (level > max) {
-        const enchitem = Enchantments.custom[type]?.[current + 1]?.[item.typeId]
-        if (!enchitem) return { can: false, level: 0, enchantment }
+        const enchitem = Enchantments.custom[type]?.[level]?.[item.typeId]
+        if (!enchitem) return { can: false, level: 0, enchantment: enchantmentCurrent }
 
-        enchantment.level = level
         if (check) return { can: true, level, enchantment }
 
         const newitem = enchitem.clone()
@@ -259,15 +259,14 @@ export class Mage extends ShopNpc {
         try {
           item.enchantable.addEnchantment(enchantment)
         } catch (e) {
-          return { can: false, level: -1, enchantment }
+          return { can: false, level: -1, enchantment: enchantmentCurrent }
         }
-        enchantment.level = level
         if (check) return { can: true, level, enchantment }
         if (slot instanceof ContainerSlot) slot.setItem(item)
       }
     }
 
-    return { can: false, level: 0, enchantment }
+    return { can: false, level: 0, enchantment: enchantmentCurrent }
   }
 }
 
