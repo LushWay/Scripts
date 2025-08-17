@@ -16,7 +16,7 @@ export const ores = new OreCollector(
     .groupChance(70)
     .weight(1),
 
-  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).weight(0.8),
+  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).weight(1),
   new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -30).groupChance(50).weight(2),
   new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).range(0, -64).groupChance(10).weight(0.5),
   new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).range(0, -64).groupChance(60).weight(0.3),
