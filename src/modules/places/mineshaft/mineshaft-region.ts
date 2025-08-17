@@ -1,4 +1,4 @@
-import { Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
+import { LocationOutOfWorldBoundariesError, Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 import { ActionForm, ms, registerRegionType, Vec } from 'lib'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
@@ -16,19 +16,26 @@ export class MineshaftRegion extends MineareaRegion {
 
   async removeAllOresAndResaveStructure() {
     let oresFound = 0
-    const regionsRestored = await this.restoreAndResaveStructure(vector => {
-      const block = this.dimension.getBlock(vector)
-      const ore = block && ores.getOre(block.typeId)
-      if (ore) {
-        logger.info`Replacing ${block.typeId} at ${vector} with ${ore.empty}`
-        block.setType(ore.empty)
-        oresFound++
+    try {
+      const regionsRestored = await this.restoreAndResaveStructure(vector => {
+        const block = this.dimension.getBlock(vector)
+        const ore = block && ores.getOre(block.typeId)
+        if (ore) {
+          logger.info`Replacing ${block.typeId} at ${vector} with ${ore.empty}`
+          block.setType(ore.empty)
+          oresFound++
+        }
+      })
+
+      logger.info`Created new mineshaft region. Ores found: ${oresFound}, crossregions restored: ${regionsRestored}`
+
+      return { oresFound, regionsRestored }
+    } catch (e) {
+      if (e instanceof LocationOutOfWorldBoundariesError) {
+        logger.info`Deleting cuz out of bounds ${this.id} ${this.area.toString()}`
+        this.delete()
       }
-    })
-
-    logger.info`Created new mineshaft region. Ores found: ${oresFound}, crossregions restored: ${regionsRestored}`
-
-    return { oresFound, regionsRestored }
+    }
   }
 
   onBlockBreak(player: Player, event: PlayerBreakBlockBeforeEvent) {
