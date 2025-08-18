@@ -15,7 +15,7 @@ describe('itemDescription', () => {
         undefined,
         player,
       ),
-    ).toMatchInlineSnapshot(`"§7Apple"`)
+    ).toMatchInlineSnapshot(`"§7Яблоко"`)
   })
   it('should create description', () => {
     const player = TEST_createPlayer()
