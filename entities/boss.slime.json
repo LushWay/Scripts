@@ -27,8 +27,8 @@
 
         // Entity specific options
         "minecraft:collision_box": {
-          "width": 2.08,
-          "height": 2.08
+          "width": 1.04,
+          "height": 1.04
         },
 
         "minecraft:behavior.nearest_attackable_target": {
@@ -58,7 +58,7 @@
           "damage": 8
         },
         "minecraft:movement": {
-          "value": 1
+          "value": 0.9
         },
         "minecraft:scale": {
           "value": 6
