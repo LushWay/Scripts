@@ -68,7 +68,16 @@ export const NOT_MOB_ENTITIES = [
   MinecraftEntityTypes.Npc,
   'minecraft:item',
   'minecraft:leash_knot',
+  MinecraftEntityTypes.FishingHook,
 ] as string[]
+
+export const PVP_ENTITIES = [
+  MinecraftEntityTypes.Player,
+  MinecraftEntityTypes.Arrow,
+  MinecraftEntityTypes.Snowball,
+  CustomEntityTypes.Fireball,
+  CustomEntityTypes.Cannon,
+]
 
 const ALLOW_SPAWN_PROP = 'allowSpawn'
 export function forceAllowSpawnInRegion(entity: Entity) {

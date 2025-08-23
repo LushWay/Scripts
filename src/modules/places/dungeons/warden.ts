@@ -5,6 +5,7 @@ import {
   ActionGuardOrder,
   fromMsToTicks,
   ms,
+  PVP_ENTITIES,
   Region,
   RegionPermissions,
   registerRegionType,
@@ -41,7 +42,7 @@ class WardenDungeonLootRegion extends Region {
 
   protected defaultPermissions: RegionPermissions = {
     allowedAllItem: true,
-    allowedEntities: 'all',
+    allowedEntities: PVP_ENTITIES,
 
     doors: true,
     gates: true,
