@@ -42,8 +42,8 @@
     "eslint-plugin-file-progress": "^3.0.2",
     "eslint-plugin-only-warn": "^1.1.0",
     "leafy-utils": "^7.1.5",
-    "prettier": "^3.6.1",
-    "prettier-plugin-jsdoc": "^1.3.2",
+    "prettier": "^3.6.2",
+    "prettier-plugin-jsdoc": "^1.3.3",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.0",
@@ -57,9 +57,7 @@
     "printWidth": 120,
     "endOfLine": "crlf",
     "quoteProps": "consistent",
-    "plugins": [
-      "prettier-plugin-jsdoc"
-    ],
+    "plugins": [],
     "jsdocTagsOrder": "{\"template\": 24.5}"
   },
   "packageManager": "yarn@4.9.1",

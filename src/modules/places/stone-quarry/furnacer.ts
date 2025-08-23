@@ -2,6 +2,7 @@ import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vec, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { i18n } from 'lib/i18n/text'
@@ -11,7 +12,6 @@ import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
-import { defaultLang } from 'lib/assets/lang'
 
 const furnaceExpireTime = ms.from('hour', 1)
 const furnaceExpireTimeText = i18n`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
@@ -97,6 +97,8 @@ export class Furnacer extends ShopNpc {
   }
 }
 
+const dontOpenFurnaceDialog = Symbol('dontOpenFurnaceDialog')
+
 actionGuard((player, region, ctx) => {
   // Not our event
   if (ctx.type !== 'interactWithBlock' || !ctx.event.isFirstEvent) return
@@ -110,12 +112,12 @@ actionGuard((player, region, ctx) => {
   const notAllowed = (
     message = i18n`Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!`,
   ) => {
-    return () => (system.delay(() => player.fail(message)), false)
+    return () => system.delay(() => player.fail(message))
   }
 
-  const tryItem = (slot: ContainerSlot) => {
+  const tryItem = (slot: ContainerSlot): boolean | typeof dontOpenFurnaceDialog | VoidFunction => {
     const lore = FurnaceKeyItem.schema.parse(player.lang, slot, undefined, false)
-    if (!lore) return notAllowed()
+    if (!lore) return false
 
     if (lore.furnacer !== furnacer.id) return notAllowed(i18n`Этот ключ используется для других печек!`)
 
@@ -157,29 +159,25 @@ actionGuard((player, region, ctx) => {
         })
 
         // Prevent from opening furnace dialog
-        return false
+        return dontOpenFurnaceDialog
       }
-    } else return notAllowed(i18n.error`Вы уже использовали этот ключ для другой печки.`)
+    }
+
+    return notAllowed(i18n.error`Вы уже использовали этот ключ для другой печки.`)
   }
 
-  const mainhand = tryItem(player.mainhand())
-  if (typeof mainhand === 'function') {
-    if (player.container) {
-      let lastError: VoidFunction | undefined
-      for (const [index, slot] of player.container.slotEntries()) {
-        if (index === player.selectedSlotIndex) continue
+  let lastError: undefined | VoidFunction
+  const entries = player.container?.slotEntries().sort((a, b) => (a[0] === player.selectedSlotIndex ? 1 : -1)) ?? []
+  for (const [index, slot] of entries) {
+    const result = tryItem(slot)
+    if (result === dontOpenFurnaceDialog || result) {
+      player.info(i18n`Использован ключ из слота ${index}`)
+      return result === dontOpenFurnaceDialog ? false : true
+    } else if (typeof result === 'function') lastError = result
+  }
 
-        const result = tryItem(slot)
-        if (typeof result === 'function') {
-          lastError = result
-        } else {
-          player.info(i18n`Использован ключ из слота ${index}`)
-          return result
-        }
-      }
-      return (lastError ?? notAllowed())()
-    }
-  } else return mainhand
+  ;(lastError ?? notAllowed)()
+  return false
 }, ActionGuardOrder.Feature)
 
 class FurnaceKeyItem {
