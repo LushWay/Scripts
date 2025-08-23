@@ -8,7 +8,7 @@ import { Vec } from 'lib/vector'
 export class FloatingText {
   private static readonly dynamicProperty = 'floatingText'
 
-  private static readonly typeId = CustomEntityTypes.FloatingTextNpc
+  private static readonly typeId = CustomEntityTypes.FloatingText
 
   static {
     // system.delay(() => {
