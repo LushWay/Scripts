@@ -1,5 +1,6 @@
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 import { Airdrop, isNotPlaying, Loot, Vec } from 'lib'
+import { Items } from 'lib/assets/custom-items'
 import { i18n } from 'lib/i18n/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../pvp/cannon'
@@ -18,7 +19,12 @@ const base = new Loot('base_airdrop')
   .weight('10%')
 
   .itemStack(CannonItem.blueprint)
-  .weight('5%').build
+  .weight('5%')
+
+  .item(Items.Money)
+  .weight('100%')
+  .amount({ '10...40': '1%' })
+  .duplicate(5).build
 
 const powerfull = new Loot('powerfull_airdrop')
   .item('Gunpowder')
@@ -33,7 +39,12 @@ const powerfull = new Loot('powerfull_airdrop')
   .weight('10%')
 
   .itemStack(CannonItem.itemStack)
-  .weight('5%').build
+  .weight('5%')
+
+  .item(Items.Money)
+  .weight('100%')
+  .amount({ '10...40': '1%' })
+  .duplicate(5).build
 
 let airdrop: Airdrop | undefined
 function timeout() {

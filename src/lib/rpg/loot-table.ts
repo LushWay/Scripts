@@ -1,7 +1,6 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
 import { MinecraftEnchantmentTypes, MinecraftEnchantmentTypesUnion, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
-import { Command } from 'lib/command'
 import { Enchantments } from 'lib/enchantments'
 import { EventSignal } from 'lib/event-signal'
 import { inspect, isKeyof, pick } from 'lib/util'
@@ -134,7 +133,7 @@ export class Loot {
 
   trash(types: Partial<Record<'web' | 'string', number>>) {
     if (typeof types.string === 'number')
-      this.item('String').weight('30%').amount({ '10...20': '10%', '21...30': '20%' }).duplicate(types.string)
+      this.item('String').weight('30%').amount({ '5...10': '1%' }).duplicate(types.string)
 
     if (typeof types.web === 'number') this.item('Web').weight('40%').amount({ '1...2': '1%' }).duplicate(types.web)
 

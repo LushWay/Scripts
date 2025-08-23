@@ -42,7 +42,7 @@ const defaultLoot = new Loot('dungeon_default_loot')
     '5...10': '80%',
     '11...30': '20%',
   })
-  .trash({ web: 4, string: 1 }).build
+  .trash({ web: 3, string: 1 }).build
 
 const d = StructureDungeonsId
 

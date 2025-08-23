@@ -111,6 +111,7 @@ export class Airdrop {
       setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
     }
 
+    Airdrop.minimapedTemp?.cleanup();
     Airdrop.minimapedTemp = new Temporary(() => {
       const event = onPlayerMove.subscribe(({ player }) => {
         setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
