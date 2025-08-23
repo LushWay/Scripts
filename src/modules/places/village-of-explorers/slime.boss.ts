@@ -1,25 +1,28 @@
 import { world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { Loot, ms } from 'lib'
+import { i18nShared } from 'lib/i18n/text'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
-import { MagicSlimeBall } from './village-of-explorers'
+import { MagicSlimeBall } from './items'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('slime')
-    .name('Магический Слайм')
+    .name(i18nShared`Магический Слайм`)
     .typeId(MinecraftEntityTypes.Slime)
     .loot(
       new Loot('slime boss')
         .itemStack(MagicSlimeBall)
+        .weight('100%')
         .amount({
           '40...64': '2%',
           '65...128': '1%',
         })
 
         .item('SlimeBall')
+        .weight('100%')
         .amount({
           '0...10': '10%',
           '11...64': '40%',
@@ -29,9 +32,9 @@ export function createBossSlime(group: Group) {
     .respawnTime(ms.from('min', 10))
     .allowedEntities([])
     .spawnEvent(true)
-    .radius()
+    .radius(20)
     .interval(boss => {
-      if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return
+      if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return
 
       const slimes = world.overworld.getEntities({
         location: boss.location,
@@ -49,7 +52,7 @@ export function createBossSlime(group: Group) {
     })
 
   world.afterEvents.entityHurt.subscribe(({ hurtEntity }) => {
-    if (!boss.location.valid || !boss.region || !boss.entity?.isValid()) return
+    if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return
     if (hurtEntity.id !== boss.entity.id) return
 
     const health = hurtEntity.getComponent('health')

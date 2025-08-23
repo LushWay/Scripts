@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { EventSignal } from 'lib/event-signal'
+import { EventLoader, EventSignal } from 'lib/event-signal'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Region } from './kinds/region'
 
@@ -10,12 +10,12 @@ export class RegionEvents {
    */
   static playerInRegionsCache = new WeakPlayerMap<Region[]>()
 
-  /** Even that triggers each second and is used to update player region cache */
+  /** Event that triggers each second and is used to update player region cache */
   static onInterval = new EventSignal<{ player: Player; currentRegion: Region | undefined }>()
 
   /**
    * Event that triggers when player regions have changed. Updated each second by region interval. Uses
-   * {@link Region.playerInRegionsCache} under the hood
+   * {@link RegionEvents.playerInRegionsCache} under the hood
    */
   static onPlayerRegionsChange = new EventSignal<{ player: Player; previous: Region[]; newest: Region[] }>()
 
@@ -26,8 +26,13 @@ export class RegionEvents {
    * @param callback - Fnction that will be called when a player enters the specified region.
    */
   static onEnter(region: Region, callback: PlayerCallback) {
-    this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
+    const event = this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
       if (!previous.includes(region) && newest.includes(region)) callback(player)
     })
+
+    return () => this.onPlayerRegionsChange.unsubscribe(event)
   }
+
+  /** Event that triggers once all regions have loaded */
+  static onLoad = new EventLoader()
 }

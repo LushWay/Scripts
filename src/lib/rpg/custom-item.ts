@@ -1,7 +1,8 @@
 import { ItemStack, system } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
-import { Language } from 'lib/assets/lang'
-import { langToken, translateToken } from 'lib/utils/lang'
+import { defaultLang } from 'lib/assets/lang'
+import { translateTypeId } from 'lib/i18n/lang'
+import { i18n } from 'lib/i18n/text'
 
 export const customItems: ItemStack[] = []
 
@@ -24,15 +25,15 @@ class CustomItem {
 
   protected _nameTag: string | undefined
 
-  nameTag(nameTag: string) {
-    this._nameTag = nameTag
+  nameTag(nameTag: Text) {
+    this._nameTag = nameTag.to(defaultLang)
     return this
   }
 
   private _description: string | undefined
 
-  lore(desc: string) {
-    this._description = desc
+  lore(desc: Text) {
+    this._description = desc.to(defaultLang)
     return this
   }
 
@@ -60,7 +61,7 @@ export class CustomItemWithBlueprint extends CustomItem {
     customItems.push(this.blueprint)
   }
 
-  private _bprintName = 'Неизвестный'
+  private _bprintName = 'Unknown'
 
   setBlueprintName(name: string) {
     this._bprintName = name
@@ -69,8 +70,10 @@ export class CustomItemWithBlueprint extends CustomItem {
 
   get blueprint() {
     return new ItemStack(Items.Blueprint).setInfo(
-      `§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateToken(langToken(this._typeId), Language.ru_RU) : this._bprintName)}`,
-      'С помощью него вы можете сделать предмет у инженера',
+      i18n`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, defaultLang) : this._bprintName)}`.to(
+        defaultLang,
+      ),
+      i18n`С помощью него вы можете сделать предмет у инженера`.to(defaultLang),
     )
   }
 }

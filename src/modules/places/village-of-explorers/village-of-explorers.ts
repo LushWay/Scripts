@@ -1,23 +1,18 @@
-import { ItemStack } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Loot } from 'lib'
-import { customItems } from 'lib/rpg/custom-item'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { GuideNpc } from '../lib/npc/guide'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
+import { techCityInvestigating } from '../tech-city/quests/investigating'
+import { MagicSlimeBall } from './items'
 import { Mage } from './mage'
 import { createBossSlime } from './slime.boss'
 
-export const MagicSlimeBall = new ItemStack(MinecraftItemTypes.SlimeBall).setInfo(
-  '§aМагическая слизь',
-  'Используется у Инженера',
-)
-customItems.push(MagicSlimeBall)
-
 class VillageOfExporersBuilder extends City {
   constructor() {
-    super('VillageOfExporers', 'Деревня исследователей')
+    super('VillageOfExporers', i18nShared`Деревня исследователей`)
     this.create()
   }
 
@@ -34,6 +29,16 @@ class VillageOfExporersBuilder extends City {
   }
 
   stoner = new Stoner(this.group)
+
+  guide = new GuideNpc(this.group, i18nShared`Исследователь`, (f, { lf }) => {
+    lf.question(
+      'wtfCity',
+      i18n`А что за город`,
+      i18n`Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ`,
+    )
+
+    f.quest(techCityInvestigating.goToCityQuest, i18n`А где мне базу сделать-то?`)
+  })
 }
 
 export const VillageOfExplorers = new VillageOfExporersBuilder()

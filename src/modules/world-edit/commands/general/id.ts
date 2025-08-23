@@ -1,6 +1,6 @@
 import {} from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Vector, inspect, util } from 'lib'
+import { Vec, inspect } from 'lib'
 
 const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
 
@@ -22,7 +22,7 @@ root
   .setDescription('Выдает id блока по локации')
   .location('location', true)
   .executes((ctx, location = ctx.player.location) => {
-    const l = Vector.floor(location)
+    const l = Vec.floor(location)
 
     const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
@@ -34,7 +34,7 @@ root
   .setDescription('Выдает все states блока по локации')
   .location('location', true)
   .executes((ctx, location = ctx.player.location) => {
-    const l = Vector.floor(location)
+    const l = Vec.floor(location)
     const block = ctx.player.dimension.getBlock(l)
     if (!block) return ctx.reply('§cНет блока!')
     ctx.reply(inspect(block.permutation.getAllStates()))

@@ -1,14 +1,16 @@
 import { Entity, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { onPlayerMove } from 'lib/player-move'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
 import { LootTable } from 'lib/rpg/loot-table'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { toPoint } from 'lib/utils/point'
+import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
 import { Core } from '../extensions/core'
-import { isLocationError } from '../game-utils'
 import { Temporary } from '../temporary'
+import { isLocationError } from '../utils/game'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './minimap'
 
 // TODO Refactor to use creator style for creating
@@ -37,6 +39,8 @@ export class Airdrop {
   static instances: Airdrop[] = []
 
   static minimaped: Airdrop | undefined
+
+  static minimapedTemp: Temporary | undefined
 
   chest: Entity | undefined
 
@@ -72,7 +76,7 @@ export class Airdrop {
    * @param position - Position to spawn airdrop on
    */
   spawn(position: Vector3) {
-    logger.info`Spawning at ${Vector.floor(position)}`
+    logger.info`Spawning at ${Vec.floor(position)}`
 
     const spawn = (name: 'chicken' | 'chest', typeId: string, position: Vector3, tag: string) => {
       this[name] = world.overworld.spawnEntity(typeId, position)
@@ -89,7 +93,7 @@ export class Airdrop {
     }
 
     spawn('chicken', `${Airdrop.chickenTypeId}<chicken:drop>`, position, Airdrop.chickenTag)
-    spawn('chest', Airdrop.chestTypeId, Vector.add(position, Airdrop.chestOffset), Airdrop.chestTag)
+    spawn('chest', Airdrop.chestTypeId, Vec.add(position, Airdrop.chestOffset), Airdrop.chestTag)
 
     this.status = 'falling'
     this.save()
@@ -101,19 +105,28 @@ export class Airdrop {
     if (!this.chest) return
 
     Airdrop.minimaped = this
-    const { x, z } = Vector.floor(this.chest.location)
+    const { x, z } = Vec.floor(this.chest.location)
 
     for (const player of players) {
       setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
     }
 
+    Airdrop.minimapedTemp?.cleanup();
+    Airdrop.minimapedTemp = new Temporary(() => {
+      const event = onPlayerMove.subscribe(({ player }) => {
+        setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
+      })
+
+      return { cleanup: () => onPlayerMove.unsubscribe(event) }
+    })
+
     return this
   }
 
   teleport() {
-    if (!this.chest || !this.chicken || !this.chicken.isValid() || !this.chest.isValid()) return
+    if (!this.chest || !this.chicken || !this.chicken.isValid || !this.chest.isValid) return
 
-    this.chest.teleport(Vector.add(this.chicken.location, Airdrop.chestOffset))
+    this.chest.teleport(Vec.add(this.chicken.location, Airdrop.chestOffset))
     if (!this.chest.dimension.getBlock(this.chest.location)?.below()?.isAir) {
       this.beingLooted()
     }
@@ -141,18 +154,18 @@ export class Airdrop {
       return
     }
 
-    Airdrop.db[this.id] = {
+    Airdrop.db.set(this.id, {
       for: this.for,
       chest: this.chest.id,
       chicken: this.chicken.id,
       loot: this.lootTable.id,
       ...(this.status === 'being looted' ? { looted: true } : {}),
-    }
+    })
   }
 
   /** Shows particle trace under chest minecart */
   showParticleTrace(entity = this.chicken) {
-    if (!entity?.isValid()) return { x: 0, y: 0, z: 0 }
+    if (!entity?.isValid) return toPoint({ location: { x: 0, y: 0, z: 0 }, dimensionType: 'overworld' })
 
     const from = entity.location
     const { x, z } = from
@@ -170,12 +183,12 @@ export class Airdrop {
       }
     }
 
-    return from
+    return toPoint(entity)
   }
 
   delete() {
     Airdrop.instances = Airdrop.instances.filter(e => e !== this)
-    Reflect.deleteProperty(Airdrop.db, this.id)
+    Airdrop.db.delete(this.id)
 
     /** @param {'chest' | 'chicken'} key */
     const kill = (key: 'chest' | 'chicken') => {
@@ -209,18 +222,12 @@ system.runInterval(
 
       if (!canPerformHeavyOperation) continue
 
-      chestMinecarts ??= world.overworld.getEntities({
-        type: Airdrop.chestTypeId,
-        tags: [Airdrop.chestTag],
-      })
-      chickens ??= world.overworld.getEntities({
-        type: Airdrop.chickenTypeId,
-        tags: [Airdrop.chickenTag],
-      })
+      chestMinecarts ??= world.overworld.getEntities({ type: Airdrop.chestTypeId, tags: [Airdrop.chestTag] })
+      chickens ??= world.overworld.getEntities({ type: Airdrop.chickenTypeId, tags: [Airdrop.chickenTag] })
 
       if (airdrop.status === 'restoring') {
         try {
-          const saved = Airdrop.db[airdrop.id]
+          const saved = Airdrop.db.get(airdrop.id)
           if (typeof saved === 'undefined') return airdrop.delete()
 
           airdrop.chest = findAndRemove(chestMinecarts, saved.chest)
@@ -228,12 +235,12 @@ system.runInterval(
 
           const yes = () => logger.info`Restored airdrop with status ${airdrop.status}`
           if (saved.looted) {
-            if (airdrop.chest?.isValid()) {
+            if (airdrop.chest?.isValid) {
               airdrop.status = 'being looted'
               yes()
             }
           } else {
-            if (airdrop.chicken?.isValid() && airdrop.chest?.isValid()) {
+            if (airdrop.chicken?.isValid && airdrop.chest?.isValid) {
               airdrop.status = 'falling'
               yes()
             }
@@ -263,7 +270,7 @@ system.runInterval(
 )
 
 export function inventoryIsEmpty(entity: Entity | undefined) {
-  if (!entity?.isValid()) return false
+  if (!entity?.isValid) return false
 
   const { container } = entity
   if (!container) return false // Skip unloaded
@@ -273,7 +280,7 @@ export function inventoryIsEmpty(entity: Entity | undefined) {
 
 function cleanup(arr: Entity[], type: 'chest' | 'chicken') {
   for (const entity of arr) {
-    if (!entity.isValid()) continue
+    if (!entity.isValid) continue
 
     if (!Airdrop.instances.find(e => e[type]?.id === entity.id)) {
       entity.remove()
@@ -288,7 +295,7 @@ const findAndRemove = (arr: Entity[], id: string) => {
 }
 
 Core.afterEvents.worldLoad.subscribe(() => {
-  for (const [key, saved] of Object.entries(Airdrop.db)) {
+  for (const [key, saved] of Airdrop.db.entries()) {
     if (typeof saved === 'undefined') continue
     const loot = LootTable.instances.get(saved.loot)
 

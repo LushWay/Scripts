@@ -1,6 +1,6 @@
 import { system, System, world } from '@minecraft/server'
 import stringifyError from 'lib/utils/error'
-import { util } from '../util'
+import { capitalize, util } from '../util'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -42,6 +42,8 @@ declare module '@minecraft/server' {
      * @param tickInterval Time in ticks between each run. Its not guaranted that it will be consistent
      */
     runJobInterval(callback: () => Generator, tickInterval: number): () => void
+
+    runJob(generator: Generator<void, void, void>, name?: string): number
   }
 }
 
@@ -60,6 +62,21 @@ expand(System.prototype, {
     return Timer('timeout', super.runTimeout.bind(this), ...args)
   },
 
+  runJob(generator, name) {
+    const id = name ?? stringifyError.parent()
+    return super.runJob(
+      (function* runJobWrapper() {
+        let v
+        do {
+          const end = util.benchmark(id, 'job')
+          v = generator.next()
+          end()
+          yield
+        } while (!v.done)
+      })(),
+    )
+  },
+
   runPlayerInterval(callback, ...args) {
     return Timer(
       'playerInterval',
@@ -67,7 +84,7 @@ expand(System.prototype, {
       super.runInterval.bind(this),
       function playersInterval() {
         for (const player of world.getAllPlayers()) {
-          if (player.isValid()) callback(player)
+          if (player.isValid) callback(player)
         }
       },
 
@@ -135,7 +152,7 @@ function Timer(
   TIMERS_PATHES[visualId] = path
 
   function timer() {
-    util.catch(fn, type[0].toUpperCase() + type.slice(1))
+    util.catch(fn, capitalize(type))
   }
 
   return __DEV__

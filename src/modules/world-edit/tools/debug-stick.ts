@@ -1,9 +1,9 @@
 import { Block, BlockStates, ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
-import { ModalForm, Vector } from 'lib'
+import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t, textTable } from 'lib/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { WEeditBlockStatesMenu } from '../menu'
 
@@ -24,21 +24,11 @@ class DebugStick extends WorldEditTool<StorageSchema> {
   editToolForm(slot: ContainerSlot, player: Player, initial?: boolean): void {
     const storage = this.getStorage(slot)
     new ModalForm(this.name)
-      .addTextField('Ыыы просто потому что интерфейс сломан лол', '')
-      .addDropdownFromObject(
-        'Тип активации',
-        {
-          ui: 'Интерфейс',
-          click: 'При использовании',
-        },
-        {
-          defaultValue: storage.mode,
-        },
-      )
-      .show(player, (_, __, mode) => {
+      .addDropdownFromObject('Activation type', { ui: 'UI', click: 'On use' }, { defaultValue: storage.mode })
+      .show(player, (_, mode) => {
         storage.mode = mode
         this.saveStorage(slot, storage)
-        player.info(t`Mode is set to ${mode}`)
+        player.info(i18n`Mode is set to ${mode}`)
       })
   }
 
@@ -59,7 +49,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       }
       block.setPermutation(permutation)
     }
-    WEeditBlockStatesMenu(player, blockStates, onChangeListener, false, '§l§bСохранить').then(onChangeListener)
+    WEeditBlockStatesMenu(player, blockStates, onChangeListener, false, '§l§bSave').then(onChangeListener)
   }
 
   constructor() {
@@ -94,13 +84,9 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     stateName: string,
   ) {
     const nextStateName = player.isSneaking ? nextValue(stateNames, stateName) : stateName
-    return t`${Vector.string(block, true)} ${block.typeId}\n${textTable(
-      Object.map(allStates, (key, value) =>
-        key === stateName ? ['§b' + key, value] : key === nextStateName ? ['§e' + key, value] : [key, value],
-      ),
-      true,
-      false,
-    )}`
+    return noI18n`${Vec.string(block, true)} ${block.typeId}\n${Object.entries(allStates)
+      .map(([key, value]) => `${(key === stateName ? '§b' : key === nextStateName ? '§9' : '§7') + key}: ${value}`)
+      .join('\n')}`
   }
 
   private changeProperty(player: Player, block: Block) {
@@ -112,8 +98,8 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     if (player.isSneaking) {
       if (stateNames.length === 1)
         return player.onScreenDisplay.setActionBar(
-          t.error`У блока ${block.typeId} всего одно состояние`,
-          ActionbarPriority.UrgentNotificiation,
+          noI18n.error`Block ${block.typeId} has only one state`,
+          ActionbarPriority.Highest,
         )
 
       const nextStateName = nextValue(stateNames, stateName)
@@ -134,7 +120,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
 
   private noStatesToChangeWarning(player: Player, block: Block) {
     return player.onScreenDisplay.setActionBar(
-      t.error`У блока ${block.typeId} нет состояний для изменения`,
+      noI18n.error`Block ${block.typeId} has no states to change`,
       ActionbarPriority.PvP,
     )
   }
@@ -145,15 +131,17 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     if (stateNames.length === 0) return
 
     const cacheTypeId = block.typeId
-    const cacheLocationId = Vector.string(block)
+    const cacheLocationId = Vec.string(block)
     const stateName =
-      this.blockLocationCache.get(cacheLocationId) ?? this.blockTypeCache.get(cacheTypeId) ?? stateNames[0]
+      this.blockLocationCache.get(cacheLocationId) ??
+      this.blockTypeCache.get(cacheTypeId) ??
+      (stateNames[0] as unknown as string)
     return { stateNames, stateName, allStates, cacheTypeId, cacheLocationId }
   }
 }
 
-function nextValue<T>(array: T[], value: T) {
-  return array[array.findIndex(e => e === value) + 1] ?? array[0]
+function nextValue<T>(array: T[], value: T): T {
+  return array[array.findIndex(e => e === value) + 1] ?? (array[0] as T)
 }
 
 new DebugStick()

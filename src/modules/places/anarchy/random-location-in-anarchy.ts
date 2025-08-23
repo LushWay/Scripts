@@ -1,6 +1,7 @@
 import { system } from '@minecraft/server'
 import { dedupe } from 'lib/dedupe'
-import { getRandomVectorInCircle, getTopmostSolidBlock } from 'lib/game-utils'
+import { i18n } from 'lib/i18n/text'
+import { getRandomXZInCircle, getTopmostSolidBlock } from 'lib/utils/game'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 
 /**
@@ -14,11 +15,11 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
   info,
   onBlock,
 }: {
-  info?: (info: string) => void
+  info?: (info: Text) => void
   onBlock?: (block: Vector3) => void
 } = {}) {
   if (!Anarchy.zone) return
-  info?.('Поиск случайной локации без воды...')
+  info?.(i18n`Поиск случайной локации без воды...`)
 
   return new Promise<false | { air: Vector3; topmost: Vector3 }>(resolve => {
     const maxTries = 100
@@ -31,16 +32,16 @@ export const randomLocationInAnarchy = dedupe(async function randomLocationInAna
           if (i < 0) return resolve(false)
           if (!Anarchy.zone) return
 
-          const random = getRandomVectorInCircle(1000)
+          const random = getRandomXZInCircle(1000)
           const position = { x: random.x + Anarchy.zone.center.x, y: 200, z: random.z + Anarchy.zone.center.z }
           onBlock?.(position)
           const topmostBlock = await getTopmostSolidBlock(position)
 
           if (topmostBlock) {
-            info?.('Найдено!')
+            info?.(i18n`Найдено!`)
             return resolve({ air: position, topmost: topmostBlock })
           } else {
-            info?.(`Вода. Попытка §6${maxTries - i}/${maxTries}`)
+            info?.(i18n`Вода. Попытка ${maxTries - i}/${maxTries}`)
             timeout()
           }
         },

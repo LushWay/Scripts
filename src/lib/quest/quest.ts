@@ -1,32 +1,39 @@
 import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
-import { Group } from 'lib/rpg/place'
-import { Settings, SETTINGS_GROUP_NAME } from 'lib/settings'
+import { Compass } from 'lib/rpg/menu'
+import { Group, Place } from 'lib/rpg/place'
+import { Settings } from 'lib/settings'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { QuestButton } from './button'
 import { PlayerQuest } from './player'
 import { QS } from './step'
 
-export interface QuestDB {
-  active: {
-    id: string
-    i: number
-    db?: unknown
-  }[]
-  completed: string[]
+export declare namespace Quest {
+  interface DB {
+    active: { id: string; i: number; db?: unknown }[]
+    completed: string[]
+  }
 }
 
 export class Quest {
   static error = class QuestError extends Error {}
 
-  static playerSettings = Settings.player('Задания\n§7Настройки игровых заданий', 'quest', {
-    messageForEachStep: {
-      value: false,
-      name: 'Сообщение в чат при каждом шаге',
-      description: 'Отправлять ли сообщение в чат при каждом новом разделе задания',
+  static playerSettings = Settings.player(
+    i18n`Задания
+§7Настройки игровых заданий`,
+    'quest',
+    {
+      messageForEachStep: {
+        value: false,
+        name: i18n`Сообщение в чат при каждом шаге`,
+        description: i18n`Отправлять ли сообщение в чат при каждом новом разделе задания`,
+      },
     },
-  })
+  )
 
   static sidebar: import('lib/sidebar').SidebarLineCreate<unknown> = {
     create(sidebar) {
@@ -39,11 +46,11 @@ export class Quest {
 
         step.playerQuest.updateListeners.add(showSidebar)
 
-        const text = `§l${step.quest.name}:§r§6 ${step.text()}`
+        const text = `§l${step.quest.name.to(player.lang)}:§r§6 ${step.text().to(player.lang)}`
         const cached = textCache.get(player)
 
         if (cached?.step !== step) {
-          textCache.set(player, { step: step, time: 6 })
+          textCache.set(player, { step: step, time: 10 })
           return text
         }
 
@@ -61,48 +68,104 @@ export class Quest {
 
   static getCurrentStepOf(player: Player) {
     const db = player.database.quests?.active[0]
-    return db && this.quests.get(db.id)?.getPlayerStep(player, db.i)
+    return db && this.quests.get(db.id)?.getCurrentStep(player, db.i)
   }
 
-  players = new WeakPlayerMap<PlayerQuest>({ onLeave: (_, v) => v.list.forEach(e => e.cleanup()) })
+  private static restore(player: Player, quest: Quest, db = quest.getDatabase(player)) {
+    if (db) quest.setStep(player, db.i, true)
+  }
+
+  static {
+    Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
+      if (firstJoin) return
+
+      system.delay(() => {
+        player.database.quests?.active.forEach(db => {
+          const quest = Quest.quests.get(db.id)
+          if (!quest) return
+
+          this.restore(player, quest, db)
+        })
+      })
+    })
+  }
+
+  static {
+    Core.afterEvents.worldLoad.subscribe(() => {
+      system.delay(() => {
+        EventLoader.load(this.onQuestLoad)
+
+        EventLoader.load(this.onLoad)
+      })
+    })
+  }
+
+  protected static onQuestLoad = new EventLoader()
+
+  static onLoad = new EventLoader()
+
+  players = new WeakPlayerMap<PlayerQuest>({ onLeave: (_, v) => v.steps.forEach(e => e.cleanup()) })
+
+  get id() {
+    return this.place.id
+  }
+
+  get name() {
+    return this.place.group.name && this.place.name
+      ? i18nShared.join`${this.place.group.sharedName} - ${this.place.name}`
+      : (this.place.sharedName ?? this.place.group.sharedName)
+  }
 
   /**
    * Creates a Quest and registers it in a collection.
    *
-   * @param id - Unique identifier for the quest.
-   * @param name - The name of the quest.
    * @param description - Provides a brief explanation or summary of the quest. It typically describes the objective or
    *   goal that players need to achieve in order to complete the quest.
    */
   constructor(
-    public readonly id: string,
-    public readonly name: Text,
+    public readonly place: Place,
     public readonly description: Text,
     private create: (
       q: Omit<PlayerQuest, 'list' | 'updateListeners' | 'update' | 'player' | 'quest'>,
       p: Player,
     ) => void,
+    public readonly guideIgnore = false,
   ) {
     Quest.quests.set(this.id, this)
-    Core.afterEvents.worldLoad.subscribe(() => {
-      system.delay(() => {
-        world.getAllPlayers().forEach(e => Quest.restore(e, this))
-
-        const questSettings = Settings.worldMap[this.group.id]
-        if (typeof questSettings !== 'undefined' && Object.keys(questSettings).length) {
-          questSettings[SETTINGS_GROUP_NAME] = `Задание: ${this.name}\n§7${this.description}`
-        }
-      })
+    Quest.onQuestLoad.subscribe(() => {
+      world.getAllPlayers().forEach(e => Quest.restore(e, this))
     })
+    this.onCreate()
   }
 
+  protected onCreate() {
+    // Hook
+  }
+
+  /** Starts this quest for player */
   enter(player: Player) {
     this.setStep(player, 0)
+    // Prevent bug when entering new quest without place caused compass to
+    // keep pointing to the previous quest place because cleanup is not called
+    Compass.setFor(player, undefined)
   }
 
+  isCompleted(player: Player) {
+    return player.database.quests?.completed.includes(this.id) ?? false
+  }
+
+  hadEntered(player: Player) {
+    return this.isCompleted(player) || !!this.getDatabase(player)
+  }
+
+  getDatabase(player: Player) {
+    return player.database.quests?.active.find(e => e.id === this.id)
+  }
+
+  /** Moves player to the specific quest step with all the visuals etc */
   setStep(player: Player, i: number, restore = false) {
-    const step = this.getPlayerStep(player, i) ?? this.createPlayerSteps(player, i)
-    if (typeof step === 'undefined') return // Index can be unknown, e.g quest have 4 steps but index is 10
+    const step = this.getCurrentStep(player, i) ?? this.createPlayerSteps(player, i)
+    if (typeof step === 'undefined') return // Index can point to unknown step, e.g quest have 4 steps but index is 10
 
     const db = this.getDatabase(player) ?? this.createDatabase(player, i)
 
@@ -112,69 +175,42 @@ export class Quest {
     step.enter(!restore)
   }
 
-  getPlayerStep(player: Player, index = this.getActive(player)?.i): QS | undefined {
-    return this.players.get(player)?.list[index ?? 0]
-  }
-
   private createPlayerSteps(player: Player, index: number) {
-    const steps = new PlayerQuest(this, player)
-    this.players.set(player, steps)
-    this.create(steps, player)
+    const playerQuest = new PlayerQuest(this, player)
+    this.players.set(player, playerQuest)
+    this.create(playerQuest, player)
 
-    return steps.list[index]
-  }
-
-  private getDatabase(player: Player) {
-    return player.database.quests?.active.find(e => e.id === this.id)
+    return playerQuest.steps[index]
   }
 
   private createDatabase(player: Player, i: number) {
-    const quests = (player.database.quests ??= {
-      active: [],
-      completed: [],
-    })
+    const quests = (player.database.quests ??= { active: [], completed: [] })
 
-    const db = { id: this.id, i: i } as QuestDB['active'][number]
+    const db = { id: this.id, i: i } as Quest.DB['active'][number]
     quests.active.unshift(db)
 
     return db
   }
 
-  /**
-   * The active quest object for a specific player with the given step number. If the active quest does not exist for
-   * the player, it creates a new active quest object with the provided step number and adds it to the player's list of
-   * active quests before returning it.
-   *
-   * @param player - Player to recieve quest from
-   * @param i - Number that represents the step index of the quest.
-   */
-  private getActive(player: Player, i?: number) {
-    const quests = (player.database.quests ??= {
-      active: [],
-      completed: [],
-    })
-
-    let active = quests.active.find(e => e.id === this.id)
-    if (!active && typeof i === 'number') {
-      active = { id: this.id, i: i }
-      quests.active.unshift(active)
-    }
-
-    return active
+  /** Gets current active step of this quest that player is in */
+  getCurrentStep(player: Player, stepIndex = this.getDatabase(player)?.i): QS | undefined {
+    return this.players.get(player)?.steps[stepIndex ?? 0]
   }
 
   /** Sends message and displays title on quest step move */
   private stepSwitchVisual(player: Player, step: QS, i: number, restore: boolean) {
     if (Quest.playerSettings(player).messageForEachStep) {
       const text = step.description?.()
-      if (text) player.success(`§f§l${this.name}: §r§6${text}`)
+      // TODO Fix colors
+      if (text) player.success(i18n.nocolor`§f§l${this.name}: §r§6${text}`)
     }
 
     if (i === 0 && !restore) {
       system.runTimeout(
         () => {
-          player.onScreenDisplay.setHudTitle('§6' + this.name, {
-            subtitle: this.description,
+          // TODO Fix colors
+          player.onScreenDisplay.setHudTitle('§6' + this.name.to(player.lang), {
+            subtitle: this.description.to(player.lang),
             fadeInDuration: 0,
             stayDuration: 20 * 8,
             fadeOutDuration: 0,
@@ -187,44 +223,45 @@ export class Quest {
     }
   }
 
-  exit(player: Player, end = false) {
+  /**
+   * Removes this quest from the active player quests
+   *
+   * @param player - Player to exit
+   * @param end - Whenther to mark this quest as completed successfully and add to the completed array or not
+   */
+  exit(player: Player, end = false, removeFromCompleted = false) {
     const db = player.database
     if (!db.quests) return
 
     const active = db.quests.active.find(q => q.id === this.id)
     if (active) {
-      this.getPlayerStep(player, active.i)?.cleanup()
+      this.getCurrentStep(player, active.i)?.cleanup()
       this.players.delete(player.id)
     }
 
+    if (end) EventSignal.emit(Quest.onEnd, { quest: this, player })
+
     db.quests.active = db.quests.active.filter(q => q !== active)
-    if (end) db.quests.completed.push(this.id)
-  }
-
-  static {
-    Join.onMoveAfterJoin.subscribe(
-      ({ player, firstJoin }) =>
-        !firstJoin &&
-        system.delay(() => {
-          player.database.quests?.active.forEach(db => {
-            const quest = Quest.quests.get(db.id)
-            if (!quest) return
-
-            this.restore(player, quest, db)
-          })
-        }),
-    )
+    if (end && !db.quests.completed.includes(this.id)) db.quests.completed.push(this.id)
+    if (removeFromCompleted) {
+      db.quests.completed = db.quests.completed.filter(e => e !== this.id)
+    }
   }
 
   get group() {
-    return new Group('quest: ' + this.id, this.name)
+    return new Group(`quest: ${this.id}`, noI18n`Задание: ${this.name}\n§7${this.description}`)
   }
 
-  private static restore(
-    player: Player,
-    quest: Quest,
-    db = player.database.quests?.active.find(e => e.id === quest.id),
-  ) {
-    if (db) quest.setStep(player, db.i, true)
+  button = new QuestButton(this)
+
+  static onEnd = new EventSignal<{ quest: Quest; player: Player }>()
+}
+
+/** Marks quest to be included into the daily quests list */
+export class DailyQuest extends Quest {
+  static dailyQuests = new Set<DailyQuest>()
+
+  protected onCreate(): void {
+    DailyQuest.dailyQuests.add(this)
   }
 }

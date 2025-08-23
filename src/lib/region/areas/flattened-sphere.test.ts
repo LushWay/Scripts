@@ -1,4 +1,6 @@
-import { createPoint } from 'lib'
+import { consoleLang } from 'lib/assets/lang'
+import { textTable } from 'lib/i18n/text'
+import { createPoint } from 'lib/utils/point'
 import { FlattenedSphereArea } from './flattened-sphere'
 
 describe('rectangle', () => {
@@ -19,8 +21,8 @@ describe('rectangle', () => {
     expect(flts.isNear(createPoint(12, 0, 0), 1)).toBe(false)
 
     expect(flts.edges).toEqual([
-      { x: 10, y: 2, z: 10 },
       { x: -10, y: -2, z: -10 },
+      { x: 10, y: 2, z: 10 },
     ])
 
     expect(flts.radius).toBe(10)
@@ -31,5 +33,11 @@ describe('rectangle', () => {
     expect(flts.radius).toBe(20)
 
     flts.center = { x: 10, y: 10, z: 10 }
+
+    expect(textTable(flts.getFormDescription()).to(consoleLang)).toMatchInlineSnapshot(`
+      "§7Center: §f§c10 §a10 §b10
+      §7Radius: §612
+      §7YRadius: §620"
+    `)
   })
 })

@@ -1,8 +1,8 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { ItemFilter, OnSelect, selectItemForm } from 'lib/form/select-item'
-import { MaybeRawText, t } from 'lib/text'
-import { langToken, translateEnchantment } from 'lib/utils/lang'
+import { translateEnchantment, translateTypeId } from 'lib/i18n/lang'
+import {  i18n } from 'lib/i18n/text'
 import { Cost, MultiCost, ShouldHaveItemCost } from '../cost'
 import { ShopForm, ShopFormSection } from '../form'
 import { ProductName } from '../product'
@@ -12,9 +12,9 @@ export function createItemModifier(
   shopForm: ShopForm,
   name: ProductName,
   cost: Cost,
-  itemFilterName: MaybeRawText,
+  itemFilterName: Text,
   itemFilter: ItemFilter,
-  modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: MaybeRawText) => boolean | void,
+  modifyItem: (itemSlot: ContainerSlot, itemStack: ItemStack, successBuyText: Text) => boolean | void,
 ) {
   shopForm
     .product()
@@ -52,8 +52,8 @@ export function createItemModifierSection(
   shopForm: ShopForm,
   shop: Shop,
 
-  name: MaybeRawText,
-  itemFilterName: MaybeRawText,
+  name: Text,
+  itemFilterName: Text,
   itemFilter: ItemFilter,
   onOpen: ShopMenuWithSlotCreate,
   manualSelectItemButton = false,
@@ -84,7 +84,7 @@ export function createItemModifierSection(
 }
 
 function onSelect(
-  name: MaybeRawText,
+  name: Text,
   shopForm: ShopForm,
   shop: Shop,
   player: Player,
@@ -109,17 +109,18 @@ function onSelect(
         if (!itemStack) return
         item = itemStack
 
+        // TODO Check colors
+        // TODO Check lang for potions etc
+
         form.body = () =>
-          t.raw`Зачарования:\n${{
-            rawtext: item.enchantable
-              ?.getEnchantments()
-              .map(e => [translateEnchantment(e), { text: '\n' }])
-              .flat(),
-          }}`
+          i18n`Зачарования:\n${item.enchantable
+            ?.getEnchantments()
+            .map(e => translateEnchantment(e, player.lang))
+            .join('\n')}`
 
         const addSelectItem = () =>
           form.button(
-            t.raw`Выбранный предмет: ${{ translate: langToken(item) }}\n§7Нажмите, чтобы сменить`,
+            i18n`Выбранный предмет: ${translateTypeId(item.typeId, player.lang)}\nНажмите, чтобы сменить`,
             getAuxOrTexture(item.typeId, !!item.enchantable?.getEnchantments().length),
             select,
           )

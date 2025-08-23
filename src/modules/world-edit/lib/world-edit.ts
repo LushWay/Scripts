@@ -1,12 +1,13 @@
 import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
-import { Vector, getRole, isLocationError, prompt } from 'lib'
+import { Vec, ask, getRole, isLocationError } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
-import { t } from 'lib/text'
+import { i18n } from 'lib/i18n/text'
 import { stringify } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
-import { ngettext } from 'lib/utils/ngettext'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { BigStructure } from '../../../lib/utils/big-structure'
+import { Cuboid } from '../../../lib/utils/cuboid'
 import { WE_CONFIG, spawnParticlesInArea } from '../config'
 import {
   ReplaceMode,
@@ -16,14 +17,21 @@ import {
   toPermutation,
   toReplaceTarget,
 } from '../utils/blocks-set'
-import { BigStructure } from './big-structure'
-import { Cuboid } from './cuboid'
 
 // TODO Add WorldEdit.runMultipleAsyncJobs
 
 interface WeDB {
   pos1: Vector3
   pos2: Vector3
+}
+
+export interface WeBackup {
+  load(): void
+  delete(): void
+  name: string
+  pos1?: Vector3
+  pos2?: Vector3
+  type?: (name: string) => WeBackup
 }
 
 const logger = createLogger('WorldEdit')
@@ -78,22 +86,22 @@ export class WorldEdit {
 
       const color = { 1: '§5', 2: '§d' }[pos]
 
-      this.player.tell(`${color}►${pos}◄§r (${action}) ${Vector.string(this[`pos${pos}`])}`)
+      this.player.tell(`${color}►${pos}◄§r (${action}) ${Vec.string(this[`pos${pos}`])}`)
       this.player.playSound(Sounds.Success)
       this.updateSelectionCuboids()
     })
   }
 
   private updateSelectionCuboids() {
-    if (!Vector.valid(this.pos1) || !Vector.valid(this.pos2)) return
+    if (!Vec.isValid(this.pos1) || !Vec.isValid(this.pos2)) return
 
     this.selection = new Cuboid(this.pos1, this.pos2)
-    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vector.add(this.selection.max, Vector.one))
+    this.visualSelectionCuboid = new Cuboid(this.selection.min, Vec.add(this.selection.max, Vec.one))
   }
 
-  history: BigStructure[] = []
+  history: WeBackup[] = []
 
-  undos: BigStructure[] = []
+  undos: WeBackup[] = []
 
   currentCopy: BigStructure | undefined
 
@@ -102,7 +110,7 @@ export class WorldEdit {
   private historyLimit = 100
 
   constructor(private player: Player) {
-    this.db = WorldEdit.db[this.player.id]
+    this.db = WorldEdit.db.get(this.player.id)
 
     const we = WorldEdit.instances.get(player)
     if (we) return we
@@ -142,7 +150,13 @@ export class WorldEdit {
    * @param pos2 Position 2 of cuboid location
    * @param history Save location where you want the to store your backup
    */
-  backup(name: string, pos1: Vector3 = this.pos1, pos2: Vector3 = this.pos2, history: BigStructure[] = this.history) {
+  backup(
+    name: string,
+    pos1: Vector3 = this.pos1,
+    pos2: Vector3 = this.pos2,
+    history: WeBackup[] = this.history,
+    type?: WeBackup['type'],
+  ) {
     if (history.length === this.historyLimit) {
       if (!this.hasWarnAboutHistoryLimit) {
         console.log('Player', this.player.name, 'has reached history limit (', this.historyLimit, ')')
@@ -152,11 +166,13 @@ export class WorldEdit {
         this.hasWarnAboutHistoryLimit = true
       }
 
-      history[0].delete()
+      history[0]?.delete()
       history.splice(0, 1)
     }
 
-    const structrure = new BigStructure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, this.player.dimension, name)
+    const structrure = type
+      ? type(name)
+      : new BigStructure(WE_CONFIG.BACKUP_PREFIX, pos1, pos2, this.player.dimension, name)
 
     history.push(structrure)
   }
@@ -176,21 +192,20 @@ export class WorldEdit {
         this.loadBackup(history, backup)
       }
 
-      this.player.info(
-        `§3Успешно ${history === this.history ? 'отменить' : 'восстановить'} §f${amount} §3${ngettext(amount, ['действие', 'действия', 'действий'])}!`,
-      )
+      this.player.info(`§3Успешно ${history === this.history ? 'отменено' : 'восстановлено'} §f${amount} §3действ!`)
     } catch (error) {
       this.failedTo('отменить', error)
     }
   }
 
   /** Loads backup and removes it from history */
-  loadBackup(history: BigStructure[], backup: BigStructure) {
+  loadBackup(history: WeBackup[], backup: WeBackup) {
     this.backup(
       history === this.history ? 'Отмена (undo) ' + backup.name : 'Восстановление (redo) ' + backup.name,
       backup.pos1,
       backup.pos2,
       history === this.history ? this.undos : this.history,
+      backup.type,
     )
 
     backup.load()
@@ -230,7 +245,7 @@ export class WorldEdit {
         this.player.dimension,
       )
       this.player.info(
-        `Скопирована область размером ${selection.size}\n§3От: ${Vector.string(this.pos1, true)}\n§3До: ${Vector.string(
+        `Скопирована область размером ${selection.size}\n§3От: ${Vec.string(this.pos1, true)}\n§3До: ${Vec.string(
           this.pos2,
           true,
         )}`,
@@ -241,14 +256,14 @@ export class WorldEdit {
   }
 
   /** Parses paste positions, used by this.paste and by draw paste selection */
-  pastePositions(rotation: StructureRotation, currentCopy: NonNullable<WorldEdit['currentCopy']>) {
-    let dx = Math.abs(currentCopy.pos2.x - currentCopy.pos1.x)
-    const dy = Math.abs(currentCopy.pos2.y - currentCopy.pos1.y)
-    let dz = Math.abs(currentCopy.pos2.z - currentCopy.pos1.z)
+  pastePositions(rotation: StructureRotation, structure: BigStructure) {
+    const dy = Math.abs(structure.pos2.y - structure.pos1.y)
+    let dx = Math.abs(structure.pos2.x - structure.pos1.x)
+    let dz = Math.abs(structure.pos2.z - structure.pos1.z)
     if (rotation === StructureRotation.Rotate270 || rotation === StructureRotation.Rotate90) [dx, dz] = [dz, dx]
 
-    const pastePos1 = Vector.floor(this.player.location)
-    const pastePos2 = Vector.add(pastePos1, { x: dx, y: dy, z: dz })
+    const pastePos1 = Vec.floor(this.player.location)
+    const pastePos2 = Vec.add(pastePos1, { x: dx, y: dy, z: dz })
 
     return { pastePos1, pastePos2 }
   }
@@ -291,7 +306,7 @@ export class WorldEdit {
         integritySeed,
       })
 
-      this.player.success(`Успешно вставлено в ${Vector.string(pastePos1)}`)
+      this.player.success(`Успешно вставлено в ${Vec.string(pastePos1)}`)
     } catch (error) {
       this.failedTo('вставить', error)
     }
@@ -316,7 +331,7 @@ export class WorldEdit {
       }
     } else {
       if (this.selection.size > 10000) {
-        const result = await prompt(
+        const result = await ask(
           player,
           `§6Внимание! §cВы уверены что хотите использовать выделенную область размером §f${this.selection.size}§c?`,
           'Да',
@@ -357,13 +372,15 @@ export class WorldEdit {
 
       system.runJob(
         (function* fillBetweenJob() {
-          for (const position of Vector.foreach(selection.min, selection.max)) {
+          let i = 0
+          for (const position of Vec.forEach(selection.min, selection.max)) {
+            i++
             const block = world.overworld.getBlock(position)
             if (!block) continue
 
             try {
               replaceWithTargets(replaceTargets, replaceMode, block, permutations)
-              yield
+              if (i % 500 === 0) yield
             } catch (error) {
               if (errors < 3 && error instanceof Error) {
                 player.fail(`Ошибка при заполнении (§f${errors}§c): §4${error.name} §f${error.message}`)
@@ -378,11 +395,10 @@ export class WorldEdit {
         })(),
       )
 
-      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3${ngettext(selection.size, [
-        'блок',
-        'блока',
-        'блоков',
-      ])} за ${t.options({ unit: '§f', text: '§3' }).time(Date.now() - startTime)}.`
+      let reply = `§3${errors ? 'всего' : 'Заполнено'} §f${selection.size} §3за ${i18n
+        .restyle({ unit: '§f', text: '§3' })
+        .time(Date.now() - startTime)
+        .to(player.lang)}.`
 
       if (replaceTargets.filter(Boolean).length) {
         reply += `§3, заполняемые блоки: §f${stringifyBlockWeights(replaceTargets)}`

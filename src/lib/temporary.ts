@@ -9,7 +9,7 @@ import {
   world,
 } from '@minecraft/server'
 
-interface ProxiedSubscribers {
+export interface TemporaryProxies {
   system: System
   world: World
   cleanup: VoidFunction
@@ -20,37 +20,34 @@ export class Temporary {
   /** List of functions that will be called on clear */
   protected cleaners: VoidFunction[] = []
 
-  // @ts-expect-error Assignment is done.
-  protected proxies: ProxiedSubscribers
+  readonly proxies: TemporaryProxies
 
   /** Weather events are unsubscribed or not */
   cleaned = false
 
   /** Creates new temporary system */
-  constructor(execute: (arg: ProxiedSubscribers) => void | { cleanup(this: void): void }, parent?: Temporary) {
-    const target = parent ? parent : this
-    if (target === this) {
-      this.proxies = {
-        world: Object.setPrototypeOf(
-          {
-            afterEvents: this.proxyEvents(world.afterEvents),
-            beforeEvents: this.proxyEvents(world.beforeEvents),
-          },
-          world,
-        ) as World,
-        system: Object.setPrototypeOf(
-          {
-            afterEvents: this.proxyEvents(system.afterEvents),
-            beforeEvents: this.proxyEvents(system.beforeEvents),
-          },
-          this.proxySystem(),
-        ) as System,
-        cleanup: this.cleanup,
-        temporary: this,
-      }
+  constructor(execute: (arg: TemporaryProxies) => void | { cleanup(this: void): void }, parent?: Temporary) {
+    this.proxies = parent?.proxies ?? {
+      world: Object.setPrototypeOf(
+        {
+          afterEvents: this.proxyEvents(world.afterEvents),
+          beforeEvents: this.proxyEvents(world.beforeEvents),
+        },
+        world,
+      ) as World,
+      system: Object.setPrototypeOf(
+        {
+          afterEvents: this.proxyEvents(system.afterEvents),
+          beforeEvents: this.proxyEvents(system.beforeEvents),
+        },
+        this.proxySystem(),
+      ) as System,
+      cleanup: this.cleanup,
+      temporary: this,
     }
 
-    const result = execute(target.proxies)
+    const target = parent ?? this
+    const result = execute(this.proxies)
     if (result) target.cleaners.push(result.cleanup)
     return target
   }

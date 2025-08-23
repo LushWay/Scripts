@@ -1,9 +1,10 @@
 import { Player } from '@minecraft/server'
 import { is, ModalForm } from 'lib'
 import { selectPlayer } from 'lib/form/select-player'
+import { i18n, noI18n } from 'lib/i18n/text'
 
 new Command('pid')
-  .setDescription('Выдает ваш айди')
+  .setDescription(i18n`Выдает ваш айди`)
   .executes(ctx =>
     pid(
       ctx.player.id,
@@ -15,7 +16,7 @@ new Command('pid')
 
   .overload('get')
   .setPermissions('techAdmin')
-  .setDescription('Открывает форму для получения айди других игроков')
+  .setDescription(noI18n`Открывает форму для получения айди других игроков`)
   .executes(ctx => playersPid(ctx.player))
 
 function playersPid(player: Player) {

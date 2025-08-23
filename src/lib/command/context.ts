@@ -1,5 +1,6 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
+import { Message } from 'lib/i18n/message'
 
 export class CommandContext {
   player: Player
@@ -38,7 +39,7 @@ export class CommandContext {
    * @param text Message or a lang code
    */
   reply(text: unknown) {
-    this.player.tell(`${text}`)
+    this.player.tell(text instanceof Message ? text : `${text}`)
     this.player.playSound(Sounds.Click)
   }
 
@@ -47,7 +48,7 @@ export class CommandContext {
    *
    * @param errorText - Text to send
    */
-  error(errorText: string) {
+  error(errorText: Text) {
     this.player.fail(errorText)
   }
 }

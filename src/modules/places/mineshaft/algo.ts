@@ -1,34 +1,32 @@
 import { Block, Dimension, Player } from '@minecraft/server'
 import { MinecraftBlockTypes as b, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { EventSignal } from 'lib/event-signal'
 import { getEdgeBlocksOf } from './get-edge-blocks-of'
 import { MineshaftRegion } from './mineshaft-region'
 import { Ore, OreCollector, OreEntry } from './ore-collector'
 
 export const ores = new OreCollector(
-  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).chance(3),
-  new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).below(-30).groupChance(90).chance(1),
+  new Ore().type(b.CoalOre).deepslate(b.DeepslateCoalOre).groupChance(90).range(60, 0).weight(5),
+  new Ore().type(b.CopperOre).deepslate(b.DeepslateCopperOre).range(20, -20).groupChance(90).weight(1),
   new Ore()
-    .type(b.RedstoneOre)
-    .type(b.LitRedstoneOre)
-    .deepslate(b.DeepslateRedstoneOre)
-    .deepslate(b.LitDeepslateRedstoneOre)
-    .below(-40)
+    .type(b.RedstoneOre, b.LitRedstoneOre)
+    .deepslate(b.DeepslateRedstoneOre, b.LitDeepslateRedstoneOre)
+    .range(20, -30)
     .groupChance(70)
-    .chance(1),
+    .weight(1),
 
-  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).below(-10).groupChance(80).chance(0.1),
-  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).below(30).groupChance(50).chance(2),
-  new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).below(0).groupChance(10).chance(0.5),
-  new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).below(17).groupChance(20).chance(0.3),
-  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).below(-50).chance(0.1),
-).stoneChance(90)
+  new Ore().type(b.LapisOre).deepslate(b.DeepslateLapisOre).range(-10, -30).groupChance(80).weight(0.8),
+  new Ore().type(b.IronOre).deepslate(b.DeepslateIronOre).range(50, -30).groupChance(50).weight(2),
+  new Ore().type(b.GoldOre).deepslate(b.DeepslateGoldOre).range(0, -64).groupChance(10).weight(0.5),
+  new Ore().type(b.DiamondOre).deepslate(b.DeepslateDiamondOre).range(0, -64).groupChance(60).weight(0.3),
+  new Ore().type(b.EmeraldOre).deepslate(b.DeepslateEmeraldOre).range(-30, -64).weight(0.05),
+).stoneChance(40)
 
 export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension: Dimension, player: Player) {
   const possibleBlocks = []
   const airCache: Record<string, { air: boolean; block: Block }> = {
-    [Vector.string(brokenLocation)]: { air: false, block: brokenLocation },
+    [Vec.string(brokenLocation)]: { air: false, block: brokenLocation },
   }
 
   for (const vector of getEdgeBlocksOf(brokenLocation)) {
@@ -37,8 +35,8 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
     if (!MineshaftRegion.getAt(block)) continue
 
     const nearAir = getEdgeBlocksOf(block).some(location => {
-      const key = Vector.string(location)
-      if (key in airCache) return airCache[key].air
+      const key = Vec.string(location)
+      if (airCache[key]) return airCache[key].air
 
       const block = dimension.getBlock(location)
       if (block) return (airCache[key] = { block, air: !block.isSolid }).air
@@ -61,7 +59,7 @@ export function placeOre(brokenLocation: Block, brokenTypeId: string, dimension:
 }
 
 function place(block: Block, oreTypeId: string) {
-  if (block.isValid() && !block.isAir && oreTypeId) {
+  if (block.isValid && !block.isAir && oreTypeId) {
     block.setType(oreTypeId)
     return true
   } else return false

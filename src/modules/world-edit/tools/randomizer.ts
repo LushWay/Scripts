@@ -2,8 +2,8 @@ import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { ModalForm } from 'lib'
-import { isBuilding } from 'lib/game-utils'
-import { t } from 'lib/text'
+import { i18n } from 'lib/i18n/text'
+import { isNotPlaying } from 'lib/utils/game'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { BlocksSetRef, blocksSetDropdown, getBlocksInSet, stringifyBlocksSetRef } from '../utils/blocks-set'
 
@@ -25,7 +25,7 @@ class RandomizerTool extends WorldEditTool<{ blocksSet: BlocksSetRef; version: n
     /* Replaces the block with a random block from the storage of the item. */
     world.afterEvents.playerPlaceBlock.subscribe(({ block, player }) => {
       const slot = player.mainhand()
-      if (!this.isOurItemType(slot) || !isBuilding(player)) return
+      if (!this.isOurItemType(slot) || !isNotPlaying(player)) return
 
       const storage = weRandomizerTool.getStorage(slot)
       const blocksSet = getBlocksInSet(storage.blocksSet)
@@ -33,7 +33,7 @@ class RandomizerTool extends WorldEditTool<{ blocksSet: BlocksSetRef; version: n
       if (blocksSet.length) {
         player.dimension.getBlock(block.location)?.setPermutation(blocksSet.randomElement())
       } else {
-        player.fail(t.error`Пустой набор блоков '${stringifyBlocksSetRef(storage.blocksSet)}'! Выберите другой.`)
+        player.fail(i18n.error`Пустой набор блоков '${stringifyBlocksSetRef(storage.blocksSet)}'! Выберите другой.`)
         weRandomizerTool.editToolForm(slot, player)
       }
     })
@@ -45,7 +45,7 @@ class RandomizerTool extends WorldEditTool<{ blocksSet: BlocksSetRef; version: n
       .addDropdown('Набор блоков', ...blocksSetDropdown(storage.blocksSet, player))
       .show(player, (_, blocksSet) => {
         this.configure(slot, [player.id, blocksSet], storage)
-        player.info(t`Набор блоков сменен на ${blocksSet}`)
+        player.info(i18n`Набор блоков сменен на ${blocksSet}`)
       })
   }
 

@@ -1,38 +1,61 @@
 import { Vector3 } from '@minecraft/server'
-import { AbstractPoint, toPoint } from 'lib/game-utils'
-import { Vector } from 'lib/vector'
+import { AbstractPoint, toPoint } from 'lib/utils/point'
+import { VecXZ } from 'lib/vector'
 import { Area } from './area'
 
-class ChunkCube extends Area<{ from: VectorXZ; to: VectorXZ }> {
+interface ChunkCubeDatabase extends JsonObject {
+  from: VectorXZ
+  to: VectorXZ
+}
+
+class ChunkCube extends Area<ChunkCubeDatabase> {
+  constructor(database: ChunkCubeDatabase, dimensionType?: DimensionType) {
+    if (typeof database.from === 'object') {
+      const from = VecXZ.min(database.from, database.to)
+      const to = VecXZ.max(database.from, database.to)
+      database.from = from
+      database.to = to
+    }
+    super(database, dimensionType)
+  }
+
   type = 'c'
 
   isNear(point: AbstractPoint, distance: number): boolean {
-    const { vector, dimensionType } = toPoint(point)
+    const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
-    const [from, to] = this.edges
+    const { from, to } = this.database
 
-    return Vector.between(
-      distance === 0 ? from : Vector.add(Vector.min(from, to), { x: -distance, y: 0, z: -distance }),
-      distance === 0 ? to : Vector.add(Vector.max(from, to), { x: distance, y: 0, z: distance }),
-      { x: vector.x, y: 0, z: vector.z },
+    return VecXZ.isBetween(
+      distance === 0 ? from : VecXZ.add(from, { x: -distance, z: -distance }),
+      distance === 0 ? to : VecXZ.add(to, { x: distance, z: distance }),
+      vector,
     )
   }
 
+  private centerY =
+    this.dimension.heightRange.min + (this.dimension.heightRange.max - this.dimension.heightRange.min) / 2
+
   get center() {
-    return {
-      x: Math.abs(this.database.from.x - this.database.to.x) / 2,
-      y: this.dimension.heightRange.max - this.dimension.heightRange.min / 2,
-      z: Math.abs(this.database.from.z - this.database.to.z) / 2,
-    }
+    const { from, to } = this.database
+    const { x, z } = VecXZ.center(from, to)
+    return { x, y: this.centerY, z }
+  }
+
+  getFormDescription(): Text.Table {
+    return [
+      ['From', `${this.database.from.x} ${this.database.from.z}`],
+      ['To', `${this.database.to.x} ${this.database.to.z}`],
+    ]
   }
 
   get edges(): [Vector3, Vector3] {
     const { max, min } = this.dimension.heightRange
     const { from, to } = this.database
     return [
-      { x: from.x, y: max, z: from.z },
-      { x: to.x, y: min, z: to.z },
+      { x: from.x, y: min, z: from.z },
+      { x: to.x, y: max, z: to.z },
     ]
   }
 }

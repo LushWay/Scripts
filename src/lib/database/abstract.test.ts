@@ -6,7 +6,7 @@ describe('abstract table', () => {
   })
 
   it('should return actual provider', () => {
-    table('testing').value = 5
+    table('testing').set('value', 5)
 
     expect(getProvider().getRawTableData('testing')).toMatchInlineSnapshot(`"{"value":5}"`)
   })

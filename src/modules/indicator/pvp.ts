@@ -3,10 +3,12 @@ import { Boss, BossArenaRegion, LockAction, ms, Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { i18n } from 'lib/i18n/text'
 import { RegionEvents } from 'lib/region/events'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { Anarchy } from 'modules/places/anarchy/anarchy'
 
-const options = Settings.world(...Settings.worldCommon, {
+const settings = Settings.world(...Settings.worldCommon, {
   pvpEnabled: {
     value: true,
     description: 'Возможность входа в сражения режим (блокировка всех тп команд)',
@@ -27,22 +29,27 @@ const options = Settings.world(...Settings.worldCommon, {
     description: 'Время блокировки в режиме сражения в секундах',
     name: 'Время сражения с боссом',
   },
+  pvpKillOnJoin: {
+    value: true,
+    description: 'Убивать игрока, зашедшего на анархию после выхода с сервера со незавершенным таймером сражения',
+    name: 'Убивать вышедшего в сражении',
+  },
 })
 
 const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   indicator: {
-    name: 'Индикатор',
-    description: 'Индикатор попадания по существу из лука',
+    name: i18n`Индикатор`,
+    description: i18n`Индикатор попадания по существу из лука`,
     value: true,
   },
   bowSound: {
-    name: 'Звук лука',
-    description: 'Звук попадания по существо из лука',
+    name: i18n`Звук лука`,
+    description: i18n`Звук попадания по существо из лука`,
     value: true,
   },
 })
 
-const lockAction = new LockAction(p => p.scores.pvp > 0, 'Вы находитесь в режиме сражения!')
+const lockAction = new LockAction(p => p.scores.pvp > 0, i18n`Вы находитесь в режиме сражения!`)
 
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
   if (deadEntity.isPlayer()) deadEntity.scores.pvp = 0
@@ -50,7 +57,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
 
 system.runInterval(
   () => {
-    if (options.pvpEnabled) {
+    if (settings.pvpEnabled) {
       for (const player of world.getAllPlayers()) {
         if (player.scores.pvp) player.scores.pvp--
       }
@@ -68,7 +75,8 @@ RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
   const region = previous.find(e => e instanceof BossArenaRegion)
 
   if (lockAction.isLocked(player) && region && !newest.some(e => e instanceof BossArenaRegion)) {
-    region.returnEntity(player)
+    const boss = region.boss
+    region.returnEntity(player, boss?.location.valid ? boss.location : undefined)
     playerTimeouts.set(player, {
       expires: Date.now() + ms.from('sec', 4),
       callback() {
@@ -96,18 +104,18 @@ system.runInterval(
 Core.afterEvents.worldLoad.subscribe(() => {
   system.runPlayerInterval(
     player => {
-      if (!options.pvpEnabled) return
+      if (!settings.pvpEnabled) return
       const score = player.scores.pvp
 
       if (score <= 0) return
 
-      const settings = getPlayerSettings(player)
-      if (!settings.indicator) return
+      const psettings = getPlayerSettings(player)
+      if (!psettings.indicator) return
 
       const q =
-        score === options.pvpBossCooldown ||
-        score === options.pvpMonsterCooldown ||
-        score == options.pvpPlayerCooldown ||
+        score === settings.pvpBossCooldown ||
+        score === settings.pvpMonsterCooldown ||
+        score === settings.pvpPlayerCooldown ||
         score === 1
       const g = (p: string) => (q ? `§4${p}` : '')
 
@@ -131,13 +139,28 @@ Core.afterEvents.worldLoad.subscribe(() => {
   world.afterEvents.entityHurt.subscribe(event => {
     onDamage(event, false)
   })
+
+  // Reset on respawn
+  world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
+    if (!settings.pvpEnabled) return
+    if (!initialSpawn) player.scores.pvp = 0
+  })
+
+  Anarchy.onPlayerFirstEnter.subscribe(({ player }) => {
+    if (!settings.pvpEnabled) return
+
+    if (player.scores.pvp > 0) {
+      player.warn(i18n.warn`Вы вышли из сервера во время сражения, поэтому были убиты при входе.`)
+      player.kill()
+    }
+  })
 })
 
 function onDamage(
   { damage, hurtEntity, damageSource: { damagingEntity, cause } }: EntityHurtAfterEvent,
   fatal = false,
 ) {
-  if (!hurtEntity.isValid()) return
+  if (!hurtEntity.isValid) return
 
   if (
     ![
@@ -154,7 +177,7 @@ function onDamage(
   if (
     !hurtEntity.typeId.startsWith('minecraft:') ||
     !(hurtEntity.isPlayer() || hurtEntity.matches({ families: ['monster'] }) || hurtBoss) ||
-    !options.pvpEnabled
+    !settings.pvpEnabled
   )
     return
 
@@ -167,24 +190,24 @@ function onDamage(
 
   const cooldown =
     damagingEntity?.isPlayer() && hurtEntity.isPlayer()
-      ? options.pvpPlayerCooldown
+      ? settings.pvpPlayerCooldown
       : hurtBoss || (damagingEntity && Boss.isBoss(damagingEntity))
-        ? options.pvpBossCooldown
-        : options.pvpMonsterCooldown
+        ? settings.pvpBossCooldown
+        : settings.pvpMonsterCooldown
 
   if (damagingEntity?.isPlayer()) {
     damagingEntity.scores.pvp = Math.max(damagingEntity.scores.pvp, cooldown)
     damagingEntity.scores.damageGive += damage
     if (fatal) damagingEntity.scores.kills++
 
-    const setting = getPlayerSettings(damagingEntity)
+    const psetting = getPlayerSettings(damagingEntity)
 
     const isBow = cause === EntityDamageCause.projectile
-    if (isBow && setting.bowSound) {
+    if (isBow && psetting.bowSound) {
       playHitSound(damagingEntity, current, value)
     }
 
-    if (setting.indicator) {
+    if (psetting.indicator) {
       if (!fatal) {
         // damagingEntity.onScreenDisplay.setActionBar(`§c-${damage}♥`)
       } else {
@@ -193,14 +216,14 @@ function onDamage(
           // Player
           damagingEntity.onScreenDisplay.setActionBar(
             `${isBow ? emoji.custom.kill : emoji.custom.kill} ${hurtEntity.name}`,
-            ActionbarPriority.UrgentNotificiation,
+            ActionbarPriority.Highest,
           )
         } else {
           // Entity
           const entityName = hurtEntity.typeId.replace('minecraft:', '')
           damagingEntity.onScreenDisplay.setActionBar(
             { rawtext: [{ text: emoji.custom.kill + ' ' }, { translate: `entity.${entityName}.name` }] },
-            ActionbarPriority.UrgentNotificiation,
+            ActionbarPriority.Highest,
           )
         }
       }

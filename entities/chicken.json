@@ -44,12 +44,7 @@
         },
         "minecraft:ageable": {
           "duration": 1200,
-          "feed_items": [
-            "wheat_seeds",
-            "beetroot_seeds",
-            "melon_seeds",
-            "pumpkin_seeds"
-          ],
+          "feed_items": ["wheat_seeds", "beetroot_seeds", "melon_seeds", "pumpkin_seeds"],
           "grow_up": {
             "event": "minecraft:ageable_grow_up",
             "target": "self"
@@ -87,12 +82,7 @@
               "target": "baby"
             }
           },
-          "breed_items": [
-            "wheat_seeds",
-            "beetroot_seeds",
-            "melon_seeds",
-            "pumpkin_seeds"
-          ]
+          "breed_items": ["wheat_seeds", "beetroot_seeds", "melon_seeds", "pumpkin_seeds"]
         },
         "minecraft:behavior.breed": {
           "priority": 3,
@@ -195,12 +185,7 @@
       "minecraft:behavior.tempt": {
         "priority": 4,
         "speed_multiplier": 1.0,
-        "items": [
-          "wheat_seeds",
-          "beetroot_seeds",
-          "melon_seeds",
-          "pumpkin_seeds"
-        ]
+        "items": ["wheat_seeds", "beetroot_seeds", "melon_seeds", "pumpkin_seeds"]
       },
       "minecraft:behavior.random_stroll": {
         "priority": 6,
@@ -239,10 +224,7 @@
 
       "chicken:drop": {
         "remove": {
-          "component_groups": [
-            "minecraft:chicken_baby",
-            "minecraft:spawn_adult"
-          ]
+          "component_groups": ["minecraft:chicken_baby", "minecraft:spawn_adult"]
         },
         "add": {
           "component_groups": ["drop"]

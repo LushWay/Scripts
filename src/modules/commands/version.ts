@@ -1,24 +1,24 @@
 import { is } from 'lib'
-import { textTable } from 'lib/text'
+import { i18n, textTable } from 'lib/i18n/text'
 
 new Command('version')
   .setAliases('v')
-  .setDescription('Версия сервера')
+  .setDescription(i18n`Версия сервера`)
   .executes(ctx => {
     ctx.reply(
-      textTable({
-        'Версия майнкрафта': '1.21.2',
-        'Версия сервера': '1.21.3',
-      }),
+      textTable([
+        [i18n`Версия майнкрафта`, '1.21.2'],
+        [i18n`Версия сервера`, '1.21.3'],
+      ]),
     )
 
     if (is(ctx.player.id, 'techAdmin')) {
       ctx.reply(
-        textTable({
-          Commit: __GIT__,
-          Development: __DEV__,
-          Release: __RELEASE__,
-        }),
+        textTable([
+          ['Commit', __GIT__],
+          ['Development', __DEV__],
+          ['Release', __RELEASE__],
+        ]),
       )
     }
   })

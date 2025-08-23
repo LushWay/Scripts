@@ -1,7 +1,8 @@
 import { Player, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { BUTTON } from 'lib/form/utils'
-import { t } from 'lib/text'
+import { i18n } from 'lib/i18n/text'
+import { NewFormCallback } from './new'
 
 /**
  * Creates select player menu
@@ -45,12 +46,12 @@ export function createSelectPlayerMenu(
       })
       .addCustomButtonBeforeArray(form => {
         if (selected.length) {
-          form.addButton(t.badge`§3Убрать выделение ${selected.length}`, BUTTON['-'], () => {
+          form.button(i18n.accent`Убрать выделение`.size(selected.length).to(player.lang), BUTTON['-'], () => {
             selected.splice(0, selected.length)
             callback()
           })
         } else {
-          form.addButton(t.badge`§3Выбрать всех ${players.length}`, BUTTON['+'], () => {
+          form.button(i18n.accent`Выбрать всех`.size(players.length).to(player.lang), BUTTON['+'], () => {
             selected.splice(0, selected.length, ...getAllPlayersSelected())
             callback()
           })
@@ -80,7 +81,7 @@ export namespace createSelectPlayerMenu {
 }
 
 function getPlayersForSelectMenu(offline = true) {
-  let players = Object.entries(Player.database)
+  let players = Player.database.entries()
   if (!offline) {
     const online = world.getAllPlayers().map(e => e.id)
     players = players.filter(([id]) => online.includes(id))
@@ -92,26 +93,26 @@ function getPlayersForSelectMenu(offline = true) {
 export function selectPlayer(
   player: Player,
   reason: string,
-  back?: VoidFunction,
+  back?: NewFormCallback,
 ): Promise<{ id: string; name: string; player?: Player }> {
   return new Promise(resolve => {
     const onlinePlayers = world.getAllPlayers()
     const players = []
 
-    for (const [id, db] of Object.entries(Player.database)) {
+    for (const [id, db] of Player.database.entries()) {
       const player = onlinePlayers.find(e => e.id === id)
 
       const name = player?.name ?? db.name ?? id
       players.push({ online: !!player, name, id, player })
     }
 
-    new ArrayForm('§3Выберите игрока чтобы §f' + reason, players)
+    new ArrayForm(i18n`§3Выберите игрока чтобы ${reason}`, players)
       .filters({
         sort: {
-          name: 'Сортировать по',
+          name: i18n`Сортировать по`,
           value: [
-            ['online', 'Онлайну'],
-            ['date', 'Дате входа'],
+            ['online', i18n`Онлайну`],
+            ['date', i18n`Дате входа`],
           ],
         },
       })

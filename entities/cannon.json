@@ -41,8 +41,8 @@
         "is_pushable_by_piston": true
       },
       "minecraft:health": {
-        "value": 40,
-        "max": 40,
+        "value": 80,
+        "max": 80,
         "min": 0
       },
 

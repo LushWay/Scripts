@@ -1,0 +1,34 @@
+{
+  "format_version": "1.17.100",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "f:t_npc",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": { "kill": { "minecraft:instant_despawn": {} } },
+    "components": {
+      "minecraft:fire_immune": true,
+      "minecraft:movement": { "value": 0 },
+      "minecraft:type_family": { "family": ["inanimate"] },
+      "minecraft:health": { "value": 1, "max": 1, "min": 1 },
+      "minecraft:nameable": { "allow_name_tag_renaming": true, "always_show": true },
+      "minecraft:collision_box": { "width": -1, "height": -1 },
+      "minecraft:push_through": { "value": 1 },
+      "minecraft:scale": { "value": 0 },
+      "minecraft:knockback_resistance": { "value": 100, "max": 100 },
+      "minecraft:physics": { "has_gravity": false, "has_collision": false },
+      "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": false },
+      "minecraft:navigation.walk": { "can_sink": false },
+      "minecraft:npc": {
+        "npc_data": {
+          "portrait_offsets": { "translate": [-7, 50, 0], "scale": [1.75, 1.75, 1.75] },
+          "picker_offsets": { "translate": [0, 20, 0], "scale": [1.7, 1.7, 1.7] },
+          "skin_list": [{ "variant": 0 }]
+        }
+      }
+    },
+    "events": { "f:t:kill": { "add": { "component_groups": ["kill"] } } }
+  }
+}

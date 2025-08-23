@@ -1,11 +1,11 @@
-import { system, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { t } from 'lib/text'
-import { DatabaseDefaultValue, DatabaseError, DatabaseTable, configureDatabase } from './abstract'
+import { i18n, noI18n } from 'lib/i18n/text'
+import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 
-class DynamicPropertyDB<Key extends string = string, Value = undefined> extends ProxyDatabase<Key, Value> {
-  static tables: Record<string, DatabaseTable> = {}
+class DynamicPropertyDB<Value = unknown, Key extends string = string> extends ProxyDatabase<Value, Key> {
+  static tables: Record<string, UnknownTable> = {}
 
   constructor(
     protected id: string,
@@ -14,26 +14,15 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
     super(id, defaultValue)
     if (id in DynamicPropertyDB.tables) throw new DatabaseError(`Table ${this.id} already initialized!`)
     this.init()
-    DynamicPropertyDB.tables[id] = this.proxy()
+    DynamicPropertyDB.tables[id] = this as UnknownTable
   }
 
   private init() {
     // Init
     try {
-      this.value = Object.fromEntries(
-        Object.entries(LongDynamicProperty.get(this.id) as Record<string, unknown>).map(([key, value]) => {
-          const defaultv = typeof key !== 'symbol' && this.defaultValue?.(key)
-          return [
-            // Add default value
-            key,
-            typeof value === 'object' && value !== null && typeof defaultv === 'object' && defaultv !== null
-              ? ProxyDatabase.setDefaults(value as JsonObject, defaultv as JsonObject)
-              : (value ?? defaultv),
-          ]
-        }),
-      )
+      this.value = new Map(this.restore(LongDynamicProperty.get(this.id) as Record<string, unknown>))
     } catch (error) {
-      console.error(new DatabaseError(t`Failed to init table '${this.id}': ${error}`))
+      console.error(new DatabaseError(noI18n`Failed to init table '${this.id}': ${error}`))
     }
   }
 
@@ -45,7 +34,7 @@ class DynamicPropertyDB<Key extends string = string, Value = undefined> extends 
 const separator = '|'
 
 export class LongDynamicProperty {
-  static get(propertyId: string, defaultValue = '{}') {
+  static get(propertyId: string, defaultValue = '{}', parse = true) {
     const metadata = this.getMetadata(propertyId)
     if (!metadata.value) {
       metadata.value = ''
@@ -58,7 +47,7 @@ export class LongDynamicProperty {
       }
     }
 
-    return JSON.parse(metadata.value || defaultValue) as unknown
+    return parse ? (JSON.parse(metadata.value || defaultValue) as unknown) : metadata.value
   }
 
   static set(propertyId: string, value: string) {
@@ -99,7 +88,7 @@ export class LongDynamicProperty {
     if (typeof value !== 'string') {
       console.error(
         new DatabaseError(
-          t.error`Corrupted database table '${propertyId}', index ${i}, expected string, recieved '${value}'`,
+          noI18n.error`Corrupted database table '${propertyId}', index ${i}, expected string, recieved '${value}'`,
         ),
       )
 
@@ -115,10 +104,10 @@ export class LongDynamicProperty {
 if (!__VITEST__)
   configureDatabase({
     createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
-      new DynamicPropertyDB<string, unknown>(name, defaultValue).proxy(),
+      new DynamicPropertyDB<unknown, string>(name, defaultValue),
 
     tables: DynamicPropertyDB.tables,
     getRawTableData(tableId) {
-      return `${world.getDynamicProperty(tableId)}`
+      return String(LongDynamicProperty.get(tableId, undefined, false))
     },
   })

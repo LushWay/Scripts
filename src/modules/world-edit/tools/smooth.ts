@@ -1,9 +1,8 @@
 import { Block, BlockPermutation, ContainerSlot, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { is, ModalForm, util, Vector } from 'lib'
+import { is, ModalForm, util, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
-import { ngettext } from 'lib/utils/ngettext'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import {
   BlocksSetRef,
@@ -76,8 +75,8 @@ export async function smoothVoxelData(
   replaceTargets: ReplaceTarget[],
 ) {
   return new Promise<void>((resolve, reject) => {
-    const pos1 = Vector.add(baseBlock, { x: radius, y: radius, z: radius })
-    const pos2 = Vector.add(baseBlock, { x: -radius, y: -radius, z: -radius })
+    const pos1 = Vec.add(baseBlock, { x: radius, y: radius, z: radius })
+    const pos2 = Vec.add(baseBlock, { x: -radius, y: -radius, z: -radius })
 
     WorldEdit.forPlayer(player).backup('Сглаживание', pos1, pos2)
 
@@ -101,8 +100,8 @@ export async function smoothVoxelData(
         const time2 = util.benchmark('calculate smooth', 'we')
 
         const sizeX = voxelDataCopy.length
-        const sizeY = voxelDataCopy[0].length
-        const sizeZ = voxelDataCopy[0][0].length
+        const sizeY = voxelDataCopy[0]?.length ?? 0
+        const sizeZ = voxelDataCopy[0]?.[0]?.length ?? 0
         for (let smooth = 0; smooth <= smoothLevel; smooth++) {
           // Apply smoothing
           for (let x = 1; x < sizeX - 1; x++) {
@@ -110,14 +109,18 @@ export async function smoothVoxelData(
               for (let z = 1; z < sizeZ - 1; z++) {
                 let sum = 0
                 const permutations = []
-                const cache = voxelDataCopy[x][y][z]
+                const cache = voxelDataCopy[x]?.[y]?.[z]
+                if (!cache) continue
 
-                if (replaceTargets.length && !replaceTargets.some(e => e.matches(cache.block))) continue
+                if (replaceTargets.length && !replaceTargets.some(e => e.matches(cache.block, replaceTargets))) continue
 
                 for (let dx = -1; dx <= 1; dx++) {
                   for (let dy = -1; dy <= 1; dy++) {
                     for (let dz = -1; dz <= 1; dz++) {
-                      const { permutation, void: isVoid } = voxelDataCopy[x + dx][y + dy][z + dz]
+                      const cached = voxelDataCopy[x + dx]?.[y + dy]?.[z + dz]
+                      if (!cached) continue
+
+                      const { permutation, void: isVoid } = cached
                       if (!isVoid) {
                         sum++
                         permutations.push(permutation)
@@ -161,10 +164,7 @@ export async function smoothVoxelData(
           }
         }
 
-        if (radius > 5)
-          player.info(
-            prefix + `Будет заполнено §6${toFill.length} §f${ngettext(toFill.length, ['блок', 'блока', 'блоков'])}`,
-          )
+        if (radius > 5) player.info(prefix + `Будет заполнено §6${toFill.length}`)
 
         for (const toFillBlock of toFill) {
           const block = world.overworld.getBlock(toFillBlock.location)
@@ -209,7 +209,7 @@ function* getBlocksAreasData(block: Block, radius: number) {
     for (let x = -radius, x2 = 0; x < radius; x++, x2++) {
       const bz = []
       for (let z = -radius; z < radius; z++) {
-        const location = Vector.add(block.location, { x, y, z })
+        const location = Vec.add(block.location, { x, y, z })
 
         const value = BLOCK_CACHE[location.x]?.[location.y]?.[location.z]
         if (value) {

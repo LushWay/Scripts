@@ -2,6 +2,8 @@ import {
   Entity,
   LocationInUnloadedChunkError,
   PlayerInteractWithEntityBeforeEvent,
+  RawMessage,
+  RawText,
   system,
   world,
 } from '@minecraft/server'
@@ -9,6 +11,7 @@ import {
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
+import { i18n } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
 import { anyPlayerNear } from 'lib/player-move'
 import { Temporary } from 'lib/temporary'
@@ -39,8 +42,8 @@ export class Npc {
     readonly point: Place,
     private onInteract: Npc.OnInteract,
   ) {
-    this.id = point.fullId
-    this.dimensionId = point.group.dimensionId
+    this.id = point.id
+    this.dimensionId = point.group.dimensionType
     this.location = location(point)
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
@@ -91,7 +94,14 @@ export class Npc {
     if (!npc) return
 
     entity.setDynamicProperty(Npc.dynamicPropertyName, this.id)
-    npc.name = '§6§l' + this.point.name
+
+    if (typeof this.point.name === 'string') {
+      npc.name = this.point.name
+    } else {
+      const name = this.point.name.toRawText()
+      if (name.rawtext) name.rawtext.unshift({ text: '§l§6' })
+      npc.name = JSON.stringify(name)
+    }
     if (this.location.valid) entity.teleport(this.location)
   }
 
@@ -108,12 +118,17 @@ export class Npc {
           const npc = Npc.npcs.find(e => e.entity?.id === event.target.id)
           const component = event.target.getComponent('npc')
           const npcName = component ? component.name : event.target.nameTag
+          let nameParsed: RawText | RawMessage | string = { text: npcName }
+          try {
+            nameParsed = JSON.parse(npcName) as RawText
+          } catch {}
 
           if (!npc || !(npc.onQuestInteraction(event) || npc.onInteract(event))) {
-            return event.player.fail(`§f${npcName}: §cЯ не могу с вами говорить. Приходите позже.`)
+            const text = i18n.error`Я не могу с вами говорить. Приходите позже.`.to(event.player.lang)
+            return event.player.sendMessage({ rawtext: [nameParsed, { text: ': ' + text }] })
           }
         } catch (e) {
-          event.player.warn(`Не удалось открыть диалог. ${developersAreWarned}`)
+          event.player.warn(i18n.warn`Не удалось открыть диалог. ${developersAreWarned}`)
           this.logger.error(e)
         }
       })
@@ -138,7 +153,7 @@ export class Npc {
             if (filteredNpcs.length > 1) {
               // More then one? Save only first one, kill others
               npc.entity = filteredNpcs.find(
-                e => e.entity.isValid() && e.entity.getComponent('npc')?.skinIndex !== 0,
+                e => e.entity.isValid && e.entity.getComponent('npc')?.skinIndex !== 0,
               )?.entity
 
               if (npc.entity) filteredNpcs.forEach(e => e.entity.id !== npc.entity?.id && e.entity.remove())

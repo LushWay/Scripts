@@ -1,6 +1,8 @@
+import { Player, system } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { RegionEvents } from '../events'
-import { registerCreateableRegion, registerSaveableRegion } from '../index'
+import { registerRegionType, registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
 
 export class RoadRegion extends Region {
@@ -9,10 +11,10 @@ export class RoadRegion extends Region {
     owners: [],
 
     doors: true,
-    gates: true,
+    gates: false,
     switches: true,
-    trapdoors: true,
-    openContainers: true,
+    trapdoors: false,
+    openContainers: false,
 
     allowedAllItem: true,
     allowedEntities: 'all',
@@ -20,16 +22,32 @@ export class RoadRegion extends Region {
 
   protected priority = -1
 
-  get displayName(): string | undefined {
-    return 'Дорога'
+  get displayName(): Text | undefined {
+    return i18n`Дорога`
   }
 }
 
 registerSaveableRegion('road', RoadRegion)
-registerCreateableRegion('Дороги', RoadRegion)
+registerRegionType(noI18n`Дороги`, RoadRegion)
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest }) => {
-  if (newest.some(e => e instanceof RoadRegion)) {
+  speed(player, newest)
+})
+
+system.runPlayerInterval(
+  player => {
+    const regions = RegionEvents.playerInRegionsCache.get(player)
+
+    if (!regions) return
+
+    speed(player, regions)
+  },
+  'road skin region',
+  20,
+)
+
+function speed(player: Player, regions: Region[]) {
+  if (regions.some(e => e instanceof RoadRegion)) {
     player.addEffect(MinecraftEffectTypes.Speed, 40, { showParticles: false, amplifier: 2 })
   }
-})
+}

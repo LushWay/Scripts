@@ -4,20 +4,16 @@ import {
   MolangVariableMap,
   world,
 } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 export const WE_CONFIG = {
   BRUSH_LOCATOR: '§c │ \n§c─┼─\n§c │',
 
-  STRUCTURE_CHUNK_SIZE: { x: 64, y: 384, z: 64 },
   COPY_FILE_NAME: 'copy',
   BACKUP_PREFIX: 'backup',
 
   /** The ammout of blocks in a generation before it will check servers speed to delay the loading of a generation */
   BLOCKS_BEFORE_AWAIT: 10000,
-
-  /** The ammout of ticks to delay during a heavy proccess generation */
-  TICKS_TO_SLEEP: 1,
 
   DRAW_SELECTION_PARTICLE: 'minecraft:balloon_gas_particle',
   DRAW_SELECTION_MAX_SIZE: 5000,
@@ -33,11 +29,11 @@ WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
 export function spawnParticlesInArea(
   pos1: Vector3,
   pos2: Vector3,
-  { min = Vector.min(pos1, pos2), max = Vector.max(pos1, pos2) }: { min?: Vector3; max?: Vector3 } = {},
+  { min = Vec.min(pos1, pos2), max = Vec.max(pos1, pos2) }: { min?: Vector3; max?: Vector3 } = {},
 ) {
-  const size = Vector.size(min, max)
+  const size = Vec.size(min, max)
   if (size > WE_CONFIG.DRAW_SELECTION_MAX_SIZE) return
-  for (const { x, y, z } of Vector.foreach(min, max)) {
+  for (const { x, y, z } of Vec.forEach(min, max)) {
     const isEdge =
       ((x == min.x || x == max.x) && (y == min.y || y == max.y)) ||
       ((y == min.y || y == max.y) && (z == min.z || z == max.z)) ||

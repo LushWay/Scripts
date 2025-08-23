@@ -7,7 +7,6 @@ declare global {
   const __RELEASE__: boolean
   const __SERVER_PORT__: string
   const __VITEST__: boolean
-  const __ESBUILD__: boolean
   const __GIT__: string
 }
 

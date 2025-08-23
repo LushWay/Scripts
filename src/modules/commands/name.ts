@@ -1,7 +1,8 @@
 import { world } from '@minecraft/server'
+import { i18n } from 'lib/i18n/text'
 
 const name = new Command('name')
-  .setDescription('Меняет имя')
+  .setDescription(i18n`Меняет имя`)
   .setPermissions('admin')
   .executes(ctx => {
     ctx.player.tell(ctx.player.nameTag)
@@ -12,7 +13,7 @@ name
   .string('new name')
   .executes((ctx, newname) => {
     ctx.player.nameTag = newname
-    ctx.player.success('Изменено на ' + newname)
+    ctx.player.success(i18n`Изменено на ${newname}`)
   })
 
 const reset = name.overload('reset').executes(ctx => {

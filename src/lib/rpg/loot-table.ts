@@ -1,13 +1,16 @@
 import { Container, EnchantmentType, ItemLockMode, ItemStack, system } from '@minecraft/server'
-import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Command } from 'lib/command'
+import { MinecraftEnchantmentTypes, MinecraftEnchantmentTypesUnion, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Items } from 'lib/assets/custom-items'
+import { Enchantments } from 'lib/enchantments'
 import { EventSignal } from 'lib/event-signal'
-import { inspect, isKeyof } from 'lib/util'
+import { inspect, isKeyof, pick } from 'lib/util'
+import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
+import { selectByChance } from './random'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
 
-interface Options {
+interface ItemStackMetaOptions {
   lore?: string[]
   nameTag?: string
   keepOnDeath?: boolean
@@ -17,31 +20,15 @@ interface Options {
 }
 
 interface StoredItem {
-  itemStack: ItemStack
+  itemStack: ItemStack | (() => ItemStack)
   enchantments: Partial<Record<MinecraftEnchantmentTypes, number[]>>
-  chance: number
+  weight: number
   amount: number[]
   damage: number[]
+  custom: { chances: number[]; apply: (item: ItemStack, result: number) => void }[]
 }
 
-new Command('loot')
-  .setPermissions('curator')
-  .string('lootTableName')
-  .executes((ctx, lootTableName) => {
-    const lootTable = LootTable.instances.get(lootTableName)
-    if (typeof lootTable === 'undefined')
-      return ctx.error(
-        `${lootTableName} - unknown loot table. All tables:\n${Object.keys(LootTable.instances).join('\n')}`,
-      )
-
-    const block = ctx.player.dimension.getBlock(ctx.player.location)?.below()
-    if (!block) return ctx.error('No block under feats')
-    const inventory = block.getComponent('inventory')
-    if (!inventory?.container) return ctx.error('No inventory in block')
-    lootTable.fillContainer(inventory.container)
-  })
-
-type PreparedItems = { item: ItemStack; chance: number }[]
+type PreparedItems = { item: ItemStack; weight: number }[]
 
 export class Loot {
   private items: StoredItem[] = []
@@ -66,65 +53,55 @@ export class Loot {
    *
    * @param type Keyof MinecraftItemTypes
    */
-  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>): this
-
-  /**
-   * Creates new item entry
-   *
-   * @param type String type of the item
-   */
-  // eslint-disable-next-line @typescript-eslint/unified-signatures
-  item(type: string): this
-
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-  item(type: string | Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'>) {
-    if (isKeyof(type, MinecraftItemTypes)) type = MinecraftItemTypes[type]
-    this.create(new ItemStack(type))
+  item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'> | Items) {
+    this.create(new ItemStack(isKeyof(type, MinecraftItemTypes) ? MinecraftItemTypes[type] : type))
 
     return this
   }
 
-  itemStack(item: ItemStack) {
+  itemStack(item: ItemStack | (() => ItemStack)) {
     this.create(item)
 
     return this
   }
 
-  private create(itemStack: ItemStack) {
+  private create(itemStack: ItemStack | (() => ItemStack)) {
     if (this.current) this.items.push(this.current)
-    this.current = { itemStack, chance: 100, amount: [1], damage: [0], enchantments: {} }
+    this.current = { itemStack, weight: 100, amount: [1], damage: [0], enchantments: {}, custom: [] }
   }
 
-  private modifyCreatingItem() {
+  private getCurrent() {
     if (!this.current) throw new Error('You should create item first! Use .item or .itemStack')
     return this.current
   }
 
-  chance(percent: Percent) {
-    const chance = parseInt(percent)
-    if (isNaN(chance)) throw new TypeError(`Chance must be \`{number}%\`, got '${inspect(percent)}' instead!`)
+  weight(percent: Percent) {
+    const weight = parseInt(percent)
+    if (isNaN(weight)) throw new TypeError(`Chance must be \`{number}%\`, got '${inspect(percent)}' instead!`)
 
-    this.modifyCreatingItem().chance = chance
-
-    return this
-  }
-
-  meta(meta: Options) {
-    const { itemStack } = this.modifyCreatingItem()
-    const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } = meta
-    if (canDestroy) itemStack.setCanDestroy(canDestroy)
-    if (canPlaceOn) itemStack.setCanPlaceOn(canPlaceOn)
-    if (lockMode) itemStack.lockMode = lockMode
-    if (keepOnDeath) itemStack.keepOnDeath = true
-    if (lore) itemStack.setLore(lore)
-    if (nameTag) itemStack.nameTag = nameTag
+    this.getCurrent().weight = weight
 
     return this
   }
 
-  enchantmetns(enchantments: Partial<Record<MinecraftEnchantmentTypes, RandomCostMap>>) {
-    this.modifyCreatingItem().enchantments = Object.map(enchantments, (key, value) => [
-      key,
+  meta(meta: ItemStackMetaOptions) {
+    const { itemStack } = this.getCurrent()
+    if (typeof itemStack === 'function') {
+      this.getCurrent().itemStack = () => {
+        const item = itemStack()
+        applyOptions(item, meta)
+        return item
+      }
+    } else {
+      applyOptions(itemStack, meta)
+    }
+
+    return this
+  }
+
+  enchantmetns(enchantments: Partial<Record<MinecraftEnchantmentTypesUnion, RandomCostMap>>) {
+    this.getCurrent().enchantments = Object.map(enchantments, (key, value) => [
+      MinecraftEnchantmentTypes[key],
       Loot.randomCostToArray(value),
     ])
 
@@ -132,13 +109,33 @@ export class Loot {
   }
 
   amount(amount: RandomCostMap) {
-    this.modifyCreatingItem().amount = Loot.randomCostToArray(amount)
+    this.getCurrent().amount = Loot.randomCostToArray(amount)
 
     return this
   }
 
   damage(damage: RandomCostMap) {
-    this.modifyCreatingItem().damage = Loot.randomCostToArray(damage)
+    this.getCurrent().damage = Loot.randomCostToArray(damage)
+
+    return this
+  }
+
+  custom(chances: RandomCostMap, apply: (item: ItemStack, result: number) => void) {
+    this.getCurrent().custom.push({ chances: Loot.randomCostToArray(chances), apply })
+  }
+
+  duplicate(count: number) {
+    // We should push it count-1 times because next thing also pushes it
+    for (let i = 0; i < count - 1; i++) this.items.push(this.getCurrent())
+
+    return this
+  }
+
+  trash(types: Partial<Record<'web' | 'string', number>>) {
+    if (typeof types.string === 'number')
+      this.item('String').weight('30%').amount({ '5...10': '1%' }).duplicate(types.string)
+
+    if (typeof types.web === 'number') this.item('Web').weight('40%').amount({ '1...2': '1%' }).duplicate(types.web)
 
     return this
   }
@@ -153,7 +150,7 @@ export class Loot {
         const match = /^(\d{1,4})\.\.\.(\d{1,4})$/.exec(range)
         if (!match) throw new RangeError(`Range '${range}' doesn't matches the pattern 'number...number'.`)
 
-        const [, min, max] = match.map(parseIntStrict)
+        const [, min, max] = match.map(parseIntStrict) as [string, number, number]
         if (min > max) throw new RangeError('Min cannot be greater than max.')
         if (min === max) throw new RangeError('Min cannot be equal to max. Use one number as key instead.')
 
@@ -169,13 +166,12 @@ export class Loot {
       }
     }
 
-    const size = Object.values(parsed).reduce((p, c) => p + c, 0)
-    const array = new Array<number>(size)
+    const min = Math.min(...Object.values(parsed))
+    let array: number[] = []
 
-    let i = 0
     for (const [key, value] of Object.entries(parsed)) {
-      array.fill(Number(key), i, i + value)
-      i += value
+      const toFill = Math.round(value / min)
+      array = array.concat(new Array(toFill).fill(Number(key), 0, toFill))
     }
 
     return array
@@ -192,7 +188,7 @@ export class Loot {
 }
 
 export class LootTable {
-  static all: LootTable[] =[] 
+  static all: LootTable[] = []
 
   static instances = new Map<string, LootTable>()
 
@@ -225,12 +221,15 @@ export class LootTable {
    * @returns Array of ItemStack or undefined
    */
   generate(length = this.items.length): (ItemStack | undefined)[] {
-    const items = this.items.map(i => this.generateItems(i)).flat()
+    const items = this.items.map(i => this.generateItems(i)).flat() as {
+      item: undefined | ItemStack
+      weight: number
+    }[]
     if (length === 1) return items.map(e => e.item)
 
     // Separate items by chance
-    let explictItems = items.filter(e => e.chance === 100)
-    const randomizableItems = items.filter(e => e.chance !== 100)
+    let explictItems = items.filter(e => e.weight === 100)
+    const randomizableItems = items.filter(e => e.weight !== 100)
 
     let air = 0
 
@@ -247,7 +246,7 @@ export class LootTable {
         return item.item
       } else if (randomizableItems.length > 0) {
         const { index, item } = selectByChance(randomizableItems)
-        randomizableItems.splice(index, 1)
+        if (randomizableItems[index]) randomizableItems[index].item = undefined
 
         return item
       }
@@ -259,21 +258,18 @@ export class LootTable {
       // Randomise item properties
       const amount = item.amount.randomElement()
       if (amount <= 0) return []
-      if (amount > item.itemStack.maxAmount) {
-        const average = Math.floor(amount / item.itemStack.maxAmount)
-        const last = amount % item.itemStack.maxAmount
+
+      let stack = typeof item.itemStack === 'function' ? item.itemStack().clone() : item.itemStack.clone()
+      const { maxAmount } = stack
+      if (amount > maxAmount) {
+        const average = Math.floor(amount / maxAmount)
+        const last = amount % maxAmount
         return new Array(average)
           .fill(null)
-          .map((e, i, a) =>
-            this.generateItems({
-              ...item,
-              amount: e === a.at(-1) ? [last] : [average],
-            }),
-          )
+          .map((_, i, a) => this.generateItems({ ...item, amount: i + 1 === a.length ? [last] : [average] }))
           .flat()
       }
 
-      const stack = item.itemStack.clone()
       stack.amount = amount
 
       const { enchantable } = stack
@@ -284,7 +280,19 @@ export class LootTable {
           const level = levels.randomElement()
           if (!level) continue
 
-          enchantable.addEnchantment({ type: new EnchantmentType(type), level })
+          const etype = new EnchantmentType(type)
+
+          if (level <= etype.maxLevel) {
+            enchantable.addEnchantment({ type: etype, level })
+          } else {
+            const custom = Enchantments.custom[type]?.[level]?.[stack.typeId]
+            if (!custom) throw new Error(`Unkown enchantment for ${stack.typeId}: ${type} ${level}`)
+
+            const newitem = custom.clone()
+            copyAllItemPropertiesExceptEnchants(stack, newitem)
+            newitem.enchantable?.addEnchantments(enchantable.getEnchantments())
+            stack = newitem
+          }
         }
       }
 
@@ -293,14 +301,17 @@ export class LootTable {
         if (damage && stack.durability) stack.durability.damage = damage
       }
 
-      return [
-        {
-          item: stack,
-          chance: item.chance,
-        },
-      ]
+      for (const custom of item.custom) custom.apply(stack, custom.chances.randomElement())
+
+      return [{ item: stack, weight: item.weight }]
     } catch (err) {
-      console.error('Failed to generate loot item for', item, 'error:', err)
+      console.error(
+        'Failed to generate loot item for',
+        this.id,
+        pick(item, ['amount', 'weight', 'damage', 'enchantments']),
+        'error:',
+        err,
+      )
       return []
     }
   }
@@ -320,14 +331,12 @@ function parseIntStrict(string: string) {
   return int
 }
 
-export function selectByChance<T>(items: { chance: number; item: T }[]) {
-  const totalChance = items.reduce((sum, { chance }) => sum + chance, 0)
-  let random = Math.randomFloat(0, totalChance)
-
-  for (const [index, { chance, item }] of items.entries()) {
-    random -= chance
-    if (random < 0) return { index, item }
-  }
-
-  return { index: 0, item: items[0].item }
+function applyOptions(itemStack: ItemStack, meta: ItemStackMetaOptions) {
+  const { canDestroy, canPlaceOn, lockMode, keepOnDeath, lore, nameTag } = meta
+  if (canDestroy) itemStack.setCanDestroy(canDestroy)
+  if (canPlaceOn) itemStack.setCanPlaceOn(canPlaceOn)
+  if (lockMode) itemStack.lockMode = lockMode
+  if (keepOnDeath) itemStack.keepOnDeath = true
+  if (lore) itemStack.setLore(lore)
+  if (nameTag) itemStack.nameTag = nameTag
 }

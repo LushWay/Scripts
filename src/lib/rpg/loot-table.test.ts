@@ -4,7 +4,7 @@ import { Loot } from './loot-table'
 
 describe('loot table', () => {
   it('should generate 100% items', () => {
-    const lootTable = new Loot('test').item('AcaciaBoat').chance('100%').build
+    const lootTable = new Loot('test').item('AcaciaBoat').weight('100%').build
 
     expect(!!lootTable.generate(10).find(e => e?.typeId === MinecraftItemTypes.AcaciaBoat)).toBe(true)
   })
@@ -40,5 +40,26 @@ describe('loot table', () => {
       .item('AcaciaBoat').build
 
     expect(lootTable.generateOne().typeId).toBe(MinecraftItemTypes.AcaciaBoat)
+  })
+})
+
+describe('loot table random cost', () => {
+  it('should create random cost', () => {
+    expect(
+      Loot.randomCostToArray({
+        '1...3': '10%',
+        '4...5': '20%',
+      }),
+    ).toMatchInlineSnapshot(`
+      [
+        1,
+        2,
+        3,
+        4,
+        4,
+        5,
+        5,
+      ]
+    `)
   })
 })

@@ -1,27 +1,28 @@
 import { Player, system, TicksPerSecond, world } from '@minecraft/server'
 import { Menu, Region, separateNumberWithDots, Settings, Sidebar } from 'lib'
 import { emoji } from 'lib/assets/emoji'
+import { i18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest/quest'
 import { Minigame } from 'modules/minigames/Builder'
 import { BaseRegion } from 'modules/places/base/region'
 
 const getSidebarSettings = Settings.player(...Menu.settings, {
   enabled: {
-    name: 'Использовать меню',
-    description: 'Определяет, включено ли внутриигровое меню',
+    name: i18n`Использовать меню`,
+    description: i18n`Определяет, включено ли внутриигровое меню`,
     value: true,
   },
   sidebarMaxWordLength: {
-    name: 'Максимальный размер бокового меню',
-    description: 'Максимально допустимое кол-во символов, при достижении которого слова будут переноситься',
+    name: i18n`Максимальный размер бокового меню`,
+    description: i18n`Максимально допустимое кол-во символов, при достижении которого слова будут переноситься`,
     value: 20,
   },
   mode: {
-    name: 'Режим отображения',
-    description: 'Определяет, где будет меню',
+    name: i18n`Режим отображения`,
+    description: i18n`Определяет, где будет меню`,
     value: [
-      ['tips', 'Разделенные подсказки'],
-      ['sidebar', 'Боковое меню'],
+      ['tips', i18n`Разделенные подсказки`],
+      ['sidebar', i18n`Боковое меню`],
     ],
   },
   //   format: {
@@ -41,19 +42,19 @@ const getSidebarSettings = Settings.player(...Menu.settings, {
   //   },
 })
 
-const inventoryDisplay: Record<Player['database']['inv'], string> = {
-  anarchy: 'Анархия',
-  mg: 'Миниигра',
-  spawn: 'Спавн',
+const inventoryDisplay: Record<Player['database']['inv'], Text> = {
+  anarchy: i18n`Анархия`,
+  mg: i18n`Миниигра`,
+  spawn: i18n`Спавн`,
 }
 
 const names = {
-  mode: 'режим',
-  region: 'регион',
-  money: 'монеты',
-  leafs: 'листья',
-  online: 'онлайн',
-  quest: 'квест',
+  mode: 'mode',
+  region: 'region',
+  money: 'money',
+  leafs: 'leafs',
+  online: 'online',
+  quest: 'quest',
 }
 
 // $режим§l§7$регион
@@ -85,17 +86,25 @@ const survivalSidebar = new Sidebar(
     [names.region]: (player, settings) => {
       const regions = Region.getManyAt(player)
       const region = regions[0] as Region | undefined
-      const base = '§l' + inventoryDisplay[player.database.inv] + '§r§f'
+      const base = '§l' + inventoryDisplay[player.database.inv].to(player.lang) + '§r§f'
       let text = base
       if (player.database.inv === 'anarchy') {
-        if (region) {
+        if (region instanceof BaseRegion) {
+          if (region.getMemberRole(player.id)) text = region.baseMemberText(player)
+        } else if (region) {
           text = ''
-          if (!region.permissions.pvp) text = '§aМирная зона§f '
-          const { displayName } = region
-          if (displayName) text += displayName
-          if (region instanceof BaseRegion) {
-            if (region.getMemberRole(player.id)) text = '§6Ваша база'
-            else text = base
+          const displayName = region.displayName?.to(player.lang)
+          if (displayName) {
+            switch (region.permissions.pvp) {
+              case true:
+                text = displayName
+                break
+              case 'pve':
+                text = `${emoji.shield.yellow} ${displayName}`
+                break
+              case false:
+                text = `${emoji.shield.green} ${displayName}`
+            }
           }
         }
       }

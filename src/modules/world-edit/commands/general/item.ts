@@ -34,17 +34,32 @@ root
     item.amount = count
     ctx.player.success(`§f${oldamount} ► ${item.amount}`)
   })
-root
+
+const damage = root
   .overload('damage')
-  .int('count')
-  .executes((ctx, count) => {
+  .setDescription('Показывает состояние поломанности предмета')
+  .executes(ctx => {
     const slot = ctx.player.mainhand()
     const item = slot.getItem()
-    if (!item?.durability) return ctx.error('НЕА')
+    if (!item?.durability) return ctx.error('No damage component on item')
 
-    item.durability.damage = count
+    ctx.player.success(`${item.durability.maxDurability - item.durability.damage}/${item.durability.maxDurability}`)
+  })
+
+damage
+  .int('count')
+  .setDescription('Задает уровень поломанности предмета')
+  .executes((ctx, damage) => {
+    const slot = ctx.player.mainhand()
+    const item = slot.getItem()
+    if (!item?.durability) return ctx.error('No damage component on item')
+    if (damage > item.durability.maxDurability) {
+      return ctx.error(`Damage is bigger then max. ${damage}/${item.durability.maxDurability}`)
+    }
+
+    item.durability.damage = damage
     slot.setItem(item)
-    ctx.player.success(`${count}`)
+    ctx.player.success(`${damage}/${item.durability.maxDurability}`)
   })
 
 new Command('dupe')

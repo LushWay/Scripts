@@ -1,20 +1,19 @@
-import '../places/anarchy/anarchy'
-import '../places/spawn'
-import '../places/stone-quarry/stone-quarry'
-import '../places/tech-city/tech-city'
-import '../places/village-of-explorers/village-of-explorers'
-import '../places/village-of-miners/village-of-miners'
-
 import '../features/import'
+import '../places/import'
 
 import '../quests/index'
 import './stats'
 
+import './cleanup'
 import './death-quest-and-gravestone'
 import './menu'
 import './random-teleport'
 import './realtime'
+import './recurring-events'
 import './sidebar'
+import './speedrun/target'
+
+import type { VectorInDimension } from 'lib/utils/point'
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
@@ -29,9 +28,9 @@ declare module '@minecraft/server' {
       /** Player anarchy position */
       anarchy?: Vector3
 
-      doNotSaveAnarchy?: 1
+      deadAt2?: VectorInDimension
 
-      deadAt?: Vector3
+      gravestoneId?: string
     }
   }
 }

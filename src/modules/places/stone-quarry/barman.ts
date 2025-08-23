@@ -1,38 +1,60 @@
 import { ItemStack } from '@minecraft/server'
-import { MinecraftItemTypes as i } from '@minecraft/vanilla-data'
+import {
+  MinecraftPotionEffectTypes as e,
+  MinecraftItemTypes as i,
+  MinecraftPotionLiquidTypes as lt,
+  MinecraftPotionModifierTypes as mt,
+} from '@minecraft/vanilla-data'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 
 export class Barman extends ShopNpc {
   constructor(group: Group) {
-    super(group.point('barman').name('Бармен'))
-    this.shop.body(() => 'Ну что, устал от жизни? Пришел попить?.\n\n')
+    super(group.place('barman').name(i18nShared`Бармен`))
+    this.shop.body(() => i18n`Ну что, устал от жизни? Пришел попить?\n\n`)
 
     this.shop.menu(form => {
       form.itemStack(new ItemStack(i.MilkBucket), new MoneyCost(10))
       form.itemStack(new ItemStack(i.HoneyBottle), new MoneyCost(20))
 
-      const pivo = new ItemStack(i.GlassBottle)
-      pivo.nameTag = 'Пиво'
-      form.itemStack(pivo, new MoneyCost(1))
+      form.itemStack(
+        ItemStack.createPotion({ effect: e.FireResistance, liquid: lt.Lingering }).setInfo(i18n`Квас`, undefined),
+        new MoneyCost(40),
+      )
 
-      const kvac = new ItemStack(i.GlassBottle)
-      kvac.nameTag = 'Квас'
-      form.itemStack(kvac, new MoneyCost(1))
+      form.itemStack(
+        ItemStack.createPotion({ effect: e.FireResistance, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
+          i18n`Пиво`,
+          undefined,
+        ),
+        new MoneyCost(50),
+      )
 
-      const sidr = new ItemStack(i.GlassBottle)
-      sidr.nameTag = 'Сидр'
-      form.itemStack(sidr, new MoneyCost(1))
+      form.itemStack(
+        ItemStack.createPotion({ effect: e.Invisibility, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
+          i18n`Сидр`,
+          undefined,
+        ),
+        new MoneyCost(500),
+      )
 
-      const sh = new ItemStack(i.GlassBottle)
-      sh.nameTag = 'Настойка из шпината'
-      form.itemStack(sh, new MoneyCost(1))
+      form.itemStack(
+        ItemStack.createPotion({ effect: e.WaterBreath, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
+          i18n`Настойка из шпината`,
+          undefined,
+        ),
+        new MoneyCost(300),
+      )
 
-      const wine = new ItemStack(i.GlassBottle)
-      wine.nameTag = 'Вино'
-      form.itemStack(wine, new MoneyCost(1))
-      // TODO On potion API expansion add WINE
+      form.itemStack(
+        ItemStack.createPotion({ effect: e.TurtleMaster, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
+          i18n`Вино`,
+          undefined,
+        ),
+        new MoneyCost(1000),
+      )
     })
   }
 }

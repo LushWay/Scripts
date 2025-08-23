@@ -1,8 +1,10 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { developersAreWarned } from 'lib/assets/text'
+import { intlListFormat } from 'lib/i18n/intl'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { ROLES } from 'lib/roles'
-import { inaccurateSearch } from '../search'
+import { inaccurateSearch } from '../utils/search'
 import { LiteralArgumentType, LocationArgumentType } from './argument-types'
 import { CommandContext } from './context'
 
@@ -34,21 +36,11 @@ export function parseArguments(message: string): string[] {
  * @param player Player to send message to
  */
 export function commandNotFound(player: Player, command: string): void {
-  player.tell({
-    rawtext: [
-      {
-        text: `§c`,
-      },
-      {
-        translate: `commands.generic.unknown`,
-        with: [command],
-      },
-    ],
-  })
+  player.sendMessage({ rawtext: [{ text: `§c` }, { translate: `commands.generic.unknown`, with: [command] }] })
   player.playSound(Sounds.Fail)
 
   suggestCommand(player, command)
-  player.tell('§cСписок всех доступных вам команд: §f.help')
+  player.tell(i18n.error`Список всех доступных вам команд: §f.help`)
   Command.logger.player(player).warn`Unknown command: ${command}`
 }
 
@@ -64,31 +56,37 @@ function suggestCommand(player: Player, command: string): void {
 
   for (const c of Command.commands.filter(e => e.sys.requires(player))) {
     cmds.add(c.sys.name)
-    if (c.sys.aliases.length > 0) {
-      c.sys.aliases.forEach(e => cmds.add(e))
-    }
-  }
-  let search = inaccurateSearch(command, [...cmds.values()])
-
-  const options = {
-    minMatchTriggerValue: 0.5,
-    maxDifferenceBeetwenSuggestions: 0.15,
-    maxSuggestionsCount: 3,
+    if (c.sys.aliases.length > 0) c.sys.aliases.forEach(e => cmds.add(e))
   }
 
-  if (!search[0] || (search[0] && search[0][1] < options.minMatchTriggerValue)) return
+  suggest(player, command, [...cmds.values()])
+}
 
-  const suggest = (a: [string, number]) => `§f${a[0]} §7(${(a[1] * 100).toFixed(0)}%%)§c`
+const settings = {
+  minMatchTriggerValue: 0.5,
+  maxDifferenceBeetwenSuggestions: 0.15,
+  maxSuggestionsCount: 3,
+}
 
-  let suggestion = '§cВы имели ввиду ' + suggest(search[0])
-  const firstValue = search[0][1]
-  search = search
-    .filter(e => firstValue - e[1] <= options.maxDifferenceBeetwenSuggestions)
-    .slice(1, options.maxSuggestionsCount)
+/**
+ * Sends a command not found message to a player
+ *
+ * @param player Player to send message to
+ */
+export function suggest(player: Pick<Player, 'tell' | 'lang'>, input: string, options: string[]): void {
+  if (!input) return
 
-  for (const [i, e] of search.entries()) suggestion += `${i + 1 === search.length ? ' или ' : ', '}${suggest(e)}`
+  const search = inaccurateSearch(input, options)
+  if (!search[0] || search[0][1] < settings.minMatchTriggerValue) return
 
-  player.tell(suggestion + '§c?')
+  player.tell(
+    i18n.error`Вы имели ввиду ${intlListFormat(
+      i18n.error.style,
+      player.lang,
+      'or',
+      search.slice(0, settings.maxSuggestionsCount).map(e => noI18n.nocolor`${e[0]} (${~~(e[1] * 100)}%%)`),
+    )}?`,
+  )
 }
 
 /**
@@ -99,10 +97,10 @@ function suggestCommand(player: Player, command: string): void {
 export function commandNoPermissions(player: Player, command: import('./index').Command): void {
   let additional = ''
   if (!__RELEASE__ && typeof command.sys.role !== 'undefined') {
-    additional += `\n§cКоманда доступна начиная с роли ${ROLES[command.sys.role]}§c`
+    additional += i18n.error`\nКоманда доступна начиная с роли ${ROLES[command.sys.role]}`.to(player.lang)
   }
   player.fail(
-    `§cУ вас нет разрешения для использования команды §f${command.sys.name}${additional}\n§cСписок всех доступных вам команд: §f.help`,
+    i18n.error`У вас нет разрешения для использования команды ${command.sys.name}${additional}\nСписок всех доступных вам команд: §f.help`,
   )
 
   Command.logger.player(player).warn`No permission to use ${command}`
@@ -110,11 +108,9 @@ export function commandNoPermissions(player: Player, command: import('./index').
 
 /** Sends a syntax failure message to player */
 export function commandSyntaxFail(player: Player, command: import('./index').Command, args: string[], i: number) {
-  player.tell({
+  player.sendMessage({
     rawtext: [
-      {
-        text: `§c`,
-      },
+      { text: `§c` },
       {
         translate: `commands.generic.syntax`,
         with: [
@@ -149,12 +145,15 @@ export function parseLocationArguments(
   })
   const b = [x, y, z].map((arg, index) => {
     return arg.includes('~')
-      ? a[index] + locations[index]
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        a[index]! + locations[index]!
       : arg.includes('^')
-        ? a[index] + viewVectors[index]
+        ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          a[index]! + viewVectors[index]!
         : a[index]
   })
-  return { x: b[0], y: b[1], z: b[2] }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return { x: b[0]!, y: b[1]!, z: b[2]! }
 }
 
 /**
@@ -162,9 +161,6 @@ export function parseLocationArguments(
  *
  * @param cmdArgs The args that the command used
  * @param args Args to use
- * @param event
- * @param baseCommand
- * @param rawInput
  */
 export function sendCallback(
   cmdArgs: string[],
@@ -179,16 +175,16 @@ export function sendCallback(
     if (arg.sys.type.name.endsWith('*')) continue
     if (arg.sys.type instanceof LocationArgumentType) {
       argsToReturn.push(
-        parseLocationArguments([cmdArgs[i], cmdArgs[i + 1], cmdArgs[i + 2]], event.sender) ?? event.sender.location,
+        parseLocationArguments(cmdArgs as [string, string, string], event.sender) ?? event.sender.location,
       )
       continue
     }
     if (arg.sys.type instanceof LiteralArgumentType) continue
-    argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
+    if (cmdArgs[i]) argsToReturn.push(arg.sys.type.matches(cmdArgs[i]).value ?? cmdArgs[i])
   }
   if (typeof lastArg.sys.callback !== 'function') {
     console.warn('Command not implemented: ', lastArg)
-    return event.sender.warn('Упс, эта команда пока не работает.')
+    return event.sender.warn(noI18n`Command not implemented.`)
   }
 
   ;(async () => {
@@ -199,7 +195,7 @@ export function sendCallback(
         ...argsToReturn,
       ) as Promise<void> | void)
     } catch (e) {
-      event.sender.warn(`При выполнении команды произошла ошибка. ${developersAreWarned}`)
+      event.sender.warn(i18n`При выполнении команды произошла ошибка. ${developersAreWarned}`)
       console.error(e)
     }
   })()

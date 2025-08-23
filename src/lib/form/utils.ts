@@ -3,19 +3,22 @@ import {
   ActionFormData,
   ActionFormResponse,
   FormCancelationReason,
+  FormRejectError,
   MessageFormData,
   MessageFormResponse,
   ModalFormData,
   ModalFormResponse,
 } from '@minecraft/server-ui'
+import { i18n } from 'lib/i18n/text'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { MessageForm } from './message'
+import { NewFormCallback, ShowForm } from './new'
 
 interface BaseForm {
   show(player: Player, ...args: unknown[]): void
 }
 
-export class FormCallback<Form extends BaseForm = BaseForm> {
+export class FormCallback<Form extends ShowForm | BaseForm = BaseForm> {
   /** Creates a new form callback instance that can be used by buttons, and args to run various functions */
   constructor(
     /** Form that was used in this call */
@@ -32,61 +35,64 @@ export class FormCallback<Form extends BaseForm = BaseForm> {
    * @param message Error message to show
    */
   error(message: string): void {
-    new MessageForm('§cОшибка', message)
-      .setButton1('Назад', this.back)
-      .setButton2('§cЗакрыть', () => {
+    new MessageForm(i18n.error`Ошибка`.to(this.player.lang), message)
+      .setButton1(i18n`Назад`.to(this.player.lang), this.back)
+      .setButton2(i18n.error`Закрыть`.to(this.player.lang), () => {
         // Do nothing
       })
       .show(this.player)
   }
 }
 
-const { UserBusy, UserClosed } = FormCancelationReason
-
 /**
  * It shows a form to a player and if the player is busy, it will try to show the form again until it succeeds or the
  * maximum number of attempts is reached.
  *
- * @param {Pick<ActionFormData, 'show'> | Pick<ModalFormData, 'show'> | Pick<MessageFormData, 'show'>} form - The form
- *   you want to show.
- * @param {Player} player - The player who will receive the form.
+ * @param form - The form you want to show.
+ * @param player - The player who will receive the form.
  * @returns The response from the form.
  */
 export async function showForm(
   form: Pick<ActionFormData, 'show'> | Pick<ModalFormData, 'show'> | Pick<MessageFormData, 'show'>,
   player: Player,
 ) {
-  const hold = 5
-  for (let i = 1; i <= hold; i++) {
-    /** @type {ActionFormResponse | ModalFormResponse | MessageFormResponse} */
-    const response: ActionFormResponse | ModalFormResponse | MessageFormResponse = await form.show(player)
+  try {
+    const hold = 5
+    for (let i = 1; i <= hold; i++) {
+      const response: ActionFormResponse | ModalFormResponse | MessageFormResponse = await form.show(player)
 
-    if (response.canceled) {
-      if (response.cancelationReason === UserClosed) return false
-      if (response.cancelationReason === UserBusy) {
-        switch (i) {
-          case 1:
-            // First attempt failed, maybe chat closed...
-            player.closeChat()
-            continue
+      if (response.canceled) {
+        if (response.cancelationReason === FormCancelationReason.UserClosed) return false
+        if (response.cancelationReason === FormCancelationReason.UserBusy) {
+          switch (i) {
+            case 1:
+              // First attempt failed, maybe chat closed...
+              player.closeChat()
+              continue
 
-          case 2:
-            // Second attempt, tell player to manually close chat...
-            player.info('Закрой чат!')
-            await system.sleep(10)
-            continue
+            case 2:
+              // Second attempt, tell player to manually close chat...
+              player.info(i18n`Закрой чат!`)
+              await system.sleep(10)
+              continue
 
-          default:
-            await system.sleep(10)
-            break
+            default:
+              await system.sleep(10)
+              break
 
-          case hold:
-            // Last attempt, we cant do anything
-            player.fail(`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
-            return false
+            case hold:
+              // Last attempt, we cant do anything
+              player.fail(i18n`Не удалось открыть форму. Закрой чат или другое меню и попробуй снова`)
+              return false
+          }
         }
-      }
-    } else return response
+      } else return response
+    }
+  } catch (e) {
+    if (e instanceof FormRejectError) {
+      console.warn(e)
+      return false
+    } else throw e
   }
 }
 
@@ -100,14 +106,16 @@ export const BUTTON = {
   'settings': 'textures/ui/custom/settings',
 }
 
-export function debounceMenu<T extends (player: Player, ...args: any[]) => Promise<any>>(menu: T): T {
+type FormShow = (player: Player, ...args: any[]) => Promise<any>
+
+export function debounceMenu<T extends NewFormCallback | FormShow>(menu: T): T {
   const sent = new WeakPlayerSet()
 
-  return (async (player: Player, ...args) => {
+  return (async (player: Player, ...args: Parameters<T>) => {
     if (sent.has(player)) return
 
     sent.add(player)
-    await menu(player, ...(args as Parameters<T>))
+    await menu(player, ...args)
     system.runTimeout(() => sent.delete(player), 'debounceMenu reset', 40)
   }) as T
 }

@@ -1,7 +1,7 @@
 import { ContainerSlot, EquipmentSlot, Player, system } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { actionGuard, ActionGuardOrder } from 'lib/region/index'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Items } from './assets/custom-items'
 import { onPlayerMove } from './player-move'
 
@@ -9,7 +9,7 @@ type PlaceType = 'enters' | 'interactions'
 
 export class PlaceAction {
   private static placeId(place: Vector3, dimension: DimensionType) {
-    return Vector.string(Vector.floor(place)) + ' ' + dimension
+    return Vec.string(Vec.floor(place)) + ' ' + dimension
   }
 
   static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: DimensionType = 'overworld') {
@@ -51,7 +51,9 @@ export class PlaceAction {
   private static interactions = new Map<string, Set<PlayerCallback>>()
 
   static {
-    onPlayerMove.subscribe(({ player, vector, dimensionType }) => this.emit('enters', vector, player, dimensionType))
+    onPlayerMove.subscribe(({ player, location, dimensionType }) =>
+      this.emit('enters', location, player, dimensionType),
+    )
 
     actionGuard((_player, _region, ctx) => {
       // Allow using any block specified by interaction
@@ -66,7 +68,7 @@ export class PlaceAction {
   }
 }
 
-type LockActionFunction = (player: Player) => boolean | { lockText: string }
+type LockActionFunction = (player: Player) => boolean | { lockText: Text }
 
 export interface LockActionCheckOptions {
   ignore?: LockAction[]
@@ -83,10 +85,8 @@ export class LockAction {
    * Checks if player is locked by any LockerAction and returns first lockText from it
    *
    * @param {Player} player - Player to check
-   * @param {object} o
    * @param {LockAction[]} [o.ignore] - Which LockerActions ignore
    * @param {LockAction[]} [o.accept] - Which LockerActions only accept
-   * @param {boolean} [o.tell]
    * @param {boolean} [o.returnText] - Return lock text instead of boolean
    */
   static locked(player: Player, { ignore, accept, tell = true, returnText }: LockActionCheckOptions = {}) {
@@ -97,7 +97,7 @@ export class LockAction {
       const isLocked = lock.isLocked(player)
       if (isLocked) {
         const text = typeof isLocked === 'object' ? isLocked.lockText : lock.lockText
-        if (tell && player.isValid()) player.fail(text)
+        if (tell && player.isValid) player.fail(text)
         return returnText ? text : true
       }
     }
@@ -110,7 +110,7 @@ export class LockAction {
     /** Function that checks if player is being locked */
     readonly isLocked: LockActionFunction,
     /** Text that returns when player is locked */
-    readonly lockText: string,
+    readonly lockText: Text,
   ) {
     LockAction.instances.push(this)
   }
@@ -126,7 +126,7 @@ export class InventoryInterval {
   static {
     system.runPlayerInterval(
       player => {
-        if (!player.isValid()) return
+        if (!player.isValid) return
 
         const { container } = player
         if (!container) return

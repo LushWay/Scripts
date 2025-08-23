@@ -1,10 +1,14 @@
-import { ItemStack, Player } from '@minecraft/server'
-import { MaybeRawText, t } from 'lib/text'
+import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
+import { eqSlots } from 'lib/form/select-item'
+import { Message } from 'lib/i18n/message'
+import { i18n, noI18n } from 'lib/i18n/text'
+import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
-import { itemDescription } from '../rewards'
 import { CostType } from './cost'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
+
+type Slots = Map<number | EquipmentSlot, { amount: number | undefined; slot: ContainerSlot }>
 
 export class ItemCost extends Cost {
   /**
@@ -26,22 +30,27 @@ export class ItemCost extends Cost {
   }
 
   protected getItems(player: Player) {
-    if (!player.container) return { canBuy: false, slots: new Map<number, number | undefined>(), amount: 0 }
+    const equippable = player.getComponent(EntityComponentTypes.Equippable)
+    if (!player.container || !equippable) return { canBuy: false, slots: new Map() as Slots, amount: 0 }
 
     let amount = this.amount
-    const slots = new Map<number, number | undefined>()
-    for (const [i, item] of player.container.entries()) {
+    const slots = new Map() as Slots
+    for (const [i, slot] of [
+      ...player.container.slotEntries(),
+      ...eqSlots.map(e => [e, equippable.getEquipmentSlot(e)] as const),
+    ]) {
       if (amount === 0) break
+      const item = slot.getItem()
       if (!item || !this.is(item)) continue
 
       amount -= item.amount
       if (amount < 0) {
         // in this slot there is more items then we need
-        slots.set(i, -(amount + item.amount))
+        slots.set(i, { amount: -(amount + item.amount), slot })
         break
       } else {
         // take all the items from this slot
-        slots.set(i, undefined)
+        slots.set(i, { amount: undefined, slot })
       }
     }
 
@@ -57,30 +66,31 @@ export class ItemCost extends Cost {
 
     const { container } = player
     if (!container) return
-    for (const [i, amount] of items.slots) {
+    for (const [, { amount, slot }] of items.slots) {
       if (amount) {
-        container.getSlot(i).amount += amount
+        slot.amount += amount
       } else {
-        container.setItem(i, undefined)
+        slot.setItem(undefined)
       }
     }
 
     super.take(player)
   }
 
-  toString(canBuy?: boolean, _?: Player, amount = true): MaybeRawText {
-    return itemDescription(
+  toString(player: Player, canBuy?: boolean, amount = true): string {
+    return itemNameXCount(
       this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',
       amount,
+      player.lang,
     )
   }
 
-  failed(player: Player): MaybeRawText {
+  failed(player: Player): string {
     super.failed(player)
     const items = this.getItems(player)
 
-    return t.raw`${t.error`${this.amount - items.amount}/${this.amount} `}${this.toString(false, void 0, false)}`
+    return noI18n.error`${this.amount - items.amount}/${this.amount} ${this.toString(player, false, false)}`
   }
 }
 
@@ -89,20 +99,22 @@ export class ShouldHaveItemCost extends ItemCost {
     return CostType.Requirement
   }
 
-  static createFromFilter(filter: ItemFilter, text?: ShouldHaveItemCost['text']) {
+  static createFromFilter(filter: ItemFilter, text?: Text) {
     const cost = new this('', 1, filter)
     cost.text = text ?? ''
     return cost
   }
 
-  private text: MaybeRawText = ''
+  private text: Text = ''
 
-  toString() {
-    return this.text
+  toString(player: Player) {
+    return this.text.to(player.lang)
   }
 
   failed(player: Player) {
-    return this.text ? t.error`В инвентаре нет ${this.text}` : t.error`Нет предмета`
+    // TODO Fix colors
+    const message = this.text ? i18n.error`В инвентаре нет ${this.text}` : i18n.error`Нет предмета`
+    return message.to(player.lang)
   }
 
   take(player: Player): void {

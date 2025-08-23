@@ -1,12 +1,16 @@
-import { Block, Dimension, Entity, system, world } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Dimension, system, world } from '@minecraft/server'
+import { i18n } from 'lib/i18n/text'
+import { stringifyError } from 'lib/util'
+import { AbstractPoint } from 'lib/utils/point'
+import { Vec } from 'lib/vector'
 
 export type AreaCreator = new (o: any) => Area
-export type AreaWithType<T = AreaCreator> = T & {
-  type: string
-}
+export type AreaWithType<T = AreaCreator> = T & { type: string }
 
-export type AbstractPoint = { vector: Vector3; dimensionType: DimensionType } | Entity | Block
+export interface AreaAsJson extends JsonObject {
+  t: string
+  d: JsonObject
+}
 
 export abstract class Area<T extends JsonObject = JsonObject> {
   static areas: AreaWithType[] = []
@@ -27,6 +31,18 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return b
   }
 
+  static fromJson(a: Immutable<AreaAsJson>) {
+    Area.loaded = true
+
+    const area = Area.areas.find(e => e.type === a.t)
+    if (!area) {
+      console.warn(i18n`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
+      return
+    }
+
+    return new area(a.d)
+  }
+
   constructor(
     protected database: T,
     public dimensionType: DimensionType = 'overworld',
@@ -40,31 +56,37 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   }
 
   /** Edges of the area */
-  abstract get edges(): [Vector3, Vector3]
+  abstract get edges(): [min: Vector3, max: Vector3]
 
   /** Center of the area */
   abstract get center(): Vector3
 
   abstract isNear(point: AbstractPoint, distance: number): boolean
 
+  toString() {
+    return i18n`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
+  }
+
+  abstract getFormDescription(): Text.Table
+
   protected isOurDimension(dimensionType: DimensionType) {
     return this.dimensionType === dimensionType
   }
 
   get radius() {
-    return Vector.distance(...this.edges) / 2
+    return Vec.distance(...this.edges) / 2
   }
 
   get size() {
     const [from, to] = this.edges
-    return Vector.subtract(from, to)
+    return Vec.subtract(to, from)
   }
 
   /**
    * Json representation that is used to save area to the database. Then result of this function will be provided to
    * restore the same state
    */
-  toJSON() {
+  toJSON(): AreaAsJson {
     return { t: this.type, d: this.database }
   }
 
@@ -72,23 +94,29 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return world[this.dimensionType]
   }
 
-  forEachVector(callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void) {
+  forEachVector(
+    callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | Promise<void> | symbol,
+    yieldEach = 10,
+  ) {
     const { edges, dimension } = this
-    const isIn = (vector: Vector3) => this.isIn({ vector, dimensionType: this.dimensionType })
+    const isIn = (vector: Vector3) => this.isIn({ location: vector, dimensionType: this.dimensionType })
 
     return new Promise<void>((resolve, reject) => {
       system.runJob(
         (function* forEachRegionVectorJob() {
           try {
-            for (const vector of Vector.foreach(...edges)) {
+            let i = 0
+            for (const vector of Vec.forEach(...edges)) {
               callback(vector, isIn(vector), dimension)
-              yield
+              i++
+              if (i % yieldEach === 0) yield
             }
             resolve()
           } catch (e: unknown) {
             reject(e as Error)
           }
         })(),
+        `forEachRegionVectorJob ${stringifyError.stack.get(2)}`,
       )
     })
   }

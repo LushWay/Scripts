@@ -1,17 +1,19 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { langToken, selectByChance } from 'lib'
+import { translateTypeId } from 'lib'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
+import { rollChance } from 'lib/rpg/random'
 import { MultiCost } from 'lib/shop/cost'
+import { ErrorCost } from 'lib/shop/cost/cost'
 import { ShopNpc } from 'lib/shop/npc'
-import { t } from 'lib/text'
+import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
-import { copyAllItemPropertiesExceptEnchants } from '../village-of-explorers/mage'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
-    super(group.point('gunsmith').name('Оружейник'))
-    this.shop.body(() => 'Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.')
+    super(group.place('gunsmith').name(i18nShared`Оружейник`))
+    this.shop.body(() => i18n`Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.`)
 
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
@@ -19,7 +21,7 @@ export class Gunsmith extends ShopNpc {
     this.shop.menu((form, player) => {
       form
         .itemModifierSection(
-          'Улучшить до незерита',
+          i18n`Улучшить до незерита`,
           item =>
             (
               [
@@ -32,30 +34,35 @@ export class Gunsmith extends ShopNpc {
                 i.DiamondSword,
               ] as string[]
             ).includes(item.typeId),
-          'Алмазный предмет',
+          i18n`Алмазный предмет`,
           (form, slot) => {
             form
               .product()
-              .name('Улучшить')
+              .name(i18nShared`Улучшить`)
               .cost(new MultiCost().item(i.NetheriteIngot, 1).money(1000))
               .onBuy(() => this.upgradeDiamondSwordToNetherite(slot, player))
           },
         )
 
         .itemModifierSection(
-          'Починить',
+          i18n`Починить`,
           i => !!i.durability && i.durability.damage !== 0,
-          'Любой поломанный предмет',
+          i18n`Любой поломанный предмет`,
           (form, slot) => {
             const item = slot.getItem()
             if (!item?.durability) return false
 
-            const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 0) ?? 1
+            const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
+            const repairCost = ((item.durability.damage / 1000) * enchantmentsLevels) / 5
+            const cost =
+              item.durability.damage === 0
+                ? ErrorCost(i18n.error`Предмет целый, выберите другой`)
+                : new MultiCost().xp(repairCost)
 
             form
               .product()
-              .name('Починить')
-              .cost(new MultiCost().xp((item.durability.damage / 100) * (enchantmentsLevels / 1000)))
+              .name(i18nShared`Починить`)
+              .cost(cost)
               .onBuy(() => {
                 if (item.durability) item.durability.damage = 0
                 const olditem = item.clone()
@@ -80,14 +87,16 @@ export class Gunsmith extends ShopNpc {
   }
 
   private copyEnchantments(newitem: ItemStack, item: ItemStack, player: Player) {
+    // TODO Enchants above max level won't work here
     let lost = false
     if (newitem.enchantable && item.enchantable) {
       for (const ench of item.enchantable.getEnchantments()) {
-        if (!lost && selectByChance(looseEnchantment).item) {
+        if (!lost && rollChance(3)) {
           lost = true
-          player.tell(
-            t.warn
-              .raw`Онет, кажется, зачарование ${{ translate: langToken(ench.type.id) }} уровнем ${ench.level.toString()}§e потерялось...`,
+          player.warn(
+            i18n.warn`Онет, кажется, зачарование ${translateTypeId(ench.type.id, player.lang)} уровнем ${ench.level.toString()} потерялось...`.to(
+              player.lang,
+            ),
           )
           continue
         } else {
@@ -97,14 +106,3 @@ export class Gunsmith extends ShopNpc {
     }
   }
 }
-
-const looseEnchantment = [
-  {
-    item: true,
-    chance: 3,
-  },
-  {
-    item: false,
-    chance: 97,
-  },
-]

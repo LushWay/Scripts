@@ -1,8 +1,7 @@
 import {} from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { WorldEdit } from '../../lib/world-edit'
 
- 
 export class SelectionManager {
   /**
    * Expands the selection area
@@ -21,20 +20,20 @@ export class SelectionManager {
 
     if (dx < 0 && dz < 0) {
       //means u need to sub,  sub to get to pos1
-      builder.pos1 = Vector.add(builder.pos1, new Vector(amount, -amount, amount))
-      builder.pos2 = Vector.add(builder.pos2, new Vector(-amount, amount, -amount))
+      builder.pos1 = Vec.add(builder.pos1, new Vec(amount, -amount, amount))
+      builder.pos2 = Vec.add(builder.pos2, new Vec(-amount, amount, -amount))
     } else if (dx < 0 && dz >= 0) {
       //means u need to sub,  add to get to pos1
-      builder.pos1 = Vector.add(builder.pos1, new Vector(amount, -amount, -amount))
-      builder.pos2 = Vector.add(builder.pos2, new Vector(-amount, amount, amount))
+      builder.pos1 = Vec.add(builder.pos1, new Vec(amount, -amount, -amount))
+      builder.pos2 = Vec.add(builder.pos2, new Vec(-amount, amount, amount))
     } else if (dx >= 0 && dz >= 0) {
       //means u need to add,  add to get to pos1
-      builder.pos1 = Vector.add(builder.pos1, new Vector(-amount, -amount, -amount))
-      builder.pos2 = Vector.add(builder.pos2, new Vector(amount, amount, amount))
+      builder.pos1 = Vec.add(builder.pos1, new Vec(-amount, -amount, -amount))
+      builder.pos2 = Vec.add(builder.pos2, new Vec(amount, amount, amount))
     } else if (dx >= 0 && dz < 0) {
       //means u need to add, sub to get to pos1
-      builder.pos1 = Vector.add(builder.pos1, new Vector(-amount, -amount, amount))
-      builder.pos2 = Vector.add(builder.pos2, new Vector(amount, amount, -amount))
+      builder.pos1 = Vec.add(builder.pos1, new Vec(-amount, -amount, amount))
+      builder.pos2 = Vec.add(builder.pos2, new Vec(amount, amount, -amount))
     }
   }
 
@@ -50,7 +49,7 @@ export class SelectionManager {
    */
 
   static expandVert(builder: WorldEdit, amount: number): void {
-    builder.pos2 = Vector.add(builder.pos2, new Vector(0, amount, 0))
+    builder.pos2 = Vec.add(builder.pos2, new Vec(0, amount, 0))
   }
 }
 
@@ -64,9 +63,9 @@ expand.int('size').executes((ctx, size) => {
   if (!we.selection) return ctx.reply('§cЗона не выделена!')
   SelectionManager.expand(we, size)
   ctx.reply(
-    `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
+    `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vec.string(
       we.pos1,
-    )}\n§3по \n§f${Vector.string(we.pos2)}`,
+    )}\n§3по \n§f${Vec.string(we.pos2)}`,
   )
 })
 
@@ -79,8 +78,8 @@ expand
     if (!we.selection) return ctx.reply('§cЗона не выделена!')
     SelectionManager.expandVert(we, size)
     ctx.reply(
-      `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vector.string(
+      `§b► §3Выделенная зона поднята на §f${size} §3блоков вверх, теперь она с\n§f${Vec.string(
         we.pos1,
-      )}\n§3по \n§f${Vector.string(we.pos2)}`,
+      )}\n§3по \n§f${Vec.string(we.pos2)}`,
     )
   })

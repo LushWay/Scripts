@@ -90,14 +90,14 @@ function expandTest(test: GameTest.Test, history: string[], fullname: string) {
 function expandPlayer(player: GameTest.SimulatedPlayer, test: GameTest.ExtendedTest) {
   expand(player, {
     get name() {
-      return this.isValid() ? super.name : 'Testing player'
+      return this.isValid ? super.name : 'Testing player'
     },
     playSound(sound, options) {
       test.print(`${this.name}: §9playSound§f(§2'${sound}'§f, ${inspect(options)}§f)`)
     },
 
     tell(message) {
-      this.sendMessage(message)
+      this.sendMessage(message.to(this.lang))
     },
 
     sendMessage(message) {

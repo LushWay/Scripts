@@ -148,7 +148,7 @@ const emojiArmor: Record<ArmorLevel, string> = {
   [ArmorLevel.Chainmail]: emoji.custom.armor.chainmail,
   [ArmorLevel.Golden]: emoji.custom.armor.golden,
   [ArmorLevel.Diamond]: emoji.custom.armor.diamond,
-  [ArmorLevel.Iron]: emoji.custom.armor.diamond,
+  [ArmorLevel.Iron]: emoji.custom.armor.iron,
   [ArmorLevel.Netherite]: emoji.custom.armor.netherite,
 }
 

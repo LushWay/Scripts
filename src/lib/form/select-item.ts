@@ -1,23 +1,31 @@
-import { Container, ContainerSlot, ItemStack, Player } from '@minecraft/server'
+import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { enchantData } from 'lib/assets/texture-data'
 import { ChestForm } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
-import { MaybeRawText, t } from 'lib/text'
-import { langToken, rawTextToString, translateEnchantment, translateToken } from 'lib/utils/lang'
+import { langToken, translateEnchantment, translateToken } from 'lib/i18n/lang'
+import { Message } from 'lib/i18n/message'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
 export type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
 
+export const eqSlots = [
+  EquipmentSlot.Head,
+  EquipmentSlot.Chest,
+  EquipmentSlot.Feet,
+  EquipmentSlot.Legs,
+  EquipmentSlot.Offhand,
+]
+
 export function selectItemForm(
   itemFilter: ItemFilter,
   player: Player,
-  text: MaybeRawText,
+  text: Text,
   select: OnSelect,
   back?: VoidFunction,
 ) {
   const { container } = player
   if (!container) return
-  const chestForm = new ChestForm('45').title(t.options({ unit: '§0' }).raw`${text}`).pattern([0, 0], ['<-------?'], {
+  const chestForm = new ChestForm('45').title(text.to(player.lang)).pattern([0, 0], ['<-     -?'], {
     '<': {
       icon: BUTTON['<'],
       callback: back,
@@ -29,42 +37,53 @@ export function selectItemForm(
       icon: BUTTON['?'],
     },
   })
-  for (const [i, item] of container.entries().filter(([, item]) => item && itemFilter(item))) {
-    if (!item) continue
-
-    addItem(item, player, chestForm, i, select, container)
+  const equipment = player.getComponent(EntityComponentTypes.Equippable)
+  if (equipment) {
+    for (const [i, slotId] of eqSlots.entries()) {
+      const slot = equipment.getEquipmentSlot(slotId)
+      addItem(slot, player, chestForm, i + 2, select, itemFilter)
+    }
+  }
+  for (const [i, slot] of container.slotEntries()) {
+    addItem(slot, player, chestForm, i + 9, select, itemFilter)
   }
 
   chestForm.show(player)
 }
 
 function addItem(
-  item: ItemStack,
+  slot: ContainerSlot,
   player: Player,
   chestForm: ChestForm,
   i: number,
   select: OnSelect,
-  container: Container,
+  itemFilter: (itemStack: ItemStack) => boolean,
 ) {
+  const item = slot.getItem()
+  if (!item) return
+  if (!itemFilter(item)) return
+
+  const typeId = item.typeId
+
   // Enchant data does not applies for the custom items becuase they don't use aux ids
-  const enchanted = enchantData[item.typeId] ?? !!item.enchantable?.getEnchantments().length
+  const enchanted = enchantData[typeId] ?? !!item.enchantable?.getEnchantments().length
   const nameTagPrefix = enchanted ? '§b' : ''
-  const lore = [...enchantmentsToLore(item, player), ...item.getLore(), ...addItemDurabilityToLore(item)]
+  const lore = [...enchantmentsToLore(item, player), ...slot.getLore(), ...addItemDurabilityToLore(item)]
 
   chestForm.button({
-    slot: i + 9,
-    icon: item.typeId,
-    nameTag: nameTagPrefix + translateToken(langToken(item.typeId), player.lang),
-    amount: item.amount,
+    slot: i,
+    icon: typeId,
+    nameTag: nameTagPrefix + translateToken(langToken(typeId), player.lang),
+    amount: slot.amount,
     enchanted,
     lore,
-    callback: () => select(container.getSlot(i), item),
+    callback: () => select(slot, item),
   })
 }
 
 function enchantmentsToLore(item: ItemStack, player: Player): string[] {
   if (item.enchantable) {
-    return item.enchantable.getEnchantments().map(e => rawTextToString(translateEnchantment(e), player.lang))
+    return item.enchantable.getEnchantments().map(e => translateEnchantment(e, player.lang))
   } else return []
 }
 

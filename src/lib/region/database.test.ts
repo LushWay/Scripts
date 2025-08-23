@@ -1,8 +1,13 @@
 import { Region, RegionIsSaveable } from 'lib'
-import { Vector } from 'lib/vector'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { SphereArea } from './areas/sphere'
-import { RegionDatabase, registerSaveableRegion, restoreRegionFromJSON } from './database'
+import {
+  RegionDatabase,
+  RegionSave,
+  registerSaveableRegion,
+  restoreRegionFromJSON,
+  TEST_clearSaveableRegions,
+} from './database'
 
 class TestK1Region extends Region {
   method() {}
@@ -17,7 +22,6 @@ class TestK1Region extends Region {
     return this.id
   }
 }
-registerSaveableRegion('k1', TestK1Region)
 
 class TestK2Region extends Region {
   get regionKey() {
@@ -28,7 +32,16 @@ class TestK2Region extends Region {
     return this.toJSON()
   }
 }
-registerSaveableRegion('k2', TestK2Region)
+
+beforeEach(() => {
+  TEST_clearSaveableRegions()
+  registerSaveableRegion('k2', TestK2Region)
+  registerSaveableRegion('k1', TestK1Region)
+})
+
+afterAll(() => {
+  TEST_clearSaveableRegions()
+})
 
 beforeAll(() => {
   TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
@@ -41,7 +54,7 @@ describe('region initialization', () => {
       {},
       'test',
     )
-    const json = region.json
+    const json = region.json as Immutable<RegionSave>
 
     expect(json.a.t).toBe(SphereArea.type)
     expect(json.k).toBe(TestK1Region.kind)
@@ -54,7 +67,7 @@ describe('region initialization', () => {
 
   it('should restore region from database', () => {
     const region = TestK1Region.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
-    const regionJSON = RegionDatabase[region.regionKey]
+    const regionJSON = RegionDatabase.getImmutable(region.regionKey)
 
     expect(regionJSON).toEqual(region.json)
 
@@ -63,8 +76,8 @@ describe('region initialization', () => {
   })
 
   it('should restore cuberegion', () => {
-    const region = TestK2Region.create(new ChunkCubeArea({ from: Vector.one, to: Vector.one }, 'overworld'))
-    const regionJSON = RegionDatabase[region.regionKey]
+    const region = TestK2Region.create(new ChunkCubeArea({ from: { x: 1, z: 1 }, to: { x: 1, z: 1 } }, 'overworld'))
+    const regionJSON = RegionDatabase.getImmutable(region.regionKey)
 
     expect(regionJSON).toEqual(region.json)
     expect(restoreRegionFromJSON(['test', regionJSON])).toBeInstanceOf(TestK2Region)
@@ -78,10 +91,10 @@ describe('region initialization', () => {
     const region = OldRadiusRegionKind.create(new SphereArea({ center: { x: 0, y: 0, z: 0 }, radius: 2 }, 'overworld'))
     const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-    expect(restoreRegionFromJSON(['test', region.json])).toBeUndefined()
+    expect(restoreRegionFromJSON(['test', region.json as Immutable<RegionSave>])).toBeUndefined()
     expect(consoleWarn.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7[Region][Database] No kind found for §funknown§7. Maybe you forgot to register kind or import file?§7",
+        "§7[Region][Database] No kind found for §funknown§7. Available kinds: §fk2, k1§7. Maybe you forgot to register kind or import file?",
       ]
     `)
   })

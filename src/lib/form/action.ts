@@ -1,6 +1,8 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { prompt } from 'lib/form/message'
+import { defaultLang, Language } from 'lib/assets/lang'
+import { ask } from 'lib/form/message'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'
@@ -15,8 +17,9 @@ interface IActionFormButton {
 }
 
 export class ActionForm {
+  // TODO Remove
   /** Text used by back button */
-  static backText = '§l§b< §r§3Назад'
+  static backText = i18n`§l§b< §r§3Назад`
 
   /** The buttons this form has */
   private buttons: IActionFormButton[] = []
@@ -43,7 +46,7 @@ export class ActionForm {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, callback: NewFormCallback): ActionForm
+  button(text: string | RawMessage, callback: NewFormCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -52,7 +55,7 @@ export class ActionForm {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  addButton(text: string | RawMessage, iconPath: string | null | undefined, callback: NewFormCallback): ActionForm
+  button(text: string | RawMessage, iconPath: string | null | undefined, callback: NewFormCallback): ActionForm
 
   /**
    * Adds a button to this form
@@ -61,7 +64,7 @@ export class ActionForm {
    * @param iconPathOrCallback - The path this button icon
    * @param callback - What happens when this button is clicked
    */
-  addButton(
+  button(
     text: string | RawMessage,
     iconPathOrCallback: string | null | undefined | NewFormCallback,
     callback?: NewFormCallback,
@@ -73,45 +76,47 @@ export class ActionForm {
     } else iconPath = iconPathOrCallback
 
     this.buttons.push({ text, iconPath, callback })
-    this.form.button(text, iconPath ? iconPath : void 0)
+    this.form.button(text, iconPath ?? void 0)
 
     return this
   }
 
   /**
-   * Adds back button to the form. Alias to {@link ActionForm.addButton}
+   * Adds back button to the form. Alias to {@link ActionForm.button}
    *
    * @param backCallback - Callback function that will be called when back button is pressed.
    */
-  addButtonBack(backCallback: VoidFunction | undefined) {
+  addButtonBack(backCallback: NewFormCallback | undefined, lang: Language) {
     if (!backCallback) return this
-    else return this.addButton('§r§3Назад', BUTTON['<'], backCallback)
+    else return this.button(i18n`§r§3Назад`.to(lang), BUTTON['<'], backCallback)
   }
 
   /**
-   * Adds prompt button to the form. Alias to {@link ActionForm.addButton}
+   * Adds ask button to the form. Alias to {@link ActionForm.button}
    *
-   * Prompt is alias to {@link prompt}
+   * Ask is alias to {@link ask}
    *
    * @example
-   *   addButtonPrompt('§cУдалить письмо', '§cУдалить', () => deleteLetter(), 'Отмена')
+   *   ask('§cУдалить письмо§r', '§cУдалить§r', () => deleteLetter(), 'Отмена') //
    *   // Will show message form with `§cВы уверены, что хотите удалить письмо?` and `§cУдалить`, `Отмена` buttons
+   *   §r
    *
-   * @param text - ActionForm Button text. Will be also used as prompt body
-   * @param yesText - PromptForm yes button text, e.g. 'Да'
-   * @param yesAction - Function callback that will be called when prompt yes button was pressed
-   * @param noText - PromptForm no button
-   * @param texture - PromptForm texture
+   * @param text - Button text. Will be also used as ask body
+   * @param yesText - Yes button text, e.g. 'Да'
+   * @param yesAction - Function that will be called when yes button was pressed
+   * @param noText - Function that will be called when no button was pressed
+   * @param texture - Button texture
    */
-  addButtonPrompt(
+  ask(
     text: string,
     yesText: string,
     yesAction: VoidFunction,
-    noText = 'Отмена',
+    noText: Text = i18n`Отмена`,
     texture: string | null = null,
   ) {
-    return this.addButton(text, texture, p =>
-      prompt(p, '§cВы уверены, что хотите ' + text + '?', yesText, yesAction, noText, () => this.show(p)),
+    // TODO Fix
+    return this.button(text, texture, p =>
+      ask(p, i18n`§cВы уверены, что хотите ${text}?`, yesText, yesAction, noText, () => this.show(p)),
     )
   }
 
@@ -121,7 +126,7 @@ export class ActionForm {
    * @param player Player to show form to
    */
   async show(player: Player): Promise<boolean> {
-    if (!this.buttons.length) this.addButton('Пусто', () => this.show(player))
+    if (!this.buttons.length) this.button(noI18n`Empty`, () => this.show(player))
 
     const response = await showForm(this.form, player)
 
@@ -130,7 +135,7 @@ export class ActionForm {
 
     const callback = this.buttons[response.selection]?.callback
     if (typeof callback === 'function') {
-      util.catch(() => callback(player, () => this.show(player)))
+      util.catch(() => callback(player, () => this.show(player)) as void)
       return true
     }
 

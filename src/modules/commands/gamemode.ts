@@ -4,7 +4,7 @@ import { GameMode } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { is, isNotPlaying, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 function fastGamemode(mode: GameMode, shorname: string) {
@@ -12,8 +12,8 @@ function fastGamemode(mode: GameMode, shorname: string) {
     .setDescription('Переключает режим на ' + mode)
     .setPermissions('builder')
     .executes(ctx => {
+      ctx.player.success(i18n`${shorname}: ${ctx.player.getGameMode()} -> ${mode}`)
       ctx.player.setGameMode(mode)
-      ctx.player.success()
     })
 }
 
@@ -45,18 +45,34 @@ function fastEffect(effect: MinecraftEffectTypes, commandName: string, effectNam
       if (!isNotPlaying(ctx.player) && !is(ctx.player.id, 'techAdmin'))
         return ctx.error('Вы не можете совершить это действие вне режима строительства')
 
-      if (ctx.player.getEffect(effect)) {
+      const has = ctx.player.getEffect(effect)
+      if (has?.amplifier === amplifier) {
+        log()
         ctx.player.removeEffect(effect)
       } else {
-        ctx.player.addEffect(effect, 99999, {
-          amplifier,
-        })
+        if (has) {
+          log()
+          ctx.player.removeEffect(effect)
+        }
+        log()
+        ctx.player.addEffect(effect, 20000000, { amplifier, showParticles: false })
+      }
+
+      function log() {
+        const current = ctx.player.getEffect(effect)
+        const effectname = Object.entries(MinecraftEffectTypes).find(e => e[1] === effect)?.[0]
+        if (current) {
+          ctx.player.success(i18n`${'§c-'} ${effectname} ${current.amplifier}`)
+        } else {
+          ctx.player.success(i18n`${'§a+'} ${effectname} ${amplifier}`)
+        }
       }
     })
 }
 
 fastEffect(MinecraftEffectTypes.NightVision, 'night', 'ночного зрения')
 fastEffect(MinecraftEffectTypes.Speed, 'speed', 'скорости')
+fastEffect(MinecraftEffectTypes.Haste, 'haste', 'скорости копания')
 
 new Command('heal')
   .setPermissions(__RELEASE__ ? 'techAdmin' : 'builder')
@@ -99,8 +115,8 @@ new Command('hpi')
               if (typeof hit === 'undefined') return
 
               ctx.player.onScreenDisplay.setActionBar(
-                t`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
-                ActionbarPriority.UrgentNotificiation,
+                noI18n`HP: ${hit.entity.getComponent('health')?.currentValue ?? 0}/${hit.entity.getComponent('health')?.effectiveMax} TP: ${hit.entity.typeId.replace('minecraft:', '')}\nID: ${hit.entity.id}`,
+                ActionbarPriority.Highest,
               )
             },
             'hpi',

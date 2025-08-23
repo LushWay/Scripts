@@ -1,7 +1,7 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, typeIdToReadable } from 'lib'
-import { t } from 'lib/text'
+import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, translateTypeId } from 'lib'
+import { i18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
 import {
@@ -24,10 +24,10 @@ export function useBlockSelection(
     notSelected = {},
   }: { onSelect?: (player: Player) => void; notSelected?: Partial<ChestButton> } = {},
 ): [blocks: (BlockPermutation | ReplaceTarget)[] | undefined, options: ChestButton] {
-  const block = storage.get(player.id)
+  const selection = storage.get(player.id)
 
   const callback = () => {
-    selectBlockSource(player, () => onSelect(player), block).then(e => {
+    selectBlockSource(player, () => onSelect(player), selection).then(e => {
       storage.set(player, e)
       onSelect(player)
     })
@@ -43,45 +43,46 @@ export function useBlockSelection(
       ...notSelected,
     },
   ]
-  if (!block) return empty
+  if (!selection) return empty
 
   let result: (BlockPermutation | ReplaceTarget)[]
   let dispaySource: Pick<BlockPermutation, 'getAllStates' | 'type'>
   let options = {} as ChestButton
 
-  if ('permutations' in block) {
-    const type =
-      block.permutations[0] instanceof BlockPermutation
-        ? block.permutations[0].type
-        : BlockTypes.get(block.permutations[0].typeId)
+  if ('permutations' in selection) {
+    const block = selection.permutations[0]
+
+    if (!block) {
+      player.fail('No permutations selected')
+      throw new Error('No permutations selected')
+    }
+
+    const type = block instanceof BlockPermutation ? block.type : BlockTypes.get(block.typeId)
 
     if (!type) {
-      player.fail(t.error`Неизвестный тип блока: ${inspect(block.permutations[0])}`)
-      throw new Error(`Unknown block type: ${inspect(block.permutations[0])}`)
+      player.fail(i18n.error`Неизвестный тип блока: ${inspect(selection.permutations[0])}`)
+      throw new Error(`Unknown block type: ${inspect(selection.permutations[0])}`)
     }
 
     dispaySource =
-      block.permutations[0] instanceof BlockPermutation
-        ? block.permutations[0]
+      block instanceof BlockPermutation
+        ? block
         : {
-            getAllStates() {
-              if (block.permutations[0] instanceof BlockPermutation) return block.permutations[0].getAllStates()
-              return block.permutations[0].states
-            },
+            getAllStates: () => (block instanceof BlockPermutation ? block.getAllStates() : block.states),
             type: type,
           }
-    result = block.permutations
+    result = selection.permutations
   } else {
-    const set = getBlocksInSet(block.ref)
+    const set = getBlocksInSet(selection.ref)
     if (!set[0]) return empty
     result = set
     dispaySource = set[0]
 
     options.nameTag = desc
-    desc = 'Набор блоков ' + stringifyBlocksSetRef(block.ref)
+    desc = 'Набор блоков ' + stringifyBlocksSetRef(selection.ref)
   }
   options = {
-    ...ChestForm.permutationToButton(dispaySource),
+    ...ChestForm.permutationToButton(dispaySource, player),
     ...options,
     callback,
   }
@@ -97,30 +98,30 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
     currentSelection &&
     'permutations' in currentSelection &&
     currentSelection.permutations[0] &&
-    typeIdToReadable(
+    translateTypeId(
       currentSelection.permutations[0] instanceof BlockPermutation
         ? currentSelection.permutations[0].type.id
         : currentSelection.permutations[0].typeId,
+      player.lang,
     )
 
   const promise = new Promise<SelectedBlock>(resolve => {
     const base = new ActionForm('Выбери блок/набор блоков')
-      .addButton(ActionForm.backText, back)
-      .addButton(
-        selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков',
-        () => {
-          const blocksSets = getAllBlocksSets(player.id)
+      .button(ActionForm.backText.to(player.lang), back)
+      .button(selectedBlocksSet ? `§2Сменить выбранный набор:\n§7${selectedBlocksSet}` : 'Выбрать набор блоков', () => {
+        const blocksSets = getAllBlocksSets(player.id)
 
-          const form = new ActionForm('Наборы блоков').addButton(ActionForm.backText, () => base.show(player))
+        const form = new ActionForm('Наборы блоков').button(ActionForm.backText.to(player.lang), () =>
+          base.show(player),
+        )
 
-          for (const blocksSet of Object.keys(blocksSets)) {
-            form.addButton(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
-          }
+        for (const blocksSet of Object.keys(blocksSets)) {
+          form.button(blocksSet, () => resolve({ ref: [player.id, blocksSet] }))
+        }
 
-          form.show(player)
-        },
-      )
-      .addButton(
+        form.show(player)
+      })
+      .button(
         selectedBlock ? `§2Сменить выбранный блок: §f${selectedBlock}` : 'Выбрать из инвентаря/под ногами',
         () => {
           const form = new ChestForm('large')
@@ -141,7 +142,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             },
             'B': {
               ...(blockBelow
-                ? ChestForm.permutationToButton(blockBelow.permutation)
+                ? ChestForm.permutationToButton(blockBelow.permutation, player)
                 : { icon: MinecraftBlockTypes.Air }),
               description: 'Нажми чтобы выбрать',
               callback: () =>
@@ -151,7 +152,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             },
             'G': {
               ...(blockFromView?.block
-                ? ChestForm.permutationToButton(blockFromView.block.permutation)
+                ? ChestForm.permutationToButton(blockFromView.block.permutation, player)
                 : { icon: MinecraftBlockTypes.Air }),
               description: 'Нажми чтобы выбрать блок на который смотришь',
               callback: () =>
@@ -174,7 +175,7 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
             form.button({
               slot: base + blocks.length,
               icon: typeId,
-              nameTag: typeIdToReadable(typeId),
+              nameTag: translateTypeId(typeId, player.lang),
               description: 'Нажми чтобы выбрать',
               callback() {
                 resolve({ permutations: [BlockPermutation.resolve(typeId)] })
@@ -188,9 +189,10 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
       )
 
     if (currentSelection && 'permutations' in currentSelection && currentSelection.permutations[0])
-      base.addButton('§2Редактировать свойства выбранного блока', async () => {
+      base.button('§2Редактировать свойства выбранного блока', async () => {
         const selection = currentSelection.permutations[0]
-        currentSelection.permutations[0]
+        if (!selection) throw new Error('No selection!')
+
         const states = await WEeditBlockStatesMenu(
           player,
           selection instanceof BlockPermutation ? selection.getAllStates() : selection.states,
@@ -208,10 +210,10 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
       })
 
     base
-      .addButton('Ввести ID вручную', () => {
+      .button('Ввести ID вручную', () => {
         selectBlockByIdModal(player, resolve)
       })
-      .addButton('§cОчистить выделение', () => {
+      .button('§cОчистить выделение', () => {
         resolve(undefined)
       })
 
@@ -225,7 +227,8 @@ function selectBlockSource(player: Player, back: () => void, currentSelection: S
 function selectBlockByIdModal(player: Player, resolve: (v: SelectedBlock) => void, error = '') {
   new ModalForm('Введи айди блока').addTextField(`${error}ID блока`, 'например, stone').show(player, (_, id) => {
     let error = ''
-    if (!blockIsAvaible(id, { fail: m => (error += m) })) return selectBlockByIdModal(player, resolve, `${error}\n`)
+    if (!blockIsAvaible(id, { tell: m => (error += m.to(player.lang)), lang: player.lang }))
+      return selectBlockByIdModal(player, resolve, `${error}\n`)
 
     resolve({ permutations: [BlockPermutation.resolve(id)] })
   })

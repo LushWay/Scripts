@@ -1,17 +1,16 @@
 import 'lib'
 
-// import '../test/test'
 import './anticheat/index'
-import './chat/chat'
-import './commands/index'
-import './indicator/index'
-import './places/dungeons/command'
-import './places/dungeons/warden'
-import './places/stone-quarry/index'
-import './pvp/import'
 import './survival/import'
+
+import './chat/chat'
 import './test/test'
+import './wiki/wiki'
 import './world-edit/builder'
 import './world-edit/import'
+
+import './commands/index'
+import './indicator/index'
+import './pvp/import'
 
 import 'lib/load/message2'

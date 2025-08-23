@@ -1,7 +1,10 @@
 import { Player, world } from '@minecraft/server'
-import { ProxyDatabase } from 'lib/database/proxy'
-import { AbstractPoint, toPoint } from 'lib/game-utils'
+import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
+import { removeDefaults, setDefaults } from 'lib/database/defaults'
+import { ActionForm } from 'lib/form/action'
+import { noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
+import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
 import { defaultRegionPermissions, RegionDatabase, RegionSave } from '../database'
 import { RegionStructure } from '../structure'
@@ -39,7 +42,7 @@ export interface RegionCreationOptions {
 }
 
 interface RegionConstructor<I extends Region>
-  extends Pick<typeof Region, 'regions' | 'getAll' | 'getAt' | 'getManyAt'> {
+  extends Pick<typeof Region, 'regions' | 'getAll' | 'getAt' | 'getManyAt' | 'chunkQuery'> {
   new (...args: any[]): I
 }
 
@@ -49,10 +52,10 @@ export class Region {
 
   protected static generateRegionKey(kind: string, area: string, radius: number) {
     const date = new Date()
-    let key = `${kind}-${area}-${radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
-    if (key in RegionDatabase) {
+    let key = `${kind}-${area}-${~~radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
+    if (RegionDatabase.has(key)) {
       let i = 0
-      while (`${key}-${i}` in RegionDatabase) i++
+      while (RegionDatabase.has(`${key}-${i}`)) i++
       key = `${key}-${i}`
     }
     return key
@@ -65,9 +68,13 @@ export class Region {
     options: ConstructorParameters<T>[1] = {},
     key?: string,
   ): InstanceType<T> {
-    const region = new this(area, options, key ?? this.generateRegionKey(this.kind, area.type, area.radius))
+    if (this !== Region && this.regions === Region.regions) this.regions = []
 
-    region.permissions = ProxyDatabase.setDefaults(options.permissions ?? {}, region.defaultPermissions)
+    const region = new this(area, options, key ?? this.generateRegionKey(this.kind, area.type, area.radius))
+    this.regions.push(region)
+    if (this !== Region) Region.regions.push(region)
+
+    region.permissions = setDefaults(options.permissions ?? {}, region.defaultPermissions)
     region.kind = this.kind
     region.creator = this
     if (options.ldb) region.ldb = options.ldb
@@ -82,8 +89,22 @@ export class Region {
       region.onRestore()
     }
 
+    if (area.radius) this.chunkQuery.add(region)
+
     return region as unknown as InstanceType<T>
   }
+
+  static chunkQuery = new ChunkQuery<Region>(
+    (location, { area }) => area.isIn({ location, dimensionType: area.dimensionType }),
+    (location, { area }, distance) => area.isNear({ location, dimensionType: area.dimensionType }, distance),
+    (chunk, { area }) =>
+      area.isNear(
+        { dimensionType: chunk.dimensionType, location: { ...chunk.center, y: area.center.y } },
+        ChunkArea.size,
+      ),
+    object => object.dimensionType,
+    object => object.area.edges,
+  )
 
   /** Regions list */
   static regions: Region[] = []
@@ -93,8 +114,29 @@ export class Region {
    *
    * @returns Array of instances that match the specified type `R` of Region.
    */
-  static getAll<I extends Region>(this: RegionConstructor<I>) {
-    return this.regions.filter((e => e instanceof this) as (e: Region) => e is I)
+  static getAll<I extends Region>(this: RegionConstructor<I> | typeof Region): I[] {
+    return this.regions as I[]
+  }
+
+  /**
+   * Returns an array of regions of the type of the caller that are near a specified point within a given radius.
+   *
+   * @param point - Represents point in the world
+   */
+  static getNear<I extends Region>(
+    this: RegionConstructor<I> | typeof Region,
+    point: AbstractPoint,
+    radius: number,
+    chunkQuery = false, // Still slower. Need to investigate
+  ): I[] {
+    point = toPoint(point)
+
+    if (chunkQuery) {
+      const all = this.chunkQuery.getNear(point, radius)
+      return (this === Region ? all : all.filter(e => e instanceof this)) as I[]
+    }
+
+    return (this.regions as I[]).filter(region => region.area.isNear(point, radius))
   }
 
   /**
@@ -111,11 +153,20 @@ export class Region {
    *
    * @param point - Represents point in the world
    */
-  static getManyAt<I extends Region>(this: RegionConstructor<I> | typeof Region, point: AbstractPoint): I[] {
-    const regions = this === Region ? this.regions : this.getAll()
+  static getManyAt<I extends Region>(
+    this: RegionConstructor<I> | typeof Region,
+    point: AbstractPoint,
+    chunkQuery = true, // 99% faster then iteration
+  ): I[] {
     point = toPoint(point)
 
-    return regions.filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority) as I[]
+    if (chunkQuery) {
+      const all = this.chunkQuery.getAt(point)
+      const filtered = (this === Region ? all : all.filter(e => e instanceof this)) as I[]
+      return filtered.sort((a, b) => b.priority - a.priority)
+    }
+
+    return (this.regions as I[]).filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority)
   }
 
   /** Region priority. Used in {@link Region.getAt} */
@@ -153,10 +204,7 @@ export class Region {
     public area: Area,
     options: RegionCreationOptions,
     readonly id: string,
-  ) {
-    this.area = area
-    if (id) Region.regions.push(this)
-  }
+  ) {}
 
   /** Function that gets called on region creation after saving (once) */
   protected onCreate() {
@@ -178,12 +226,12 @@ export class Region {
   }
 
   /** Name of the region that should always be */
-  get name() {
+  get name(): Text {
     return this.ownerName ?? this.id
   }
 
   /** Name that will be displayed on the sidebar e.g. It can be empty. */
-  get displayName(): string | undefined {
+  get displayName(): Text | undefined {
     return undefined
   }
 
@@ -228,7 +276,7 @@ export class Region {
     return {
       a: this.area.toJSON(),
       k: this.kind,
-      permissions: ProxyDatabase.removeDefaults(this.permissions, this.defaultPermissions),
+      permissions: removeDefaults(this.permissions, this.defaultPermissions),
       dimensionId: this.dimensionType,
       ldb: this.ldb,
     }
@@ -238,14 +286,26 @@ export class Region {
   save() {
     if (!(RegionIsSaveable in this)) return false
 
-    RegionDatabase[this.id] = this.toJSON()
+    RegionDatabase.set(this.id, this.toJSON())
   }
 
   /** Removes this region */
   delete() {
     this.structure?.delete()
+    Region.chunkQuery.remove(this)
     Region.regions = Region.regions.filter(e => e.id !== this.id)
-    Reflect.deleteProperty(RegionDatabase, this.id)
+    this.creator.regions = this.creator.regions.filter(e => e.id !== this.id)
+    RegionDatabase.delete(this.id)
+  }
+
+  /** Can be overriden to add custom buttons to the .region edit form */
+  customFormButtons(form: ActionForm, player: Player) {
+    // Can be overriden to add custom buttons
+  }
+
+  /** Can be overriden to add custom description */
+  customFormDescription(player: Player): Text.Table {
+    return [[noI18n`Приоритет`, this.priority]]
   }
 }
 

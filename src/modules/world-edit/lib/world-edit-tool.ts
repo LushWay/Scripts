@@ -3,14 +3,14 @@ import {
   ContainerSlot,
   ItemStack,
   ItemTypes,
-  ItemUseOnBeforeEvent,
   Player,
+  PlayerInteractWithBlockBeforeEvent,
   system,
   world,
 } from '@minecraft/server'
-import { Command, inspect, isKeyof, stringify, util } from 'lib'
+import { Command, inspect, isKeyof, noBoolean, stringify, util } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { textTable } from 'lib/text'
+import { noI18n, textUnitColorize } from 'lib/i18n/text'
 import { BlocksSetRef, stringifyBlocksSetRef } from 'modules/world-edit/utils/blocks-set'
 import { worldEditPlayerSettings } from '../settings'
 
@@ -161,16 +161,20 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
     if (!writeLore) return
 
-    const table = Object.map(storage, (key, value) => {
-      if (!isKeyof(key, this.translation)) return false
+    const table = Object.entries(storage)
+      .map(([key, value]) => {
+        if (!isKeyof(key, this.translation)) return false
 
-      return [
-        this.translation[key],
-        WorldEditTool.loreBlockRefKeys.includes(key) ? stringifyBlocksSetRef(value as BlocksSetRef) : stringify(value),
-      ]
-    })
+        const translatedKey = this.translation[key]
+        const fullValue = WorldEditTool.loreBlockRefKeys.includes(key)
+          ? stringifyBlocksSetRef(value as BlocksSetRef)
+          : stringify(value)
 
-    slot.setLore([' ', ...textTable(table, false, false).map(e => '§r' + e.slice(0, 48))])
+        return `§7${translatedKey}: ${textUnitColorize(fullValue, undefined, false)}`
+      })
+      .filter(noBoolean)
+
+    slot.setLore([' ', ...table.map(e => `§r${noI18n`${e[0]}: ${e[1]}`.slice(0, 48)}`)])
   }
 
   /** @deprecated */
@@ -242,17 +246,18 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
 
   static {
     this.onUseEvent('itemUse')
-    this.onUseEvent('itemUseOn')
+    this.onUseEvent('playerInteractWithBlock')
     this.intervalsJob()
   }
 
-  private static onUseEvent(event: 'itemUse' | 'itemUseOn') {
+  private static onUseEvent(event: 'itemUse' | 'playerInteractWithBlock') {
     const property =
       event === 'itemUse' ? ('onUse' satisfies keyof WorldEditTool) : ('onUseOnBlock' satisfies keyof WorldEditTool)
 
-    world[event === 'itemUseOn' ? 'beforeEvents' : 'afterEvents'][event].subscribe(someEvent => {
-      const { source: player, itemStack: item } = someEvent
-      if (!(player instanceof Player)) return
+    world[event === 'playerInteractWithBlock' ? 'beforeEvents' : 'afterEvents'][event].subscribe(someEvent => {
+      const { itemStack: item } = someEvent
+      const player = 'player' in someEvent ? someEvent.player : someEvent.source
+      if (!(player instanceof Player) || !item) return
 
       for (const tool of WorldEditTool.tools) {
         if (!tool[property] || !tool.isOurItemType(item)) continue
@@ -264,7 +269,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
           if (create) return create(tool, player)
           tool[property](player, item, storage)
         } else {
-          const event = someEvent as ItemUseOnBeforeEvent
+          const event = someEvent as PlayerInteractWithBlockBeforeEvent
           if (!event.isFirstEvent) return
 
           event.cancel = true
@@ -280,7 +285,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   private static create(this: void, tool: WorldEditTool, player: Player) {
     if (tool.editToolForm) {
       tool.editToolForm(player.mainhand(), player)
-    } else player.onScreenDisplay.setActionBar('§cИспользуй .we', ActionbarPriority.UrgentNotificiation)
+    } else player.onScreenDisplay.setActionBar('§cИспользуй .we', ActionbarPriority.Highest)
   }
 
   private static intervalsJob() {
@@ -290,7 +295,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   private static *createJob() {
     try {
       for (const player of world.getAllPlayers()) {
-        if (!player.isValid()) continue
+        if (!player.isValid) continue
 
         const slot = player.mainhand()
         const tools = WorldEditTool.tools.filter(e => e.typeId === slot.typeId)

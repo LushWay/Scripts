@@ -4,7 +4,8 @@ import '../../tools/defines'
 declare global {
   type VoidFunction = () => void
 
-  type Vector3 = mc.Vector3
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  type Vector3 = { x: number; y: number; z: number }
   type Vector2 = mc.Vector2
   type VectorXZ = Record<'x' | 'z', number>
   type Vector5 = Record<'x' | 'y' | 'z' | 'rx' | 'ry', number>
@@ -42,9 +43,7 @@ declare global {
 
   type ValueOf<T> = T[keyof T]
 
-  /** Text that can be displayed on player screen and should support translation */
-  type Text = import('lib/text').Text
-  // type Text = (mc.RawMessage | string)[] | mc.RawMessage | string
+  type MaybePromise<T> = T | Promise<T>
 
   // Custom immutable type
   // source: https://github.com/Microsoft/TypeScript/issues/13923#issuecomment-653675557
@@ -74,6 +73,17 @@ declare global {
 
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Worker {}
+
+  // I hate eslint btw
+  interface PromiseWithResolvers<T> {
+    promise: Promise<T>
+    resolve: (value: T | PromiseLike<T>) => void
+    reject: (reason?: any) => void
+  }
+
+  interface PromiseConstructor {
+    withResolvers<T>(): PromiseWithResolvers<T>
+  }
 }
 
 /** Describes types that can be narrowed */
@@ -84,7 +94,8 @@ declare module '@minecraft/server' {
     name?: string | undefined
     readonly role: Role
     prevRole?: Role
-    quests?: import('./quest/quest').QuestDB
+    quests?: import('./quest/quest').Quest.DB
+    achivs?: import('./achievements/achievement').Achievement.DB
     join?: {
       position?: number[]
       stage?: number

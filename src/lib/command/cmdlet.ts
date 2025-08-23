@@ -1,4 +1,5 @@
 import { ChatSendAfterEvent } from '@minecraft/server'
+import { i18n } from 'lib/i18n/text'
 import { CommandContext } from './context'
 import { Command } from './index'
 
@@ -9,7 +10,7 @@ export class CmdLet {
 
   callback: CmdLetCallback | undefined
 
-  description: string | undefined
+  description: Text | undefined
 
   name: string
 
@@ -30,16 +31,16 @@ export class CmdLet {
     const results = []
     for (const cmdlet of CmdLet.list) {
       const input = cmdlets.find(e => e[0] === cmdlet.name)
-      if (input && cmdlet.callback) {
+      if (input?.[0] && cmdlet.callback) {
         results.push(cmdlet.callback(new CommandContext(event, args, command, rawInput), input[0]))
       }
     }
 
     if (cmdlets.length > 0 && results.length < 1) {
       event.sender.fail(
-        `§cНеизвестный аргумент: §f${cmdlets.join(
+        i18n.error`Неизвестный аргумент: ${cmdlets.join(
           '§c, §f',
-        )}§c.\nДоступные командлеты: \n§f${CmdLet.list.map(e => `\n  §f${e.name} §7§o- ${e.description}`)}\n `,
+        )}.\nДоступные командлеты: \n${CmdLet.list.map(e => i18n.nocolor.join`\n  §f${e.name} §7§o- ${e.description}`.to(event.sender.lang)).join('')}\n `,
       )
       return 'stop'
     }
@@ -53,7 +54,7 @@ export class CmdLet {
     CmdLet.list.push(this)
   }
 
-  setDescription(string: string) {
+  setDescription(string: Text) {
     this.description = string
     return this
   }

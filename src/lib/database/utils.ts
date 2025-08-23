@@ -1,7 +1,8 @@
 /* i18n-ignore */
 
 import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { noI18n } from 'lib/i18n/text'
+import { Vec } from 'lib/vector'
 
 interface TableEntity {
   entity: Entity
@@ -38,7 +39,7 @@ export class DatabaseUtils {
         if (typeof tableName !== 'string' || typeof tableType !== 'string' || typeof index !== 'number')
           return { entity, tableName: 'NOTDB', tableType: 'NONE', index: 0 }
 
-        if (Vector.distance(entity.location, DatabaseUtils.entityLocation) > 1) {
+        if (Vec.distance(entity.location, DatabaseUtils.entityLocation) > 1) {
           entity.teleport(DatabaseUtils.entityLocation)
         }
 
@@ -60,7 +61,7 @@ export class DatabaseUtils {
     this.allEntities = this.getEntities()
 
     if (this.allEntities.length < 1) {
-      console.warn('§6Не удалось найти базы данных. Попытка загрузить бэкап...')
+      console.warn(noI18n`§6Не удалось найти базы данных. Попытка загрузить бэкап...`)
 
       world.overworld
         .getEntities({
@@ -75,7 +76,7 @@ export class DatabaseUtils {
       this.allEntities = this.getEntities()
 
       if (this.allEntities.length < 1) {
-        console.warn('§cНе удалось загрузить базы данных из бэкапа.')
+        console.warn(noI18n`§cНе удалось загрузить базы данных из бэкапа.`)
         return []
       } else console.warn(`Бэкап успешно загружен! Всего баз данных: ${this.allEntities.length}`)
     }
@@ -90,7 +91,7 @@ export class DatabaseUtils {
     entity.setDynamicProperty('tableName', tableName)
     entity.setDynamicProperty('tableType', tableType)
     entity.setDynamicProperty('index', index)
-    entity.nameTag = `§7DB §f${tableName} `
+    entity.nameTag = noI18n`DB ${tableName} `
 
     return entity
   }
@@ -133,6 +134,6 @@ export class DatabaseUtils {
   }
 }
 
-world.afterEvents.worldInitialize.subscribe(() => {
-  world.overworld.runCommandAsync('tickingarea add 0 -64 0 0 200 0 database true')
+world.afterEvents.worldLoad.subscribe(() => {
+  world.overworld.runCommand('tickingarea add 0 -64 0 0 200 0 database true')
 })

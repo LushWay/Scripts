@@ -29,8 +29,8 @@
           }
         },
         "power": 1.5,
-        "gravity": 0.025,
-        "inertia": 1,
+        "gravity": 0.01,
+        "inertia": 1.1,
         "liquid_inertia": 1,
         "uncertainty_base": 0,
         "uncertainty_multiplier": 0,

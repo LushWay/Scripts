@@ -7,7 +7,7 @@ export { inspect, stringify, stringifyError }
 
 export const util = {
   /** Runs the given callback safly. If it throws any error it will be handled */
-  catch(fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
+  catch(this: void, fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
     const prefix = `§6${subtype}: `
     try {
       const promise = fn()
@@ -30,11 +30,11 @@ export const util = {
      * @param {string} label - The name of the benchmark.
      * @returns {(label?: string) => number} A function that returns the time it took to run the function.
      */
-    function benchmark(label: string, type = 'test'): (label?: string) => number {
+    function benchmark(label: string, type = 'test'): (label?: string, subruns?: number) => number {
       const startTime = Date.now()
 
-      return function end(string) {
-        const tookTime = Date.now() - startTime
+      return function end(string, tookDivide = 1) {
+        const tookTime = (Date.now() - startTime) / tookDivide
 
         const typeresults = (util.benchmark.results[type] ??= {})
         typeresults[label] = ((typeresults[label] ?? 0) + tookTime) / 2
@@ -74,10 +74,10 @@ export const util = {
 
   /** Replaces each §<color> to its terminal eqiuvalent */
   toTerminalColors(text: string) {
-    return __SERVER__
-      ? text.replace(/§(.)/g, (_, a: string) => (TerminalColors[a] as string | undefined) ?? TerminalColors.r) +
-          TerminalColors.r
-      : text.replace(/§(.)/g, '')
+    const r = TerminalColors.r
+    if (!r) throw new TypeError('Broken terminal colors: no r')
+
+    return __SERVER__ ? text.replace(/§(.)/g, (_, a: string) => TerminalColors[a] ?? r) + r : text.replace(/§(.)/g, '')
   },
 
   fromTerminalColorsToMinecraft(string: string) {
@@ -114,17 +114,19 @@ export function wrap(string: string, maxLength: number) {
 
     // Last element index
     const i = lines.length - 1
-    const line = lines[i]
+    const line = lines[i] ?? ''
     const lastLineChar = line[line.length - 1]
 
     if (lastLineChar === '§' || char === '§') {
       // Ignore limit for invisible chars
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       lines[i] += char
     } else if ((char + line).replace(/§./g, '').length > maxLength) {
       // Limit exceeded, newline
       char.trim() && lines.push(char)
     } else {
       // No limit, add char to the line
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
       lines[i] += char
     }
   }
@@ -137,7 +139,7 @@ export function wrapLore(lore: string) {
   return wrap(lore, 30).map(e => {
     // Get latest color from the string
     const match = /^.*(§.)/.exec(e)
-    if (match) color = match[1]
+    if (match?.[1]) color = match[1]
     return '§r' + color + e
   })
 }
@@ -216,7 +218,7 @@ export function hexToRgb(hex: `#${string}`): RGB {
     ?.map(x => parseInt(x, 16) / 256)
 
   if (!rgb) throw new TypeError(`HEX ${hex} is invalid. Expected #[a-f\\d][a-f\\d][a-f\\d]`)
-  const [red, green, blue] = rgb
+  const [red, green, blue] = rgb as [number, number, number]
 
   return { red, green, blue }
 }
@@ -235,3 +237,28 @@ export function isEmpty(target: object | unknown[]): boolean {
 /** Empty function that does nothing. */
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export const doNothing = () => {}
+/** Adds minecraft: namespace to the text if not added already */
+
+export function addNamespace(text: string) {
+  return text.includes(':') ? text : `minecraft:${text}`
+}
+
+export function removeNamespace(text: string) {
+  return text.replace(/^minecraft:/, '')
+}
+
+Promise.withResolvers = <T>() => {
+  let resolve: ((value: T | PromiseLike<T>) => void) | undefined
+  let reject: ((value: Error) => void) | undefined
+  const promise = new Promise<T>((r, j) => ((resolve = r), (reject = j)))
+  if (!resolve || !reject) throw new TypeError('Promise is broken lol')
+  return { resolve, reject, promise }
+}
+
+export function capitalize<T extends string>(str: T) {
+  return ((str[0] ?? '').toUpperCase() + str.slice(1)) as Capitalize<T>
+}
+
+export function pick<T extends object, K extends keyof T>(object: T, keys: K[]): Pick<T, K> {
+  return Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key as K))) as Pick<T, K>
+}

@@ -1,8 +1,9 @@
 import { CameraFadeOptions, Player, TicksPerSecond } from '@minecraft/server'
 import { LockAction, LockActionCheckOptions, PlaceAction } from 'lib/action'
 import { hexToRgb } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { Core } from './extensions/core'
+import { i18n } from './i18n/text'
 
 export class Portal {
   static canTeleport(player: Player, lockActionOptions?: Parameters<(typeof LockAction)['locked']>[1]) {
@@ -15,7 +16,7 @@ export class Portal {
         fadeInDuration: 0,
         stayDuration: time * TicksPerSecond,
         fadeOutDuration: 0,
-        subtitle: '§2Перемещение...',
+        subtitle: i18n.nocolor`§2Перемещение...`.to(player.lang),
         priority: 100,
       })
     }
@@ -79,7 +80,7 @@ export class Portal {
     this.unsubscribers = []
 
     if (this.from && this.to)
-      for (const pos of Vector.foreach(this.from, this.to)) {
+      for (const pos of Vec.forEach(this.from, this.to)) {
         this.unsubscribers.push(PlaceAction.onEnter(pos, p => this.teleport(p)).unsubscribe)
       }
   }

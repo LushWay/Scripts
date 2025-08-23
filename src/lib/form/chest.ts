@@ -1,12 +1,11 @@
-import { BlockPermutation, Player, RawText } from '@minecraft/server'
+import { BlockPermutation, ItemPotionComponent, ItemStack, Player } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { MinecraftItemTypes, MinecraftPotionLiquidTypes } from '@minecraft/vanilla-data'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
-import { nmspc } from 'lib/game-utils'
-import { MaybeRawText, t } from 'lib/text'
-import { inspect, isKeyof, util, wrapLore } from 'lib/util'
-import { typeIdToReadable } from 'lib/utils/lang'
+import { translateTypeId } from 'lib/i18n/lang'
+import { addNamespace, inspect, isKeyof, util, wrapLore } from 'lib/util'
 import { typeIdToDataId, typeIdToID } from '../assets/chest-ui-type-ids'
 import { BUTTON, showForm } from './utils'
 
@@ -14,6 +13,10 @@ const NUMBER_OF_1_16_100_ITEMS = totalCustomItems
 
 const customItemsReverted: Record<string, string> = Object.map(Items, (k, v) => [v, k])
 export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
+  if (textureOrTypeId === MinecraftItemTypes.Potion) {
+    console.warn(new Error('Potion passed to getAuxOrTexture, use getAuxTextureOrPotionAux instead'))
+  }
+
   if (textureOrTypeId.startsWith('textures')) return textureOrTypeId
   if (isKeyof(textureOrTypeId, textureData)) return textureData[textureOrTypeId]
 
@@ -23,14 +26,39 @@ export function getAuxOrTexture(textureOrTypeId: string, enchanted = false) {
   )
     return `textures/items/${textureOrTypeId.replace('lw:', '').replace('_spawn_egg', '')}`
 
-  const typeId = nmspc(textureOrTypeId)
+  const typeId = addNamespace(textureOrTypeId)
   const ID = typeIdToID.get(typeId) ?? typeIdToDataId.get(typeId)
+  return idToAux(ID, enchanted)
+}
+
+function idToAux(ID: number | undefined, enchanted: boolean) {
   if (typeof ID === 'undefined') return BUTTON['?']
 
   let AUX = (ID + (ID < 256 ? 0 : NUMBER_OF_1_16_100_ITEMS)) * 65536
   if (enchanted) AUX += 32768
 
   return AUX.toString()
+}
+
+export function getAuxTextureOrPotionAux(itemStack: ItemStack) {
+  const potion = itemStack.getComponent(ItemPotionComponent.componentId)
+  if (!potion) return getAuxOrTexture(MinecraftItemTypes.Potion)
+
+  const { potionEffectType: effect, potionLiquidType: liquid } = potion
+  const type = liquid.id !== MinecraftPotionLiquidTypes.Regular ? '_' + liquid.id.toLowerCase() : ''
+  const effectId =
+    (effect.id[0] ?? '').toLowerCase() +
+    effect.id
+      .slice(1)
+      .replace(/([A-Z])/g, '_$1')
+      .toLowerCase()
+  const typeId =
+    effectId === 'none' && type === ''
+      ? 'minecraft:potion'
+      : `minecraft:${effectId === 'none' ? '' : effectId}${type}_potion`
+  const ID = typeIdToDataId.get(typeId)
+
+  return idToAux(ID, false)
 }
 
 const SIZES = {
@@ -67,29 +95,30 @@ export interface ChestButtonOptions {
 export class ChestForm {
   static permutationToButton(
     permutation: Pick<BlockPermutation, 'getAllStates' | 'type'>,
+    player: Player,
   ): Omit<ChestButtonOptions, 'slot'> {
     const states = permutation.getAllStates()
     return {
-      nameTag: typeIdToReadable(permutation.type.id),
+      nameTag: translateTypeId(permutation.type.id, player.lang),
       icon: permutation.type.id,
       lore: [...(Object.keys(states).length ? inspect(states).split('\n') : [])],
     }
   }
 
-  private titleText: RawText
+  private titleText: string
 
   private buttons: ChestButton[] = []
 
   constructor(sizeType: keyof typeof SIZES = 'small') {
     const [sizeName, size] = SIZES[sizeType]
 
-    this.titleText = t.raw`${sizeName}`
+    this.titleText = sizeName + '§0'
 
     for (let i = 0; i < size; i++) this.buttons.push({ text: '', icon: undefined })
   }
 
-  title(text: MaybeRawText) {
-    this.titleText = t.raw`${this.titleText}${text}`
+  title(text: string) {
+    this.titleText = `${this.titleText}${text}`
     return this
   }
 
@@ -130,14 +159,13 @@ export class ChestForm {
   pattern(from: [number, number], pattern: string[], key: Record<string, Omit<ChestButtonOptions, 'slot'>>) {
     for (let y = 0; y < pattern.length; y++) {
       const row = pattern[y]
-      for (let x = 0; x < row.length; x++) {
-        const slot = key[row[x]]
-        if (typeof slot === 'undefined') continue
+      if (!row) continue
 
-        this.button({
-          ...slot,
-          slot: from[1] + x + (from[0] + y) * 9,
-        })
+      for (let x = 0; x < row.length; x++) {
+        const slot = key[row[x] ?? '']
+        if (!slot) continue
+
+        this.button({ ...slot, slot: from[1] + x + (from[0] + y) * 9 })
       }
     }
     return this
@@ -157,7 +185,7 @@ export class ChestForm {
         )
           return
 
-        const callback = this.buttons[response.selection].callback
+        const callback = this.buttons[response.selection]?.callback
         if (!callback) this.show(player)
         else util.catch(() => callback(player))
       })

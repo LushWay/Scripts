@@ -2,6 +2,7 @@ import { GameMode, Player, ScriptEventSource, system, world } from '@minecraft/s
 import { EventSignal } from 'lib/event-signal'
 import { isKeyof } from 'lib/util'
 import { Core } from './extensions/core'
+import { i18n, noI18n } from './i18n/text'
 
 declare global {
   /** Any known role */
@@ -10,21 +11,21 @@ declare global {
 
 /** The roles that are in this server */
 export const ROLES = {
-  creator: '§aРуководство',
-  curator: '§6Куратор',
-  techAdmin: '§cТех. Админ',
-  chefAdmin: '§dГл. Админ',
-  admin: '§5Админ',
-  moderator: '§6Модератор',
-  helper: '§eПомошник',
-  grandBuilder: '§bГл. Строитель',
-  builder: '§3Строитель',
-  member: '§fУчастник',
-  spectator: '§9Наблюдатель',
-  tester: '§9Тестер',
+  creator: i18n.nocolor`§aРуководство`,
+  curator: i18n.nocolor`§6Куратор`,
+  techAdmin: i18n.nocolor`§cТех. Админ`,
+  chefAdmin: i18n.nocolor`§dГл. Админ`,
+  admin: i18n.nocolor`§5Админ`,
+  moderator: i18n.nocolor`§6Модератор`,
+  helper: i18n.nocolor`§eПомошник`,
+  grandBuilder: i18n.nocolor`§bГл. Строитель`,
+  builder: i18n.nocolor`§3Строитель`,
+  member: i18n.nocolor`§fУчастник`,
+  spectator: i18n.nocolor`§9Наблюдатель`,
+  tester: i18n.nocolor`§9Тестер`,
 }
 
-export const DEFAULT_ROLE: Role = __RELEASE__ ? 'member' : 'spectator'
+export const DEFAULT_ROLE: Role = 'member'
 
 /** List of role permissions */
 const PERMISSIONS: Record<Role, Role[]> = {
@@ -84,7 +85,7 @@ export function is(playerID: string, role: Role) {
 export function getRole(playerID: Player | string): Role {
   if (playerID instanceof Player) playerID = playerID.id
 
-  const role = Player.database[playerID].role
+  const role = Player.database.getImmutable(playerID).role
 
   if (!Object.keys(ROLES).includes(role)) return 'member'
   return role
@@ -104,7 +105,7 @@ export function getRole(playerID: Player | string): Role {
  */
 export function setRole(player: Player | string, role: Role): void {
   const id = player instanceof Player ? player.id : player
-  const database = Player.database[id]
+  const database = Player.database.get(id)
   if (typeof database !== 'undefined') {
     EventSignal.emit(Core.beforeEvents.roleChange, {
       id,
@@ -139,6 +140,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   }
 })
 
+/* istanbul ignore next */
 if (!__VITEST__) {
   // Allow recieving roles from scriptevent function run by console
   system.afterEvents.scriptEventReceive.subscribe(event => {
@@ -146,7 +148,7 @@ if (!__VITEST__) {
       if (event.sourceType === ScriptEventSource.Server) {
         // Allow
       } else {
-        if (Object.values(Player.database).find(e => WHO_CAN_CHANGE.includes(e.role))) {
+        if (Player.database.values().find(e => WHO_CAN_CHANGE.includes(e.role))) {
           return console.error(`(SCRIPTEVENT::${event.id}) Admin already set.`)
         }
       }
@@ -155,7 +157,7 @@ if (!__VITEST__) {
       if (!isKeyof(role, ROLES)) {
         return console.error(
           `(SCRIPTEVENT::${event.id}) Unkown role: ${role}, allowed roles:\n${Object.entries(ROLES)
-            .map(e => e[0] + ': ' + e[1])
+            .map(e => noI18n`${e[0]}: ${e[1]}`)
             .join('\n')}`,
         )
       }

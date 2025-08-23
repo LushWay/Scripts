@@ -2,9 +2,10 @@
 
 import { Player, system, world } from '@minecraft/server'
 import { ArrayForm, ROLES, getRole, inspect, util } from 'lib'
-import { DatabaseTable, getProvider } from 'lib/database/abstract'
+import { UnknownTable, getProvider } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
 
 new Command('db')
@@ -15,25 +16,25 @@ new Command('db')
 function selectTable(player: Player, firstCall?: true) {
   const form = new ActionForm('Таблицы данных')
   for (const [tableId, table] of Object.entries(getProvider().tables)) {
-    const name = `${tableId} §7${Object.keys(table).length}§r`
+    const name = noI18n`${tableId} ${`§7${table.size}`} ${getProvider().getRawTableData(tableId).length / (256 * 1024)}§r`
 
-    form.addButton(name, () => showTable(player, tableId, table))
+    form.button(name, () => showTable(player, tableId, table))
   }
   form.show(player)
   if (firstCall) player.info('Закрой чат!')
 }
 
-function showTable(player: Player, tableId: string, table: DatabaseTable) {
+function showTable(player: Player, tableId: string, table: UnknownTable) {
   const selfback = () => showTable(player, tableId, table)
-  const keys = Object.keys(table)
+  const keys = [...table.keys()]
   new ArrayForm(`${tableId} ${keys.length}`, keys)
     .addCustomButtonBeforeArray(form => {
       form
-        .addButton('§3Новое значение§r', () => {
-          changeValue(player, null, (newVal, key) => (table[key] = newVal), selfback)
+        .button('§3Новое значение§r', () => {
+          changeValue(player, null, (newVal, key) => table.set(key, newVal), selfback)
         })
-        .addButtonPrompt('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
-          Object.keys(table).forEach(e => Reflect.deleteProperty(table, e))
+        .ask('§cОчистить таблицу', 'ДААА УДАЛИТЬ ВСЕ НАФИГ', () => {
+          for (const key of table.keys()) table.delete(key)
         })
     })
     .back(() => selectTable(player))
@@ -41,9 +42,9 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
       let name = key
       if (tableId === 'player') {
         const playerDatabase = table as typeof Player.database
-        name = `${playerDatabase[key].name} ${(ROLES[getRole(key)] as string | undefined) ?? '§7Без роли'}\n§8(${key})`
+        name = `${playerDatabase.get(key).name} ${(ROLES[getRole(key)] as Text | undefined)?.to(player.lang) ?? '§7Без роли'}\n§8(${key})`
       } else {
-        name += `\n§7${JSON.stringify(table[key]).slice(0, 200).replace(/"/g, '')}`
+        name += `\n§7${JSON.stringify(table.get(key)).slice(0, 200).replace(/"/g, '')}`
       }
 
       return [name, () => tableProperty(key, table, player, selfback)] as const
@@ -51,13 +52,13 @@ function showTable(player: Player, tableId: string, table: DatabaseTable) {
     .show(player)
 }
 
-function tableProperty(key: string, table: DatabaseTable, player: Player, back: VoidFunction) {
+function tableProperty(key: string, table: UnknownTable, player: Player, back: VoidFunction) {
   key = key + ''
   let value: unknown
   let failedToLoad = false
 
   try {
-    value = table[key]
+    value = table.get(key)
   } catch (e) {
     console.error(e)
     value = 'a'
@@ -68,23 +69,31 @@ function tableProperty(key: string, table: DatabaseTable, player: Player, back: 
     '§3Ключ ' + key,
     `§7Тип: §f${typeof value}\n ${failedToLoad ? '\n§cОшибка при получении данных из таблицы!§r\n\n' : ''}\n${inspect(value)}\n `,
   )
-    .addButton('Изменить', () =>
+    .button('Изменить', () =>
       changeValue(
         player,
         value,
         newValue => {
-          table[key] = newValue
+          table.set(key, newValue)
           player.tell(inspect(value) + '§r -> ' + inspect(newValue))
         },
         () => tableProperty(key, table, player, back),
         key,
       ),
     )
-    .addButton('§cУдалить§r', () => {
-      Reflect.deleteProperty(table, key)
+    .button('Переименовать', () => {
+      new ModalForm('Переименовать').addTextField('Ключ', 'останется прежним', key).show(player, (ctx, newKey) => {
+        if (newKey) {
+          player.success(i18n`Renamed ${key} -> ${newKey}`)
+          table.set(newKey, table.get(key))
+        } else player.info(i18n`Key ${key} left as is`)
+      })
+    })
+    .button(noI18n.error`Удалить`, () => {
+      table.delete(key)
       system.delay(back)
     })
-    .addButtonBack(back)
+    .addButtonBack(back, player.lang)
     .show(player)
 }
 
@@ -138,34 +147,36 @@ function changeValue(
 }
 
 const cmd = new Command('benchmark')
+  .setAliases('bench')
   .setDescription('Показывает время работы серверных систем')
   .setPermissions('techAdmin')
 
 cmd
   .string('type', true)
   .boolean('pathes', true)
-  .boolean('useChat', true)
-  .executes((ctx, type, pathes, useChat) => {
-    if (type && !(type in util.benchmark.results))
+  .boolean('sort', true)
+  .array('output', ['form', 'chat', 'log'], true)
+  .executes((ctx, type = 'timers', timerPathes = false, sort = true, output = 'form') => {
+    if (!(type in util.benchmark.results))
       return ctx.error(
         'Неизвестный тип бенчмарка! Доступные типы: \n  §f' + Object.keys(util.benchmark.results).join('\n  '),
       )
 
-    if (useChat) {
-      return ctx.reply(stringifyBenchmarkResult({ type: type ?? 'timers', timerPathes: pathes ?? false }))
-    }
+    const result = stringifyBenchmarkResult({ type: type, timerPathes, sort })
 
-    function show() {
-      new ActionForm(
-        'Benchmark',
-        stringifyBenchmarkResult({
-          type: type ?? 'timers',
-          timerPathes: pathes ?? false,
-        }),
-      )
-        .addButton('Refresh', null, show)
-        .addButton('Exit', null, () => void 0)
-        .show(ctx.player)
+    switch (output) {
+      case 'form': {
+        const show = () => {
+          new ActionForm('Benchmark', result)
+            .button('Refresh', null, show)
+            .button('Exit', null, () => void 0)
+            .show(ctx.player)
+        }
+        return show()
+      }
+      case 'chat':
+        return ctx.reply(result)
+      case 'log':
+        return console.log(result)
     }
-    show()
   })

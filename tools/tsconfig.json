@@ -9,8 +9,8 @@
     "lib": ["ES2022"],
     "target": "ES2022",
     "types": ["node"],
-    "module": "NodeNext"
+    "module": "NodeNext",
+    "allowImportingTsExtensions": true
   },
-  "include": [".", "../../tools/asset-lang-js.ts"],
-  "exclude": ["defines.d.ts"]
+  "include": [".", "./defines.d.ts"]
 }

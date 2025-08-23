@@ -1,16 +1,17 @@
 import { Player } from '@minecraft/server'
+import { MemoryTable } from 'lib/database/abstract'
+import { i18n, noI18n } from 'lib/i18n/text'
 import {
-  SETTINGS_GROUP_NAME,
   Settings,
+  SETTINGS_GROUP_NAME,
+  SettingsDatabaseValue,
   settingsGroupMenu,
   type SettingsConfig,
   type SettingsConfigParsed,
   type SettingsDatabase,
 } from 'lib/settings'
-import { MaybeRawText } from 'lib/text'
-import { rawTextToString } from 'lib/utils/lang'
-import { stringSimilarity } from '../search'
 import { util } from '../util'
+import { stringSimilarity } from '../utils/search'
 import { ActionForm } from './action'
 import { ModalForm } from './modal'
 import { NewFormCallback } from './new'
@@ -22,19 +23,19 @@ export declare namespace ArrayForm {
     filters: F,
     form: ActionForm,
     back: VoidFunction,
-  ) => readonly [text: MaybeRawText, callback: NewFormCallback] | false
+  ) => readonly [text: Text, callback: NewFormCallback] | false
   type Sort<T, F> = (array: T[], filters: F) => T[]
   type AddCustomButtons<TH, C> = (this: TH, form: ActionForm, filters: C, back: VoidFunction) => void
 
   interface Config<T, C extends SettingsConfig, F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>> {
     filters: C
-    description?: MaybeRawText
+    description?: Text
     button?: Button<T, F>
     sort?: Sort<T, F>
     addCustomButtonBeforeArray?: AddCustomButtons<this, F>
     itemsPerPage?: number
     minItemsForFilters?: number
-    back?: VoidFunction
+    back?: NewFormCallback
   }
 }
 
@@ -43,18 +44,14 @@ export class ArrayForm<
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
-  private config: ArrayForm.Config<T, C, F> = {
-    filters: {
-      [SETTINGS_GROUP_NAME]: 'Пустые фильтры',
-    } as C,
-  }
+  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: noI18n`Empty filters` } as C }
 
   constructor(
     private title: Text,
     private array: readonly T[],
   ) {}
 
-  description(text?: MaybeRawText) {
+  description(text?: Text) {
     this.config.description = text
     return this
   }
@@ -65,10 +62,7 @@ export class ArrayForm<
   }
 
   filters<const V extends SettingsConfig>(filters: V) {
-    this.config.filters = {
-      [SETTINGS_GROUP_NAME]: 'Фильтры',
-      ...(filters as unknown as C),
-    }
+    this.config.filters = { [SETTINGS_GROUP_NAME]: i18n`Фильтры`, ...(filters as unknown as C) }
     return this as unknown as ArrayForm<T, V>
   }
 
@@ -82,7 +76,7 @@ export class ArrayForm<
     return this
   }
 
-  back(back?: VoidFunction) {
+  back(back?: NewFormCallback) {
     this.config.back = back
     return this
   }
@@ -95,7 +89,7 @@ export class ArrayForm<
   show(
     player: Player,
     fromPage = 1,
-    filtersDatabase: SettingsDatabase = {},
+    filtersDatabase: SettingsDatabase = new MemoryTable<SettingsDatabaseValue>({}, () => ({})),
     filters = Settings.parseConfig(filtersDatabase, 'filters', this.config.filters) as F,
     searchQuery = '',
   ) {
@@ -108,7 +102,7 @@ export class ArrayForm<
       this.config.minItemsForFilters,
     )
 
-    const form = this.createForm(fromPage, paginator.maxPages)
+    const form = this.createForm(player, fromPage, paginator.maxPages)
 
     // Force show helper buttons when array is filtered
     // this is needed because when filters are applied and button count
@@ -128,21 +122,22 @@ export class ArrayForm<
 
     // Array item buttons & navigation
     if (paginator.canGoBack)
-      form.addButton('§r§3Предыдущая', BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
+      form.button(i18n.accent`Предыдущая`.to(player.lang), BUTTON['<'], () => this.show(player, fromPage - 1, ...args))
 
-    this.addButtons(paginator.array, form, filters, selfback)
+    this.addButtons(player, paginator.array, form, filters, selfback)
 
-    if (paginator.canGoNext) form.addButton('§3Следующая', BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
+    if (paginator.canGoNext)
+      form.button(i18n.accent`Следующая`.to(player.lang), BUTTON['>'], () => this.show(player, fromPage + 1, ...args))
 
     return form.show(player)
   }
 
-  private createForm(fromPage: number, maxPages: number) {
+  private createForm(player: Player, fromPage: number, maxPages: number) {
     const form = new ActionForm(
-      this.title.replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
-      this.config.description,
+      this.title.to(player.lang).replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
+      this.config.description?.to(player.lang),
     )
-    if (this.config.back) form.addButtonBack(this.config.back)
+    if (this.config.back) form.addButtonBack(this.config.back, player.lang)
 
     return form
   }
@@ -155,11 +150,19 @@ export class ArrayForm<
     filtersDatabase: SettingsDatabase,
     parsedFilters: F,
   ) {
-    form.addButton(!searchQuery ? '§3Поиск' : `§3Результаты поиска по запросу\n§f${searchQuery}`, BUTTON.search, () => {
-      new ModalForm('Поиск').addTextField('Запрос', 'Ничего не произойдет').show(player, (ctx, query) => {
-        this.show(player, fromPage, filtersDatabase, parsedFilters, query)
-      })
-    })
+    form.button(
+      !searchQuery
+        ? i18n.accent`Поиск`.to(player.lang)
+        : i18n.accent`Результаты поиска по запросу\n${searchQuery}`.to(player.lang),
+      BUTTON.search,
+      () => {
+        new ModalForm(i18n`Поиск`.to(player.lang))
+          .addTextField(i18n`Запрос`.to(player.lang), i18n`Ничего не произойдет`.to(player.lang))
+          .show(player, (ctx, query) => {
+            this.show(player, fromPage, filtersDatabase, parsedFilters, query)
+          })
+      },
+    )
   }
 
   private addFilterButton(
@@ -173,13 +176,16 @@ export class ArrayForm<
     const size = keys.length
 
     const key = keys[0]
+    if (!key) return
+
     const firstFilterConfig = this.config.filters[key]
+    if (!firstFilterConfig) return
 
     if (size === 0) return
     if (size === 1 && Settings.isDropdown(firstFilterConfig.value)) {
       const values = firstFilterConfig.value
       let i = values.findIndex(e => filters[key] === e[0])
-      form.addButton('§3' + firstFilterConfig.name + ':§f ' + values[i][1], () => {
+      form.button(i18n.accent.join`${firstFilterConfig.name}: ${values[i]?.[1]}`.to(player.lang), () => {
         if (i >= values.length - 1) i = 0
         else i++
 
@@ -190,8 +196,8 @@ export class ArrayForm<
       })
     } else {
       const propertyName = 'filters'
-      const applied = Object.keys(database[propertyName] ?? {}).length
-      form.addButton(`§3Фильтры ${applied ? `§f(${applied})` : ''}`, BUTTON.settings, () =>
+      const applied = Object.keys(database.get(propertyName)).length
+      form.button(i18n.accent`Фильтры`.size(applied).to(player.lang), BUTTON.settings, () =>
         settingsGroupMenu(
           player,
           propertyName,
@@ -216,7 +222,7 @@ export class ArrayForm<
         const button = this.config.button(item, filters, empty, back)
 
         if (button) {
-          const buttonText = typeof button[0] === 'string' ? button[0] : rawTextToString(button[0], player.lang)
+          const buttonText = button[0].to(player.lang)
           sorted.push({ button, search: stringSimilarity(searchQuery, buttonText), item })
         }
       }
@@ -227,12 +233,12 @@ export class ArrayForm<
     } else return this.array
   }
 
-  private addButtons(array: readonly T[], form: ActionForm, filters: F, back: VoidFunction) {
+  private addButtons(player: Player, array: readonly T[], form: ActionForm, filters: F, back: VoidFunction) {
     if (!this.config.button) throw new TypeError('No button modifier!')
     for (const item of array) {
       const button = this.config.button(item, filters, form, back)
 
-      if (button) form.addButton(...button)
+      if (button) form.button(button[0].to(player.lang), button[1])
     }
   }
 }

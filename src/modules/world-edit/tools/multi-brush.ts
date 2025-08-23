@@ -1,5 +1,5 @@
 import { Direction, ItemStack, Player } from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ToolsDataStorage, WorldEditMultiTool } from '../lib/world-edit-multi-tool'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -35,7 +35,7 @@ class MultiBrushTool extends WorldEditMultiTool {
             return {
               block,
               face: Direction.Down,
-              faceLocation: Vector.down,
+              faceLocation: Vec.down,
             }
           } else return
         },
@@ -47,7 +47,7 @@ class MultiBrushTool extends WorldEditMultiTool {
   getRandomSpreadLocation(from: Vector3, spread: number) {
     const half = spread / 2
     const rd = () => Math.randomInt(-half, half)
-    return Vector.add(from, { x: rd(), y: rd(), z: rd() })
+    return Vec.add(from, { x: rd(), y: rd(), z: rd() })
   }
 }
 

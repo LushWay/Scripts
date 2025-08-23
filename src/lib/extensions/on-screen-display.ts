@@ -4,7 +4,7 @@ import { fromMsToTicks, fromTicksToMs } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 export enum ActionbarPriority {
-  UrgentNotificiation = 3,
+  Highest = 3,
   PvP = 2,
   Quest = 1,
   Lowest = 0,
@@ -87,9 +87,7 @@ type ScreenDisplayOverrideThis = ThisType<
 type ScreenDisplayOverrideTypes = Omit<(typeof ScreenDisplay)['prototype'], 'player'>
 
 export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOverrideThis = {
-  isValid() {
-    return this.player[ScreenDisplaySymbol].isValid()
-  },
+  isValid: true,
 
   setHudTitle(message, options, prefix = $title, n = 0) {
     let playerScreenDisplay = titles.get(this.player.id)
@@ -235,7 +233,7 @@ function run() {
             continue
           }
 
-          if (!player.isValid()) continue
+          if (!player.isValid) continue
 
           if (event.title?.expires && event.title.expires < Date.now()) {
             player.onScreenDisplay.setHudTitle('', {

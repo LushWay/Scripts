@@ -1,6 +1,6 @@
 import { ContainerSlot, Player, world } from '@minecraft/server'
-import { ActionForm } from 'lib'
 import { Items } from 'lib/assets/custom-items'
+import { form } from 'lib/form/new'
 import { setSelectionMenu } from 'modules/world-edit/commands/region/set/set-selection'
 import { WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
@@ -24,18 +24,19 @@ class WandTool extends WorldEditTool {
 
   editToolForm(_: ContainerSlot, player: Player, initial: boolean) {
     if (initial) return
-    new ActionForm('Действия с областью')
-      .addButton('Заполнить/Заменить блоки', () => setSelectionMenu(player))
-      .show(player)
+    form(f => {
+      f.title('Действия с областью')
+      f.button('Заполнить/Заменить блоки', setSelectionMenu)
+    }).show(player)
   }
 
   constructor() {
     super()
-    world.beforeEvents.itemUseOn.subscribe(event => {
-      if (event.itemStack.typeId !== this.typeId || !(event.source instanceof Player) || !event.isFirstEvent) return
+    world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+      if (event.itemStack?.typeId !== this.typeId || !event.isFirstEvent) return
 
       event.cancel = true
-      WorldEdit.forPlayer(event.source).pos2 = event.block
+      WorldEdit.forPlayer(event.player).pos2 = event.block
     })
 
     world.beforeEvents.playerBreakBlock.subscribe(event => {

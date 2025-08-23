@@ -1,5 +1,5 @@
 import {} from '@minecraft/server'
-import { Vector } from 'lib'
+import { Vec } from 'lib'
 import { WorldEdit } from '../../lib/world-edit'
 
 new Command('pos2')
@@ -7,5 +7,5 @@ new Command('pos2')
   .setPermissions('builder')
   .location('pos', true)
   .executes((ctx, pos = ctx.player.location) => {
-    WorldEdit.forPlayer(ctx.player).pos2 = Vector.floor(pos)
+    WorldEdit.forPlayer(ctx.player).pos2 = Vec.floor(pos)
   })

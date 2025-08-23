@@ -38,6 +38,17 @@ const stringifyError = Object.assign(
     isError(object: unknown): object is Error {
       return typeof object === 'object' && object !== null && object instanceof Error
     },
+    trace(add = 0) {
+      return this.stack.get(add + 1).replaceAll('\n', '  ')
+    },
+    parent(add = 0) {
+      return (
+        this.stack
+          .get(add + 1)
+          .split('\n')
+          .find(e => !e.includes('native')) ?? ''
+      )
+    },
     stack: {
       modifiers: [
         [/\\/g, '/'],
@@ -46,6 +57,7 @@ const stringifyError = Object.assign(
         [/(.*)\(native\)(.*)/, '§8$1(native)$2§f'],
         [s => (s.includes('lib') ? `§7${s.replace(/§./g, '')}§f` : s)],
         // [s => (s.startsWith('§7') ? s : s.replace(/:(\d+)/, ':§6$1§f'))],
+        [/__init \(index\.js:4\)/, ''],
       ] as [RegExp | ((s: string) => string), string?][],
 
       /** Parses stack */

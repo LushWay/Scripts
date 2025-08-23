@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { TestStructures } from 'test/constants'
 import { gamesuite, gametest } from 'test/framework'
 import { SphereArea } from '../areas/sphere'
@@ -10,7 +10,7 @@ class TestStructure extends RegionWithStructure {}
 gamesuite('RegionWithStructure', () => {
   gametest('should save and load structure only with region blocks', async test => {
     const region = TestStructure.create(
-      new SphereArea({ center: test.worldLocation(new Vector(2, 5, 2)), radius: 3 }, test.getDimension().type),
+      new SphereArea({ center: test.worldLocation(new Vec(2, 5, 2)), radius: 3 }, test.getDimension().type),
     )
 
     region.structure.save() // save empty structure with air

@@ -1,6 +1,7 @@
 import { ItemStack, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { EventLoader } from 'lib/event-signal'
+import { addNamespace } from 'lib/util'
 import { enchantmentsJson } from './assets/enchantments'
 import { Core } from './extensions/core'
 
@@ -54,7 +55,7 @@ function load() {
         continue
       }
 
-      ;((Enchantments.custom[ench.type.id] ??= {})[ench.level] ??= {})[item.typeId] = item
+      ;((Enchantments.custom[addNamespace(ench.type.id)] ??= {})[ench.level] ??= {})[item.typeId] = item
       expecting--
     }
   }

@@ -32,11 +32,11 @@
       },
 
       "minecraft:damage_sensor": {
-				"triggers": {
-					"cause": "all",
-					"deals_damage": false
-				}
-			},
+        "triggers": {
+          "cause": "all",
+          "deals_damage": false
+        }
+      },
 
       "minecraft:pushable": {
         "is_pushable": false,

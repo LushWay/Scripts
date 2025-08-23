@@ -2,8 +2,8 @@ import { Entity, ItemStack, Player, ShortcutDimensions, TicksPerSecond, system, 
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { StructureRootId } from 'lib/assets/structures'
 import { Cooldown } from '../cooldown'
-import { t } from '../text'
-import { Vector } from '../vector'
+import { i18n } from '../i18n/text'
+import { Vec } from '../vector'
 
 export default class ChestLootAnimation {
   constructor(
@@ -22,13 +22,13 @@ export default class ChestLootAnimation {
   private animate(entity: Entity, player: Player, current: CurrentAnimation) {
     const standing = current.stage > 25
     const y = standing ? 0 : current.stage * 0.005
-    const animationLocation = Vector.add(entity.location, { x: 0, y, z: 0 })
+    const animationLocation = Vec.add(entity.location, { x: 0, y, z: 0 })
     entity.teleport(animationLocation)
-    const particleSource = !standing ? animationLocation : Vector.add(entity.location, { x: 0, y: 1.5, z: 0 })
+    const particleSource = !standing ? animationLocation : Vec.add(entity.location, { x: 0, y: 1.5, z: 0 })
 
     player.spawnParticle(
       'minecraft:balloon_gas_particle',
-      Vector.subtract(Vector.add(particleSource, { x: 0.5, y: -0.2, z: 0.5 }), this.entityOffset),
+      Vec.subtract(Vec.add(particleSource, { x: 0.5, y: -0.2, z: 0.5 }), this.entityOffset),
     )
   }
 
@@ -48,17 +48,17 @@ export default class ChestLootAnimation {
     })[0]
 
     if (typeof entity === 'undefined') {
-      console.warn(t.error`Unable to spawn armor stand for ${this.id}, location ${Vector.string(location, true)}`)
+      console.warn(i18n.error`Unable to spawn armor stand for ${this.id}, location ${Vec.string(location, true)}`)
       return
     }
 
     // Equippable does not work's with armor stand in 1.20.81, please replace to equippable replace when fixed
     entity.runCommand(`replaceitem entity @s slot.weapon.mainhand 0 ${item.typeId}`)
     const enchantments = item.enchantable?.getEnchantments()
-    if (enchantments?.length) entity.runCommand(`enchant @s ${enchantments[0].type.id} 1`)
+    if (enchantments?.length) entity.runCommand(`enchant @s ${enchantments[0]?.type.id} 1`)
 
     entity.addEffect(MinecraftEffectTypes.SlowFalling, this.timetick, { showParticles: false, amplifier: 255 })
-    entity.teleport(Vector.add(location, this.entityOffset))
+    entity.teleport(Vec.add(location, this.entityOffset))
 
     this.current = {
       item,
@@ -81,7 +81,7 @@ export default class ChestLootAnimation {
           this.stop()
           return
         }
-        if (!this.current.entity.isValid() || !this.current.player.isValid()) {
+        if (!this.current.entity.isValid || !this.current.player.isValid) {
           this.stop()
           return
         }
@@ -103,10 +103,10 @@ export default class ChestLootAnimation {
     if (!this.current) return
 
     system.clearRun(this.current.timeout)
-    if (this.current.entity.isValid()) this.current.entity.remove()
-    if (this.current.player.isValid()) {
+    if (this.current.entity.isValid) this.current.entity.remove()
+    if (this.current.player.isValid) {
       this.current.player.container?.addItem(this.current.item)
-      this.current.player.info(t`Вы получили свою награду!`)
+      this.current.player.info(i18n`Вы получили свою награду!`)
     }
 
     delete this.current

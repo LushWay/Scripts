@@ -4,9 +4,10 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'
+import { i18n } from 'lib/i18n/text'
 
 class ChatBuilder {
-  db = table<string>('chatCooldown')
+  db = table<Record<string, number>>('chatCooldown', () => ({}))
 
   settings = Settings.world(...Settings.worldCommon, {
     cooldown: {
@@ -30,15 +31,15 @@ class ChatBuilder {
     },
   })
 
-  playerSettings = Settings.player('Чат\n§7Звуки и внешний вид чата', 'chat', {
+  playerSettings = Settings.player(i18n`Чат\n§7Звуки и внешний вид чата`, 'chat', {
     hightlightMessages: {
-      name: 'Подсветка моих сообщений',
-      description: 'Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r',
+      name: i18n`Подсветка моих сообщений`,
+      description: i18n`Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r`,
       value: true,
     },
     disableSound: {
-      name: 'Выключение звука',
-      description: 'Выключение звука чужих сообщений',
+      name: i18n`Выключение звука`,
+      description: i18n`Выключение звука чужих сообщений`,
       value: false,
     },
   })
@@ -47,7 +48,7 @@ class ChatBuilder {
   private cooldown: Cooldown
 
   private updateCooldown() {
-    this.cooldown = new Cooldown(this.settings.cooldown, true, this.db)
+    this.cooldown = new Cooldown(this.settings.cooldown, true, this.db.get('cooldown'))
   }
 
   constructor() {
@@ -99,7 +100,9 @@ class ChatBuilder {
         }
 
         const doHightlight = this.playerSettings(event.sender).hightlightMessages
-        event.sender.tell(doHightlight ? `${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message)
+        event.sender.tell(
+          doHightlight ? i18n.nocolor`${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message,
+        )
       } catch (error) {
         console.error(error)
       }

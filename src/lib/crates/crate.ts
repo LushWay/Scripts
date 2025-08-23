@@ -1,6 +1,7 @@
-import { LocationInUnloadedChunkError, Player, system, world, type ShortcutDimensions } from '@minecraft/server'
+import { LocationInUnloadedChunkError, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { form } from 'lib/form/new'
+import { SharedI18nMessage } from 'lib/i18n/message'
 import { is } from 'lib/roles'
 import { customItems } from 'lib/rpg/custom-item'
 import { FloatingText } from 'lib/rpg/floating-text'
@@ -9,17 +10,18 @@ import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
+import { i18n, i18nShared, noI18n } from '../i18n/text'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
-import { t } from '../text'
 import CrateLootAnimation from './animation'
+import { defaultLang } from 'lib/assets/lang'
 
 export class Crate {
   static crates = new Map<string, Crate>()
 
   static getName(id: string, crate = Crate.crates.get(id)) {
     if (crate) {
-      return `${crate.place.group.name} - ${crate.place.name}`
-    } else return 'Неизвестный'
+      return i18nShared.join`${crate.place.group.sharedName} - ${crate.place.name}`
+    } else return noI18n`Unknown`
   }
 
   static typeIds: string[] = [MinecraftBlockTypes.EnderChest, MinecraftBlockTypes.Chest]
@@ -33,11 +35,11 @@ export class Crate {
   constructor(
     public place: Place,
     private lootTable: LootTable,
-    public dimensionId: ShortcutDimensions = 'overworld',
+    public dimensionType: DimensionType = place.group.dimensionType,
   ) {
-    this.id = place.fullId
+    this.id = place.id
     this.location = location(place)
-    this.floatingText = new FloatingText(this.id, this.dimensionId)
+    this.floatingText = new FloatingText(this.id, this.dimensionType)
     this.location.onLoad.subscribe(l => this.onValidLocation(l))
 
     Crate.crates.set(this.id, this)
@@ -46,16 +48,17 @@ export class Crate {
   }
 
   createKeyItemStack() {
-    return schema.create({ crate: this.id }).item
+    // TODO Use player.lang
+    return schema.create(defaultLang, { crate: this.id }).item
   }
 
   private onValidLocation(location: ValidLocation<Vector3>) {
-    this.floatingText.update(location, t`${this.place.name} ящик\n§7${this.place.group.name}`)
-    if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionId)
+    this.floatingText.update(location, i18nShared`${this.place.name} ящик`)
+    if (location.firstLoad) PlaceAction.onInteract(location, p => this.onInteract(p), this.dimensionType)
 
     try {
-      const block = world[this.dimensionId].getBlock(location)
-      if (!block || Crate.typeIds.includes(block.typeId)) return
+      const block = world[this.dimensionType].getBlock(location)
+      if (!block || !Crate.typeIds[0] || Crate.typeIds.includes(block.typeId)) return
 
       block.setType(Crate.typeIds[0])
     } catch (e) {
@@ -72,13 +75,13 @@ export class Crate {
     system.delay(() => {
       if (!this.location.valid) return
 
-      const storage = schema.parse(player.mainhand())
+      const storage = schema.parse(player.lang, player.mainhand())
       if (!storage) {
         return this.preview.show(player)
       }
 
       if (storage.crate !== this.id) {
-        return player.fail(t.error`Ключ для ${Crate.getName(storage.crate)} не подходит к ящику ${this.name}`)
+        return player.fail(i18n.error`Ключ для ${Crate.getName(storage.crate)} не подходит к ящику ${this.name}`)
       }
 
       this.open(player, this.location)
@@ -88,33 +91,37 @@ export class Crate {
   }
 
   private open(player: Player, location: Vector3) {
-    player.success(t`Открыт ящик ${this.name}!`, false)
+    player.success(i18n`Открыт ящик ${this.name}!`, false)
     player.mainhand().setItem(undefined)
 
     this.animation.start(player, this.lootTable.generateOne(), location)
   }
 
-  private preview = form((f, player) => {
+  private preview = form((f, { player }) => {
     f.title(this.name)
-      .body(t`Чтобы открыть этот сундук, возьмите в руки ключ`)
-      .button('Купить ключ', () => {
-        player.fail('Пока не работает.')
+      .body(i18n`Чтобы открыть этот сундук, возьмите в руки ключ`)
+      .button(i18n`Купить ключ`, () => {
+        player.fail(noI18n`Пока не работает.`)
       })
-      .button('Посмотреть содержимое', this.previewItems.show)
+      .button(i18n`Посмотреть содержимое`, this.previewItems.show)
 
     if (is(player.id, 'techAdmin'))
       f.button('admin: get key', () => player.container?.addItem(this.createKeyItemStack()))
   })
 
-  private previewItems = lootTablePreview(this.lootTable, t.header`${this.name + ' ящик'} > Содержимое`, true)
+  private previewItems = lootTablePreview({
+    lootTable: this.lootTable,
+    name: i18n.header`${i18n`${this.name} ящик`} > Содержимое`,
+    one: true,
+  })
 
-  private animation = new CrateLootAnimation(this.place.fullId, this.dimensionId)
+  private animation = new CrateLootAnimation(this.place.id, this.dimensionType)
 }
 
 const schema = new ItemLoreSchema('crate')
   .property('crate', String)
 
-  .nameTag((_, storage) => t.header`Ключ для ящика ${Crate.getName(storage.crate)}`)
-  .lore(lore => [t`Используйте этот ключ, чтобы открыть ящик с лутом!`, ...lore])
+  .nameTag((_, storage) => i18n.header`Ключ для ящика ${Crate.getName(storage.crate)}`)
+  .lore(lore => [i18n`Используйте этот ключ, чтобы открыть ящик с лутом!`, ...lore])
 
   .build()

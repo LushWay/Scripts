@@ -1,5 +1,6 @@
 import { Vector3 } from '@minecraft/server'
-import { AbstractPoint, toPoint } from 'lib/game-utils'
+import { AbstractPoint, toPoint } from 'lib/utils/point'
+import { Vec } from 'lib/vector'
 import { Area } from './area'
 
 class FlattenedSphere extends Area<{
@@ -10,7 +11,7 @@ class FlattenedSphere extends Area<{
   type = 'fs'
 
   isNear(point: AbstractPoint, distance: number): boolean {
-    const { vector, dimensionType } = toPoint(point)
+    const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
 
     const dx = vector.x - this.database.center.x
@@ -26,8 +27,8 @@ class FlattenedSphere extends Area<{
       center: { x, y, z },
     } = this.database
     return [
-      { x: x + rx, y: y + ry, z: z + rx },
-      { x: x - rx, y: y - ry, z: y - rx },
+      { x: x - rx, y: y - ry, z: z - rx },
+      { x: x + rx, y: y + ry, z: y + rx },
     ]
   }
 
@@ -57,6 +58,14 @@ class FlattenedSphere extends Area<{
 
   set center(c) {
     this.database.center = c
+  }
+
+  getFormDescription(): Text.Table {
+    return [
+      ['Center', Vec.string(this.center, true)],
+      ['Radius', this.rx],
+      ['YRadius', this.ry],
+    ]
   }
 }
 

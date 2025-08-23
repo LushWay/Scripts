@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { ArrayForm, BUTTON, doNothing, ModalForm, prompt } from 'lib'
-import { t } from 'lib/text'
+import { ArrayForm, ask, BUTTON, doNothing, ModalForm } from 'lib'
+import { noI18n } from 'lib/i18n/text'
 import { WorldEditTool } from './world-edit-tool'
 
 export interface ToolsDataStorage {
@@ -57,24 +57,24 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
       })
       .configure({ minItemsForFilters: 1 })
       .addCustomButtonBeforeArray((form, filters, back) => {
-        form.addButton('§l§dДобавить', BUTTON['+'], () => {
+        form.button('§l§dДобавить', BUTTON['+'], () => {
           this.selectToolForm(slot, player, tools, back)
         })
 
         if (filters.mode === 'sort') {
-          form.addButton(t`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
+          form.button(noI18n.nocolor`§l§dРежим сортировки: ${options.sortMode === SortMode.Up ? '/\\' : '\\/'}`, () => {
             options.sortMode = options.sortMode === SortMode.Up ? SortMode.Down : SortMode.Up
             back()
           })
         }
 
-        form.addButton(t`§l§dНастройки`, () => this.settingsForm(slot, player, back))
+        form.button(noI18n.nocolor`§l§dНастройки`, () => this.settingsForm(slot, player, back))
       })
       .button((item, filters, _, back) => {
         const tool = this.getToolByData(item)
         const onClick = () => {
           if (filters.mode === 'delete') {
-            prompt(player, t.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
+            ask(player, noI18n.error`Удалить инструмент ${item.name} безвозвратно?`, '§cУдалить', () => {
               const newTools = tools.filter(e => e !== item)
               this.saveToolsData(slot, newTools)
               this.updateItemSlot(slot, newTools)
@@ -87,6 +87,7 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
             const to = index - move
             const max = tools.length - 1
             if (to < 0 || to > max) return back()
+            if (!tools[index] || !tools[to]) return back()
             ;[tools[to], tools[index]] = [tools[index], tools[to]]
             this.saveToolsData(slot, tools)
             back()
@@ -101,18 +102,18 @@ export abstract class WorldEditMultiTool extends WorldEditTool<ToolsDataStorage>
   }
 
   protected updateItemSlot(slot: ContainerSlot, toolsData: ToolData[]) {
-    slot.nameTag = t`§r§l${this.name} (${toolsData.length})`
+    slot.nameTag = noI18n.nocolor`§r§l${this.name} (${toolsData.length})`
     slot.setLore([' ', ...toolsData.map(e => e.name)])
   }
 
   private selectToolForm(slot: ContainerSlot, player: Player, toolsData: ToolData[], back: VoidFunction) {
+    if (this.tools.length === 0) throw new Error('No tools to select!')
+
     const select = (tool: WorldEditTool) => {
       const toolData: ToolData = { name: `T#: ${tool.name}`, tpid: tool.id }
       toolsData.push(toolData)
       this.editOneToolForm(slot, player, toolsData, toolData, tool, back)
     }
-
-    if (this.tools.length === 0) return select(this.tools[0])
 
     new ArrayForm('Тип инструмента', this.tools)
       .back(back)

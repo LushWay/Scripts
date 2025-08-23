@@ -27,8 +27,27 @@
 
         // Entity specific options
         "minecraft:collision_box": {
-          "width": 1.04,
-          "height": 1.04
+          "width": 2.08,
+          "height": 2.08
+        },
+
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 5,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  }
+                ]
+              },
+              "max_dist": 30
+            }
+          ],
+          "must_see": true
         },
 
         "minecraft:health": {
@@ -51,6 +70,9 @@
           "width": 1.04,
           "height": 1.04
         },
+        "minecraft:attack": {
+          "damage": 4
+        },
         "minecraft:scale": {
           "value": 4
         }
@@ -58,8 +80,14 @@
 
       "lw:normal": {
         "minecraft:collision_box": {
-          "width": 1.04,
-          "height": 1.04
+          "width": 0.52,
+          "height": 0.52
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:attack": {
+          "damage": 1
         },
         "minecraft:scale": {
           "value": 2

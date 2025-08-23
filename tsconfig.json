@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
-    "allowJs": true,
-    "checkJs": true,
     "noEmit": true,
     "skipLibCheck": true,
 
@@ -13,6 +10,8 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "noErrorTruncation": true,
 
     "lib": [
       "ES2016",
@@ -32,9 +31,16 @@
       "ES2020.Promise",
       "ES2020.String",
       "ES2020.Symbol.WellKnown",
-      "ES2021.String"
+      "ES2021.String",
+      "ES2017.Intl",
+      "ES2018.Intl",
+      "ES2019.Intl",
+      "ES2020.Intl",
+      "ES2021.Intl",
+      "ES2022.Intl",
+      "ESNext.Intl"
     ],
-    "types": ["vitest/globals"],
+    "types": ["./src/test/vitest"],
     "target": "ES2020",
     "module": "ES2020",
     "moduleResolution": "Bundler",
@@ -43,7 +49,4 @@
   },
   "include": ["src", "tools/defines.d.ts"],
   "exclude": ["node_modules", "src/chestui", "vitest/dist/**", "scripts/**"] //  "src/test/**",
-
-  // Pollutes global
-  // "references": [{ "path": "./tsconfig.test.json" }, { "path": "./tsconfig.spec.json" }]
 }

@@ -31,7 +31,8 @@ const settings = Settings.world(...Settings.worldCommon, {
           i++
           if (i >= socials.length) i = 0
 
-          world.say(socials[0])
+          const social = socials[i]
+          if (social) world.say(social[0])
         },
         'social ad',
         ~~(TicksPerSecond * 60 * settings.socialAd),

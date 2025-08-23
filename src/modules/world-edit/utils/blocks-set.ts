@@ -1,9 +1,10 @@
 import { Block, BlockPermutation, Player } from '@minecraft/server'
 
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
-import { noNullable, typeIdToReadable } from 'lib'
+import { noNullable, translateTypeId } from 'lib'
 import { table } from 'lib/database/abstract'
 import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS, REPLACE_MODES } from './default-block-sets'
+import { Language } from 'lib/assets/lang'
 
 export type BlockStateWeight = [...Parameters<typeof BlockPermutation.resolve>, number]
 
@@ -17,45 +18,42 @@ export type BlocksSets = Record<string, BlocksSet>
 export type BlocksSetRef = [owner: string, blocksSetName: string]
 
 /** Reference to block replace validation */
-export interface ReplaceTarget {
+export interface ReplaceTarget extends ReplaceMode {
   typeId: string
   states: Record<string, string | number | boolean>
-  matches(block: Block): boolean
-  select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
 }
 
 /** Reference to block replace validation */
 export interface ReplaceMode {
-  matches(block: Block): boolean
+  matches(block: Block, replaceBlocks: ReplaceTarget[]): boolean
   select?(block: Block, permutations: BlockPermutation[]): BlockPermutation | undefined
 }
 
-const blocksSets = table<BlocksSets>('blockSets')
+const blocksSets = table<BlocksSets>('blockSets', () => ({}))
 
 // GENERAL MANIPULATIONS
 
 export function getOtherPlayerBlocksSets(playerId: string): [string, BlocksSets][] {
-  return Object.entries(blocksSets).filter(
-    (e => e[0] !== playerId && e[1]) as (e: [string, BlocksSets | undefined]) => e is [string, BlocksSets],
-  )
+  return blocksSets
+    .entries()
+    .filter((e => e[0] !== playerId && e[1]) as (e: [string, BlocksSets | undefined]) => e is [string, BlocksSets])
 }
 
 export function getAllBlocksSets(id: string): BlocksSets {
-  const playerBlocksSets = blocksSets[id] ?? {}
+  const playerBlocksSets = blocksSets.get(id)
   return { ...playerBlocksSets, ...DEFAULT_BLOCK_SETS }
 }
 
 export function getOwnBlocksSetsCount(id: string) {
-  return Object.keys(blocksSets[id] ?? {}).length
+  return Object.keys(blocksSets.get(id)).length
 }
 
 export function setBlocksSet(id: string, setName: string, set: BlocksSet | undefined) {
-  blocksSets[id] ??= {}
-  const db = blocksSets[id]
+  const db = blocksSets.get(id)
   if (typeof db !== 'undefined') {
     if (set) {
       // Append new set onto start
-      blocksSets[id] = { [setName]: set, ...db }
+      blocksSets.set(id, { [setName]: set, ...db })
     } else {
       Reflect.deleteProperty(db, setName)
     }
@@ -94,9 +92,8 @@ export function getBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
 }
 
 export function getReplaceTargets(ref: BlocksSetRef): ReplaceTarget[] {
-  if (ref[1] in DEFAULT_REPLACE_TARGET_SETS) {
-    return DEFAULT_REPLACE_TARGET_SETS[ref[1]]
-  }
+  const defaultReplaceTarget = DEFAULT_REPLACE_TARGET_SETS[ref[1]]
+  if (defaultReplaceTarget) return defaultReplaceTarget
 
   return getActiveBlocksInSet(ref)?.map(fromBlockStateWeightToReplaceTarget) ?? []
 }
@@ -117,13 +114,14 @@ export function replaceWithTargets(
   block: Block,
   permutations: BlockPermutation[],
 ) {
-  if (!replaceMode.matches(block)) return
+  const targets = replaceBlocks.slice()
+  if (!replaceMode.matches(block, targets)) return
 
   const getPermutation = () => replaceMode.select?.(block, permutations) ?? permutations.randomElement()
-  if (!replaceBlocks.length) return block.setPermutation(getPermutation())
+  if (!targets.length) return block.setPermutation(getPermutation())
 
-  for (const replaceBlock of replaceBlocks) {
-    if (!replaceBlock.matches(block)) continue
+  for (const replaceBlock of targets) {
+    if (!replaceBlock.matches(block, targets)) continue
 
     block.setPermutation(getPermutation())
   }
@@ -158,7 +156,9 @@ export function stringifyBlocksSetRef([playerId, set]: BlocksSetRef): string {
 export function stringifyBlockWeights(targets: (undefined | ReplaceTarget | BlockPermutation | BlockStateWeight)[]) {
   return targets
     .filter(noNullable)
-    .map(e => typeIdToReadable(e instanceof BlockPermutation ? e.type.id : Array.isArray(e) ? e[0] : e.typeId))
+    .map(e =>
+      translateTypeId(e instanceof BlockPermutation ? e.type.id : Array.isArray(e) ? e[0] : e.typeId, Language.ru_RU),
+    )
     .join(', ')
 }
 

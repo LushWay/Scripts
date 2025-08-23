@@ -1,21 +1,21 @@
 import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
 import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
-import { MessageForm } from 'lib/form/message'
+import { form } from 'lib/form/new'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
-import { ActionForm } from '../form/action'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
+import { Language } from 'lib/assets/lang'
 
 export class Menu {
-  static settings: [string, string] = ['Меню\n§7Разные настройки интерфейсов и меню в игре', 'menu']
+  static settings: [Text, string] = [i18n`Меню\n§7Разные настройки интерфейсов и меню в игре`, 'menu']
 
-  static createItem(typeId: string = Items.Menu, name?: string) {
-    if (!ItemTypes.get(typeId)) throw new TypeError('Unknown item type: ' + typeId)
+  static createItem(typeId: string = Items.Menu, name?: SharedText) {
     const item = new ItemStack(typeId).setInfo(
       name,
-      '§r§7Возьми в руку и используй §r§7предмет\n\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu',
+      i18n.nocolor`§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu`,
     )
     item.lockMode = ItemLockMode.inventory
     item.keepOnDeath = true
@@ -25,7 +25,7 @@ export class Menu {
 
   static itemStack = this.createItem()
 
-  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another))
+  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), i18n`меню`, false)
 
   static {
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -33,17 +33,12 @@ export class Menu {
       if (!this.isMenu(itemStack)) return
 
       util.catch(() => {
-        const menu = this.open(player)
-        if (menu) menu.show(player)
+        this.form.show(player)
       })
     })
   }
 
-  static open(player: Player): ActionForm | false {
-    new MessageForm('Меню выключено', 'Все еще в разработке').show(player)
-
-    return false
-  }
+  static form = form(f => f.title(noI18n`Меню выключено`).body(noI18n`Все еще в разработке`))
 
   static isCompass(slot: Pick<ContainerSlot, 'typeId'>) {
     return !!slot.typeId?.startsWith(Items.CompassPrefix)
@@ -67,12 +62,12 @@ export class Compass {
       setMinimapNpcPosition(player, MinimapNpc.Quest, location.x, location.z)
     } else {
       this.players.delete(player)
-      if (player.isValid()) resetMinimapNpcPosition(player, MinimapNpc.Quest)
+      if (player.isValid) resetMinimapNpcPosition(player, MinimapNpc.Quest)
     }
   }
 
   private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(`${Items.CompassPrefix}${i}`, '§r§l§6Цель\n§r§7(use)')
+    return Menu.createItem(`${Items.CompassPrefix}${i}`)
   })
 
   /** Map of player as key and compass target as value */
@@ -125,12 +120,12 @@ export class Compass {
   }
 
   private static getCompassItem(view: Vector3, origin: Vector3, target: Vector3) {
-    if (!Vector.valid(view) || !Vector.valid(target) || !Vector.valid(origin)) return
+    if (!Vec.isValid(view) || !Vec.isValid(target) || !Vec.isValid(origin)) return
 
-    const v = Vector.multiply(view, { x: 1, y: 0, z: 1 }).normalized()
-    const ot = Vector.multiply(Vector.subtract(target, origin), { x: 1, y: 0, z: 1 }).normalized()
-    const cos = Vector.dot(v, ot)
-    const sin = Vector.dot(Vector.cross(ot, v), Vector.up)
+    const v = Vec.multiplyVec(view, { x: 1, y: 0, z: 1 }).normalized()
+    const ot = Vec.subtract(target, origin).multiplyVec({ x: 1, y: 0, z: 1 }).normalized()
+    const cos = Vec.dot(v, ot)
+    const sin = Vec.dot(Vec.cross(ot, v), Vec.up)
     const angle = Math.atan2(sin, cos)
     const i = Math.floor((16 * angle) / Math.PI + 16) || 0
 
@@ -138,9 +133,13 @@ export class Compass {
   }
 }
 
-export function createPublicGiveItemCommand(name: string, itemStack: ItemStack, is = itemStack.is.bind(itemStack)) {
-  const itemNameTag = itemStack.nameTag?.split('\n')[0]
-
+export function createPublicGiveItemCommand(
+  name: string,
+  itemStack: ItemStack,
+  is: ItemStack['is'],
+  itemNameTag: Text,
+  setNameTag = true,
+) {
   /** Gives player an item */
   function give(player: Player, { mode = 'tell' }: { mode?: 'tell' | 'ensure' } = {}) {
     const { container } = player
@@ -153,23 +152,35 @@ export function createPublicGiveItemCommand(name: string, itemStack: ItemStack, 
       .concat([{ item: offhand?.getItem(), remove: () => offhand?.setItem(void 0) }])
       .filter(({ item }) => item && is(item))
 
+    const getItem = () => {
+      const item = itemStack.clone()
+      if (setNameTag) item.nameTag = itemNameTag.to(player.lang)
+      item.setInfo(
+        undefined,
+        i18n.accent`Используйте ${'.' + name} чтобы убрать этот предмет из инвентаря или получить его снова`.to(
+          player.lang,
+        ),
+      )
+      return item
+    }
+
     if (mode === 'tell') {
       if (items.length) {
         items.forEach(e => e.remove())
-        player.info(`§c-${itemNameTag}`)
+        player.info(i18n.join`§c-${itemNameTag}`)
       } else {
-        container.addItem(itemStack)
-        player.info(`§a+${itemNameTag}`)
+        container.addItem(getItem())
+        player.info(i18n.join`§a+${itemNameTag}`)
       }
     } else {
       if (!items.length) {
-        container.addItem(itemStack)
+        container.addItem(getItem())
       }
     }
   }
 
   const command = new Command(name)
-    .setDescription(`Выдает или убирает ${itemNameTag}§r§7§o из инвентаря`)
+    .setDescription(i18n`Выдает или убирает ${itemNameTag} из инвентаря`)
     .setGroup('public')
     .setPermissions('member')
     .executes(ctx => {

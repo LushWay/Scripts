@@ -1,19 +1,24 @@
 import { Player } from '@minecraft/server'
+import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 import { LeafyCost, MoneyCost } from 'lib/shop/cost'
-import { t, textTable } from 'lib/text'
 import { ShopForm, ShopMenuCreate } from './form'
 
 export class Shop {
-  static getPlayerSettings = Settings.player('Магазин\n§7Внутриигровой магазин', 'market', {
+  static getPlayerSettings = Settings.player(i18n`Магазин\n§7Внутриигровой магазин`, 'market', {
     prompt: {
-      name: 'Подтверждение покупки',
-      description: 'Определяет, включено ли подтверждение перед покупкой.',
+      name: i18n`Подтверждение покупки`,
+      description: i18n`Определяет, включено ли подтверждение перед покупкой.`,
       value: true,
     },
     defaultBody: {
-      name: 'Показывать счет',
-      description: 'Показывать ли счет в меню (монеты, листья)',
+      name: i18n`Показывать счет`,
+      description: i18n`Показывать ли счет в меню (монеты, листья)`,
+      value: false,
+    },
+    sellableItemsScreen: {
+      name: i18n`Продаваемые предметы`,
+      description: i18n`Сразу открывать меню покупки`,
       value: false,
     },
   })
@@ -27,12 +32,12 @@ export class Shop {
    * @param name - Name of the shop that will be displayed in form
    */
   constructor(
-    private name: string,
+    private name: SharedText | string,
     readonly id: string,
   ) {
     const shop = Shop.shops.get(id)
     if (shop) {
-      console.warn(new Error(t.error`Shop ${id} already exists`))
+      console.warn(new Error(noI18n.error`Shop ${id} already exists`))
       return shop
     }
 
@@ -43,11 +48,15 @@ export class Shop {
 
   private static defaultBody = (player: Player) =>
     Shop.getPlayerSettings(player).defaultBody
-      ? textTable({
-          'Подтверждение перед покупкой': Shop.getPlayerSettings(player).prompt,
-          'Ваш баланс':
-            new MoneyCost(player.scores.money).toString() + ' ' + new LeafyCost(player.scores.leafs).toString(),
-        })
+      ? textTable([
+          [i18n`Подтверждение перед покупкой`, Shop.getPlayerSettings(player).prompt],
+          [
+            i18n`Ваш баланс`,
+            new MoneyCost(player.scores.money).toString(player) +
+              ' ' +
+              new LeafyCost(player.scores.leafs).toString(player),
+          ],
+        ])
       : ''
 
   private getBody = (player: Player): Text => ''
@@ -83,8 +92,8 @@ export class Shop {
    */
   open(player: Player) {
     new ShopForm(
-      () => t.header.raw`${this.name}`,
-      () => t.raw`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
+      () => i18n.header`${this.name}`,
+      () => i18n`${this.getBody(player)}${this.useDefaultBody ? Shop.defaultBody(player) : ''}`,
       this,
       this.onOpen,
       player,

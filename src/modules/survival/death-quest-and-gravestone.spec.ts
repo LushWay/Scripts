@@ -1,7 +1,7 @@
 import { ItemStack, ItemTypes } from '@minecraft/server'
 import { TestStructures } from 'test/constants'
 import { gamesuite, gametest } from 'test/framework'
-import { gravestoneEntity } from './death-quest-and-gravestone'
+import { gravestoneEntityTypeId } from './death-quest-and-gravestone'
 
 gamesuite('death-quest-and-gravestone', () => {
   gametest('save-inventory', async test => {
@@ -30,7 +30,7 @@ gamesuite('death-quest-and-gravestone', () => {
     const entities = test.getDimension().getEntities({ location: test.relativeLocation(location), maxDistance: 4 })
     test.assert(entities.length === 0, 'no entities present')
 
-    const entity = entities.find(e => e.typeId === gravestoneEntity)
+    const entity = entities.find(e => e.typeId === gravestoneEntityTypeId)
     if (!entity) throw new Error('no gravestone entity found')
     await test.idle(400)
   }).structureName(TestStructures.flat)

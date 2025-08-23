@@ -1,4 +1,4 @@
-import { isNotPlaying } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/utils/game'
 import { QS, QSBuilder } from '../step'
 
 export class QSCounter extends QS<{ count: number }> {
@@ -6,24 +6,31 @@ export class QSCounter extends QS<{ count: number }> {
 
   end = 1
 
-  diff(diff: number) {
-    if (isNotPlaying(this.player)) return
-    const result = this.value + diff
+  add(diff: number) {
+    this.set(this.value + diff)
+  }
 
-    if (result < this.end) {
+  remove(diff: number) {
+    this.set(this.value - diff)
+  }
+
+  protected set(value: number) {
+    if (isNotPlaying(this.player)) return
+
+    if (value < this.end) {
       // Saving value to db
-      this.db ??= { count: result }
-      this.db.count = result
+      this.db ??= { count: value }
+      this.db.count = value
 
       // Updating interface
-      this.value = result
+      this.value = value
       this.update()
     } else {
       this.next()
     }
   }
 
-  protected activate = () => {
+  protected activate() {
     if (typeof this.db?.count === 'number') this.value = this.db.count
   }
 }
@@ -39,8 +46,8 @@ export class QSCounterBuilder extends QSBuilder<QSCounter> {
     return this
   }
 
-  description(desc: string | ((count: number) => string)) {
-    this.step.description = typeof desc === 'string' ? () => desc : () => desc(this.step.value)
+  description(desc: Text | ((count: number) => Text)) {
+    this.step.description = typeof desc === 'function' ? () => desc(this.step.value) : () => desc
     return this
   }
 }

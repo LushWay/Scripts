@@ -1,5 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ModalFormData, ModalFormResponse } from '@minecraft/server-ui'
+import { defaultLang } from 'lib/assets/lang'
+import { i18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { FormCallback, showForm } from './utils'
 
@@ -13,7 +15,7 @@ interface IModalFormArg {
 type AppendFormField<Base, Next> = Base extends (...args: infer E) => infer R ? (...args: [...E, Next]) => R : never
 
 export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => void = (ctx: FormCallback) => void> {
-  static arrayDefaultNone = 'Никакой'
+  static arrayDefaultNone = i18n.nocolor`Никакой`
 
   triedToShow
 
@@ -55,7 +57,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       defaultValueIndex = 0,
       defaultValue,
       none,
-      noneText = ModalForm.arrayDefaultNone,
+      noneText = ModalForm.arrayDefaultNone.to(defaultLang),
     }: {
       defaultValueIndex?: number
       defaultValue?: T[number]
@@ -95,7 +97,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       defaultValueIndex: defaultValueIndexInput,
       defaultValue,
       none,
-      noneText = ModalForm.arrayDefaultNone,
+      noneText = ModalForm.arrayDefaultNone.to(defaultLang),
       noneSelected = false,
     }: {
       defaultValueIndex?: number | string
@@ -207,10 +209,10 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
       if (!response.formValues) return
       const args = response.formValues.map((formValue, i) => {
         const arg = this.args[i]
+        if (!arg) return formValue
 
-        if (arg.type === 'dropdown' && typeof formValue === 'number') {
-          return arg.options?.[formValue]
-        } else return formValue
+        if (arg.type === 'dropdown' && typeof formValue === 'number') return arg.options?.[formValue]
+        else return formValue
       })
       callback(new FormCallback(this, player, () => this.show(player, callback)), ...args)
     })

@@ -1,24 +1,24 @@
-import { TicksPerSecond, system, world } from '@minecraft/server'
+import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vector, getAuxOrTexture, ms } from 'lib'
+import { Vec, getAuxOrTexture, ms } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { i18n } from 'lib/i18n/text'
 import { ActionGuardOrder, actionGuard } from 'lib/region/index'
 import { Group, Place } from 'lib/rpg/place'
 import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
-import { t } from 'lib/text'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
+import { defaultLang } from 'lib/assets/lang'
 
 const furnaceExpireTime = ms.from('hour', 1)
-const furnaceExpireTimeText =
-  'Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!'
+const furnaceExpireTimeText = i18n`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
 
 export class Furnacer extends ShopNpc {
   static create() {
-    return Group.pointCreator(place => ({
+    return Group.placeCreator(place => ({
       furnaceTypeIds: (furnaceTypeIds: string[]) => ({
         onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer(place, furnaceTypeIds, onlyInStoneQuarry),
       }),
@@ -33,7 +33,7 @@ export class Furnacer extends ShopNpc {
   static npcs: Furnacer[] = []
 
   get id() {
-    return this.place.fullId
+    return this.place.id
   }
 
   /**
@@ -50,7 +50,7 @@ export class Furnacer extends ShopNpc {
     onlyInStoneQuarry: boolean,
   ) {
     super(place)
-    this.shop.body(() => 'У меня ты можешь купить ключ доступа к печкам\n\n')
+    this.shop.body(() => i18n`У меня ты можешь купить ключ доступа к печкам\n\n`)
     Furnacer.npcs.push(this)
 
     if (onlyInStoneQuarry) {
@@ -60,26 +60,20 @@ export class Furnacer extends ShopNpc {
     }
 
     this.shop.menu((form, player) => {
-      const { item } = FurnaceKeyItem.schema.create({
-        status: 'notUsed',
-        furnacer: this.id,
-        code: (Date.now() - 1_700_000_000_000).toString(32).toUpperCase(),
-        player: player.name,
-        location: '',
-      })
+      const item = this.createItemKey(player)
 
       form.itemStack(item, new MoneyCost(50), getAuxOrTexture(MinecraftItemTypes.TripwireHook, true))
       form.itemModifier(
-        'Сдать неиспользуемый ключ',
+        i18n`Сдать неиспользуемый ключ`,
         FreeCost,
         i => FurnaceKeyItem.schema.is(i),
-        'Ключ от печки',
+        i18n`Ключ от печки`,
         (slot, _, text) => {
-          const parsed = FurnaceKeyItem.schema.parse(slot)
+          const parsed = FurnaceKeyItem.schema.parse(player.lang, slot)
           if (!parsed) return
 
-          const key = Object.entries(FurnaceKeyItem.db).find(e => e[1]?.code === parsed.code)?.[0]
-          if (key) Reflect.deleteProperty(FurnaceKeyItem.db, key)
+          const key = FurnaceKeyItem.db.entries().find(e => e[1]?.code === parsed.code)?.[0]
+          if (key) FurnaceKeyItem.db.delete(key)
           slot.setItem(undefined)
 
           form.show(text)
@@ -90,6 +84,16 @@ export class Furnacer extends ShopNpc {
         },
       )
     })
+  }
+
+  createItemKey(player?: Player) {
+    return FurnaceKeyItem.schema.create(player?.lang ?? defaultLang, {
+      status: 'notUsed',
+      furnacer: this.id,
+      code: (Date.now() - 1700000000000).toString(32).toUpperCase(),
+      player: player?.name ?? '',
+      location: '',
+    }).item
   }
 }
 
@@ -103,111 +107,113 @@ actionGuard((player, region, ctx) => {
   if (!furnacer) return
 
   // Restrictions
-  const notAllowed = (message = 'Для использования печек вам нужно купить ключ у печкина или взять его в руки!') => {
-    system.delay(() => player.fail(message))
-    return false
+  const notAllowed = (
+    message = i18n`Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!`,
+  ) => {
+    return () => (system.delay(() => player.fail(message)), false)
   }
 
-  const lore = FurnaceKeyItem.schema.parse(player.mainhand(), undefined, false)
-  if (!lore) return notAllowed()
+  const tryItem = (slot: ContainerSlot) => {
+    const lore = FurnaceKeyItem.schema.parse(player.lang, slot, undefined, false)
+    if (!lore) return notAllowed()
 
-  if (lore.furnacer !== furnacer.id) return notAllowed(`Этот ключ используется для других печек!`)
+    if (lore.furnacer !== furnacer.id) return notAllowed(i18n`Этот ключ используется для других печек!`)
 
-  const blockId = Vector.string(ctx.event.block)
-  const furnace = FurnaceKeyItem.db[blockId]
+    const blockId = Vec.string(ctx.event.block)
+    const furnace = FurnaceKeyItem.db.get(blockId)
 
-  if (furnace) {
-    // Access allowed
-    if (furnace.code === lore.code) {
+    // Furnace is already taken
+    if (furnace && furnace.code === lore.code) {
+      // Same key, acess allowed, update metadata
       furnace.lastPlayerId = player.id
       return true
-      // Search for other keys in the inventory
-    } else if (player.container) {
-      for (const [slot, item] of player.container.entries()) {
-        if (!item) continue
-
-        const lore = FurnaceKeyItem.schema.parse(item, undefined, false)
-        if (!lore) continue
-
-        if (furnace.code === lore.code) {
-          player.warn(t`Использован ключ из слота ${slot}`)
-          furnace.lastPlayerId = player.id
-          return true
-        }
-      }
     }
+
+    // Furnace is free, creating access key
+    if (lore.status === 'notUsed') {
+      // Database record exists
+      if (furnace) {
+        if (furnace.expires < Date.now()) {
+          // Notify previous owner (Maybe?)
+        } else {
+          return notAllowed(
+            i18n.error`Эта печка уже занята. Печка освободится через ${i18n.error.time(furnace.expires - Date.now())}, ключ: ${furnace.code}`,
+          )
+        }
+      } else {
+        // Create new...
+        system.delay(() => {
+          FurnaceKeyItem.db.set(blockId, {
+            code: lore.code,
+            expires: Date.now() + furnaceExpireTime,
+            lastPlayerId: player.id,
+          })
+
+          lore.status = 'inUse'
+          lore.location = Vec.string(ctx.event.block.location, true)
+          lore.player = player.name
+
+          player.success(furnaceExpireTimeText)
+        })
+
+        // Prevent from opening furnace dialog
+        return false
+      }
+    } else return notAllowed(i18n.error`Вы уже использовали этот ключ для другой печки.`)
   }
 
-  // Furnace is free, creating access key
-  if (lore.status === 'notUsed') {
-    // Database record exists
-    if (furnace) {
-      if (furnace.expires < Date.now()) {
-        // Notify previous owner (Maybe?)
-      } else {
-        return notAllowed(
-          t.error`Эта печка уже занята. Печка освободится через ${t.error.time`${furnace.expires - Date.now()}`}, ключ: ${furnace.code}`,
-        )
-      }
-    } else {
-      // Create new...
-      system.delay(() => {
-        FurnaceKeyItem.db[blockId] = {
-          code: lore.code,
-          expires: Date.now() + furnaceExpireTime,
-          lastPlayerId: player.id,
+  const mainhand = tryItem(player.mainhand())
+  if (typeof mainhand === 'function') {
+    if (player.container) {
+      let lastError: VoidFunction | undefined
+      for (const [index, slot] of player.container.slotEntries()) {
+        if (index === player.selectedSlotIndex) continue
+
+        const result = tryItem(slot)
+        if (typeof result === 'function') {
+          lastError = result
+        } else {
+          player.info(i18n`Использован ключ из слота ${index}`)
+          return result
         }
-
-        lore.status = 'inUse'
-        lore.location = Vector.string(ctx.event.block.location, true)
-        lore.player = player.name
-
-        player.success(furnaceExpireTimeText)
-      })
-
-      // Prevent from opening furnace dialog
-      return false
+      }
+      return (lastError ?? notAllowed())()
     }
-  } else return notAllowed('Вы уже использовали этот ключ для другой печки.')
+  } else return mainhand
 }, ActionGuardOrder.Feature)
 
 class FurnaceKeyItem {
-  static db = table<{
-    expires: number
-    code: string
-    lastPlayerId: string
-    warnedAboutExpire?: 1
-  }>('furnaceKeys')
+  static db = table<{ expires: number; code: string; lastPlayerId: string; warnedAboutExpire?: 1 }>('furnaceKeys')
 
   static schema = new ItemLoreSchema('furnace key')
-    .nameTag(() => '§6Ключ от печки')
-    .lore('§7Ключ от печки в каменоломне. Используйте его, чтобы открыть печку')
+    .nameTag(() => i18n`§6Ключ от печки`)
+    .lore(i18n`§7Открывает печку в каменоломне.`)
 
     .property('furnacer', String)
 
     .property('code', String)
 
     .property('location', String)
-    .display('Привязан к печке на', l => (!l ? false : l))
+    .display(i18n`На`, l => (!l ? false : l))
 
     .property('player', String)
-    .display('Владелец')
+    .display(i18n`Владелец`)
 
     .property<'status', 'notUsed' | 'inUse' | 'used'>('status', 'notUsed')
     .display('', unit => this.status[unit])
     .build()
 
   static status = {
-    notUsed: '§r§aНе использован',
-    inUse: '§r§6Печка плавит...',
-    used: '§r§cВремя истекло',
+    notUsed: i18n.nocolor`§r§aНе использован`,
+    inUse: i18n.nocolor`§r§6Печка плавит...`,
+    used: i18n.nocolor`§r§cВремя истекло`,
   }
 
   static {
     system.runInterval(
       () => {
         let players
-        for (const [key, furnace] of Object.entries(FurnaceKeyItem.db)) {
+        for (const [key, furnace] of FurnaceKeyItem.db.entries()) {
           if (typeof furnace === 'undefined') continue
           if (furnace.warnedAboutExpire) continue
 
@@ -218,13 +224,13 @@ class FurnaceKeyItem {
             const player = players.find(e => e.id === furnace.lastPlayerId)
             if (player) {
               player.warn(
-                t`Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ${key}, ключ: ${furnace.code}`,
+                i18n`Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ${key}, ключ: ${furnace.code}`,
               )
 
               furnace.warnedAboutExpire = 1
             }
           } else if (untilExpire < 0) {
-            Reflect.deleteProperty(FurnaceKeyItem.db, key)
+            FurnaceKeyItem.db.delete(key)
           }
         }
       },

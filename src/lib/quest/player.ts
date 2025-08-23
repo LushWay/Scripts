@@ -1,13 +1,16 @@
 import { Player } from '@minecraft/server'
-import { isNotPlaying } from 'lib/game-utils'
+import { isNotPlaying } from 'lib/utils/game'
 import { Quest } from './quest'
 import { QS, QSBuilder } from './step'
 
+import { QSBreakCounter, QSBreakCounterBuilder } from './steps/break-counter'
+import { QSButton, QSButtonBuilder } from './steps/button'
 import { QSCounter, QSCounterBuilder } from './steps/counter'
 import { QSDialogue } from './steps/dialogue'
 import { QSDynamic, QSDynamicBuilder } from './steps/dynamic'
 import { QSItem, QSItemBuilder } from './steps/item'
-import { QSPlace } from './steps/place'
+import { QSReachArea } from './steps/reach-area'
+import { QSReachRegion } from './steps/reach-region'
 
 export class PlayerQuest {
   constructor(
@@ -15,7 +18,7 @@ export class PlayerQuest {
     public player: Player,
   ) {}
 
-  list: QS[] = []
+  steps: QS[] = []
 
   updateListeners = new Set<PlayerCallback>()
 
@@ -25,13 +28,22 @@ export class PlayerQuest {
 
   counter = this.wrapStep(QSCounterBuilder, QSCounter)
 
-  failed = (reason: string) => {
-    return this.dynamic(reason).activate(ctx => ctx.error(reason))
+  breakCounter = this.wrapStep(QSBreakCounterBuilder, QSBreakCounter)
+
+  failed = (reason: Text, exit = false) => {
+    return this.dynamic(reason).activate(ctx => {
+      ctx.error(reason)
+      if (exit) this.quest.exit(this.player)
+    })
   }
 
-  place = QSPlace.bind(this)
+  reachArea = QSReachArea.bind(this)
+
+  reachRegion = QSReachRegion.bind(this)
 
   dialogue = QSDialogue.bind(this)
+
+  button = this.wrapStep(QSButtonBuilder, QSButton)
 
   end = (action: (ctx: PlayerQuest) => void) => {
     this.onEnd = action.bind(this, this) as VoidFunction
@@ -39,12 +51,12 @@ export class PlayerQuest {
 
   private onEnd: VoidFunction = () => false
 
-  private next(step: QS, index: number) {
+  private next(step: QS, stepIndex: number) {
     if (isNotPlaying(this.player)) return
     step.cleanup()
 
-    if (this.list[index + 1]) {
-      this.quest.setStep(this.player, index + 1)
+    if (this.steps[stepIndex + 1]) {
+      this.quest.setStep(this.player, stepIndex + 1)
     } else {
       this.quest.exit(this.player, true)
       this.onEnd()
@@ -60,10 +72,10 @@ export class PlayerQuest {
 
   private wrapStep<S extends QS, B extends QSBuilder<S>>(Builder: new (step: S) => B, Step: new (...args: any[]) => S) {
     return (...args: Parameters<B['create']>[0]) => {
-      const index = this.list.length
+      const index = this.steps.length
       const step: S = new Step(this.quest, this.player, this, () => this.next(step, index))
       const builder = new Builder(step)
-      this.list.push(step)
+      this.steps.push(step)
       builder.create(args)
 
       return builder as Omit<B, 'create'>

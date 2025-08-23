@@ -1,8 +1,8 @@
 import { Player, system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
-import { Rewards } from 'lib/shop/rewards'
-import { t } from 'lib/text'
+import { Rewards } from 'lib/utils/rewards'
 import './command'
 
 interface StoredClan {
@@ -34,7 +34,7 @@ export class Clan {
   static create(player: Player, name: string, shortname: string) {
     while (name in this.database) name += '-'
 
-    this.database[name] = {
+    this.database.set(name, {
       members: [player.id],
       owners: [player.id],
 
@@ -45,18 +45,16 @@ export class Clan {
       joinRequests: [],
 
       createdAt: new Date().toISOString(),
-    }
+    })
 
-    return new Clan(name, this.database[name])
+    return new Clan(name, this.database.get(name))
   }
 
   private static instances = new Map<string, Clan>()
 
   static {
     system.run(() => {
-      for (const [id, db] of Object.entries(this.database)) {
-        new Clan(id, db)
-      }
+      for (const [id, db] of this.database.entries()) new Clan(id, db)
     })
   }
 
@@ -70,8 +68,8 @@ export class Clan {
     if (clan) return clan
 
     if (!db) {
-      db = Clan.database[id]
-      if (!db) throw new ReferenceError(t.error`Clan with id ${id} does not exists.`)
+      db = Clan.database.get(id)
+      if (!db) throw new ReferenceError(noI18n.error`Clan with id ${id} does not exists.`)
     } else this.db = db
 
     Clan.instances.set(this.id, this)
@@ -97,8 +95,8 @@ export class Clan {
   kickMember(playerId: string, whoKicked: string, message: string) {
     Mail.send(
       playerId,
-      `Вы выгнаны из клана '${this.db.name}'`,
-      `Вы были выгнаны из клана игроком '${whoKicked}'. Причина: ${message}`,
+      i18n.nocolor`Вы выгнаны из клана '${this.db.name}'`,
+      i18n`Вы были выгнаны из клана игроком '${whoKicked}'. Причина: ${message}`,
       new Rewards(),
     )
     this.db.members = this.db.members.filter(e => e !== playerId)
@@ -111,8 +109,8 @@ export class Clan {
     this.db.invites.push(playerId)
     Mail.send(
       playerId,
-      `Приглашение в клан '${this.db.name}'`,
-      'Вы были приглашены в клан! Чтобы вступить, используйте .clan или раздел кланов из основого меню',
+      i18n.nocolor`Приглашение в клан '${this.db.name}'`,
+      i18n`Вы были приглашены в клан! Чтобы вступить, используйте .clan или раздел кланов из основого меню`,
       new Rewards(),
     )
     return true
@@ -121,24 +119,24 @@ export class Clan {
   requestJoin(player: Player) {
     if (Clan.getPlayerClan(player.id)) return
     if (this.db.joinRequests.includes(player.id))
-      return player.fail(t.error`Вы отправили заявку в клан ${this.db.name}!`)
+      return player.fail(i18n.error`Вы отправили заявку в клан ${this.db.name}!`)
 
     Mail.sendMultiple(
       this.db.owners,
-      'Запрос на вступление в клан от ' + player.name,
-      'Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов',
+      i18n.nocolor`Запрос на вступление в клан от ${player.name}`,
+      i18n`Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов`,
       new Rewards(),
     )
     this.db.joinRequests.push(player.id)
-    player.success(`Заявка на вступление в клан '${this.db.name}' отправлена!`)
+    player.success(i18n`Заявка на вступление в клан '${this.db.name}' отправлена!`)
   }
 
   add(playerOrId: Player | string) {
     const id = playerOrId instanceof Player ? playerOrId.id : playerOrId
-    const message = `Вы приняты в клан ${this.db.name}`
+    const message = i18n.nocolor`Вы приняты в клан ${this.db.name}`
     if (playerOrId instanceof Player) {
       playerOrId.success(message)
-    } else Mail.send(id, message, 'Ура', new Rewards())
+    } else Mail.send(id, message, i18n`Ура`, new Rewards())
 
     for (const clan of Clan.getAll()) {
       clan.db.joinRequests = clan.db.joinRequests.filter(e => e !== id)
@@ -150,11 +148,11 @@ export class Clan {
   delete() {
     Mail.sendMultiple(
       this.db.members,
-      `Клан '${this.db.name}' распущен`,
-      'К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.',
+      i18n.nocolor`Клан '${this.db.name}' распущен`,
+      i18n`К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.`,
       new Rewards(),
     )
-    Reflect.deleteProperty(Clan.database, this.id)
+    Clan.database.delete(this.id)
     Clan.instances.delete(this.id)
   }
 }

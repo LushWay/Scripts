@@ -1,170 +1,307 @@
-import { Player, world } from '@minecraft/server'
+import { LocationInUnloadedChunkError, MolangVariableMap, Player, system, world } from '@minecraft/server'
 import 'lib/command'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
+import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
+import { form, NewFormCreator } from 'lib/form/new'
 import { BUTTON, FormCallback } from 'lib/form/utils'
+import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { Region } from 'lib/region/kinds/region'
-import { t, textTable } from 'lib/text'
 import { inspect } from 'lib/util'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
+import { Area } from './areas/area'
+import { ChunkCubeArea } from './areas/chunk-cube'
+import { CylinderArea } from './areas/cylinder'
+import { FlattenedSphereArea } from './areas/flattened-sphere'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 
-export const createableRegions: { name: string; region: typeof Region }[] = []
-export function registerCreateableRegion(name: string, region: typeof Region) {
-  createableRegions.push({ name, region })
+export const regionTypes: { name: string; region: typeof Region; creatable: boolean; displayName: boolean }[] = []
+export function registerRegionType(name: string, region: typeof Region, creatable = true, displayName = !creatable) {
+  regionTypes.push({ name, region, creatable, displayName })
 }
 
-new Command('region')
+const command = new Command('region')
+  .setDescription(i18n`Управляет регионами`)
   .setPermissions('techAdmin')
   .setGroup('public')
   .executes(ctx => {
     regionForm(ctx.player)
   })
 
+const db = table<{ enabled: boolean }>('regionBorders', () => ({ enabled: false }))
+
+command
+  .overload('borders')
+  .executes(ctx => ctx.player.tell(i18n`Borders enabled: ${db.get(ctx.player.id).enabled}`))
+  .boolean('toggle', true)
+  .executes((ctx, newValue = !db.get(ctx.player.id).enabled) => {
+    ctx.player.tell(i18n`${db.get(ctx.player.id).enabled} -> ${newValue}`)
+    ctx.player.database
+    db.get(ctx.player.id).enabled = newValue
+  })
+
+const variables = new MolangVariableMap()
+variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })
+
+system.runInterval(
+  () => {
+    if (!db.values().some(e => e.enabled)) return
+    const players = world.getAllPlayers()
+
+    for (const region of Region.regions) {
+      if (!(region.area instanceof SphereArea)) continue
+
+      const playersNearRegion = players.filter(e => region.area.isNear(e, 30))
+      if (!playersNearRegion.length) continue
+
+      let skip = 0
+      region.area.forEachVector((vector, isIn) => {
+        skip++
+        if (skip % 2 === 0) return
+        if (!Region.regions.includes(region)) return
+
+        try {
+          const r = Vec.distance(region.area.center, vector)
+          if (isIn && r > region.area.radius - 1) {
+            for (const player of playersNearRegion) {
+              if (!player.isValid) continue
+              if (!db.get(player.id).enabled) continue
+
+              player.spawnParticle('minecraft:wax_particle', vector, variables)
+            }
+          }
+        } catch (e) {
+          if (e instanceof LocationInUnloadedChunkError) return
+          throw e
+        }
+      }, 100)
+    }
+  },
+  'region borders',
+  40,
+)
+
 function regionForm(player: Player) {
-  const reg = (region: Parameters<typeof regionList>[1]) => () => regionList(player, region)
+  form(f => {
+    f.title(noI18n`Управление регионами`)
+    f.body(noI18n`Чтобы создать регион, перейдите в список определенных регионов`)
 
-  const form = new ActionForm(
-    'Управление регионами',
-    '§7Чтобы создать регион, перейдите в список определенных регионов',
-  )
+    const currentRegions = Region.getManyAt(player)
+    const currentRegion = currentRegions[0]
 
-  const currentRegion = Region.getAt(player)
+    function addRegionButton(currentRegion: Region, form: NewFormCreator) {
+      form.button(
+        noI18n`${currentRegion.displayName ?? noI18n`Без имени`} (${currentRegion.area.toString()})\n${currentRegion.name}`,
+        () => editRegion(player, currentRegion, false, () => regionForm(player)),
+      )
+    }
 
-  if (currentRegion)
-    form.addButton(
-      `Регион на ${Vector.string(Vector.floor(currentRegion.area.center), true)}§f\n${currentRegion.name}`,
-      () => editRegion(player, currentRegion, () => regionForm(player)),
+    if (typeof currentRegion !== 'undefined') addRegionButton(currentRegion, f)
+
+    if (currentRegions.length > 1) {
+      f.button(
+        form(f => {
+          f.title(
+            noI18n`Другие регионы тут (${currentRegions.length - 1})\n${[...new Set(currentRegions.map(e => e.creator.kind))].join(' ')}`,
+          )
+          for (const region of currentRegions.slice(1)) addRegionButton(region, f)
+        }),
+      )
+    }
+
+    for (const type of regionTypes) {
+      f.button(i18n.join`${type.name}`.size(type.region.getAll().length), () =>
+        regionList(player, type.region, type.creatable, type.displayName),
+      )
+    }
+  }).show(player)
+}
+
+function regionList(
+  player: Player,
+  RegionType: typeof Region,
+  creatable = true,
+  displayName = creatable,
+  back = () => regionForm(player),
+) {
+  const form = new ActionForm(noI18n`Список ` + RegionType.name)
+  const selfback = () => regionList(player, RegionType, creatable, displayName, back)
+
+  if (creatable)
+    form.button(noI18n`Добавить`, BUTTON['+'], () => {
+      const form = new ActionForm(noI18n`Выбери тип области региона`)
+      selectArea(form, player, area => {
+        editRegion(player, RegionType.create(area), displayName, selfback)
+      })
+      form.show(player)
+    })
+
+  for (const region of RegionType.getAll()) {
+    form.button(noI18n`${displayName ? region.displayName : region.name}\n${region.area.toString()}`, () =>
+      editRegion(player, region, displayName, selfback),
     )
-
-  for (const r of createableRegions) {
-    form.addButton(r.name, reg(r.region))
   }
+
   form.show(player)
 }
 
-function regionList(player: Player, RegionType: typeof Region, back = () => regionForm(player)) {
-  const form = new ActionForm('Список ' + RegionType.name)
-
+function selectArea(form: ActionForm, player: Player, onSelect: (area: Area) => void) {
   form
-    .addButton(ActionForm.backText, back)
-    .addButton('Создать Сферический', BUTTON['+'], () => {
-      new ModalForm('Создать Сферический ' + RegionType.name)
-        .addTextField('Центр', '~~~', '~~~')
-        .addSlider('Радиус', 1, 100, 1)
+    .button(noI18n`Сфера`, BUTTON['+'], () => {
+      new ModalForm(noI18n`Сфера`)
+        .addTextField(noI18n`Центр`, '~~~', '~~~')
+        .addSlider(noI18n`Радиус`, 1, 100, 1)
         .show(player, (ctx, rawCenter, radius) => {
           const center = parseLocationFromForm(ctx, rawCenter, player)
           if (!center) return
 
-          editRegion(player, RegionType.create(new SphereArea({ radius, center }, player.dimension.type)), () =>
-            regionList(player, RegionType, back),
-          )
+          if (center.y - radius <= -64)
+            return player.fail(
+              i18n`Нельзя создать регион, область которого ниже -64 (y: ${center.y} radius: ${radius} result: ${center.y - radius})`,
+            )
+
+          onSelect(new SphereArea({ radius, center }, player.dimension.type))
         })
     })
-    .addButton('Создать Кубический', BUTTON['+'], () => {
-      new ModalForm('Создать Кубический' + RegionType.name)
-        .addTextField('От', '~~~', '~~~')
-        .addTextField('До', '~~~', '~~~')
+    .button(noI18n`Куб`, BUTTON['+'], () => {
+      new ModalForm(noI18n`Куб`)
+        .addTextField(noI18n`От`, '~~~', '~~~')
+        .addTextField(noI18n`До`, '~~~', '~~~')
         .show(player, (ctx, rawFrom, rawTo) => {
           const from = parseLocationFromForm(ctx, rawFrom, player)
           const to = parseLocationFromForm(ctx, rawTo, player)
           if (!from || !to) return
 
-          editRegion(player, RegionType.create(new RectangleArea({ from, to }, player.dimension.type)), () =>
-            regionList(player, RegionType, back),
-          )
+          onSelect(new RectangleArea({ from, to }, player.dimension.type))
         })
     })
+    .button(noI18n`Куб без учета высоты`, BUTTON['+'], () => {
+      new ModalForm(noI18n`Куб без учета высоты`)
+        .addTextField(noI18n`От`, '~~~', '~~~')
+        .addTextField(noI18n`До`, '~~~', '~~~')
+        .show(player, (ctx, rawFrom, rawTo) => {
+          const from = parseLocationFromForm(ctx, rawFrom, player)
+          const to = parseLocationFromForm(ctx, rawTo, player)
+          if (!from || !to) return
 
-  for (const region of RegionType.getAll()) {
-    form.addButton(region.name, () => editRegion(player, region, () => regionList(player, RegionType, back)))
-  }
-  form.show(player)
+          onSelect(new ChunkCubeArea({ from, to }, player.dimension.type))
+        })
+    })
+    .button(noI18n`Цилиндр`, BUTTON['+'], () => {
+      new ModalForm(noI18n`Цилиндр`)
+        .addTextField(noI18n`Центр`, '~~~', '~~~')
+        .addSlider(noI18n`Радиус`, 1, 100, 1)
+        .addSlider(noI18n`Высота`, 1, 100, 1)
+        .show(player, (ctx, rawCenter, radius, yradius) => {
+          const center = parseLocationFromForm(ctx, rawCenter, player)
+          if (!center) return
+
+          onSelect(new CylinderArea({ center, radius, yradius }, player.dimension.type))
+        })
+    })
+    .button(noI18n`Приплюснутая сфера`, BUTTON['+'], () => {
+      new ModalForm(noI18n`Приплюснутая сфера`)
+        .addTextField(noI18n`Центр`, '~~~', '~~~')
+        .addSlider(noI18n`Радиус`, 1, 100, 1)
+        .addSlider(noI18n`Высота`, 1, 100, 1)
+        .show(player, (ctx, rawCenter, rx, ry) => {
+          const center = parseLocationFromForm(ctx, rawCenter, player)
+          if (!center) return
+
+          onSelect(new FlattenedSphereArea({ center, rx, ry }, player.dimension.type))
+        })
+    })
 }
 
-const pluralForms: WordPluralForms = ['региона', 'регион', 'в регионе']
-
-function editRegion(player: Player, region: Region, back: () => void) {
-  const selfback = () => editRegion(player, region, back)
+function editRegion(player: Player, region: Region, displayName: boolean, back: () => void) {
+  const selfback = () => editRegion(player, region, displayName, back)
   const form = new ActionForm(
-    `Регион ${region.name}`,
-    textTable({
-      'Тип региона': region.creator.name,
-      'Центр': Vector.string(region.area.center, true),
-      'Радиус': region.area instanceof SphereArea ? region.area.radius : 'не поддерживается',
-    }),
+    (displayName ? (region.displayName ?? region.creator.name) : region.name).to(player.lang),
+    textTable([
+      [i18n`Тип региона`, region.creator.name],
+      [i18n`Тип зоны`, Area.areas.find(e => e.type === region.area.type)?.name ?? region.area.type],
+      ...region.area.getFormDescription(),
+      ...region.customFormDescription(player),
+    ]).to(player.lang),
   )
-    .addButton(ActionForm.backText, back)
-    .addButton('Участники', () =>
-      manageRegionMembers(player, region, {
-        isOwner: true,
-        back: selfback,
-        pluralForms,
-      }),
+    .button(ActionForm.backText.to(player.lang), back)
+    .button(i18n`Участники`.to(player.lang), () =>
+      manageRegionMembers({ region, isOwner: true }).show(player, selfback),
     )
-    .addButton('Разрешения', () =>
-      editRegionPermissions(player, region, {
-        pluralForms,
-        back: selfback,
-        extendedEditPermissions: true,
-      }),
+    .button(i18n`Разрешения`.to(player.lang), () =>
+      editRegionPermissions(player, region, { back: selfback, extendedEditPermissions: true }),
     )
 
+  // TODO Move to separate form / regroup
   if (region.structure) {
     const exists = region.structure.exists
-    const color = exists ? '' : '§7'
+    const color = exists ? noI18n : noI18n.warn
 
     if (exists)
-      form.addButton(`Установить структуру в мир`, async () => {
+      form.button(noI18n`Установить структуру в мир`, async () => {
         if (!region.structure) return
-        player.info('Загружаем структуру...')
+        player.info(noI18n`Загружаем структуру...`)
         try {
           await region.structure.place()
-          player.success('Структура загружена!')
+          player.success(noI18n`Структура загружена!`)
         } catch (e) {
           console.log(e)
-          player.fail(t.error`Не удалось загрузить структуру: ${e}`)
+          player.fail(noI18n.error`Не удалось загрузить структуру: ${e}`)
         }
       })
 
-    form.addButton(`${color}${exists ? 'Перес' : 'С'}охранить структуру`, async () => {
-      player.info('Сохраняем структуру...')
+    form.button(exists ? color`Пересохранить структуру` : color`Сохранить структуру`, async () => {
+      player.info(noI18n`Сохраняем структуру...`)
       try {
         if (exists) region.structure?.delete()
         await region.structure?.save()
 
-        player.success('Структура успешно сохранена')
+        player.success(noI18n`Структура успешно сохранена`)
       } catch (e) {
         console.log(e)
-        player.fail(t.error`Не удалось сохранить структуру: ${e}`)
+        player.fail(i18n.error`Не удалось сохранить структуру: ${e}`)
       }
     })
-    if (exists) form.addButtonPrompt('§cУдалить структуру', '§cУдалить', () => region.structure?.delete())
+    if (exists) form.ask(noI18n`§cУдалить структуру`, noI18n`§cУдалить`, () => region.structure?.delete())
   }
 
-  form.addButtonPrompt('§cУдалить регион', '§cУдалить', () => region.delete(), '§aНе удалять').show(player)
+  region.customFormButtons(form, player)
+
+  form.button(noI18n`Переместиться в регион`, () => player.teleport(region.area.center))
+
+  form.button(noI18n`Заменить зону`, () => {
+    const form = new ActionForm(noI18n`Заменить зону`)
+    selectArea(form, player, area => {
+      // Area changed, need to update chunk query storages too
+      Region.chunkQuery.remove(region)
+
+      region.area = area
+      region.save()
+
+      Region.chunkQuery.add(region)
+    })
+    form.show(player)
+  })
+
+  form.ask(noI18n.error`Удалить регион`, noI18n.error`Удалить`, () => (region.delete(), back())).show(player)
 }
 
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
   const [x, y, z] = parseArguments(location)
-  if (!x || !y || !z) return ctx.error('Неправильные координаты: ' + inspect(location))
+  if (!x || !y || !z) return ctx.error(noI18n`Неправильные координаты: ` + inspect(location))
 
   const parsed = parseLocationArguments([x, y, z], player)
-  if (!parsed) return ctx.error('Неправильная локация: ' + inspect(location))
+  if (!parsed) return ctx.error(noI18n`Неправильная локация: ` + inspect(location))
 
-  return Vector.floor(parsed)
+  return Vec.floor(parsed) as Vector3
 }
 
 export function editRegionPermissions(
   player: Player,
   region: Region,
-  {
-    pluralForms,
-    back,
-    extendedEditPermissions = false,
-  }: { pluralForms: WordPluralForms; extendedEditPermissions?: boolean; back: () => void },
+  { back, extendedEditPermissions = false }: { extendedEditPermissions?: boolean; back: VoidFunction },
 ) {
   let form: ModalForm<
     (
@@ -178,43 +315,51 @@ export function editRegionPermissions(
       radius?: number,
       center?: string,
     ) => void
-  > = new ModalForm('Разрешения ' + pluralForms[0])
+  > = new ModalForm(i18n`Разрешения региона`.to(player.lang))
     .addToggle(
-      `Двери\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать двери.`,
+      i18n`Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.`.to(player.lang),
       region.permissions.doors,
     )
     .addToggle(
-      `Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать рычаг и кнопки.`,
+      i18n`Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.`.to(
+        player.lang,
+      ),
       region.permissions.switches,
     )
     .addToggle(
-      `Люки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать люки.`,
+      i18n`Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.`.to(player.lang),
       region.permissions.trapdoors,
     )
     .addToggle(
-      `Контейнеры\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки открывать контейнеры (сундуки, шалкеры и тд)`,
+      i18n`Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)`.to(
+        player.lang,
+      ),
       region.permissions.openContainers,
     )
     .addToggle(
-      `Калитки\n§7Определяет, смогут ли не добавленные в ${pluralForms[1]} игроки использовать калитки.`,
+      i18n`Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.`.to(player.lang),
       region.permissions.gates,
     )
 
   if (extendedEditPermissions) {
     form = form.addDropdownFromObject(
-      `Сражение\n§7Определяет, смогут ли игроки сражаться ${pluralForms[2]}`,
+      i18n`Сражение\n§7Определяет, смогут ли игроки сражаться в регионе`.to(player.lang),
       {
-        true: 'Да',
-        pve: 'Только с сущностями (pve)',
-        false: 'Нет',
+        true: i18n`Да`.to(player.lang),
+        pve: i18n`Только с сущностями (pve)`.to(player.lang),
+        false: i18n`Нет`.to(player.lang),
       },
       { defaultValueIndex: String(region.permissions.pvp) },
     )
 
     if (region.area instanceof SphereArea)
       form
-        .addSlider(`Радиус\n§7Определяет радиус ${pluralForms[0]}`, 1, 100, 1, region.area.radius)
-        .addTextField('Центр региона', Vector.string(region.area.center), Vector.string(region.area.center))
+        .addSlider(i18n`Радиус\n§7Определяет радиус региона`.to(player.lang), 1, 100, 1, region.area.radius)
+        .addTextField(
+          i18n`Центр региона`.to(player.lang),
+          Vec.string(region.area.center),
+          Vec.string(region.area.center),
+        )
   }
   form.show(player, (ctx, doors, switches, trapdoors, containers, fences, pvp, radiusOrCenter, rawCenter) => {
     region.permissions.doors = doors
@@ -236,79 +381,61 @@ export function editRegionPermissions(
   })
 }
 
-// TODO Remove use of the plural forms
 // TODO Migrate to settingsMenu after its refactor
 
-export function manageRegionMembers(
-  player: Player,
-  region: Region,
-  {
-    back,
-    member = region.getMemberRole(player.id),
-    isOwner = member === 'owner',
-    pluralForms,
-  }: {
-    back: () => void
-    pluralForms: WordPluralForms
-    isOwner?: boolean
-    member?: ReturnType<Region['getMemberRole']>
-  },
-) {
-  const form = new ActionForm(
-    'Участники ' + pluralForms[0],
-    isOwner ? 'Для управления участником нажмите на кнопку с его ником' : 'Вы можете только посмотреть их',
-  )
+export const manageRegionMembers = form.params<{
+  region: Region
+  isOwner?: boolean
+  member?: ReturnType<Region['getMemberRole']>
+}>(
+  (f, { player, self, params: { region, member = region.getMemberRole(player.id), isOwner = member === 'owner' } }) => {
+    f.title(i18n`Участники региона`)
+    f.body(
+      isOwner ? i18n`Для управления участником нажмите на кнопку с его ником` : i18n`Вы можете только посмотреть их`,
+    )
 
-  const selfback = () =>
-    manageRegionMembers(player, region, {
-      back,
-      member,
-      isOwner,
-      pluralForms,
-    })
+    const applyAction = () => {
+      region.save()
+      self()
+    }
 
-  const applyAction = () => {
-    region.save()
-    selfback()
-  }
+    if (isOwner)
+      f.button(
+        i18n.accent`Добавить!`,
+        BUTTON['+'],
+        form(f => {
+          f.title(i18n`Добавить участника`)
+          for (const player of world.getAllPlayers())
+            f.button(player.name, () => {
+              region.permissions.owners.push(player.id)
+              region.save()
+            })
+        }),
+      )
+    for (const [i, memberId] of region.permissions.owners.entries()) {
+      const name = Player.nameOrUnknown(memberId)
 
-  form.addButtonBack(back)
+      f.button(
+        i === 0 ? i18n`Владелец > ${name}` : name,
+        form(f => {
+          f.title(name)
+          f.body(i18n`Управление участником региона`)
+          if (region.getMemberRole(memberId) !== 'owner')
+            f.ask(
+              isOwner ? i18n`Передать права владельца региона` : i18n`Назначить владельцем региона`,
+              i18n`Передать`,
+              () => {
+                region.permissions.owners = region.permissions.owners.sort(a => (a === memberId ? 1 : -1))
+                applyAction()
+              },
+            )
 
-  if (isOwner)
-    form.addButton('§3Добавить!', BUTTON['+'], () => {
-      const form = new ActionForm('Добавить участника ' + pluralForms[2])
-
-      for (const player of world.getAllPlayers())
-        form.addButton(player.name, () => {
-          region.permissions.owners.push(player.id)
-          applyAction()
-        })
-      form.show(player)
-    })
-  for (const [i, memberId] of region.permissions.owners.entries()) {
-    const name = Player.name(memberId) ?? '§7<Имя неизвестно>'
-
-    form.addButton(`${i === 0 ? '§7Владелец > §f' : ''}${name}`, () => {
-      const form = new ActionForm(name, `Управление участником ${pluralForms[0]}`).addButtonBack(selfback)
-
-      if (region.getMemberRole(memberId) !== 'owner')
-        form.addButtonPrompt(
-          isOwner ? `Передать права владельца ${pluralForms[0]}` : `Назначить владельцем ${pluralForms[0]}`,
-          'Передать',
-          () => {
-            region.permissions.owners = region.permissions.owners.sort(a => (a === memberId ? 1 : -1))
+          f.ask(i18n.error`Удалить участника`, i18n.error`Удалить`, () => {
+            region.permissions.owners = region.permissions.owners.filter(e => e !== memberId)
             applyAction()
-          },
-        )
-
-      form
-        .addButtonPrompt('§cУдалить участника', '§cУдалить', () => {
-          region.permissions.owners = region.permissions.owners.filter(e => e !== memberId)
-          applyAction()
-        })
-        .show(player)
-    })
-  }
-
-  form.show(player)
-}
+          })
+        }),
+      )
+    }
+  },
+)

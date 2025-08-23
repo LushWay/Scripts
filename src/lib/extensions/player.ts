@@ -3,7 +3,8 @@ import { Sounds } from 'lib/assets/custom-sounds'
 import { Language } from 'lib/assets/lang'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { ScreenDisplayOverride } from 'lib/extensions/on-screen-display'
-import { MaybeRawText } from 'lib/text'
+import { i18n } from 'lib/i18n/text'
+import { Vec } from 'lib/vector'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -22,7 +23,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: warn success info
      */
-    fail(message: MaybeRawText, sound?: boolean): void
+    fail(message: Text, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -34,7 +35,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail success info**
      */
-    warn(message: MaybeRawText, sound?: boolean): void
+    warn(message: Text, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -46,7 +47,7 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn info**
      */
-    success(message?: MaybeRawText, sound?: boolean): void
+    success(message?: Text, sound?: boolean): void
     /**
      * Sends message prefixed with
      *
@@ -58,13 +59,13 @@ declare module '@minecraft/server' {
      *
      * Other message types: **fail warn success**
      */
-    info(message: MaybeRawText, sound?: boolean): void
+    info(message: Text, sound?: boolean): void
 
     /** Gets ContainerSlot from the player mainhand */
     mainhand(): ContainerSlot
 
     /** See {@link Player.sendMessage} */
-    tell(message: (RawMessage | string)[] | RawMessage | string): void
+    tell(message: Text | string): void
 
     /**
      * Applies a knock-back to a player in the direction they are facing, like dashing forward
@@ -115,7 +116,7 @@ expand(Player, {
 
   getByName(name) {
     for (const player of world.getPlayers()) {
-      if (player.isValid() && player.name === name) return player
+      if (player.isValid && player.name === name) return player
     }
   },
 
@@ -124,22 +125,22 @@ expand(Player, {
   },
 })
 
-function prefix(pref: string, sound: string): (this: Player, message: MaybeRawText, playSound?: boolean) => void
+function prefix(pref: string, sound: string): (this: Player, message: Text, playSound?: boolean) => void
 function prefix(
   pref: string,
   sound: string,
-  defaultText: string,
-): (this: Player, message?: MaybeRawText, playSound?: boolean) => void
+  defaultText: Text,
+): (this: Player, message?: Text, playSound?: boolean) => void
 function prefix(
   pref: string,
   sound: string,
-  defaultText?: string,
-): (this: Player, message?: MaybeRawText, playSound?: boolean) => void {
+  defaultText?: Text,
+): (this: Player, message?: Text, playSound?: boolean) => void {
   return function (this, message = defaultText, playSound = true) {
     system.delay(() => {
-      if (!this.isValid() || !message) return
+      if (!this.isValid || !message) return
       if (playSound) this.playSound(sound)
-      this.tell(typeof message === 'string' ? pref + message : { rawtext: [{ text: pref }, message] })
+      this.tell(pref + message.to(this.lang))
     })
   }
 }
@@ -149,7 +150,7 @@ export const ScreenDisplaySymbol = Symbol('screen_display')
 
 expand(Player.prototype, {
   get lang() {
-    return Language.ru_RU
+    return __VITEST__ ? Language.ru_RU : Language.ru_RU
   },
 
   isSimulated() {
@@ -170,17 +171,18 @@ expand(Player.prototype, {
 
   fail: prefix('§4§l> §r§c', Sounds.Fail),
   warn: prefix('§e⚠ §6', Sounds.Fail),
-  success: prefix('§a§l> §r', Sounds.Success, 'Успешно'),
+  success: prefix('§a§l> §r', Sounds.Success, i18n`Успешно`),
   info: prefix('§b§l> §r§3', Sounds.Success),
 
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  tell: Player.prototype.sendMessage,
+  tell(msg) {
+    return this.sendMessage(msg.to(this.lang))
+  },
 
   applyDash(target, horizontalStrength, verticalStrength) {
     const view = target.getViewDirection()
     const hStrength = Math.sqrt(view.x ** 2 + view.z ** 2) * horizontalStrength
     const vStrength = view.y * verticalStrength
-    target.applyKnockback(view.x, view.z, hStrength, vStrength)
+    target.applyKnockback(Vec.multiply(view, hStrength), vStrength)
   },
 
   isGamemode(mode) {
@@ -251,7 +253,7 @@ expand(Entity.prototype, {
   get container() {
     if (typeof this === 'undefined' || !this.getComponent)
       throw new ReferenceError('Bound prototype object does not exists')
-    if (!super.isValid()) throw new ReferenceError('Entity is invalid')
+    if (!super.isValid) throw new ReferenceError('Entity is invalid')
     return this.getComponent('inventory')?.container
   },
   isPlayer() {

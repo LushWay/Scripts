@@ -26,15 +26,11 @@ export default ts.config(
       '!src/lib/config.ts',
       'src/lib/lang/**',
       'src/test/__mocks__/**',
+      'coverage/**',
+      '.yarn/**',
     ],
   },
-  {
-    plugins: { tr },
-    rules: {
-      'tr/tr': I18N ? 'error' : 'off',
-      'tr/export-boundaries': 'error',
-    },
-  },
+  { plugins: { tr }, rules: { 'tr/tr': I18N ? 'error' : 'off', 'tr/export-boundaries': 'error' } },
   {
     languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname } },
     rules: {
@@ -71,12 +67,7 @@ export default ts.config(
           leadingUnderscore: 'allow',
           trailingUnderscore: 'allow',
         },
-        {
-          selector: ['enumMember'],
-          format: ['PascalCase'],
-          leadingUnderscore: 'allow',
-          trailingUnderscore: 'allow',
-        },
+        { selector: ['enumMember'], format: ['PascalCase'], leadingUnderscore: 'allow', trailingUnderscore: 'allow' },
         {
           selector: 'function',
           format: ['camelCase', 'PascalCase'],
@@ -89,10 +80,7 @@ export default ts.config(
           leadingUnderscore: 'allow',
           trailingUnderscore: 'allow',
         },
-        {
-          selector: 'typeLike',
-          format: ['PascalCase'],
-        },
+        { selector: 'typeLike', format: ['PascalCase'] },
       ],
     },
   },
@@ -106,17 +94,9 @@ export default ts.config(
     },
   },
   eslintConfigForEnv(process.env.PROGRESS || (!CI && !VSCODE), {
-    plugins: {
-      'file-progress': (await import('eslint-plugin-file-progress')).default,
-    },
-    rules: {
-      'file-progress/activate': 'warn',
-    },
+    plugins: { 'file-progress': (await import('eslint-plugin-file-progress')).default },
+    rules: { 'file-progress/activate': 'warn' },
   }),
 
-  eslintConfigForEnv(!CI, {
-    plugins: {
-      'only-warn': (await import('eslint-plugin-only-warn')).default,
-    },
-  }),
+  eslintConfigForEnv(!CI, { plugins: { 'only-warn': (await import('eslint-plugin-only-warn')).default } }),
 )

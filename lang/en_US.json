@@ -1,0 +1,1403 @@
+{
+  "Пусто": "Empty",
+  "Я не могу с вами говорить. Приходите позже.": "I can't talk with you now. Come back later.",
+  "Используйте \u0000 чтобы убрать этот предмет из инвентаря или получить его снова": [
+    "Use ",
+    " to remove this item from inventory and to get it back"
+  ],
+  "\\nПричина: \u0000": [
+    "\\nReason: ",
+    ""
+  ],
+  " игроком \u0000": [
+    " by player ",
+    ""
+  ],
+  "Ваша роль сменена c \u0000 на \u0000\u0000\u0000": [
+    "Your role has been changed from ",
+    " to ",
+    "",
+    "",
+    ""
+  ],
+  "Владелец > \u0000": [
+    "Owner > ",
+    ""
+  ],
+  "\u0000 д. \u0000": [
+    "",
+    "d ",
+    ""
+  ],
+  "Телепорт к игроку...": "Teleport to player...",
+  "\u0000 игроков": {
+    "one": [
+      "",
+      " player"
+    ],
+    "other": [
+      "",
+      " players"
+    ]
+  },
+  "У вас \u0000 непрочитанных сообщений!": {
+    "one": [
+      "You have ",
+      " unread message!"
+    ],
+    "other": [
+      "You have ",
+      " unread messages!"
+    ]
+  },
+  "Достижение получено: \u0000! Заберите награды, используя \u0000": [
+    "Achievement unlocked: ",
+    "! Claim your rewards using ",
+    ""
+  ],
+  "Достижения": "Achievements",
+  "Режим сортировки": "Sort mode",
+  "По дате получения": "By date received",
+  "По алфавиту": "Alphabetically",
+  "Скрыть неизвестные": "Hide unknown",
+  "Несобранные вверху": "Unclaimed on top",
+  "\u0000§c*\\n§aЗаберите награды!": [
+    "",
+    "§c*\\n§aClaim your rewards!"
+  ],
+  "?\\nНеизвестно": "?\\nUnknown",
+  "Награда: \u0000": [
+    "Reward: ",
+    ""
+  ],
+  "Награды забраны": "Rewards claimed",
+  "Забрать награды": "Claim rewards",
+  "Вы выгнаны из клана '\u0000'": [
+    "You have been kicked from the clan '",
+    "'"
+  ],
+  "Вы были выгнаны из клана игроком '\u0000'. Причина: \u0000": [
+    "You were kicked from the clan by player '",
+    "'. Reason: ",
+    ""
+  ],
+  "Приглашение в клан '\u0000'": [
+    "Clan invitation to '",
+    "'"
+  ],
+  "Вы были приглашены в клан! Чтобы вступить, используйте .clan или раздел кланов из основого меню": "You have been invited to a clan! To join, use .clan or the clans section in the main menu",
+  "Вы отправили заявку в клан \u0000!": [
+    "You have sent a join request to clan ",
+    "!"
+  ],
+  "Запрос на вступление в клан от \u0000": [
+    "Join request to clan from ",
+    ""
+  ],
+  "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов": "A player wants to join your clan, you can accept or reject them through the clan menu",
+  "Заявка на вступление в клан '\u0000' отправлена!": [
+    "Join request to clan '",
+    "' sent!"
+  ],
+  "Вы приняты в клан \u0000": [
+    "You have been accepted into clan ",
+    ""
+  ],
+  "Ура": "Hooray",
+  "Клан '\u0000' распущен": [
+    "Clan '",
+    "' disbanded"
+  ],
+  "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.": "Unfortunately, the clan was disbanded. No idea why the creator didn't like it, find a better clan or create a new one, no need to be sad. You can still loot the clan bases, the creator probably didn't remove you from all of them.",
+  "Клан": "Clan",
+  "Ваш клан": "Your clan",
+  "Кланы": "Clans",
+  "Выбор клана": "Clan selection",
+  "Выберите клан, чтобы отправить заявку или создайте свой клан!": "Select a clan to send a join request or create your own clan!",
+  "Приглашения": "Invitations",
+  "Создать свой клан": "Create your own clan",
+  "§7[\u0000] \u0000\u0000\\nУчастники: \u0000": [
+    "§7[",
+    "] ",
+    "",
+    "\\nMembers: ",
+    ""
+  ],
+  "Создать клан": "Create clan",
+  "Имя клана": "Clan name",
+  "Ну, давай, придумай чета оригинальное": "Come on, think of something original",
+  "Краткое имя клана": "Clan short name",
+  "Чтобы блатными в чате выглядеть": "To look cool in chat",
+  "Ошибка": "Error",
+  "Щас исправлю": "I'll fix it now",
+  "Та ну я лучше вступлю куда-то": "Nah, I'd rather join somewhere",
+  "Имя не может содержать параграф": "Name cannot contain paragraph symbol",
+  "Короткое имя не может содержать параграф": "Short name cannot contain paragraph symbol",
+  "Короткое имя должно быть КОРОТКИМ, меньше 5 символов": "Short name must be SHORT, less than 5 characters",
+  "Короткое имя не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '\u0000'": [
+    "Short name can't be TOO short, minimum 2 characters. Otherwise how to know what clan is '",
+    "'"
+  ],
+  "Клан с именем \u0000 уже существует. Либо вступи туда, либо придумай что-то более оригильное": [
+    "A clan named ",
+    " already exists. Either join it or come up with something more original"
+  ],
+  "Короткое имя \u0000 уже занято.": [
+    "Short name ",
+    " is already taken."
+  ],
+  "Меню клана": "Clan menu",
+  "Дата создания": "Creation date",
+  "Базы клана": "Clan bases",
+  "СКОРО": "COMING SOON",
+  "Участники": "Members",
+  "Заявки на вступление": "Join requests",
+  "Удалить клан": "Delete clan",
+  "Удалить": "Delete",
+  "Выбор": "Select",
+  "Принять игрока \"\u0000\" в клан?": [
+    "Accept player \"",
+    "\" into the clan?"
+  ],
+  "Принять!": "Accept!",
+  "Нет, не заслужил": "No, not deserved",
+  "Вы НЕ приняты в клан \u0000": [
+    "You were NOT accepted into clan ",
+    ""
+  ],
+  "Онет": "Oh no",
+  "Приглашения в клан '\u0000'": [
+    "Invitations to clan '",
+    "'"
+  ],
+  "Новое приглашение": "New invitation",
+  "отозвать приглашение?": "revoke invitation?",
+  "Да, отозать": "Yes, revoke",
+  "пригласить в клан": "invite to clan",
+  "Игрок \u0000 успешно приглашен в клан!": [
+    "Player ",
+    " successfully invited to the clan!"
+  ],
+  "Участники клана": "Clan members",
+  "Участник": "Member",
+  "Понизить до участника": "Demote to member",
+  "Повысить до владельца": "Promote to owner",
+  "Роль участника клана \u0000 сменена успешно.": [
+    "Role of clan member ",
+    " changed successfully."
+  ],
+  "понижены": "demoted",
+  "повышены": "promoted",
+  "Вы были \u0000": [
+    "You were ",
+    ""
+  ],
+  "Вы были \u0000 в клане '\u0000'": [
+    "You were ",
+    " in clan '",
+    "'"
+  ],
+  "Выгнать": "Kick",
+  "Выгнать участника '\u0000'": [
+    "Kick member '",
+    "'"
+  ],
+  "Причина": "Reason",
+  "Ничего не произойдет, если вы не укажете причину": "Nothing will happen if you don't specify a reason",
+  "Участник \u0000 успешно выгнан из клана \u0000": [
+    "Member ",
+    " successfully kicked from clan ",
+    ""
+  ],
+  "Причина не была указана, участник остался в клане": "No reason specified, member remains in the clan",
+  "Неизвестный аргумент: \u0000.\\nДоступные командлеты: \\n\u0000\\n ": [
+    "Unknown argument: ",
+    ".\\nAvailable subcommands: \\n",
+    "\\n "
+  ],
+  "Список всех доступных вам команд: §f.help": "List of all commands available to you: §f.help",
+  "Вы имели ввиду \u0000?": [
+    "Did you mean ",
+    "?"
+  ],
+  "\\nКоманда доступна начиная с роли \u0000": [
+    "\\nCommand available from role ",
+    ""
+  ],
+  "У вас нет разрешения для использования команды \u0000\u0000\\nСписок всех доступных вам команд: §f.help": [
+    "You do not have permission to use command ",
+    "",
+    "\\nList of all commands available to you: §f.help"
+  ],
+  "При выполнении команды произошла ошибка. \u0000": [
+    "An error occurred while executing the command. ",
+    ""
+  ],
+  "Не так быстро! Попробуй через \u0000": [
+    "Not so fast! Try again in ",
+    ""
+  ],
+  "Вы получили свою награду!": "You have received your reward!",
+  "\u0000 ящик\\n§7\u0000": [
+    "",
+    " crate\\n§7",
+    ""
+  ],
+  "Ключ для \u0000 не подходит к ящику \u0000": [
+    "Key for ",
+    " is not suitable for crate ",
+    ""
+  ],
+  "Открыт ящик \u0000!": [
+    "Crate ",
+    " opened!"
+  ],
+  "Чтобы открыть этот сундук, возьмите в руки ключ": "To open this chest, hold the key in your hand",
+  "Купить ключ": "Buy key",
+  "Посмотреть содержимое": "View contents",
+  "\u0000 > Содержимое": [
+    "",
+    " > Contents"
+  ],
+  "\u0000 ящик": [
+    "",
+    " crate"
+  ],
+  "Ключ для ящика \u0000": [
+    "Key for crate ",
+    ""
+  ],
+  "Используйте этот ключ, чтобы открыть ящик с лутом!": "Use this key to open the loot chest!",
+  "Катсцена": "Cutscene",
+  "Выход из катсцены": "Exit cutscene",
+  "Вы не находитесь в катсцене!": "You are not in a cutscene!",
+  "Игрок \u0000 сменил ник на \u0000": [
+    "Player ",
+    " changed nickname to ",
+    ""
+  ],
+  "§aЛистья": "§aLeafs",
+  "§6Монеты": "§6Money",
+  "Убийств": "Kills",
+  "Смертей": "Deaths",
+  "Рейд-блок": "Raid-block",
+  "Онлайн всего": "Online time",
+  "Блоков поставлено": "Blocks placed",
+  "Блоков сломано": "Blocks broken",
+  "Фейрверков запущено": "Fireworks launched",
+  "Фейрверков взорвано": "Fireworks exploded",
+  "Урона получено": "Damage dealt",
+  "Урона нанесено": "Damage given",
+  "Всего входов на сервер": "Join times",
+  "Время первого входа": "Join time",
+  "Онлайн на анархии": "Online time on Anarchy",
+  "Время первого входа на анархию": "Anarchy join time",
+  "Последний раз онлайн на анархии": "Last seen online on anarchy",
+  "Последний раз онлайн": "Last seen online",
+  "Успешно": "Success",
+  "§l§b< §r§3Назад": "§l§b< §r§3Back",
+  "§r§3Назад": "§r§3Back",
+  "Отмена": "Cancel",
+  "§cВы уверены, что хотите \u0000?": [
+    "§cAre you sure you want to ",
+    "?"
+  ],
+  "Фильтры": "Filters",
+  "Предыдущая": "Previous",
+  "Следующая": "Next",
+  "Поиск": "Search",
+  "Результаты поиска по запросу\\n\u0000": [
+    "Search results for\\n",
+    ""
+  ],
+  "Запрос": "Query",
+  "Ничего не произойдет": "Nothing will happen",
+  "Хорошо, назад": "Okay, back",
+  "История": "History",
+  "Вы уверены?": "Are you sure?",
+  "Никакой": "None",
+  "Вы уверены, что хотите \u0000?": [
+    "Are you sure you want to ",
+    "?"
+  ],
+  "Убрать выделение": "Deselect",
+  "Выбрать всех": "Select all",
+  "§3Выберите игрока чтобы \u0000": [
+    "§3Select a player to ",
+    ""
+  ],
+  "Сортировать по": "Sort by",
+  "Онлайну": "Online",
+  "Дате входа": "Login date",
+  "Назад": "Back",
+  "Закрыть": "Close",
+  "Закрой чат!": "Close chat!",
+  "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова": "Failed to open form. Close chat or another menu and try again",
+  "§bНовичок": "§bNewbie",
+  "§fДа": "§fYes",
+  "§cНет": "§cNo",
+  "\u0000: \u0000, просмотреть: .mail": [
+    "",
+    ": ",
+    ", view: .mail"
+  ],
+  "Почта": "Mail",
+  "Добро пожаловать!": "Welcome!",
+  "§8Очнулся в воздухе": "§8Woke up in the air",
+  "§8Проснулся": "§8Woke up",
+  "\u0000, \u0000!\\n§r§3Время §b• §3\u0000": [
+    "",
+    ", ",
+    "!\\n§r§3Time §b• §3",
+    ""
+  ],
+  "Имитирует первый вход": "Simulate first login",
+  "Вход\\n§7Все действия, связанные со входом": "Login\\n§7All actions related to login",
+  "Сообщение": "Message",
+  "о входе других игроков": "about other players logging in",
+  "Звук": "Sound",
+  "при входе игроков": "when players log in",
+  "Время": "Time",
+  "при входе": "on login",
+  "§9Доброй ночи": "§9Good night",
+  "§6Доброе утро": "§6Good morning",
+  "§bДобрый день": "§bGood afternoon",
+  "§3Добрый вечер": "§3Good evening",
+  "§2Перемещение...": "§2Teleporting...",
+  "\u0000\\nЗавершен!": [
+    "",
+    "\\nCompleted!"
+  ],
+  "Взять задание": "Take quest",
+  "Меню заданий": "Quest menu",
+  "Выйти": "Exit",
+  "У вас нет активных заданий!": "You have no active quests!",
+  "Задания": "Quests",
+  "Нет заданий": "No quests",
+  "Нет активных заданий.": "No active quests.",
+  "Завершенные задания": "Completed quests",
+  "Список завершенных заданий": "List of completed quests",
+  "Текущее действие: \u0000\\nОписание действия: \u0000\\nЛокация: \u0000": [
+    "Current action: ",
+    "\\nAction description: ",
+    "\\nLocation: ",
+    ""
+  ],
+  "\\nИзмерение: \u0000": [
+    "\\nDimension: ",
+    ""
+  ],
+  "Задание завершено!": "Quest completed!",
+  "Описание задания: \u0000\\n\\n\u0000": [
+    "Quest description: ",
+    "\\n\\n",
+    ""
+  ],
+  "Сделать приоритетным": "Make priority",
+  "Отказаться от задания": "Abandon quest",
+  "Отказаться": "Abandon",
+  "Задания\r\n§7Настройки игровых заданий": "Quests\r\n§7Game quest settings",
+  "Сообщение в чат при каждом шаге": "Chat message at each step",
+  "Отправлять ли сообщение в чат при каждом новом разделе задания": "Send a chat message at each new quest section",
+  "Задание: \u0000\\n§7\u0000": [
+    "Задание: ",
+    "\\n§7",
+    ""
+  ],
+  "При активации шага произошла ошибка. \u0000": [
+    "An error occurred while activating the step. ",
+    ""
+  ],
+  "Задание сломалось: \u0000": [
+    "Quest broke: ",
+    ""
+  ],
+  "Заберите награду": "Claim reward",
+  "\u0000\\n§aЗавершено! §6Заберите награду.": [
+    "",
+    "\\n§aCompleted! §6Claim your reward."
+  ],
+  "Забрать награду": "Claim reward",
+  "Вас ждет §f\u0000": [
+    "§f",
+    " §6is waiting for you"
+  ],
+  "Управляет регионами": "Manages regions",
+  "Нельзя создать регион, область которого ниже -64 (y: \u0000 radius: \u0000 result: \u0000)": [
+    "Cannot create a region with area below -64 (y: ",
+    " radius: ",
+    " result: ",
+    ")"
+  ],
+  "Тип региона": "Region type",
+  "Тип зоны": "Zone type",
+  "Разрешения": "Permissions",
+  "Пересохранить структуру": "Resave structure",
+  "Сохранить структуру": "Save structure",
+  "Не удалось сохранить структуру: \u0000": [
+    "Failed to save structure: ",
+    ""
+  ],
+  "Разрешения региона": "Region permissions",
+  "Двери\\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.": "Doors\\n§7Determines if players not added to the region can use doors.",
+  "Рычаг и кнопки\\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.": "Levers and buttons\\n§7Determines if players not added to the region can use levers and buttons.",
+  "Люки\\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.": "Trapdoors\\n§7Determines if players not added to the region can use trapdoors.",
+  "Контейнеры\\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)": "Containers\\n§7Determines if players not added to the region can open containers (chests, shulkers, etc.)",
+  "Калитки\\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.": "Gates\\n§7Determines if players not added to the region can use gates.",
+  "Сражение\\n§7Определяет, смогут ли игроки сражаться в регионе": "Combat\\n§7Determines if players can fight in the region",
+  "Да": "Yes",
+  "Только с сущностями (pve)": "Only with entities (pve)",
+  "Нет": "No",
+  "Радиус\\n§7Определяет радиус региона": "Radius\\n§7Determines the region radius",
+  "Центр региона": "Region center",
+  "Участники региона": "Region members",
+  "Для управления участником нажмите на кнопку с его ником": "To manage a member, click the button with their nickname",
+  "Вы можете только посмотреть их": "You can only view them",
+  "Добавить!": "Add!",
+  "Добавить участника": "Add member",
+  "§7Владелец > ": "§7Owner > ",
+  "Управление участником региона": "Manage region member",
+  "Передать права владельца региона": "Transfer region ownership",
+  "Назначить владельцем региона": "Assign as region owner",
+  "Передать": "Transfer",
+  "Удалить участника": "Remove member",
+  "Нельзя сражаться в мирной зоне": "Cannot fight in safe zone",
+  "§cБосс §6\u0000": [
+    "§cBoss §6",
+    ""
+  ],
+  "§bЗона добычи новичков": "§bNewbie mining zone",
+  "§7Зона добычи": "§7Mining zone",
+  "Вы не можете добывать блоки в зоне добычи новичков": "You cannot mine blocks in the newbie mining zone",
+  "Регион сохраняется": "Region is being saved",
+  "Регион создается. \u0000%%": [
+    "Region is being created. ",
+    "%%"
+  ],
+  "Дорога": "Road",
+  "Безопасная зона \u0000": [
+    "Safe ",
+    ""
+  ],
+  "§aРуководство": "§aGuide",
+  "§6Куратор": "§6Curator",
+  "§cТех. Админ": "§cTech Admin",
+  "§dГл. Админ": "§dHead Admin",
+  "§5Админ": "§5Admin",
+  "§6Модератор": "§6Moderator",
+  "§eПомошник": "§eHelper",
+  "§bГл. Строитель": "§bHead Builder",
+  "§3Строитель": "§3Builder",
+  "§fУчастник": "§fMember",
+  "§9Наблюдатель": "§9Observer",
+  "§9Тестер": "§9Tester",
+  "\u0000\\nДо появления\\nосталось \u0000": [
+    "",
+    "\\nДо появления\\nосталось ",
+    ""
+  ],
+  "Убит босс \u0000!": [
+    "Boss ",
+    " defeated!"
+  ],
+  "§fЧертеж предмета \u0000": [
+    "§fItem blueprint ",
+    ""
+  ],
+  "С помощью него вы можете сделать предмет у инженера": "With it you can craft an item at the engineer",
+  "Содержимое": "Contents",
+  "Просмотр содержимого таблиц лута": "View loot table contents",
+  "Меню\\n§7Разные настройки интерфейсов и меню в игре": "Menu\\n§7Various interface and menu settings in the game",
+  "§r§7Возьми в руку и используй предмет\\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu": "§r§7Hold and use the item\\n§r§7To remove from inventory, type in chat: §f.menu",
+  "меню": "menu",
+  "§r§l§6Цель\\n§r§7(use)": "§r§l§6Цель\\n§r§7(use)",
+  "Выдает или убирает \u0000 из инвентаря": [
+    "Gives or removes ",
+    " from inventory"
+  ],
+  "Успешно отменено": "Successfully cancelled",
+  "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти": "If you perform this action, you will lose newbie status:\r\n - Other players will be able to damage you\r\n - Other players will be able to take your loot after death",
+  "Я больше не новичок": "I'm no longer a newbie",
+  "НЕТ, НАЗАД": "NO, BACK",
+  "Вы \u0000, поэтому вышли из режима новичка.": [
+    "You are ",
+    ", so you left newbie mode."
+  ],
+  "ударили игрока": "hit a player",
+  "Будь осторожнее в следующий раз.": "Be more careful next time.",
+  "снова ударили игрока": "hit a player again",
+  "Используйте, чтобы выйти из режима новичка": "Use to exit newbie mode",
+  "использовали команду": "used the command",
+  "Вы не находитесь в режиме новичка.": "You are not in newbie mode.",
+  "Вводит в режим новичка": "Enters newbie mode",
+  "провели на анархии больше 2 часов": "spent more than 2 hours on anarchy",
+  "\u0000: Я не могу с вами говорить. Приходите позже.": [
+    "",
+    ": Я не могу с вами говорить. Приходите позже."
+  ],
+  "Не удалось открыть диалог. \u0000": [
+    "Failed to open dialog. ",
+    ""
+  ],
+  "Общие настройки мира\\n§7Чат, спавн и тд": "General world settings\\n§7Chat, spawn, etc.",
+  "§8(По умолчанию)\\n": "§8(Default)\\n",
+  "\\n§7§lЗначение:§r \u0000": [
+    "\\n§7§lValue:§r ",
+    ""
+  ],
+  "\\n§7§lТип: §r§f\u0000": [
+    "\\n§7§lType: §r§f",
+    ""
+  ],
+  "Настройка не изменится": "Setting will not change",
+  "Введите число!": "Enter a number!",
+  "Сохранено!": "Saved!",
+  "Строка": "String",
+  "Число": "Number",
+  "JSON-Объект": "JSON Object",
+  "Переключатель": "Toggle",
+  "§dНастройки": "§dSettings",
+  "Зачарования:\\n\u0000": [
+    "Enchantments:\\n",
+    ""
+  ],
+  "Выбранный предмет: \u0000\\nНажмите, чтобы сменить": [
+    "Selected item: ",
+    "\\nClick to change"
+  ],
+  "Товара на складе: \u0000/\u0000, \u0000%%": [
+    "Items in stock: ",
+    "/",
+    ", ",
+    "%%"
+  ],
+  "Продать": "Sell",
+  "Купить": "Buy",
+  "Склад переполнен": "Warehouse is full",
+  "Товар закончился": "Out of stock",
+  "В инвентаре нет \u0000": [
+    "No ",
+    " in inventory"
+  ],
+  "Нет предмета": "No item",
+  "Недостаточно средств.": "Insufficient funds.",
+  "Нужно уровней опыта: \u0000, \u0000/\u0000": [
+    "Required experience levels: ",
+    ", ",
+    "/",
+    ""
+  ],
+  "Покупка невозможна:\u0000\u0000": [
+    "Purchase not possible:",
+    "",
+    ""
+  ],
+  "Подтверждение": "Confirmation",
+  "Продать \u0000 за \u0000?": [
+    "Sell ",
+    " for ",
+    "?"
+  ],
+  "Купить \u0000 за \u0000?": [
+    "Buy ",
+    " for ",
+    "?"
+  ],
+  "Продать!": "Sell!",
+  "Купить!": "Buy!",
+  "Продажа отменена": "Sale cancelled",
+  "Покупка отменена": "Purchase cancelled",
+  "Успешная продажа \u0000 за \u0000!": [
+    "Successfully sold ",
+    " for ",
+    "!"
+  ],
+  "Успешная покупка \u0000 за \u0000!": [
+    "Successfully bought ",
+    " for ",
+    "!"
+  ],
+  "При покупке произошла ошибка. \u0000": [
+    "An error occurred during purchase. ",
+    ""
+  ],
+  "Покупка невозможна": "Purchase not possible",
+  "Продажа невозможна": "Sale not possible",
+  "Нет места в инвентаре (нужно еще \u0000)": [
+    "No space in inventory (need ",
+    " more)"
+  ],
+  "Магазин\\n§7Внутриигровой магазин": "Shop\\n§7In-game shop",
+  "Подтверждение покупки": "Purchase confirmation",
+  "Определяет, включено ли подтверждение перед покупкой.": "Determines if confirmation before purchase is enabled.",
+  "Показывать счет": "Show balance",
+  "Показывать ли счет в меню (монеты, листья)": "Show balance in menu (coins, leaves)",
+  "Продаваемые предметы": "Sellable items",
+  "Сразу открывать меню покупки": "Open purchase menu immediately",
+  "Подтверждение перед покупкой": "Confirmation before purchase",
+  "Ваш баланс": "Your balance",
+  " (долгое)": " (long)",
+  "Вы получили награды!": "You received rewards!",
+  "Чат\\n§7Звуки и внешний вид чата": "Chat\\n§7Chat sounds and appearance",
+  "Подсветка моих сообщений": "Highlight my messages",
+  "Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r": "If enabled, you will see your messages in chat like this: §l§6Me: §r§fMessage§r",
+  "Выключение звука": "Mute",
+  "Выключение звука чужих сообщений": "Mute others' messages",
+  "\u0000§6§lЯ§r: §f\u0000": [
+    "",
+    "§6§lMe§r: §f",
+    ""
+  ],
+  "Возвращает камеру в исходное состояние": "Resets camera to default state",
+  "Выводит список команд": "Displays list of commands",
+  " Пусто": " Empty",
+  "\u0000─═─═─═§f Доступно: \u0000/\u0000 \u0000═─═─═─═─": [
+    "",
+    "─═─═─═§f Available: ",
+    "/",
+    " ",
+    "═─═─═─═─"
+  ],
+  " (также \u0000)": [
+    " (also ",
+    ")"
+  ],
+  "   §fКоманда §6.\u0000\u0000§7§o - \u0000": [
+    "   §fCommand §6.",
+    "",
+    "§7§o - ",
+    ""
+  ],
+  "Выводит справку о команде": "Displays command help",
+  "Убивает вас. Используйте, если застряли где-то": "Kills you. Use if you are stuck somewhere",
+  "Посмотреть входящие сообщения почты": "View incoming mail messages",
+  "Читать письмо при открытии": "Read mail on open",
+  "Помечать ли письмо прочитанным при открытии": "Mark mail as read on open",
+  "Собирать награды при удалении": "Collect rewards on delete",
+  "Собирать ли награды при удалении письма": "Collect rewards when deleting mail",
+  "Показывать ли при входе сообщение с кол-вом непрочитанных": "Show unread mail count on login",
+  "Непрочитанные": "Unread",
+  "Показывать только непрочитанные сообщения": "Show only unread messages",
+  "Несобранные награды": "Unclaimed rewards",
+  "У письма есть несобранные награды": "Mail has unclaimed rewards",
+  "Соритровать по": "Sort by",
+  "Дате": "Date",
+  "Имени": "Name",
+  "\u0000\u0000\\n\\n§l§fНаграды:§r\\n\u0000": [
+    "",
+    "",
+    "\\n\\n§l§fRewards:§r\\n",
+    ""
+  ],
+  "Награда успешно забрана!\\n\\n": "Reward successfully claimed!\\n\\n",
+  "Пометить как прочитанное": "Mark as read",
+  "Удалить письмо?": "Delete mail?",
+  " Все награды будут собраны автоматически": " All rewards will be collected automatically",
+  " Вы потеряете все награды, прикрепленные к письму!": " You will lose all rewards attached to the mail!",
+  "Удалить письмо": "Delete mail",
+  "\u0000 \u0000! Посмотреть: \u0000": [
+    "",
+    " ",
+    "! View: ",
+    ""
+  ],
+  "Почта:": "Mail:",
+  "Меняет имя": "Change name",
+  "Изменено на \u0000": [
+    "Changed to ",
+    ""
+  ],
+  "Выдает ваш айди": "Displays your ID",
+  "Показывает пинг сервера": "Displays server ping",
+  "Понг! Проверяем...": "Pong! Checking...",
+  "TPS сервера \u0000§f: \u0000": [
+    "Server TPS ",
+    "§f: ",
+    ""
+  ],
+  "§aхороший": "§agood",
+  "§gнормальный": "§gnormal",
+  "§cплохой": "§cbad",
+  "Общее меню игрока": "General player menu",
+  "Другие игроки": "Other players",
+  "открыть его меню": "open their menu",
+  "Статистика": "Statistics",
+  "Достижения \u0000/\u0000 (\u0000%%)": [
+    "Achievements ",
+    "/",
+    " (",
+    "%%)"
+  ],
+  "Порталы \u0000/\u0000": [
+    "Portals ",
+    "/",
+    ""
+  ],
+  "Лор прочитан": "Lore read",
+  "Показывает вашу роль": "Displays your role",
+  "Восстанавливает вашу роль": "Restores your role",
+  "Вы вернули роль §r\u0000": [
+    "You restored role §r",
+    ""
+  ],
+  "Ваша роль: \u0000\u0000": [
+    "Your role: ",
+    "",
+    ""
+  ],
+  "\\n\\n§3Восстановить прошлую роль: §f.role restore": "\\n\\n§3Restore previous role: §f.role restore",
+  "§3Ваша роль: \u0000": [
+    "§3Your role: ",
+    ""
+  ],
+  "§bонлайну": "§bonline",
+  "§aролям": "§aroles",
+  "§6дате входа": "§6login date",
+  "§3Сменить мою роль\\n§7(Восстановить потом: §f.role restore§7)": "§3Change my role\\n§7(Restore later: §f.role restore§7)",
+  "Без имени": "No name",
+  " §4Не сменить": " §4Cannot change",
+  "У игрока \u0000 роль выше или такая же как у вас, вы не можете ее сменить.": [
+    "Player ",
+    " has a role higher or equal to yours, you cannot change it."
+  ],
+  "Уведомлять": "Notify",
+  "Показать Ваш ник в уведомлении": "Show your nickname in notification",
+  "Роль": "Role",
+  "Причина смены роли": "Reason for role change",
+  "Например, \"чел дурной, пол технограда снес\"": "For example, \"guy is crazy, destroyed half of Technograd\"",
+  "Ваша роль сменена c \u0000 §3на \u0000\u0000\u0000": [
+    "Your role changed from ",
+    " §3to ",
+    "",
+    "",
+    ""
+  ],
+  "§3 игроком §r\u0000": [
+    "§3 by player §r",
+    ""
+  ],
+  "\\n§r§3Причина: §r\u0000": [
+    "\\n§r§3Reason: §r",
+    ""
+  ],
+  "Роль игрока \u0000 сменена успешно": [
+    "Role of player ",
+    " changed successfully"
+  ],
+  "Роль сменена успешно": "Role changed successfully",
+  "Вы телепортируетесь!": "You are teleporting!",
+  "Вы не телепортируетесь!": "You are not teleporting!",
+  "Телепортация в случайное место на анархии": "Teleport to a random place in anarchy",
+  "Недоступно": "Unavailable",
+  "Отменяет телепортацию": "Cancels teleportation",
+  "Настройки": "Settings",
+  "Настройки мира": "World settings",
+  "Присаживает вас": "Makes you sit",
+  "Вы не можете сесть в падении!": "You can't sit while falling!",
+  "Вы сели. Чтобы встать, крадитесь": "You sat down. To stand up, sneak",
+  "Показывает статистику по игре": "Shows game statistics",
+  "Показывать относительную дату": "Show relative date",
+  "Показывать относительную дату на экране статистики": "Show relative date on the statistics screen",
+  "\u0000 дней": [
+    "",
+    " days"
+  ],
+  "\u0000 часов": [
+    "",
+    " hours"
+  ],
+  "\u0000 минут": [
+    "",
+    " minutes"
+  ],
+  "\u0000 секунд": [
+    "",
+    " seconds"
+  ],
+  "Статистика игрока \u0000": [
+    "Player statistics ",
+    ""
+  ],
+  "Анархия \u0000": [
+    "Anarchy ",
+    ""
+  ],
+  "Убийств/Смертей": "Kills/Deaths",
+  "Нанесено/Получено": "Dealt/Received",
+  "Открывает меню телепортации": "Opens teleport menu",
+  "Команда доступна только тестерам, наблюдателям и администраторам.": "Command available only to testers, observers, and administrators.",
+  "Выберите локацию": "Select location",
+  "Также доступна из команды .tp\\n\\nПосле выхода из беты команда не будет доступна!": "Also available from the .tp command\\n\\nAfter beta, the command will not be available!",
+  "Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.": "You must enter anarchy or switch to creative mode before teleporting! Otherwise, you will be returned to spawn.",
+  "Версия сервера": "Server version",
+  "Версия майнкрафта": "Minecraft version",
+  "Вы не можете создать точку восстановления не находясь на анархии": "You cannot create a restore point unless you are in anarchy",
+  "Вы не можете создать точку восстановления не находясь в выживании или приключении": "You cannot create a restore point unless you are in survival or adventure",
+  "Очищает и сохраняет все данные (для тестов)": "Clears and saves all data (for testing)",
+  "Сохранения": "Saves",
+  "Точки восстановления, нужные для тестирования\\n\\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ": "Restore points needed for testing\\n\\n§cENDER CHEST IS NOT SAVED",
+  "Полный сброс": "Full reset",
+  "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.": "Are you sure you want to clear the anarchy inventory and return to spawn? Useful for tutorial testing.",
+  "Создать точку восстановления": "Create restore point",
+  "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\\n\\n§f\\nСохраняются:\\nПозиция в мирe\\nЗадания\\nИнвентарь\\nОпыт\\nМонеты\\nСтатистика\\nНазвание точки восстановления:": "§cENDER CHEST IS NOT SAVED\\n\\n§f\\nSaved:\\nWorld position\\nQuests\\nInventory\\nExperience\\nCoins\\nStatistics\\nRestore point name:",
+  "Точки восстановления других игроков": "Other players' restore points",
+  "Перезаписать": "Overwrite",
+  "Перезаписать точку восстановления": "Overwrite restore point",
+  "Загрузиться": "Load",
+  "удалить точку": "delete point",
+  "Уведомлять о ломающемся предмете": "Notify about breaking item",
+  "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран": "If enabled, when you interact with a block using an item with less than 90%% durability, show a full-screen notification",
+  "Не давать ломать предмет": "Don't allow breaking item",
+  "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.": "If enabled, when you interact with a block using an item with less than 99%% durability, the interaction will be canceled and the item will be saved.",
+  "Инструмент скоро сломается! \u0000/\u0000 (\u0000%)": [
+    "Tool will break soon! ",
+    "/",
+    " (",
+    "%)"
+  ],
+  "Вы не можете ломать не поставленные игроками блоки\\nвне вашей базы, шахты или зоны добычи": "You cannot break blocks not placed by players\\noutside your base, mine, or mining zone",
+  "Индикатор": "Indicator",
+  "Индикатор попадания по существу из лука": "Bow hit indicator",
+  "Звук лука": "Bow sound",
+  "Звук попадания по существо из лука": "Bow hit sound",
+  "Вы находитесь в режиме сражения!": "You are in combat mode!",
+  "Вы вышли из сервера во время сражения, поэтому были убиты при входе.": "You left the server during combat, so you were killed on entry.",
+  "Усиленный аирдроп скоро упадет на \u0000!": [
+    "Reinforced airdrop will soon fall at ",
+    "!"
+  ],
+  "Обычный аирдроп скоро упадет на \u0000!": [
+    "Regular airdrop will soon fall at ",
+    "!"
+  ],
+  "Выдает радиус границы анархии сейчас": "Shows current anarchy border radius",
+  "Радиус границы анархии сейчас: \u0000": [
+    "Anarchy border radius now: ",
+    ""
+  ],
+  "Вы уже находитесь на анархии! Если это не так, используйте \u0000": [
+    "You are already in anarchy! If not, use ",
+    ""
+  ],
+  "§bПеремещает на анархию": "§bTeleports to anarchy",
+  "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку": "Clears saved anarchy point. When teleporting to anarchy, you will be thrown to a random location",
+  "Успех! Теперь вы можете использовать \u0000 для перемещения на случайную позицию.": [
+    "Success! Now you can use ",
+    " to teleport to a random position."
+  ],
+  "Озеро Технограда": "Technograd Lake",
+  "Высокая радиация!": "High radiation!",
+  "Очень высокая радиация!": "Very high radiation!",
+  "Поиск случайной локации без воды...": "Searching for a random location without water...",
+  "Найдено!": "Found!",
+  "Вода. Попытка \u0000/\u0000": [
+    "Water. Attempt ",
+    "/",
+    ""
+  ],
+  "решили создать базу": "decided to create a base",
+  "Теперь вы можете свободно создать базу!": "Now you can freely create a base!",
+  "Нельзя создать базу на высоте ниже \u0000!": [
+    "Cannot create a base below height ",
+    "!"
+  ],
+  "§cВы уже \u0000!": [
+    "§cYou are already ",
+    "!"
+  ],
+  "владеете базой": "own a base",
+  "состоите в базе игрока '\u0000'": [
+    "are in the base of player '",
+    "'"
+  ],
+  "Рядом есть другие регионы!": "There are other regions nearby!",
+  "База успешно создана! Чтобы открыть меню базы используйте команду \u0000": [
+    "Base successfully created! To open the base menu, use command ",
+    ""
+  ],
+  "скоро начнется гниение": "decay will start soon",
+  "Всех материалов хватает!\\nБаза защищена от гниения на \u0000§r\\n": [
+    "All materials are sufficient!\\nBase protected from decay for ",
+    "§r\\n"
+  ],
+  "Не хватает ресурсов:\\n\u0000": [
+    "Not enough resources:\\n",
+    ""
+  ],
+  "Гниение базы": "Base decay",
+  "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\\n\u0000\\nМатериалы в бочке:\\n\u0000\\n\u0000\\nДо следующего сбора ресурсов: \u0000": [
+    "To prevent base decay, the barrel must contain the following resources daily:\\n",
+    "\\nMaterials in barrel:\\n",
+    "\\n",
+    "\\nUntil next resource collection: ",
+    ""
+  ],
+  "§cБаза гниет!\\n§4Срочно пополните материалы!": "§cBase is decaying!\\n§4Urgently replenish materials!",
+  "§cБаза разрушена!\\n§4Срочно поставьте блок базы на \u0000!": [
+    "§cBase destroyed!\\n§4Urgently place the base block at ",
+    "!"
+  ],
+  "Состояние базы": "Base status",
+  "гниет": "decaying",
+  "разрушена": "destroyed",
+  "База с владельцем \u0000 \u0000.": [
+    "Base with owner ",
+    " ",
+    "."
+  ],
+  "Нужно срочно положить материалы в бочку!": "Urgently put materials in the barrel!",
+  "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью": "Base was raided. Sorry. You can still restore it if it hasn't completely decayed",
+  "База гниет! Положите материалы из .base -> Гниение в бочку": "Base is decaying! Put materials from .base -> Decay into the barrel",
+  "Максимальный уровень\\n\u0000": [
+    "Maximum level\\n",
+    ""
+  ],
+  "\u0000 (радиус \u0000 -> \u0000)": [
+    "",
+    " (radius ",
+    " -> ",
+    ")"
+  ],
+  "Улучшить базу: \u0000": [
+    "Upgrade base: ",
+    ""
+  ],
+  "Меню базы": "Base menu",
+  "У вас нет базы! Вступите в существующую или создайте свою.": "You don't have a base! Join an existing one or create your own.",
+  "Это ваша база.": "This is your base.",
+  "База игрока \u0000": [
+    "Base of player ",
+    ""
+  ],
+  "\\n\\nКоординаты: \u0000\\nРадиус: \u0000": [
+    "\\n\\nCoordinates: ",
+    "\\nRadius: ",
+    ""
+  ],
+  "Телепорт!": "Teleport!",
+  "§6База": "§6Base",
+  "Поставьте эту бочку и она станет базой.": "Place this barrel and it will become a base.",
+  "(гниет)": "(decaying)",
+  "(разрушена)": "(destroyed)",
+  "§6Ваша база \u0000": [
+    "§6Your base ",
+    ""
+  ],
+  "Данж": "Dungeon",
+  "Заправка 1": "Gas Station 1",
+  "Заправка 2": "Gas Station 2",
+  "Заправка 3": "Gas Station 3",
+  "Заправка 4": "Gas Station 4",
+  "Гараж": "Garage",
+  "§cАванпост": "§cOutpost",
+  "§4Бункер": "§4Bunker",
+  "§cПалатка аванпоста": "§cOutpost Tent",
+  "§5Варден": "§5Warden",
+  "§dНезеритовая жила": "§dNetherite Vein",
+  "Доберитесь до указанного города или деревни": "Reach the specified city or village",
+  "Город не настроен!": "City not configured!",
+  "Доберитесь до города!": "Reach the city!",
+  "Исследуйте новый город!": "Explore the new city!",
+  "Обзор города": "City overview",
+  "§7Обычный": "§7Normal",
+  "§bУсиленный": "§bReinforced",
+  "§9Хранилище": "§9Storage",
+  "Исследование \u0000": [
+    "Exploration ",
+    ""
+  ],
+  "Посети город": "Visit the city",
+  "Сходи в город, сделай запланированые покупки": "Go to the city, make your planned purchases",
+  "Мясник": "Butcher",
+  "И рыбник.\\n\\n": "And fishmonger.\\n\\n",
+  "Ювелир": "Jeweler",
+  "Украшения я делать пока не умею.\\n\\n": "I can't make jewelry yet.\\n\\n",
+  "Мусорщик": "Scavenger",
+  "Продай мне весь свой мусор": "Sell me all your junk",
+  "Любой предмет": "Any item",
+  "Любой непродаваемый предмет": "Any unsellable item",
+  "Каменщик": "Stoner",
+  "А камень я тебе дам.\\n\\n": "I'll give you stone.\\n\\n",
+  "Дровосек": "Woodman",
+  "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\\n\\n": "I only chop wood with my axe, don't try to order a murder from me.\\n\\n",
+  "Внешнее пространство": "Outer space",
+  "Открыт новый портал! [Когда-нибудь здесь будет анимация...]": "New portal opened! [Someday there will be an animation here...]",
+  "Мирная зона": "Safe",
+  "Перемещение...": "Teleporting...",
+  "Порталы": "Portals",
+  "§7Шахта": "§7Mine",
+  "Общее": "General",
+  "Вход": "Join",
+  "Телепорт на спавн": "Teleport to spawn",
+  "Определяет, будете ли вы телепортироваться на спавн при входе": "Determines if you will teleport to spawn on join",
+  "§r§bПеремещает на спавн": "§r§bTeleports to spawn",
+  "Тетя Зина": "Aunt Zina",
+  "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\\n\\n": "Come in, make yourself comfortable. All food is fresh, straight from the oven! The apple too.\\n\\n",
+  "Бармен": "Bartender",
+  "Ну что, устал от жизни? Пришел попить?\\n\\n": "So, tired of life? Came for a drink?\\n\\n",
+  "Квас": "Kvass",
+  "Пиво": "Beer",
+  "Сидр": "Cider",
+  "Настойка из шпината": "Spinach tincture",
+  "Вино": "Wine",
+  "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!": "The key is now bound to this furnace! For one hour you can open it with this key!",
+  "У меня ты можешь купить ключ доступа к печкам\\n\\n": "You can buy a furnace access key from me\\n\\n",
+  "Сдать неиспользуемый ключ": "Return unused key",
+  "Ключ от печки": "Furnace key",
+  "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!": "To use furnaces, you need to buy a key from Pechkin and keep it in your inventory!",
+  "Этот ключ используется для других печек!": "This key is used for other furnaces!",
+  "Эта печка уже занята. Печка освободится через \u0000, ключ: \u0000": [
+    "This furnace is already occupied. It will be free in ",
+    ", key: ",
+    ""
+  ],
+  "Вы уже использовали этот ключ для другой печки.": "You have already used this key for another furnace.",
+  "Использован ключ из слота \u0000": [
+    "Key used from slot ",
+    ""
+  ],
+  "§6Ключ от печки": "§6Furnace key",
+  "§7Открывает печку в каменоломне.": "§7Opens the furnace in the quarry.",
+  "На": "On",
+  "Владелец": "Owner",
+  "§r§aНе использован": "§r§aNot used",
+  "§r§6Печка плавит...": "§r§6Furnace is smelting...",
+  "§r§cВремя истекло": "§r§cTime is up",
+  "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на \u0000, ключ: \u0000": [
+    "In 5 minutes, resources in your furnace will no longer be private! Furnace is at ",
+    ", key: ",
+    ""
+  ],
+  "Оружейник": "Weaponsmith",
+  "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.": "I forge weapons. If you have nothing to do, go away, don't distract me from work.",
+  "Улучшить до незерита": "Upgrade to netherite",
+  "Алмазный предмет": "Diamond item",
+  "Улучшить": "Upgrade",
+  "Починить": "Repair",
+  "Любой поломанный предмет": "Any broken item",
+  "Предмет целый, выберите другой": "Item is intact, choose another",
+  "Онет, кажется, зачарование \u0000 уровнем \u0000 потерялось...": [
+    "Oh no, it seems the enchantment ",
+    " level ",
+    " was lost..."
+  ],
+  "Кучер": "Coachman",
+  "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n": "Wtf, I mean I have nothing to offer you yet\r\n\r\n",
+  "Каменоломня": "StoneQuarry",
+  "§6Печкин": "§6Печкин",
+  "§6Баба валя": "§6Баба валя",
+  "Ломщик": "StoneBreaker",
+  "А что за город": "What kind of city is this",
+  "Ну типа крутой камни ломаем вот да": "Well, we break cool stones here, yeah",
+  "Камнедробилка": "Stone crusher",
+  "Используется для создания базы у Инжинера в Технограде\\n\\nМожно получить из усиленного сундука и робота": "Used to create a base at the Engineer in Technograd\\n\\nCan be obtained from a reinforced chest and robot",
+  "Используется для создания платы у Инжинера в Технограде": "Used to create a board at the Engineer in Technograd",
+  "Вы не можете купить это в режиме новичка": "You cannot buy this in newbie mode",
+  "Инженер": "Engineer",
+  "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n": "Well, give me a blueprint and I'll craft something for you, yeah\r\n",
+  "Все для редстоуна": "Everything for redstone",
+  "Робот": "Robot",
+  "Техноград": "Technograd",
+  "Техник": "Technician",
+  "Ну крутой техно типо не понял что ли": "Well, cool techno guy, didn't you get it?",
+  "§aМагическая слизь": "§aMagic slime",
+  "Используется у Инженера": "Used at the Engineer",
+  "Маг": "Mage",
+  "Чего пожелаешь?": "What do you wish for?",
+  "Улучшить меч": "Upgrade sword",
+  "любой меч": "any sword",
+  "Улучшить лук": "Upgrade bow",
+  "любой лук": "any bow",
+  "Улучшить броню": "Upgrade armor",
+  "любой элемент брони": "any armor piece",
+  "Улучшить инструмент": "Upgrade tool",
+  "любые топор, кирка, мотыга или лопата": "any axe, pickaxe, hoe, or shovel",
+  "Использовать книгу чар": "Use enchantment book",
+  "Нет зачарований": "No enchantments",
+  "Предмет": "Item",
+  "Предмет для зачарования": "Item to enchant",
+  "Выбранная книга: \u0000": [
+    "Selected book: ",
+    ""
+  ],
+  "Зачаровать": "Enchant",
+  "Оружие со способностями": "Weapon with abilities",
+  "§r§fМеч со способностью §7\u0000": [
+    "§r§fSword with ability §7",
+    ""
+  ],
+  "Все для магии": "Everything for magic",
+  "Грибы": "Mushrooms",
+  "Зелья": "Potions",
+  "Отсортировать чарки": "Sort enchanted items",
+  "любой зачарованный предмет": "any enchanted item",
+  "С чарками такого уровня не работаю, слетят": "I don't work with enchantments of this level, they will be lost",
+  "Уровень зачара предмета уже выше книжки": "Item's enchantment level is already higher than the book",
+  "Уровень зачара предмета как у книжки": "Item's enchantment level is the same as the book",
+  "Максимальный уровень": "Maximum level",
+  "§8Зачарование несовместимо": "§8Enchantment incompatible",
+  "Посетите Мага": "Visit the Mage",
+  "Магический Слайм": "Magic Slime",
+  "Деревня исследователей": "Explorers' Village",
+  "Исследователь": "Explorer",
+  "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ": "Explorers, you know, silly, travel, look, enjoy, EXPLORE",
+  "А где мне базу сделать-то?": "Where should I make my base?",
+  "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!": "Go down the mine in the Miners' Village and mine the specified resource!",
+  "Копать нужно на высоте \u0000..\u0000. Ваш y = \u0000": [
+    "You need to mine at height ",
+    "..",
+    ". Your y = ",
+    ""
+  ],
+  "Добыть железо": "Mine iron",
+  "Добыть уголь": "Mine coal",
+  "Добыть алмазы": "Mine diamonds",
+  "Деревня шахтеров": "Miners' Village",
+  "Шахтер": "Miner",
+  "Где я?": "Where am I?",
+  "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны.": "This settlement is called \"Miners' Village\" - one of the surviving settlements after the war.",
+  "Ты единственный путеводитель??": "Are you the only guide??",
+  "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении.": "No, I have colleagues. There is a special guide in every settlement.",
+  "Сколько ещё сохранилось поселений?": "How many settlements have survived?",
+  "Можно узнать это, если посмотреть на карту и присесть.": "You can find out by looking at the map and crouching.",
+  "Почему шахта такая странная?": "Why is the mine so strange?",
+  "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей.": "It's a magical mine. It regenerates itself after a while. As you noticed, you won't find ore on the surface, so dig deeper along the sides of the tunnels.",
+  "Я могу потеряться в шахте?": "Can I get lost in the mine?",
+  "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков.": "It's generally very dangerous and hides many secrets. I wouldn't recommend going far from the supports and bridges.",
+  "Сколько тебе платят?": "How much do you get paid?",
+  "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты.": "I don't get paid, I just enjoy watching newbies like you develop.",
+  "Сверху упал сундук, что это?": "A chest fell from above, what is it?",
+  "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате.": "It's a starter airdrop. Survivors are supplied with these from time to time. You can track airdrops on the map or in chat.",
+  "Почему тут нет жителей?": "Why are there no villagers here?",
+  "Они есть... просто они сидят дома и смотрят стрим @shp1natqp": "They exist... they're just at home watching the @shp1natqp stream",
+  "Как мне переплавить руду?": "How do I smelt ore?",
+  "Возьми у меня задание и отправляйся в другое поселение следуя компасу.": "Take a quest from me and go to another settlement following the compass.",
+  "Используй этот предмет, чтобы установить пушку": "Use this item to place a cannon",
+  "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.": "Use this item on the cannon to fire it. You can't shoot while sitting on the cannon.",
+  "Используй этот предмет сидя на пушке": "Use this item while sitting on the cannon",
+  "Используйте, чтобы отправить все в огненный ад": "Use to send everything to fiery hell",
+  "§3Снежная бомба": "§3Snow bomb",
+  "Используйте, чтобы отправить все к снежной королеве подо льдину": "Use to send everything to the Snow Queen under the ice",
+  "Вампиризм": "Vampirism",
+  "Дополнительный урон": "Additional damage",
+  "Неизвестная": "Unknown",
+  "Восстанавливает вам половину наносимого этим мечом урона": "Restores half the damage dealt by this sword to you",
+  "10% шанс сделать двойной урон": "10% chance to deal double damage",
+  "Способность": "Ability",
+  "х2 урон!": "x2 damage!",
+  "вас рейдят": "you are being raided",
+  "вы разрушили блок на базе": "you broke a block at the base",
+  "Вы находитесь в режиме рейдблока.": "You are in raid block mode.",
+  "\u0000 Осталось \u0000": [
+    "",
+    " Left ",
+    ""
+  ],
+  "Вы вошли в режим рейдблока, потому что \u0000. Некоторые функции могут быть недоступны": [
+    "You entered raid block mode because ",
+    ". Some features may be unavailable"
+  ],
+  "Дровосек: нарубите \u0000 дерева": [
+    "Lumberjack: chop ",
+    " wood"
+  ],
+  "Шахтер: накопайте \u0000 камня": [
+    "Miner: mine ",
+    " stone"
+  ],
+  "Угольный шахтер: накопайте \u0000 угля": [
+    "Coal miner: mine ",
+    " coal"
+  ],
+  "Железный шахтер: накопайте \u0000 железа": [
+    "Iron miner: mine ",
+    " iron"
+  ],
+  "Активированный уголь": "Activated carbon",
+  "Сделал себя сам: Получи первые 10.000 монет": "Self-made: Earn your first 10,000 coins",
+  "Гробовщик: открой 10 могил разных игроков": "Gravedigger: open 10 graves of different players",
+  "Гробовщику посвящается": "Dedicated to the gravedigger",
+  "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: \u0000": [
+    "Visit all settlements to unlock daily quests. You haven't visited: ",
+    ""
+  ],
+  "Ежедневные задания": "Daily quests",
+  "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех \u0000 заданий вам дают награду. За выполнение всех ежедневных заданий \u0000 дня подряд вместо обычного ключа выдается донатный\\n\\n\u0000": [
+    "Every day at 00:00, daily quests are updated. They are the same for all players. For completing all ",
+    " quests you get a reward. For completing all daily quests ",
+    " days in a row, instead of a regular key you get a donor key\\n\\n",
+    ""
+  ],
+  "Выполнено подряд": "Completed in a row",
+  "\u0000/\u0000 Награда: ключ от сундука\\n\u0000": [
+    "",
+    "/",
+    " Reward: chest key\\n",
+    ""
+  ],
+  "Сначала выполните все ежедневные задания!": "Complete all daily quests first!",
+  "Вы уже забрали награды сегодня! Заходите завтра": "You have already claimed rewards today! Come back tomorrow",
+  "Вы получили ключ!": "You received a key!",
+  "Обучение": "Tutorial",
+  "Обучение базовым механикам сервера": "Tutorial on basic server mechanics",
+  "Вы не можете покинуть зону добычи, пока не завершили задания \u0000/\u0000": [
+    "You cannot leave the mining zone until you complete the quests ",
+    "/",
+    ""
+  ],
+  "Добыто дерева: \u0000/\u0000": [
+    "Wood collected: ",
+    "/",
+    ""
+  ],
+  "Нарубите дерева": "Chop wood",
+  "Выйди под открытое небо": "Go under the open sky",
+  "Деревья могут помешать. Выйди туда, где над тобой будет только небо": "Trees may interfere. Go where there is only sky above you",
+  "Заберите все из сундука, упавшего с неба": "Take everything from the chest that fell from the sky",
+  "Заберите все из упавшего с неба сундука. На него указывает компас": "Take everything from the chest that fell from the sky. The compass points to it",
+  "Не удалось найти аирдроп\\nИспользуйте .wipe чтобы перепройти обучение": "Airdrop not found\\nUse .wipe to restart the tutorial",
+  "Используй монеты в инвентаре": "Use coins in your inventory",
+  "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет": "Take coins from your inventory and use them to add to your balance",
+  "Следуя компасу, доберитесь до верстака": "Follow the compass to the crafting table",
+  "Сделайте деревянную кирку": "Make a wooden pickaxe",
+  "Используя верстак сделайте деревянную кирку!": "Use the crafting table to make a wooden pickaxe!",
+  "Спуститесь в шахту и добудьте камня: \u0000/\u0000": [
+    "Go down the mine and collect stone: ",
+    "/",
+    ""
+  ],
+  "Отправляйтесь в шахту, найдите и накопайте камня.": "Go to the mine, find and mine some stone.",
+  "Сделайте каменную кирку": "Make a stone pickaxe",
+  "Вернитесь к верстаку и улучшите свой инструмент.": "Return to the crafting table and upgrade your tool.",
+  "Вновь вскопайте камень в шахте \u0000/\u0000": [
+    "Mine stone again in the mine ",
+    "/",
+    ""
+  ],
+  "Добыто железной руды: \u0000/\u0000": [
+    "Iron ore mined: ",
+    "/",
+    ""
+  ],
+  "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!": "Return to the mine and mine stone. There seems to be iron behind it!",
+  "Шахтер зовет вас наверх, чтобы поговорить!": "The miner is calling you upstairs to talk!",
+  "§r§6Начальный топор": "§r§6Starter axe",
+  "Вы не можете ломать руду новичка.": "You cannot break newbie ore.",
+  "Блоки можно ломать только глубоко в шахте!": "Blocks can only be broken deep in the mine!",
+  "В мирной зоне ломать блоки запрещено.": "Breaking blocks is forbidden in the safe zone.",
+  "Режим Перерождение": "Rebirth mode",
+  "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.": "You are a survivor after the apocalypse, washed up on the shore. You don't know much, can't break blocks anywhere, and all you can do is follow the instructions above your inventory, follow the compass and the diamond on the minimap.",
+  "Вперед!": "Go!",
+  "Очистка\\n§7От предметов/могилок": "Cleanup\\n§7Of items/graves",
+  "Вы умерли без вещей!": "You died without items!",
+  "Задание \"Вернуть вещи\"": "Quest \"Return items\"",
+  "Включать ли задание по восстановлению инвентаря после смерти": "Enable quest to restore inventory after death",
+  "Сообщение при смерти с пустым инвентарём": "Message on death with empty inventory",
+  "Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов": "Send a message if you died and had no items in your inventory",
+  "Вы не можете открыть могилу новичка!": "You cannot open a newbie's grave!",
+  "Вы не можете открыть могилу игрока, умершего в зоне без сражения!": "You cannot open the grave of a player who died in a non-combat zone!",
+  "Вернуть вещи": "Return items",
+  "Верните вещи после смерти!": "Return your items after death!",
+  "Могила была удалена очисткой мусора.": "The grave was removed by garbage cleanup.",
+  "Ваше место смерти потерялось!": "Your death location is lost!",
+  "Верните свои вещи\u0000, они ждут вас на \u0000§6!": [
+    "Return your items",
+    ", they are waiting for you at ",
+    "§6!"
+  ],
+  ", никто кроме вас их забрать не может": ", no one but you can take them",
+  "Могила исчезла...": "The grave disappeared...",
+  "Поздравляем! В будущем постарайтесь быть осторожнее.": "Congratulations! Try to be more careful in the future.",
+  "Спавн": "Spawn",
+  "\u0000§8Вы тут": [
+    "",
+    "§8You are here"
+  ],
+  "Анархия": "Anarchy",
+  "Миниигры": "Minigames",
+  "§7СКОРО!": "§7COMING SOON!",
+  "База": "Base",
+  "§6Донат\\n§7СКОРО!": "§6Donate\\n§7COMING SOON!",
+  "§fПочта": "§fMail",
+  "§bВики": "§bWiki",
+  "§7Настройки": "§7Settings",
+  "Я не знаю что мне делать с этим, стоит спросить \u0000": [
+    "I don't know what to do with this, maybe ask ",
+    ""
+  ],
+  "Использовать меню": "Use menu",
+  "Определяет, включено ли внутриигровое меню": "Determines if the in-game menu is enabled",
+  "Максимальный размер бокового меню": "Maximum sidebar menu size",
+  "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься": "Maximum allowed number of characters before words are wrapped",
+  "Режим отображения": "Display mode",
+  "Определяет, где будет меню": "Determines where the menu will be",
+  "Разделенные подсказки": "Separated hints",
+  "Боковое меню": "Sidebar menu",
+  "Миниигра": "Minigame",
+  "Мирная зона\u0000": [
+    "Safezone",
+    ""
+  ],
+  "Все достижения": "All achievements",
+  "Получить базу": "Get base",
+  "Все задания": "All quests",
+  "1.000.000 монет": "1,000,000 coins",
+  "Полная незеритовая броня": "Full netherite armor",
+  "Ваш первый рекорд \u0000 поставлен! Это заняло \u0000": [
+    "Your first record ",
+    " is set! It took ",
+    ""
+  ],
+  "Вы побили ваш предыдущий рекорд \u0000! \u0000 -> \u0000": [
+    "You beat your previous record ",
+    "! ",
+    " -> ",
+    ""
+  ],
+  "Вы не смогли побить ваш предыдущий рекорд \u0000! \u0000 -> \u0000": [
+    "You couldn't beat your previous record ",
+    "! ",
+    " -> ",
+    ""
+  ],
+  "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: \u0000": [
+    "You can choose one of the categories below for speedrun. Time is counted only when you are in anarchy, i.e. while you are offline, time is not counted. Your time in anarchy now: ",
+    ""
+  ],
+  "\\nВыбрано": "\\nSelected",
+  "Спидран '\u0000' начат. Для сброса времени воспользуйтесь .wipe": [
+    "Speedrun '",
+    "' started. Use .wipe to reset the time"
+  ],
+  "Что где как все расскажу": "I'll tell you everything: what, where, how",
+  "Википедия": "Wikipedia",
+  "Руды": "Ores",
+  "Руды на y: \u0000:\\n\u0000": [
+    "Ores at y: ",
+    ":\\n",
+    ""
+  ],
+  "На этой высоте руд нет": "There are no ores at this height",
+  "\u0000, \u0000, Группа: \u0000%%": [
+    "",
+    ", ",
+    ", Group: ",
+    "%%"
+  ],
+  "Руды на \u0000": [
+    "Ores at ",
+    ""
+  ],
+  "Под": "Below",
+  "Над": "Above",
+  "Задания\n§7Настройки игровых заданий": "Quests\n§7Settings of game quests",
+  "Если вы совершите это действие, вы потеряете статус новичка:\n - Другие игроки смогут наносить вам урон\n - Другие игроки смогут забирать ваш лут после смерти": "If you do this, you will lose your beginner status.:\n - Other players can damage you \n - Other players can take your loot after death",
+  "Wtf ой то есть мне пока нечего тебе предложить\n\n": "Wtf ой то есть мне пока нечего тебе предложить\n\n",
+  "Ну типа дай мне чертеж, a я те чета там наколупаю, да\n": "Ну типа дай мне чертеж, a я те чета там наколупаю, да\n",
+  "Печкин": "Pechkin",
+  "Баба валя": "Grandma Valya",
+  "к": "к",
+  "млн": "млн",
+  "млрд": "млрд",
+  "трлн": "трлн"
+}

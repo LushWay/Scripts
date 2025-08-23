@@ -1,9 +1,10 @@
+/* i18n-ignore */
 import { GameMode, system, world } from '@minecraft/server'
- 
+
 import * as GameTest from '@minecraft/server-gametest'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vector, util } from 'lib'
+import { Vec, util } from 'lib'
 import { TestStructures } from 'test/constants'
 const time = 9999999
 
@@ -41,7 +42,7 @@ GameTest.registerAsync(simulatedPlayer, 'base', async test => {
 
   const id = player.id
   const event = world.afterEvents.entityDie.subscribe(data => {
-    if (!data.deadEntity.isValid()) return
+    if (!data.deadEntity.isValid) return
     if (data.deadEntity.typeId !== id) return
     test.succeed()
   })
@@ -125,7 +126,7 @@ new Command('player')
       `execute positioned ${testLoc.x} ${testLoc.y} ${testLoc.z} run gametest create "${simulatedPlayer}:spawn_one"`,
     )
 
-    world.overworld.getBlock(Vector.add(testLoc, { x: 1, y: 0, z: 1 }))?.setType(MinecraftBlockTypes.RedstoneBlock)
+    world.overworld.getBlock(Vec.add(testLoc, { x: 1, y: 0, z: 1 }))?.setType(MinecraftBlockTypes.RedstoneBlock)
 
     await system.sleep(10)
 
@@ -142,7 +143,7 @@ GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
     util.catch(async () => {
       while (!succeed) {
         await test.idle(Math.random() * 40)
-        if (!player.isValid()) break
+        if (!player.isValid) break
         const net = player.dimension.getEntities({
           location: player.location,
           type: 'minecraft:player',

@@ -1,15 +1,15 @@
 /* i18n-ignore */
 
 import { Container, ItemStack, MolangVariableMap, Player } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
 import { Cooldown } from 'lib/cooldown'
-import { isLocationError } from 'lib/game-utils'
+import { i18n } from 'lib/i18n/text'
 import { Temporary } from 'lib/temporary'
-import { t } from 'lib/text'
 import { util } from 'lib/util'
+import { isLocationError } from 'lib/utils/game'
 import { Cutscene } from './cutscene'
 import { cutscene as cusceneCommand } from './menu'
 
@@ -64,7 +64,7 @@ const controls: Record<
     ),
     (player, cutscene, temp) => {
       temp.cleanup()
-      player.success(t`Сохранено. Проверить: ${cusceneCommand}§f play ${cutscene.id}`)
+      player.success(i18n`Сохранено. Проверить: ${cusceneCommand}§f play ${cutscene.id}`)
     },
   ],
 }
@@ -102,7 +102,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
         await cutscene.forEachPoint(
           point => {
-            if (!Vector.valid(point)) return
+            if (!Vec.isValid(point)) return
             particle(point, whiteParticle)
           },
           { controller, sections, intervalTime: 1 },
@@ -147,7 +147,7 @@ export function editCatcutscene(player: Player, cutscene: Cutscene) {
 
         const { hotbarSlots, position } = editingPlayer
 
-        if (player.isValid()) {
+        if (player.isValid) {
           forEachHotbarSlot(player, (i, container) => container.setItem(i, hotbarSlots[i]))
           player.teleport(position)
         }
@@ -187,7 +187,7 @@ const EditingCutscene = new Map<string, EditingCutscenePlayer>()
 function backupPlayerInventoryAndCutscene(player: Player, cutscene: Cutscene) {
   EditingCutscene.set(player.id, {
     hotbarSlots: backupPlayerInventory(player),
-    position: Vector.floor(player.location),
+    position: Vec.floor(player.location),
     cutsceneSectionsBackup: cutscene.sections.slice(),
   })
 

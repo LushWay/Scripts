@@ -1,8 +1,12 @@
 import { Loot } from 'lib'
-import { CannonItem, CannonShellItem } from 'modules/features/cannon'
+import { i18n, i18nShared } from 'lib/i18n/text'
+import { CutArea } from 'lib/region/areas/cut'
+import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
+import { QuartzMineRegion } from '../anarchy/quartz'
 import { BaseItem } from '../base/base'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'
+import { GuideNpc } from '../lib/npc/guide'
 import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Engineer } from './engineer'
@@ -10,7 +14,7 @@ import { createBossGolem } from './golem.boss'
 
 class TechCityBuilder extends City {
   constructor() {
-    super('TechCity', 'Техноград')
+    super('TechCity', i18nShared`Техноград`)
     this.create()
   }
 
@@ -24,46 +28,49 @@ class TechCityBuilder extends City {
 
   golem = createBossGolem(this.group)
 
+  guide = new GuideNpc(this.group, i18nShared`Техник`, (f, { lf }) => {
+    lf.question('wtfCity', i18n`А что за город`, i18n`Ну крутой техно типо не понял что ли`)
+  })
+
   private create() {
-    const { normal, donut } = this.createKits(
+    if (this.safeArea) {
+      QuartzMineRegion.create(new CutArea({ parent: this.safeArea.area.toJSON(), cut: { axis: 'y', to: 56 } }))
+    }
+
+    this.createKits(
       new Loot()
         .itemStack(CannonItem.blueprint)
-        .chance('10%')
+        .weight('10%')
 
         .itemStack(CannonShellItem.blueprint)
-        .chance('10%')
+        .weight('10%')
 
         .item('RedTerracotta')
         .amount({
           '20...40': '70%',
           '41...64': '30%',
         })
-        .chance('10%').build,
+        .weight('10%').build,
 
       new Loot()
         .itemStack(CannonShellItem.blueprint)
-        .chance('3%')
+        .weight('3%')
 
         .itemStack(CannonShellItem.itemStack)
-        .chance('3%')
+        .weight('3%')
 
         .itemStack(CannonItem.blueprint)
-        .chance('2%')
+        .weight('2%')
 
         .itemStack(CannonItem.itemStack)
-        .chance('2%')
+        .weight('2%')
 
         .itemStack(BaseItem.blueprint)
-        .chance('1%')
+        .weight('1%')
 
         .itemStack(BaseItem.itemStack)
-        .chance('1%').build,
+        .weight('1%').build,
     )
-
-    new Command('techcity').setPermissions('techAdmin').executes(ctx => {
-      ctx.player.container?.addItem(normal.createKeyItemStack())
-      ctx.player.container?.addItem(donut.createKeyItemStack())
-    })
   }
 }
 

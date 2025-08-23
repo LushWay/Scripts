@@ -1,90 +1,138 @@
-import { Entity, Player, ScoreboardObjective, world } from '@minecraft/server'
+import { Entity, Player, ScoreboardObjective, ScoreNames, world } from '@minecraft/server'
+import { defaultLang } from 'lib/assets/lang'
 import { expand } from 'lib/extensions/extend'
+import { i18nShared } from 'lib/i18n/text'
+import { capitalize } from 'lib/util'
 
 declare module '@minecraft/server' {
-  type GameplayStatScoreName =
-    | 'blocksPlaced'
-    | 'blocksBroken'
-    | 'fireworksLaunched'
-    | 'fireworksExpoded'
-    | 'damageRecieve'
-    | 'damageGive'
-    | 'kills'
-    | 'deaths'
+  namespace ScoreNames {
+    type Stat =
+      | 'blocksPlaced'
+      | 'blocksBroken'
+      | 'fireworksLaunched'
+      | 'fireworksExpoded'
+      | 'damageRecieve'
+      | 'damageGive'
+      | 'kills'
+      | 'deaths'
 
-  type TimeStatScoreName = `${'total' | 'anarchy'}OnlineTime`
+    type GameModes = 'anarchy'
 
-  type DateStatScoreName = `${'lastSeen' | 'join'}Date`
+    type OnlineTime = `${'total' | GameModes}OnlineTime`
 
-  type StatScoreName = GameplayStatScoreName | TimeStatScoreName | DateStatScoreName
+    type Date = `${'lastSeen' | 'join'}Date`
 
-  type ScoreName = 'money' | 'leafs' | 'raid' | 'pvp' | 'joinTimes' | StatScoreName
+    type GameModesStat = `${GameModes}${Capitalize<Stat | Date>}`
+
+    type All = 'money' | 'leafs' | 'raid' | 'pvp' | 'joinTimes' | Stat | OnlineTime | Date | GameModesStat
+  }
+
+  type ScoreName = ScoreNames.All
 
   interface Player {
     /** Key-number scoreboard based database. Used as a counter mostly for money/leafs/stats etc. */
-    scores: Record<ScoreName, number>
+    scores: Record<ScoreNames.All, number>
   }
 }
 
-export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, string> = {
-  leafs: '§aЛистья',
-  money: '§6Монеты',
-  kills: 'Убийств',
-  deaths: 'Смертей',
-  raid: 'Рейд-блок',
-  totalOnlineTime: 'Онлайн всего',
-  anarchyOnlineTime: 'Онлайн на анархии',
-  blocksPlaced: 'Блоков поставлено',
-  blocksBroken: 'Блоков сломано',
-  fireworksLaunched: 'Фейрверков запущено',
-  fireworksExpoded: 'Фейрвереов взорвано',
-  damageRecieve: 'Урона получено',
-  damageGive: 'Урона нанесено',
-  joinTimes: 'Всего входов на сервер',
-  joinDate: 'Время первого входа',
+export const scoreboardDisplayNames: Record<import('@minecraft/server').ScoreName, SharedText> = {
+  leafs: i18nShared`§aЛистья`,
+  money: i18nShared`§6Монеты`,
+  kills: i18nShared`Убийств`,
+  deaths: i18nShared`Смертей`,
+  raid: i18nShared`Рейд-блок`,
+  totalOnlineTime: i18nShared`Онлайн всего`,
+  blocksPlaced: i18nShared`Блоков поставлено`,
+  blocksBroken: i18nShared`Блоков сломано`,
+  fireworksLaunched: i18nShared`Фейрверков запущено`,
+  fireworksExpoded: i18nShared`Фейрверков взорвано`,
+  damageRecieve: i18nShared`Урона получено`,
+  damageGive: i18nShared`Урона нанесено`,
+  joinTimes: i18nShared`Всего входов на сервер`,
+  joinDate: i18nShared`Время первого входа`,
 
-  lastSeenDate: 'Последний раз онлайн',
-  pvp: 'PVP',
+  anarchyOnlineTime: i18nShared`Онлайн на анархии`,
+  anarchyBlocksPlaced: i18nShared`Блоков поставлено`,
+  anarchyBlocksBroken: i18nShared`Блоков сломано`,
+  anarchyFireworksLaunched: i18nShared`Фейрверков запущено`,
+  anarchyFireworksExpoded: i18nShared`Фейрверков взорвано`,
+  anarchyDamageRecieve: i18nShared`Урона получено`,
+  anarchyDamageGive: i18nShared`Урона нанесено`,
+  anarchyKills: i18nShared`Убийств`,
+  anarchyDeaths: i18nShared`Смертей`,
+
+  anarchyJoinDate: i18nShared`Время первого входа на анархию`,
+  anarchyLastSeenDate: i18nShared`Последний раз онлайн на анархии`,
+
+  lastSeenDate: i18nShared`Последний раз онлайн`,
+  pvp: i18nShared`PVP`,
 }
-const untypedDisplayNames: Record<string, string> = scoreboardDisplayNames
+
+const statScores: Record<ScoreNames.Stat, string> = {
+  blocksPlaced: '',
+  blocksBroken: '',
+  fireworksLaunched: '',
+  fireworksExpoded: '',
+  damageRecieve: '',
+  damageGive: '',
+  kills: '',
+  deaths: '',
+}
+
+const scoreboardStatNames = Object.keys(statScores)
+export const scoreboardObjectiveNames = {
+  stats: scoreboardStatNames,
+  gameModeStats: scoreboardStatNames
+    .map(e => `anarchy${capitalize(e)}`)
+    .concat(scoreboardStatNames) as ScoreNames.GameModesStat[],
+}
+
+const untypedDisplayNames: Record<string, SharedText> = scoreboardDisplayNames
 
 expand(ScoreboardObjective.prototype, {
   get displayName() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return (untypedDisplayNames[this.id] ?? super.displayName) as string
+    return (untypedDisplayNames[this.id ?? '']?.to(defaultLang) ?? super.displayName) as string
   },
 })
 
-const players: Record<string, { player: Player; proxy: unknown }> = {}
+const players: Record<string, { proxy: Player['scores'] }> = {}
 Reflect.defineProperty(Player.prototype, 'scores', {
-  configurable: false,
+  configurable: true,
   enumerable: true,
   get() {
     const player = this as Player
+    return ScoreboardDB.getOrCreateProxyFor(player.id)
+  },
+})
 
-    if (typeof players[player.id] !== 'undefined') {
-      let valid = false
-      try {
-        valid = players[player.id].player.isValid()
-      } catch {}
+export class ScoreboardDB {
+  static getName(o: ScoreboardObjective | string) {
+    const id = typeof o === 'string' ? o : o.id
+    return untypedDisplayNames[id] ?? (o instanceof ScoreboardObjective ? o.displayName : id)
+  }
 
-      if (!valid) players[player.id].player = player
+  static defineName(id: string, name: SharedText) {
+    untypedDisplayNames[id] = name
+  }
 
-      return players[player.id].proxy
+  static getOrCreateProxyFor(playerId: string) {
+    const scoreboardPlayer = players[playerId]
+    if (scoreboardPlayer) {
+      return scoreboardPlayer.proxy
     } else {
       const obj: (typeof players)[string] = {
-        player,
         proxy: new Proxy(
-          {
-            leafs: 0,
-            money: 0,
-          },
+          { leafs: 0, money: 0 },
           {
             set(_, p, newValue: number) {
               if (typeof p === 'symbol')
                 throw new Error(`Symbol objectives to set are not accepted, recieved ${p.description}`)
 
-              ScoreboardDB.objective(p, untypedDisplayNames[p]).setScore(obj.player.id, Math.round(newValue))
+              ScoreboardDB.objective(p, untypedDisplayNames[p]?.to(defaultLang)).setScore(
+                playerId,
+                Math.round(newValue),
+              )
               return true
             },
             get(_, p) {
@@ -92,28 +140,27 @@ Reflect.defineProperty(Player.prototype, 'scores', {
                 throw new Error(`Symbol objectives to get are not accepted, recieved ${p.description}`)
 
               try {
-                return ScoreboardDB.objective(p, untypedDisplayNames[p]).getScore(obj.player.id) ?? 0
+                return ScoreboardDB.objective(p, untypedDisplayNames[p]?.to(defaultLang)).getScore(playerId) ?? 0
               } catch (e) {
                 return 0
               }
             },
           },
-        ),
+        ) as Player['scores'],
       }
 
-      return (players[player.id] = obj).proxy
+      return (players[playerId] = obj).proxy
     }
-  },
-})
+  }
 
-export class ScoreboardDB {
-  static objectives: Record<string, ScoreboardObjective> = {}
+  private static objectives = new Map<string, ScoreboardObjective>()
 
-  static objective(name: string, displayName = name) {
-    if (name in this.objectives) return this.objectives[name]
-
-    const objective = (this.objectives[name] =
-      world.scoreboard.getObjective(name) ?? world.scoreboard.addObjective(name, displayName))
+  static objective(id: string, displayName = id) {
+    let objective = this.objectives.get(id)
+    if (!objective) {
+      objective = world.scoreboard.getObjective(id) ?? world.scoreboard.addObjective(id, displayName)
+      this.objectives.set(id, objective)
+    }
 
     return objective
   }
@@ -121,36 +168,22 @@ export class ScoreboardDB {
   scoreboard
 
   constructor(
-    public name: string,
-    displayName: string = name,
+    public id: string,
+    displayName: string = id,
   ) {
-    if (name.length > 16) name = name.substring(0, 16)
-
-    this.scoreboard = ScoreboardDB.objective(name, displayName)
+    this.scoreboard = ScoreboardDB.objective(id, displayName)
   }
 
-  /**
-   * @param {Entity | string} id
-   * @param {number} value
-   */
   set(id: Entity | string, value: number) {
     if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, value)
   }
 
-  /**
-   * @param {Entity | string} id
-   * @param {number} value
-   */
   add(id: Entity | string, value: number) {
     if (typeof id !== 'string') id = id.id
     this.scoreboard.setScore(id, this.get(id) + value)
   }
 
-  /**
-   * @param {Entity | string} id
-   * @returns {number}
-   */
   get(id: Entity | string): number {
     if (typeof id !== 'string') id = id.id
     try {
@@ -159,21 +192,4 @@ export class ScoreboardDB {
       return 0
     }
   }
-
-  reset() {
-    this.scoreboard.getParticipants().forEach(e => this.scoreboard.removeParticipant(e))
-  }
 }
-
-/*
-const objective = new ScoreboardDB('objectiveName', 'display name')
-
-const score = objective.get(player)
-objective.set(player, 1)
-objective.add(player, 1)
-
-objective.nameSet('custom name', 1)
-objective.nameGet('custom name')
-
-objective.reset()
-*/

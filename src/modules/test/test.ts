@@ -1,24 +1,30 @@
 /* i18n-ignore */
 /* eslint-disable */
 
-import { MolangVariableMap, system, world } from '@minecraft/server'
+import { ItemStack, MolangVariableMap, Player, ScriptEventSource, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
   MinecraftEnchantmentTypes,
   MinecraftEntityTypes,
   MinecraftItemTypes,
+  MinecraftPotionEffectTypes,
 } from '@minecraft/vanilla-data'
 import {
   Airdrop,
   BUTTON,
   ChestForm,
   DatabaseUtils,
+  FormNpc,
+  LootTable,
   Mail,
-  NpcForm,
+  Region,
+  RoadRegion,
+  SafeAreaRegion,
   Settings,
-  Vector,
+  Vec,
   getAuxOrTexture,
+  getAuxTextureOrPotionAux,
   inspect,
   is,
   isKeyof,
@@ -27,20 +33,26 @@ import {
 } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CommandContext } from 'lib/command/context'
+import { parseArguments } from 'lib/command/utils'
 import { Cutscene } from 'lib/cutscene'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
+import { i18n, noI18n } from 'lib/i18n/text'
+import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
-import { Rewards } from 'lib/shop/rewards'
-import { t } from 'lib/text'
+import { toPoint } from 'lib/utils/point'
+import { Rewards } from 'lib/utils/rewards'
 import { requestAirdrop } from 'modules/places/anarchy/airdrop'
+import { BaseRegion } from 'modules/places/base/region'
 import { skipForBlending } from 'modules/world-edit/utils/blending'
 import loot from '../quests/learning/airdrop'
 import './enchant'
+import './load-chunks'
+import './minimap'
 import './properties'
 // import './simulatedPlayer'
 
@@ -54,7 +66,145 @@ import './properties'
 // use public tests with caution, they're available to the all players!
 // other tests are available only for tech admins and above
 
-const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
+const tests: Record<
+  string,
+  (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
+> = {
+  loot(ctx) {
+    const lootTableName = ctx.args[1] ?? ''
+    const lootTable = LootTable.instances.get(lootTableName)
+    if (typeof lootTable === 'undefined')
+      return ctx.error(
+        `${lootTableName} - unknown loot table. All tables:\n${[...LootTable.instances.keys()].join('\n')}`,
+      )
+
+    const b = ctx.player.dimension.getBlock(ctx.player.location)
+    const block = b?.typeId === MinecraftBlockTypes.Chest ? b : b?.below()
+    if (!block) return ctx.error('No block under feet')
+    const inventory = block.getComponent('inventory')
+    if (!inventory?.container) return ctx.error('No inventory in block')
+    lootTable.fillContainer(inventory.container)
+  },
+
+  na(ctx) {
+    ctx.player.mainhand().nameTag = '%enchantment.mending'
+    ctx.player.mainhand().setLore(['%enchantment.mending'])
+  },
+
+  async breakMine(ctx) {
+    const regions = MineareaRegion.getManyAt(ctx.player)
+    for (const region of regions) {
+      ctx.reply('R' + region.name)
+      await region.area.forEachVector((vector, isIn, dimension) => {
+        if (!isIn) return
+        const block = dimension.getBlock(vector)
+        if (!block) return
+
+        region.onBlockBreak(ctx.player, {
+          block,
+          cancel: false,
+          dimension: dimension,
+          itemStack: undefined,
+          player: ctx.player,
+        })
+        block.setType(MinecraftBlockTypes.Air)
+      }, 1000)
+    }
+  },
+
+  regionNear(ctx) {
+    const distance = Number(ctx.args[1] ?? '5')
+    const near = Region.chunkQuery.getNear(ctx.player, distance)
+
+    console.log(near.length)
+    ctx.player.success('' + near.length)
+  },
+
+  duplicates() {
+    const keys = new Set<string>()
+    for (const chunk of Region.chunkQuery.getStorage('overworld')) {
+      // @ts-expect-error aaaaaaaaaaaaaaaaaaaaaaaaaaa
+      const key = chunk.getKey()
+      if (keys.has(key)) {
+        console.log('Duplicate!', key)
+        continue
+      }
+      keys.add(key)
+    }
+  },
+  chunks() {
+    console.log(Region.chunkQuery.storageSize())
+  },
+  chunksNear(ctx) {
+    const distance = Number(ctx.args[1] ?? '5')
+    const near = Region.chunkQuery
+      .getChunksNear(toPoint(ctx.player), distance)
+      .map(e => `xfrom: ${e.from.x} zfrom: ${e.from.z} x: ${e.indexX}, z: ${e.indexZ}`)
+    console.log(near)
+    ctx.player.success('' + near.length)
+  },
+
+  chunkQuery(ctx) {
+    console.log(Region.chunkQuery.storageSize(ctx.player.dimension.type))
+  },
+
+  distanceQuery(ctx) {
+    const a = { x: 10341, y: -4121, z: 14 }
+    const b = { x: -1341, y: 121, z: 0 }
+    const r = 424
+    bench(
+      ctx.player,
+      'distance',
+      1000000,
+      [
+        [() => Vec.distance(a, b) <= r, 'Vector.distance'],
+        [
+          () => {
+            return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2 <= r ** 2
+          },
+          'sqrt',
+        ],
+        [
+          () => {
+            return (a.x - b.x) ** 2 + (a.z - b.z) ** 2 <= r ** 2
+          },
+          'sqrt xz',
+        ],
+      ],
+      e => e,
+      10000,
+    ).then(results => {
+      console.log([...results])
+    })
+  },
+
+  regionQuery(ctx) {
+    bench<unknown[]>(
+      ctx.player,
+      'region',
+      1000,
+      [Region, RoadRegion, SafeAreaRegion, BaseRegion]
+        // [Region]
+        .map(type => {
+          const label = noI18n`${type.name} ${type.getAll().length} - `
+          return [
+            [() => type.getManyAt(ctx.player, false), label + 'getManyAt old'],
+            [() => type.getManyAt(ctx.player, true), label + 'getManyAt §lnew'],
+            [() => type.getNear(ctx.player, 10, true), label + 'getNear old'],
+            [() => type.getNear(ctx.player, 10, false), label + 'getNear §lnew'],
+          ] as [VoidFunction, string][]
+        })
+        .flat(),
+      e => e.length,
+      50,
+    )
+  },
+  potionAux(ctx) {
+    for (const effect of Object.values(MinecraftPotionEffectTypes)) {
+      const item = ItemStack.createPotion({ effect })
+      getAuxTextureOrPotionAux(item)
+    }
+  },
   blending(ctx) {
     const lore = {
       blending: Number(ctx.args[1] ?? '7'),
@@ -66,23 +216,23 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     const player = ctx.player
     const { radius, blending, height, zone: offset, factor } = lore
 
-    const center = Vector.floor(player.location)
-    const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
-    const to = Vector.add(center, new Vector(radius, offset, radius))
+    const center = Vec.floor(player.location)
+    const from = Vec.add(center, new Vec(-radius, offset - height, -radius))
+    const to = Vec.add(center, new Vec(radius, offset, radius))
 
     player.onScreenDisplay.setActionBar(
-      t`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
-      ActionbarPriority.UrgentNotificiation,
+      noI18n`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
+      ActionbarPriority.Highest,
     )
 
-    for (const vector of Vector.foreach(from, to)) {
+    for (const vector of Vec.forEach(from, to)) {
       const block = world.overworld.getBlock(vector)
       if (!block) continue
 
       block.setType(MinecraftBlockTypes.GrassBlock)
     }
 
-    for (const vector of Vector.foreach(from, to)) {
+    for (const vector of Vec.forEach(from, to)) {
       if (skipForBlending(lore, { vector, center })) continue
 
       const block = world.overworld.getBlock(vector)
@@ -92,14 +242,14 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     }
   },
   rotation(ctx) {
-    ctx.reply(t`${ctx.player.getRotation()}`)
+    ctx.reply(i18n`${ctx.player.getRotation()}`)
   },
   air(ctx) {
     const airdrop = new Airdrop({ loot })
-    airdrop.spawn(Vector.add(ctx.player.location, { x: 0, y: 30, z: 0 }))
+    airdrop.spawn(Vec.add(ctx.player.location, { x: 0, y: 30, z: 0 }))
     system.runInterval(
       () => {
-        if (!airdrop.chest?.isValid()) return
+        if (!airdrop.chest?.isValid) return
 
         airdrop.showParticleTrace()
       },
@@ -111,7 +261,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     const player = ctx.player
 
     player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
-      location: Vector.add(player.getHeadLocation(), Vector.multiply(player.getViewDirection(), 20)),
+      location: Vec.add(player.getHeadLocation(), Vec.multiply(player.getViewDirection(), 20)),
     })
 
     system.runTimeout(
@@ -141,11 +291,11 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
   f(ctx) {
     const form = new ActionForm('MENUS', 'Menu body', '§c§u§s§r§f')
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
-    form.addButton('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
+    form.button('Test!', BUTTON['?'], () => false)
     form.show(ctx.player)
   },
   title(ctx) {
@@ -198,7 +348,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
     console.error(new TypeError('This is error test'))
   },
   forms: ctx => {
-    const menu = new ActionForm('Action', 'body').addButton('button', () => {
+    const menu = new ActionForm('Action', 'body').button('button', () => {
       new ModalForm('ModalForm')
         .addDropdown('drdown', ['op', 'op2'])
         .addSlider('slider', 0, 5, 1)
@@ -215,6 +365,40 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
   components: ctx => {
     ctx.reply(inspect(ctx.player.getComponents()))
+  },
+
+  lush(ctx) {
+    let size = parseInt(ctx.args[1] ?? '')
+    size = isNaN(size) ? 10 : size
+    ctx.player.info(i18n`Trying to replace air under the cave vines with structure void in radius ${size}`)
+
+    const vines = [
+      MinecraftBlockTypes.Vine,
+      MinecraftBlockTypes.CaveVines,
+      MinecraftBlockTypes.CaveVinesBodyWithBerries,
+      MinecraftBlockTypes.CaveVinesHeadWithBerries,
+    ] as string[]
+
+    system.runJob(
+      (function* lush() {
+        let i = 0
+        for (const vector of Vec.forEach(...Vec.around(ctx.player.location, 5))) {
+          i++
+          if (i % 100 === 0) yield
+
+          const block = ctx.player.dimension.getBlock(vector)
+          if (block && block.typeId !== MinecraftBlockTypes.Air) continue
+
+          const above = ctx.player.dimension.getBlock(Vec.add(vector, Vec.up))
+          if (!above) continue
+
+          if (vines.includes(above.typeId)) {
+            ctx.player.dimension.setBlockType(vector, MinecraftBlockTypes.StructureVoid)
+            ctx.player.success(i18n`lush > ${Vec.floor(vector)}!`)
+          }
+        }
+      })(),
+    )
   },
 
   dbinspect(ctx) {
@@ -279,7 +463,7 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
         c++
         block.dimension.spawnParticle(
           'minecraft:wax_particle',
-          Vector.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
+          Vec.add(block.location, { x: 0.5, z: 0.5, y: 1.5 }),
           variables,
         )
 
@@ -302,10 +486,10 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
   frm(ctx) {
     new ActionForm('Test')
-      .addButton('Test', getAuxOrTexture(MinecraftItemTypes.TripwireHook), () => {})
-      .addButton('Test', BUTTON['<'], () => {})
-      .addButton('Test', getAuxOrTexture(BUTTON['<']), () => {})
-      .addButton('Test', () => {})
+      .button('Test', getAuxOrTexture(MinecraftItemTypes.TripwireHook), () => {})
+      .button('Test', BUTTON['<'], () => {})
+      .button('Test', getAuxOrTexture(BUTTON['<']), () => {})
+      .button('Test', () => {})
       .show(ctx.player)
   },
   lore(ctx) {
@@ -314,21 +498,21 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
 
   form(ctx) {
     new ActionForm('Common action form', 'Common action form body')
-      .addButton('NpcForm', () => {
-        const form = new NpcForm(
+      .button('NpcForm', () => {
+        const form = new FormNpc(
           'title',
           'bodyyy, this is usually very very long text that fully describes any npc dialogue or action or any other content. So yeah its very very longs',
         )
 
-        form.addButton('Кнопка 1', () => ctx.player.success('Ура'))
+        form.button('Кнопка 1', () => ctx.player.success('Ура'))
 
-        form.addButton('Кнопка 2', () => ctx.player.success('Ура'))
+        form.button('Кнопка 2', () => ctx.player.success('Ура'))
 
-        form.addButton('Кнопка 3', () => ctx.player.success('Ура'))
+        form.button('Кнопка 3', () => ctx.player.success('Ура'))
 
         form.show(ctx.player)
       })
-      .addButton('ChestForm', () => {
+      .button('ChestForm', () => {
         new ChestForm('9')
           .title('9 slots chest ui')
           .pattern([0, 0], ['xxxxxx'], {
@@ -342,18 +526,42 @@ const tests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   },
 
   mail(ctx) {
-    Mail.send(ctx.player.id, 'Zolkin', 'Привет, мир!', new Rewards())
+    Mail.send(ctx.player.id, i18n.join`Zolkin`, i18n.join`Привет, мир!`, new Rewards())
   },
   mailr(ctx) {
     ctx.player.id
     Mail.send(
       ctx.player.id,
-      'Bugrock',
-      'это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст',
-      new Rewards().scores('money', 50).scores('leafs', 100).item(MinecraftItemTypes.Diamond, 'Алмаз', 12),
+      i18n.join`Bugrock`,
+      i18n.join`это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст. это очень длинный текст`,
+      new Rewards().score('money', 50).score('leafs', 100).item(MinecraftItemTypes.Diamond, 12),
     )
   },
 }
+
+system.afterEvents.scriptEventReceive.subscribe(event => {
+  if (event.sourceType !== ScriptEventSource.Server) return
+  if (!event.id.startsWith('t:')) return
+  const id = event.id.split(':')[1]
+  if (!id || !tests[id]) return console.log(Object.keys(tests))
+
+  const args = parseArguments(event.message)
+  try {
+    tests[id]({
+      args,
+      error: console.error,
+      reply: console.info,
+      player: {
+        location: { x: 0, y: 0, z: 0 },
+        fail: console.error,
+        info: console.info,
+        success: console.info,
+      } as Player,
+    })
+  } catch (e) {
+    console.error(e)
+  }
+})
 
 const publicTests: Record<string, (ctx: CommandContext) => void | Promise<void>> = {
   death(ctx) {
@@ -373,5 +581,42 @@ c.string('id', true).executes(async (ctx, id) => {
   if (!isKeyof(id as string, source)) return ctx.error('Неизвестный тест ' + id + ', доступные:\n§f' + keys.join('\n'))
   ctx.reply('Tест ' + id)
 
-  util.catch(() => source[id as string](ctx), 'Test')
+  util.catch(() => source[id as string]?.(ctx), 'Test')
 })
+
+function bench<T>(
+  player: Player,
+  ttype: string,
+  runs: number,
+  tests: [fn: VoidFunction, label: string][],
+  saveResultsMapper?: (r: T) => unknown,
+  yildEach = 30,
+) {
+  const subruns = yildEach
+  const r = Math.round(runs / subruns)
+  player.tell(i18n`Will run ${r} with ${subruns}`)
+  const start = Date.now()
+  const results = new Set<unknown>()
+  return new Promise<Set<unknown>>(resolve => {
+    system.runJob(
+      (function* testRegionQuery() {
+        for (const [fn, name] of tests) {
+          for (let i = 0; i < r; i++) {
+            const bench = util.benchmark(name, ttype)
+            for (let iii = 0; iii < subruns; iii++) {
+              const result = fn()
+              if (saveResultsMapper) results.add(saveResultsMapper(result as T))
+            }
+            bench(undefined, subruns)
+            yield
+          }
+          yield
+          player.info('Done for ' + name)
+        }
+        player.info(`Done! Took ${(Date.now() - start) / 1000}s`)
+        if (results.size) console.log([...results])
+        resolve(results)
+      })(),
+    )
+  })
+}

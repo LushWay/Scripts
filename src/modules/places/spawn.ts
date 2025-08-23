@@ -3,19 +3,20 @@ import { GameMode, Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 import { InventoryStore, Portal, Settings, locationWithRotation, util } from 'lib'
 
-import { isNotPlaying } from 'lib/game-utils'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
 import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
+import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
 
 class SpawnBuilder extends AreaWithInventory {
-  group = new Group('common', 'Общее')
+  group = new Group('common', i18nShared`Общее`)
 
   private readonly name = 'Spawn'
 
@@ -27,13 +28,17 @@ class SpawnBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'spawn'
 
-  location = locationWithRotation(this.group.point('spawn').name('Спавн'), { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 })
+  location = locationWithRotation(
+    this.group.place('spawn').name(noI18n`Спавн`),
+    { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
+    true,
+  )
 
-  settings = Settings.player('Вход', 'join', {
+  settings = Settings.player(i18n`Вход`, 'join', {
     teleportToSpawnOnJoin: {
       value: true,
-      name: 'Телепорт на спавн',
-      description: 'Определяет, будете ли вы телепортироваться на спавн при входе',
+      name: i18n`Телепорт на спавн`,
+      description: i18n`Определяет, будете ли вы телепортироваться на спавн при входе`,
     },
   })
 
@@ -57,7 +62,10 @@ class SpawnBuilder extends AreaWithInventory {
         Portal.showHudTitle(player, '§9> §bSpawn §9<')
       })
 
-      this.portal.createCommand().setPermissions('everybody').setDescription('§r§bПеремещает на спавн')
+      this.portal
+        .createCommand()
+        .setPermissions('everybody')
+        .setDescription(i18n.nocolor`§r§bПеремещает на спавн`)
 
       world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {

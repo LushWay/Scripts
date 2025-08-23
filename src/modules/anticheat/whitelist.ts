@@ -1,10 +1,12 @@
 import { system, world } from '@minecraft/server'
 import { DEFAULT_ROLE, is, ROLES, Settings } from 'lib'
+import { defaultLang } from 'lib/assets/lang'
+import { noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 
 // Delay execution to move whitelist settings to the end of the settings menu
 system.delay(() => {
-  const whitelist = Settings.world('WhiteList\n§7Белый список', 'whitelist', {
+  const whitelist = Settings.world(noI18n`WhiteList\n§7Белый список`, 'whitelist', {
     enabled: {
       name: 'Включен',
       description: 'Включен ли whitelist',
@@ -15,7 +17,7 @@ system.delay(() => {
     },
     allowedRole: {
       name: 'Разрешенная роль',
-      description: `Минимальная роль, с которой игрок может зайти на сервер. Роль по умолчанию при входе: ${ROLES[DEFAULT_ROLE]}`,
+      description: `Минимальная роль, с которой игрок может зайти на сервер. Роль по умолчанию при входе: ${ROLES[DEFAULT_ROLE].to(defaultLang)}`,
       value: Object.entriesStringKeys(ROLES),
     },
     kickText: {

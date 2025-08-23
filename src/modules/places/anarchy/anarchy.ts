@@ -1,10 +1,11 @@
 import { GameMode, Player } from '@minecraft/server'
-import { InventoryStore, Portal, ValidLocation, Vector, location, rawMessageToString } from 'lib'
-import { Language } from 'lib/assets/lang'
-import { isNotPlaying } from 'lib/game-utils'
-import { itemDescription } from 'lib/shop/rewards'
-import { t } from 'lib/text'
+import { EventSignal, InventoryStore, Portal, ValidLocation, Vec, location } from 'lib'
+import { consoleLang } from 'lib/assets/lang'
+import { i18n, noI18n } from 'lib/i18n/text'
+import { isNotPlaying } from 'lib/utils/game'
+import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { createLogger } from 'lib/utils/logger'
+import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { rtpCommand } from 'modules/commands/rtp'
 import { tpMenuOnce } from 'modules/commands/tp'
 import { Spawn } from 'modules/places/spawn'
@@ -18,15 +19,16 @@ class AnarchyBuilder extends AreaWithInventory {
 
   zone: RadioactiveZone | undefined
 
-  async learningRTP(player: Player): Promise<void> {
-    // Hook function
+  // Hook function
+  async enterLearning(player: Player): Promise<boolean> {
+    return Promise.resolve(true)
   }
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location(Spawn.group.point('anarchy center').name('центр анархии'))
+  centerLocation = location(Spawn.group.place('anarchy center').name(noI18n`центр анархии`))
 
-  portalLocation = location(Spawn.group.point('anarchy portal').name('портал на анархию'))
+  portalLocation = location(Spawn.group.place('anarchy portal').name(noI18n`портал на анархию`))
 
   inventoryStore = new InventoryStore('anarchy')
 
@@ -36,54 +38,70 @@ class AnarchyBuilder extends AreaWithInventory {
     this.centerLocation.onLoad.subscribe(centerLocation => {
       if (!centerLocation.firstLoad) return console.warn('Anarchy center changed, reload to update zone/radius command')
 
-      this.zone = new RadioactiveZone(centerLocation, players => players.length * 500 + 3000)
+      this.zone = new RadioactiveZone(centerLocation, 2000)
 
       new Command('radius')
-        .setDescription('Выдает радиус границы анархии сейчас')
+        .setDescription(i18n`Выдает радиус границы анархии сейчас`)
         .setGroup('public')
         .setPermissions('member')
-        .executes(ctx => ctx.player.info(t`Радиус границы анархии сейчас: ${this.zone?.lastRadius}`))
+        .executes(ctx => ctx.player.info(i18n`Радиус границы анархии сейчас: ${this.zone?.radius}`))
     })
 
     this.portalLocation.onLoad.subscribe(portalLocation => this.createPortal(portalLocation))
   }
 
   private createPortal(portalLocation: ValidLocation<Vector3>) {
-    this.portal = new Portal('anarchy', ...Vector.around(portalLocation, 0, 1, 1), player => {
+    this.portal = new Portal('anarchy', ...Vec.around(portalLocation, 0, 1, 1), player => {
       if (isNotPlaying(player)) return tpMenuOnce(player)
       if (player.database.inv === this.inventoryName) {
-        return player.fail(t.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)
+        return player.fail(i18n.error`Вы уже находитесь на анархии! Если это не так, используйте ${rtpCommand}`)
       }
 
       if (!Portal.canTeleport(player)) return
 
-      Portal.fadeScreen(player)
-      this.switchInventory(player)
-
       if (!player.database.survival.anarchy) {
-        this.learningRTP(player).then(() => {
+        this.enterLearning(player).then(r => {
+          if (!r) return
+          this.switchInventory(player)
           showSurvivalHud(player)
         })
       } else {
+        Portal.fadeScreen(player)
+
         player.teleport(player.database.survival.anarchy)
         delete player.database.survival.anarchy
+        this.switchInventory(player)
+
         showSurvivalHud(player)
         Portal.showHudTitle(player, '§6> §cAnarchy §6<')
+
+        EventSignal.emit(this.onPlayerEnter, { player })
+        if (!this.playerEnteredAnarchy.has(player)) {
+          EventSignal.emit(this.onPlayerFirstEnter, { player })
+          this.playerEnteredAnarchy.add(player)
+        }
       }
     })
 
-    const command = this.portal.createCommand().setDescription('§bПеремещает на анархию')
+    const command = this.portal.createCommand().setDescription(i18n`§bПеремещает на анархию`)
 
     command
       .overload('clearpos')
       .setDescription(
-        'Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку',
+        i18n`Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку`,
       )
       .executes(ctx => {
         delete ctx.player.database.survival.anarchy
-        ctx.player.success(t`Успех! Теперь вы можете использовать ${command} для перемещения на случайную позицию.`)
+        ctx.player.success(i18n`Успех! Теперь вы можете использовать ${command} для перемещения на случайную позицию.`)
       })
   }
+
+  onPlayerEnter = new EventSignal<{ player: Player }>()
+
+  // to prevent from triggering multiple times
+  private playerEnteredAnarchy = new WeakPlayerSet({ removeOnLeave: true })
+
+  onPlayerFirstEnter = new EventSignal<{ player: Player }>()
 
   private logger = createLogger('Anarchy')
 
@@ -111,11 +129,11 @@ class AnarchyBuilder extends AreaWithInventory {
     const inv = this.inventoryStore.get(player.id, { remove: false, fallback: InventoryStore.emptyInventory })
 
     this.logger.player(player).info`Saved inventory:\n${Object.entries(inv.slots)
-      .map(([slot, item]) => ` §6${slot}§f ${rawMessageToString(itemDescription(item), Language.ru_RU)}`)
+      .map(([slot, item]) => ` §6${slot}§f ${itemNameXCount(item, undefined, undefined, consoleLang)}`)
       .join('\n')}`
 
     // Do not save location if on spawn
-    if (Spawn.region?.area.isIn(player) || player.database.survival.doNotSaveAnarchy) return
+    if (Spawn.region?.area.isIn(player)) return
     player.database.survival.anarchy = {
       x: Math.round(player.location.x),
       z: Math.round(player.location.z),

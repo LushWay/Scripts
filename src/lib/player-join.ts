@@ -1,8 +1,8 @@
 import { Player, system, world } from '@minecraft/server'
 import { sendPacketToStdout } from 'lib/bds/api'
 import { EventSignal } from 'lib/event-signal'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
-import { t } from 'lib/text'
 import { util } from 'lib/util'
 import { Core } from './extensions/core'
 import { ActionbarPriority } from './extensions/on-screen-display'
@@ -14,15 +14,13 @@ class JoinBuilder {
     title_animation: {
       stages: ['» $title «', '»  $title  «'],
       /** @type {Record<string, string>} */
-      vars: {
-        title: `${Core.name}§r§f`,
-      },
+      vars: { title: `${Core.name}§r§f` },
     },
     actionBar: '', // Optional
-    subtitle: 'Добро пожаловать!', // Optional
+    subtitle: i18n.nocolor`Добро пожаловать!`, // Optional
     messages: {
-      air: '§8Очнулся в воздухе',
-      ground: '§8Проснулся',
+      air: i18n.nocolor`§8Очнулся в воздухе`,
+      ground: i18n.nocolor`§8Проснулся`,
       sound: 'break.amethyst_cluster',
     },
   }
@@ -33,11 +31,10 @@ class JoinBuilder {
 
   eventsDefaultSubscribers = {
     time: this.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-      if (!firstJoin) player.tell(`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
+      if (!firstJoin) player.tell(i18n.nocolor`${timeNow()}, ${player.name}!\n§r§3Время §b• §3${shortTime()}`)
     }, -1),
     playerSpawn: world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       if (!initialSpawn) return
-      if (player.scores.joinDate === 0) player.scores.joinDate = ~~(Date.now() / 1000)
       this.setPlayerJoinPosition(player)
       EventSignal.emit(this.onFirstTimeSpawn, player)
     }),
@@ -52,14 +49,14 @@ class JoinBuilder {
   setPlayerJoinPosition(player: Player) {
     player.database.join ??= {}
 
-    if (!player.isValid()) return
+    if (!player.isValid) return
     player.database.join.position = this.playerAt(player)
   }
 
   constructor() {
     system.runPlayerInterval(
       player => {
-        if (!player.isValid()) return
+        if (!player.isValid) return
         const db = player.database.join
 
         if (Array.isArray(db?.position)) {
@@ -75,21 +72,21 @@ class JoinBuilder {
               if (isNaN(db.stage) || db.stage >= Join.config.title_animation.stages.length) db.stage = 0
 
               // Creating title
-              let title = Join.config.title_animation.stages[db.stage]
+              let title = Join.config.title_animation.stages[db.stage] ?? ''
               for (const [key, value] of Object.entries(Join.config.title_animation.vars)) {
                 title = title.replace('$' + key, value)
               }
 
               // Show actionBar
               if (Join.config.actionBar) {
-                player.onScreenDisplay.setActionBar(Join.config.actionBar, ActionbarPriority.UrgentNotificiation)
+                player.onScreenDisplay.setActionBar(Join.config.actionBar, ActionbarPriority.Highest)
               }
 
               player.onScreenDisplay.setHudTitle(title, {
                 fadeInDuration: 0,
                 fadeOutDuration: 20,
                 stayDuration: 40,
-                subtitle: Join.config.subtitle,
+                subtitle: Join.config.subtitle.to(player.lang),
               })
             } else {
               // Player joined in air
@@ -108,7 +105,7 @@ class JoinBuilder {
     )
 
     new Command('join')
-      .setDescription('Имитирует первый вход')
+      .setDescription(i18n`Имитирует первый вход`)
       .setPermissions('member')
       .executes(ctx => {
         const player = ctx.player
@@ -128,7 +125,7 @@ class JoinBuilder {
         role: getFullname(player, { name: false }),
         status: 'move',
         where,
-        print: t`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
+        print: noI18n.nocolor`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
       })
 
     for (const other of world.getPlayers()) {
@@ -136,7 +133,7 @@ class JoinBuilder {
 
       const settings = this.settings(other)
       if (settings.sound) other.playSound(Join.config.messages.sound)
-      if (settings.message) other.tell(`§7${player.name} ${message}`)
+      if (settings.message) other.tell(i18n.nocolor.join`§7${player.name} ${message}`)
     }
 
     EventSignal.emit(this.onMoveAfterJoin, {
@@ -146,22 +143,10 @@ class JoinBuilder {
     })
   }
 
-  settings = Settings.player('Вход\n§7Все действия, связанные со входом', 'join', {
-    message: {
-      name: 'Сообщение',
-      description: 'о входе других игроков',
-      value: true,
-    },
-    sound: {
-      name: 'Звук',
-      description: 'при входе игроков',
-      value: true,
-    },
-    time: {
-      name: 'Время',
-      description: 'при входе',
-      value: true,
-    },
+  settings = Settings.player(i18n`Вход\n§7Все действия, связанные со входом`, 'join', {
+    message: { name: i18n`Сообщение`, description: i18n`о входе других игроков`, value: true },
+    sound: { name: i18n`Звук`, description: i18n`при входе игроков`, value: true },
+    time: { name: i18n`Время`, description: i18n`при входе`, value: true },
   })
 
   emitFirstJoin(player: Player) {
@@ -171,24 +156,17 @@ class JoinBuilder {
 
 export const Join = new JoinBuilder()
 
-/**
- * Выводит строку времени
- *
- * @returns {string}
- */
-function timeNow(): string {
+/** Выводит строку времени */
+function timeNow(): Text {
   const time = new Date(Date()).getHours() + 3
-  if (time < 6) return '§9Доброй ночи'
-  if (time < 12) return '§6Доброе утро'
-  if (time < 18) return '§bДобрый день'
-  return '§3Добрый вечер'
+  if (time < 6) return i18n`§9Доброй ночи`
+  if (time < 12) return i18n`§6Доброе утро`
+  if (time < 18) return i18n`§bДобрый день`
+  return i18n`§3Добрый вечер`
 }
 
-/**
- * Выводит время в формате 00:00
- *
- * @returns {string}
- */
+// TODO Use date.toHHMMSS
+/** Выводит время в формате 00:00 */
 function shortTime(): string {
   const time = new Date(Date())
   time.setHours(time.getHours() + 3)

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
- 
 
 interface Modules {
   Net: null | typeof import('@minecraft/server-net')

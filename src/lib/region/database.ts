@@ -1,9 +1,12 @@
 import { system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { ProxyDatabase } from 'lib/database/proxy'
-import { t } from 'lib/text'
+import { deepClone } from 'lib/database/defaults'
+import { EventLoader } from 'lib/event-signal'
+import { i18n } from 'lib/i18n/text'
 import { Area } from './areas/area'
+import './areas/cut'
 import { SphereArea } from './areas/sphere'
+import { RegionEvents } from './events'
 import { RegionIsSaveable, type Region, type RegionPermissions } from './kinds/region'
 
 export type RLDB = JsonObject | undefined
@@ -41,11 +44,21 @@ export const RegionDatabase = table<RegionSave>('region-v2', () => ({
 }))
 
 system.delay(() => {
-  Object.entries(RegionDatabase).forEach(r => restoreRegionFromJSON(r))
+  system.runJob(
+    (function* regionRestore() {
+      let i = 0
+      for (const r of RegionDatabase.entriesImmutable()) {
+        restoreRegionFromJSON(r)
+        i++
+        if (i % 100 === 0) yield
+      }
+      EventLoader.load(RegionEvents.onLoad)
+    })(),
+  )
 })
 
 let loaded = false
-const kinds: (typeof Region)[] = []
+let kinds: (typeof Region)[] = []
 export function registerSaveableRegion(kind: string, region: typeof Region) {
   if (loaded)
     throw new Error(
@@ -60,26 +73,28 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
   kinds.push(region)
 }
 
-export function restoreRegionFromJSON([key, region]: [string, (typeof RegionDatabase)[string]]) {
-  Area.loaded = true
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export function TEST_clearSaveableRegions() {
+  loaded = false
+  kinds = []
+}
+
+export function restoreRegionFromJSON([key, regionImmutable]: [string, Immutable<RegionSave>]) {
   loaded = true
 
-  if (typeof region === 'undefined') return
-  region = ProxyDatabase.unproxy(region)
+  if (typeof regionImmutable === 'undefined') return
+  const region = deepClone(regionImmutable) as RegionSave
 
   const kind = kinds.find(e => e.kind === region.k)
   if (!kind) {
-    console.warn(t`[Region][Database] No kind found for ${region.k}. Maybe you forgot to register kind or import file?`)
-    return
-  }
-
-  const area = Area.areas.find(e => e.type === region.a.t)
-  if (!area) {
     console.warn(
-      t`[Region][Database] No area found for ${region.a.t}. Maybe you forgot to register kind or import file?`,
+      i18n`[Region][Database] No kind found for ${region.k}. Available kinds: ${kinds.map(e => e.kind).join(', ')}. Maybe you forgot to register kind or import file?`,
     )
     return
   }
 
-  return kind.create(new area(region.a.d), region, key)
+  const area = Area.fromJson(region.a)
+  if (!area) return
+
+  return kind.create(area, region, key)
 }

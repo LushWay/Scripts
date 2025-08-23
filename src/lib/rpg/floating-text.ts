@@ -1,13 +1,22 @@
-import { Entity, ShortcutDimensions, world } from '@minecraft/server'
+import { Entity, EntityComponentTypes, ShortcutDimensions, world } from '@minecraft/server'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { defaultLang } from 'lib/assets/lang'
 import { anyPlayerNear } from 'lib/player-move'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 export class FloatingText {
   private static readonly dynamicProperty = 'floatingText'
 
-  private static readonly typeId = CustomEntityTypes.FloatingText
+  private static readonly typeId = CustomEntityTypes.FloatingTextNpc
+
+  static {
+    // system.delay(() => {
+    //   world.overworld
+    //     .getEntities({ type: CustomEntityTypes.FloatingText })
+    //     .forEach(e => e.getDynamicProperty(FloatingText.dynamicProperty) && e.remove())
+    // })
+  }
 
   constructor(
     private id: string,
@@ -17,23 +26,27 @@ export class FloatingText {
   private entity: Entity | undefined
 
   hide() {
-    if (!this.entity) this.entity = this.find()
-    if (this.entity?.isValid()) this.entity.remove()
+    this.entity ??= this.find()
+    if (this.entity?.isValid) this.entity.remove()
   }
 
-  update(location: Vector3, nameTag: string) {
+  update(location: Vector3, nameTag: SharedText | string) {
     if (!anyPlayerNear(location, this.dimensionType, 30)) return
 
-    location = Vector.add(location, { x: 0.5, y: 0.7, z: 0.5 })
+    location = Vec.add(location, { x: 0.5, y: 0.7, z: 0.5 })
 
     if (!this.entity) {
       this.entity = this.find()
       if (!this.entity) this.create(location)
     }
 
-    if (this.entity?.isValid()) {
+    if (this.entity?.isValid) {
       this.entity.teleport(location)
-      this.entity.nameTag = nameTag
+      const npc = this.entity.getComponent(EntityComponentTypes.Npc)
+      if (npc) {
+        if (typeof nameTag === 'string') npc.name = nameTag
+        else npc.name = JSON.stringify(nameTag.toRawText())
+      } else this.entity.nameTag = nameTag.to(defaultLang)
     } else {
       this.logger.warn('Entity is invalid')
       try {

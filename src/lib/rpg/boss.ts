@@ -2,20 +2,22 @@
 
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
-import { isChunkUnloaded, LocationInDimension } from 'lib/game-utils'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
+import { Area, AreaAsJson } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
-import { t } from 'lib/text'
+import { getBlockStatus } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { FloatingText } from './floating-text'
 import { Group, Place } from './place'
@@ -24,6 +26,11 @@ interface BossDB {
   id: string
   date: number
   dead: boolean
+}
+
+interface BossArenaDB {
+  area: AreaAsJson
+  ldb?: JsonObject
 }
 
 interface BossOptions {
@@ -39,12 +46,13 @@ interface BossOptions {
 export class Boss {
   /** Boss Database. Contains meta information about spawned boss entities */
   static db = table<BossDB>('boss')
+  static arenaDb = table<BossArenaDB>('bossArena')
 
   /** List of all registered boss types */
   static all: Boss[] = []
 
   static create() {
-    return Group.pointCreator(place => ({
+    return Group.placeCreator(place => ({
       typeId: (typeId: string) => ({
         loot: (loot: LootTable) => ({
           respawnTime: (respawnTime: number) => ({
@@ -65,6 +73,8 @@ export class Boss {
 
     return this.all.some(e => e.entity?.id === id)
   }
+
+  static entityTag = 'lw:boss'
 
   entity: Entity | undefined
 
@@ -89,6 +99,16 @@ export class Boss {
       const prev = boss.damage.get(event.damageSource.damagingEntity) ?? 0
       boss.damage.set(event.damageSource.damagingEntity, prev + event.damage)
     })
+
+    world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+      if (!entity.isValid) return
+      const regions = BossArenaRegion.getManyAt(entity)
+      for (const region of regions) if (region.boss) EventSignal.emit(region.boss.onEntitySpawn, entity)
+    })
+  }
+
+  get id() {
+    return this.options.place.id
   }
 
   /**
@@ -100,18 +120,33 @@ export class Boss {
    * @param o.respawnTime In ms
    */
   constructor(private options: BossOptions) {
-    this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.id}`
+    this.options.loot.id = `§7${this.options.place.group.id} §fBoss ${this.options.place.shortId}`
 
     if (Array.isArray(this.options.allowedEntities))
       this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
+    const areadb = Boss.arenaDb.get(this.options.place.id)
+
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
       this.check()
-      this.region = BossArenaRegion.create(
-        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionId),
-        { bossName: this.options.place.name, permissions: { allowedEntities: this.options.allowedEntities } },
-      )
+      const area =
+        (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??
+        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
+
+      this.region = BossArenaRegion.create(area, {
+        boss: this,
+        bossName: this.options.place.name,
+        permissions: { allowedEntities: this.options.allowedEntities },
+      })
+
+      if (areadb?.ldb) this.region.ldb = areadb.ldb
+
+      this.region.onSave.subscribe(() => {
+        if (this.region) {
+          Boss.arenaDb.set(this.options.place.id, { area: this.region.area.toJSON(), ldb: this.region.ldb })
+        }
+      })
       EventLoaderWithArg.load(this.onRegionCreate, this.region)
     })
 
@@ -120,16 +155,18 @@ export class Boss {
 
   readonly onRegionCreate = new EventLoaderWithArg<BossArenaRegion>()
 
+  readonly onBossEntitySpawn = new EventSignal<Entity>()
+
   readonly onEntitySpawn = new EventSignal<Entity>()
 
-  readonly onEntityDie = new EventSignal()
+  readonly onBossEntityDie = new EventSignal()
 
-  private logger = createLogger('Boss ' + this.options.place.fullId)
+  private logger = createLogger('Boss ' + this.options.place.id)
 
   private damage = new WeakPlayerMap<number>({ removeOnLeave: true })
 
-  get dimensionId() {
-    return this.options.place.group.dimensionId
+  get dimensionType() {
+    return this.options.place.group.dimensionType
   }
 
   private onInterval?: (boss: this) => void
@@ -140,54 +177,58 @@ export class Boss {
   }
 
   private check() {
-    if (!this.location.valid) return
-    if (isChunkUnloaded(this as LocationInDimension)) return
+    if (!this.location.valid || getBlockStatus(this.location.toPoint()) === 'unloaded') return
 
-    const db = Boss.db[this.options.place.fullId]
-    if (typeof db !== 'undefined') {
-      if (db.dead) {
-        this.checkRespawnTime(db)
-      } else {
-        this.ensureEntity(db)
-      }
-    } else {
+    const db = Boss.db.get(this.options.place.id)
+    if (!db) {
       // First time spawn
       this.spawnEntity()
+    } else {
+      // Interval check
+      if (db.dead) this.checkRespawnTime(db)
+      else this.ensureEntity(db)
     }
   }
 
-  private floatingText = new FloatingText(this.options.place.fullId, this.dimensionId)
+  private floatingText = new FloatingText(this.options.place.id, this.dimensionType)
 
   private checkRespawnTime(db: BossDB) {
     if (Date.now() > db.date + this.options.respawnTime) {
       this.spawnEntity()
     } else if (this.location.valid) {
       this.floatingText.update(
-        Vector.add(this.location, { x: 0, y: 2, z: 0 }),
-        `${this.options.place.name}\n${t.time`До появления\n§7осталось ${this.options.respawnTime - (Date.now() - db.date)}`}`,
+        Vec.add(this.location, { x: 0, y: 2, z: 0 }),
+        i18nShared`${this.options.place.name}\nДо появления\nосталось ${i18n.hhmmss(this.options.respawnTime - (Date.now() - db.date))}`,
       )
     }
+  }
+
+  private getName() {
+    if (typeof this.options.place.name === 'string')
+      throw new TypeError(`Boss ${this.id} name is string, expected I18nSharedMessage`)
+
+    return this.options.place.name.to(defaultLang)
+
+    // TODO add once supported
+    // return this.options.place.name.toRawText()
   }
 
   private spawnEntity() {
     if (!this.location.valid) return
 
-    // Get type id
     const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
     this.logger.info`Spawn: ${entityTypeId}`
+    this.entity = world[this.dimensionType].spawnEntity(entityTypeId, this.location)
 
-    // Spawn entity
-    this.entity = world[this.dimensionId].spawnEntity(entityTypeId, this.location)
     try {
       new Temporary(({ world, cleanup }) => {
         world.afterEvents.entitySpawn.subscribe(({ entity }) => {
           if (entity.id !== this.entity?.id) return
 
           system.delay(() => {
-            if (!this.entity) return
-
-            EventSignal.emit(this.onEntitySpawn, entity)
-            this.entity.nameTag = this.options.place.name
+            entity.nameTag = this.getName()
+            entity.addTag(Boss.entityTag)
+            EventSignal.emit(this.onBossEntitySpawn, entity)
           })
           cleanup()
         })
@@ -197,33 +238,28 @@ export class Boss {
     }
 
     // Save to database
-    Boss.db[this.options.place.fullId] = {
-      id: this.entity.id,
-      date: Date.now(),
-      dead: false,
-    }
+    Boss.db.set(this.options.place.id, { id: this.entity.id, date: Date.now(), dead: false })
   }
 
   /** Ensures that entity exists and if not calls onDie method */
   private ensureEntity(db: BossDB) {
-    this.entity ??= world[this.dimensionId]
-      .getEntities({
-        type: this.options.typeId,
-        // location: this.location,
-        // maxDistance: this.areaRadius,
-      })
+    const entities = world[this.dimensionType].getEntities({ type: this.options.typeId, tags: [Boss.entityTag] })
 
-      .find(e => e.id === db.id)
+    for (const entity of entities) {
+      if (entity.id === db.id) {
+        this.entity ??= entity
+      } else entity.remove()
+    }
 
-    if (!this.entity) {
+    if (!this.entity?.isValid) {
       // Boss died or unloaded, respawn after interval
       this.onDie({ dropLoot: false })
     } else {
-      if (!this.entity.isValid()) return
+      // Boss alive
       if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
-      this.entity.nameTag = this.options.place.name
+      this.entity.nameTag = this.getName()
       this.floatingText.hide()
     }
   }
@@ -238,22 +274,18 @@ export class Boss {
         .map(e => `§l${Player.name(e[0])}§r§f: §6${e[1]}§f`)
         .join(', ')}`,
     )
-    EventSignal.emit(this.onEntityDie, undefined)
-    const location = this.entity?.isValid() ? this.entity.location : this.location
+    EventSignal.emit(this.onBossEntityDie, undefined)
+    const location = this.entity?.isValid ? this.entity.location : this.location
     delete this.entity
 
-    Boss.db[this.options.place.fullId] = {
-      id: '',
-      date: Date.now(),
-      dead: true,
-    }
+    Boss.db.set(this.options.place.id, { id: '', date: Date.now(), dead: true })
 
     if (dropLoot) {
-      world.say(`§6Убит босс §f${this.options.place.name}!`)
+      for (const player of world.getAllPlayers()) player.tell(i18n.header`Убит босс ${this.options.place.name}!`)
 
       this.options.loot.generate().forEach(e => {
         if (e) {
-          const item = world[this.dimensionId].spawnItem(e, location)
+          const item = world[this.dimensionType].spawnItem(e, location)
           forceAllowSpawnInRegion(item)
         }
       })

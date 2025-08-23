@@ -33,10 +33,10 @@ describe('EventSignal', () => {
 
     const sortedSubscribers = EventSignal.sortSubscribers(signal)
 
-    expect(sortedSubscribers[0][0]).toBe(callback0)
-    expect(sortedSubscribers[1][0]).toBe(callback1)
-    expect(sortedSubscribers[2][0]).toBe(callback2)
-    expect(sortedSubscribers[3][0]).toBe(callback100)
+    expect(sortedSubscribers[0]?.[0]).toBe(callback0)
+    expect(sortedSubscribers[1]?.[0]).toBe(callback1)
+    expect(sortedSubscribers[2]?.[0]).toBe(callback2)
+    expect(sortedSubscribers[3]?.[0]).toBe(callback100)
   })
 
   it('should subscribe and unsubscribe callbacks', () => {

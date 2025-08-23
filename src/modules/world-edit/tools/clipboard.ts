@@ -47,12 +47,12 @@ class ClipboardTool extends WorldEditTool<Storage> {
           `Используйте предмет чтобы\n${
             player.isSneaking ? '§7<Отменить последнее действие>' : '§a<Вставить скопированную область>'
           }`,
-          ActionbarPriority.UrgentNotificiation,
+          ActionbarPriority.Highest,
         )
       } else
         player.onScreenDisplay.setActionBar(
           '§cВы ничего не копировали!\nИспользуйте §f.copy',
-          ActionbarPriority.UrgentNotificiation,
+          ActionbarPriority.Highest,
         )
     })
   }

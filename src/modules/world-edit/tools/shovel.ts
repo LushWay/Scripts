@@ -1,8 +1,8 @@
 import { ContainerSlot, ItemStack, Player, world } from '@minecraft/server'
-import { ModalForm, Vector } from 'lib'
+import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { i18n } from 'lib/i18n/text'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { skipForBlending } from '../utils/blending'
@@ -106,7 +106,7 @@ class ShovelTool extends WorldEditTool<Storage> {
 
           this.saveStorage(slot, storage)
           player.success(
-            t`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
+            i18n`${storage.blocksSet[0] ? 'Отредактирована' : 'Создана'} лопата с ${blocksSet} набором блоков и радиусом ${radius}`,
           )
         },
       )
@@ -123,7 +123,7 @@ class ShovelTool extends WorldEditTool<Storage> {
           if (lookingUp)
             return player.onScreenDisplay.setActionBar(
               'Лопата выключена,\nможно настраивать',
-              ActionbarPriority.UrgentNotificiation,
+              ActionbarPriority.Highest,
             )
         }
       }
@@ -153,13 +153,13 @@ class ShovelTool extends WorldEditTool<Storage> {
 
     const permutations = getBlocksInSet(storage.blocksSet)
     if (!permutations.length)
-      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.UrgentNotificiation)
+      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.Highest)
 
     const { offset, radius, height } = storage
     const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
-    const center = Vector.floor(player.location)
-    const from = Vector.add(center, new Vector(-radius, offset - height, -radius))
-    const to = Vector.add(center, new Vector(radius, offset, radius))
+    const center = Vec.floor(player.location)
+    const from = Vec.add(center, new Vec(-radius, offset - height, -radius))
+    const to = Vec.add(center, new Vec(radius, offset, radius))
 
     WorldEdit.forPlayer(player).backup(
       `§eЛопата §7радиус §f${radius} §7высота §f${height} §7сдвиг §f${
@@ -169,7 +169,7 @@ class ShovelTool extends WorldEditTool<Storage> {
       to,
     )
 
-    for (const vector of Vector.foreach(from, to)) {
+    for (const vector of Vec.forEach(from, to)) {
       if (skipForBlending(storage, { vector, center })) continue
 
       const block = world.overworld.getBlock(vector)

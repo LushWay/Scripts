@@ -1,11 +1,12 @@
 import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
-import { restorePlayerCamera } from 'lib/game-utils'
+import { noI18n } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
+import { restorePlayerCamera } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 /**
@@ -51,10 +52,7 @@ export class Cutscene {
   private restoreCameraTime = 2
 
   /** List of players that currently see cutscene play */
-  private current = new WeakPlayerMap<{
-    player: Player
-    controller: AbortController
-  }>({
+  private current = new WeakPlayerMap<{ player: Player; controller: AbortController }>({
     onLeave: playerId => this.exit(playerId),
   })
 
@@ -62,20 +60,15 @@ export class Cutscene {
 
   constructor(
     public id: string,
-    public displayName: string,
+    public displayName: Text,
   ) {
     Cutscene.all.set(id, this)
 
-    this.sections = Cutscene.db[this.id].slice()
+    this.sections = Cutscene.db.get(this.id).slice()
   }
 
   private get defaultSection() {
-    return {
-      points: [],
-      step: 0.15,
-      easeTime: 1,
-      easeType: EasingType.Linear,
-    }
+    return { points: [], step: 0.15, easeTime: 1, easeType: EasingType.Linear }
   }
 
   get start() {
@@ -91,7 +84,7 @@ export class Cutscene {
   play(player: Player) {
     if (!this.sections[0]?.points[0]) {
       console.error(`${this.id}: cutscene is not ready.`)
-      player.fail(`${this.displayName}: cцена еще не настроена`)
+      player.fail(noI18n`${this.displayName}: cutscene is not ready.`)
       return
     }
 
@@ -102,7 +95,7 @@ export class Cutscene {
     const controller = { cancel: false }
     const promise = this.forEachPoint(
       async (point, pointNum, section, sectionNum) => {
-        if (!player.isValid()) {
+        if (!player.isValid) {
           controller.cancel = true
           return
         }
@@ -127,21 +120,18 @@ export class Cutscene {
 
           await system.sleep(10)
 
-          if (!player.isValid()) return
+          if (!(player.isValid as boolean)) return
 
           // There is no way to set a camera without easing using pure script
           player.runCommand(
-            `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vector.string(point)} rot ${point.rx} ${point.ry}`,
+            `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vec.string(point)} rot ${point.rx} ${point.ry}`,
           )
         }
       },
       { controller, exit: () => this.exit(player) },
     )
 
-    this.current.set(player.id, {
-      player,
-      controller,
-    })
+    this.current.set(player.id, { player, controller })
 
     return promise
   }
@@ -187,15 +177,16 @@ export class Cutscene {
 
   /** Uses bezier curves to interpolate points along a section. */
   private *pointIterator({ step = 0.5, points }: Section) {
+    const emptyPoint: Point = { rx: 0, ry: 0, x: 0, y: 0, z: 0 }
     let index = 0
     for (let point = 0; point <= points.length; point += step) {
       if (!points[0]) yield { x: 0, y: 0, z: 0, rx: 0, ry: 0, index }
       const i = Math.floor(point)
       const t = point - i
-      const v0 = points[i - 1] || points[0]
-      const v1 = points[i] || points[0]
-      const v2 = points[i + 1] || v1
-      const v3 = points[i + 2] || v2
+      const v0 = points[i - 1] ?? points[0] ?? emptyPoint
+      const v1 = points[i] ?? points[0] ?? emptyPoint
+      const v2 = points[i + 1] ?? v1
+      const v3 = points[i + 2] ?? v2
 
       const x = bezier([v0, v1, v2, v3], 'x', t)
       const y = bezier([v0, v1, v2, v3], 'y', t)
@@ -228,7 +219,7 @@ export class Cutscene {
       restorePlayerCamera(player, this.restoreCameraTime)
       system.runTimeout(
         () => {
-          if (player.isValid()) player.onScreenDisplay.resetHudElements()
+          if (player.isValid) player.onScreenDisplay.resetHudElements()
           Compass.forceHide.delete(player)
           Sidebar.forceHide.delete(player)
         },
@@ -253,7 +244,11 @@ export class Cutscene {
     if (section) {
       section.points.push(getVector5(source))
     } else {
-      warn && source.warn(`Не удалось найти секцию. Позиция секции: ${sectionIndex}, всего секций: ${sections.length}`)
+      if (warn) {
+        source.warn(
+          noI18n`Unable to find section. Section index: ${sectionIndex}, total amount of sections: ${sections.length}`,
+        )
+      }
 
       return false
     }
@@ -269,7 +264,7 @@ export class Cutscene {
 
   /** Saves cutscene sections to the database */
   save() {
-    Cutscene.db[this.id] = this.sections
+    Cutscene.db.set(this.id, this.sections)
   }
 }
 
@@ -288,17 +283,18 @@ function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: k
   const [v0, v1, v2, v3] = vectors
   const t2 = t * t
   const t3 = t2 * t
+  const vv1 = v1[axis] ?? 0
+  const vv0 = v0[axis] ?? 0
+  const vv2 = v2[axis] ?? 0
+  const vv3 = v3[axis] ?? 0
   return (
     0.5 *
-    (2 * v1[axis] +
-      (-v0[axis] + v2[axis]) * t +
-      (2 * v0[axis] - 5 * v1[axis] + 4 * v2[axis] - v3[axis]) * t2 +
-      (-v0[axis] + 3 * v1[axis] - 3 * v2[axis] + v3[axis]) * t3)
+    (2 * vv1 + (-vv0 + vv2) * t + (2 * vv0 - 5 * vv1 + 4 * vv2 - vv3) * t2 + (-vv0 + 3 * vv1 - 3 * vv2 + vv3) * t3)
   )
 }
 
 function getVector5(player: Player): Vector5 {
   const { x: rx, y: ry } = player.getRotation()
-  const { x, y, z } = Vector.floor(player.getHeadLocation())
+  const { x, y, z } = Vec.floor(player.getHeadLocation())
   return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }
 }

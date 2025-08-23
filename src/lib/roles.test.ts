@@ -1,21 +1,25 @@
 import { GameMode, Player } from '@minecraft/server'
-import { getRole, setRole } from './roles'
+import { TEST_createPlayer } from 'test/utils'
+import { getRole, is, setRole } from './roles'
 
 describe('roles auto switch gamemode', () => {
   it('should switch gamemode', () => {
-    // @ts-expect-error
-    const player = new Player() as Player
+    const player = TEST_createPlayer()
 
-    expect(player.getGameMode()).toBe(GameMode.spectator)
+    expect(player.getGameMode()).toBe(GameMode.survival)
 
-    expect(getRole(player)).toBe('spectator')
+    expect(getRole(player)).toBe('member')
     expect(getRole(player.id)).toBe(getRole(player))
 
     setRole(player, 'admin')
+    expect(getRole(player.id)).toBe('admin')
     expect(player.getGameMode()).toBe(GameMode.survival)
 
     setRole(player, 'spectator')
     expect(player.getGameMode()).toBe(GameMode.spectator)
+
+    setRole(player, 'member')
+    expect(player.getGameMode()).toBe(GameMode.survival)
   })
 
   it('should return valid role', () => {
@@ -30,5 +34,20 @@ describe('roles auto switch gamemode', () => {
 
   it('should not throw for unknown player', () => {
     setRole('unknown', 'tester')
+  })
+})
+
+describe('roles is', () => {
+  it('should test is', () => {
+    const player = TEST_createPlayer()
+
+    expect(is(player.id, 'admin')).toBe(false)
+    expect(is(player.id, 'member')).toBe(true)
+    expect(is(player.id, 'spectator')).toBe(true)
+
+    setRole(player, 'admin')
+    expect(is(player.id, 'admin')).toBe(true)
+    expect(is(player.id, 'builder')).toBe(true)
+    expect(is(player.id, 'chefAdmin')).toBe(false)
   })
 })

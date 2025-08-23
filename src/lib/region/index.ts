@@ -1,16 +1,20 @@
 import {
+  EntityHealthComponent,
   Player,
   PlayerBreakBlockBeforeEvent,
   PlayerInteractWithBlockBeforeEvent,
   PlayerInteractWithEntityBeforeEvent,
   PlayerPlaceBlockBeforeEvent,
-  system,
   world,
 } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
-import { AbstractPoint, isBuilding } from 'lib/game-utils'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { i18n } from 'lib/i18n/text'
 import { onPlayerMove } from 'lib/player-move'
+import { isNotPlaying } from 'lib/utils/game'
+import { AbstractPoint } from 'lib/utils/point'
+import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
 import {
   BLOCK_CONTAINERS,
@@ -64,8 +68,12 @@ export enum ActionGuardOrder {
   Lowest = 6,
 }
 
+export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []
+
 actionGuard((player, region, ctx) => {
-  if (isBuilding(player)) return true
+  if (region && regionTypesThatIgnoreIsBuildingGuard.some(e => region instanceof e)) return
+
+  if (isNotPlaying(player)) return true
 
   if (region?.getMemberRole(player.id)) return true
 }, ActionGuardOrder.RegionMember)
@@ -152,7 +160,7 @@ world.beforeEvents.playerBreakBlock.subscribe(event => {
 
 world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   const { typeId } = entity
-  if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid()) return
+  if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid) return
 
   const region = Region.getAt(entity)
 
@@ -163,9 +171,9 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   entity.remove()
 })
 
-onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
+onPlayerMove.subscribe(({ player, location, dimensionType }) => {
   const previous = RegionEvents.playerInRegionsCache.get(player) ?? []
-  const newest = Region.getManyAt({ vector, dimensionType })
+  const newest = Region.getManyAt({ location, dimensionType })
 
   if (!Array.equals(newest, previous)) {
     EventSignal.emit(RegionEvents.onPlayerRegionsChange, { player, previous, newest })
@@ -173,16 +181,50 @@ onPlayerMove.subscribe(({ player, vector, dimensionType }) => {
 
   RegionEvents.playerInRegionsCache.set(player, newest)
   const currentRegion = newest[0]
+  const isPlaying = !isNotPlaying(player)
 
-  if (typeof currentRegion !== 'undefined' && !isBuilding(player)) {
+  const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
+
+  if (typeof currentRegion !== 'undefined' && isPlaying) {
     if (currentRegion.permissions.pvp === false) {
       player.triggerEvent(
         player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
       )
+      player.setProperty(PlayerProperties['lw:newbie'], true)
     } else if (currentRegion.permissions.pvp === 'pve') {
       player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (!player.database.survival.newbie) player.setProperty(PlayerProperties['lw:newbie'], true)
-  }
+    } else resetNewbie()
+  } else resetNewbie()
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
+})
+
+world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
+  if (!damagingEntity?.isValid || !hurtEntity.isValid) return
+
+  const region = Region.getAt(hurtEntity)
+  if (!region) return
+
+  const pvp = region.permissions.pvp
+  if (pvp === true) return
+  if (pvp === 'pve' && !(hurtEntity instanceof Player && damagingEntity instanceof Player)) return
+
+  let direction = Vec.subtract(damagingEntity.location, hurtEntity.location).normalized()
+  direction = Vec.multiply(direction, 10)
+
+  if (damagingEntity instanceof Player) {
+    damagingEntity.onScreenDisplay.setActionBar(
+      i18n.error`Нельзя сражаться в мирной зоне`.to(damagingEntity.lang),
+      ActionbarPriority.Highest,
+    )
+  }
+
+  const health = damagingEntity.getComponent(EntityHealthComponent.componentId)
+  if (!health) {
+    damagingEntity.kill()
+  } else {
+    health.setCurrentValue(health.currentValue - damage)
+    damagingEntity.applyDamage(0)
+    if (health.currentValue >= 0) damagingEntity.applyKnockback(direction, direction.y)
+  }
 })

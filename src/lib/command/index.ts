@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { t } from 'lib/text'
+import { defaultLang, Language } from 'lib/assets/lang'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
@@ -48,7 +49,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     const parsed = parseCommand(event.message, 1)
     if (!parsed) {
       this.logger.player(event.sender).error`Unable to parse: ${event.message}`
-      return event.sender.fail('Не удалось обработать команду.')
+      return event.sender.fail(noI18n`Failed to parse command`)
     } else this.logger.player(event.sender).info`Command ${event.message}`
 
     const { cmd, args, input } = parsed
@@ -67,7 +68,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
       if (!command) return 'fail'
       if (start.sys.children.length > 0) {
         const child = start.sys.children.find(
-          v => v.sys.type.matches(args[i]).success || (!args[i] && v.sys.type.optional),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          v => v.sys.type.matches(args[i]!).success || (!args[i] && v.sys.type.optional),
         )
         if (!child && !args[i] && start.sys.callback) return 'success'
         if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
@@ -87,18 +89,24 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   static commands: Command[] = []
 
   static getHelpForCommand(command: Command, ctx: CommandContext) {
-    return ctx.error('Генератор справки для команд выключен!')
+    return ctx.error(noI18n`Help is disabled`)
   }
 
   [stringifySymbol]() {
-    return '§f' + Command.prefixes[0] + this.sys.name
+    return `§f${Command.prefixes[0]}${this.getFullName()}`
+  }
+
+  private getFullName(name = ''): string {
+    const add = (v: string) => (name ? v + ' ' + name : v)
+    if (!this.sys.parent) return add(this.sys.name)
+    return this.sys.parent.getFullName(add(this.sys.name))
   }
 
   private static checkIsUnique(name: string) {
     for (const command of this.commands) {
       if (!command.sys.parent && command.sys.name === name) {
         Command.logger
-          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? t.warn`And:\n${command.stack}` : ''}`
+          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? i18n.warn`And:\n${command.stack}` : ''}`
         return
       }
     }
@@ -121,7 +129,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
      * @example
      *   'Bans the player'
      */
-    description: '',
+    description: '' as Text,
 
     /**
      * A function that will determine if a player has permission to use this command
@@ -177,7 +185,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    */
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
     this.stack = stringifyError.stack.get(2)
-    if (!parent) Command.checkIsUnique(name)
+    if (!parent && !__VITEST__) Command.checkIsUnique(name)
 
     this.sys.name = name
 
@@ -195,7 +203,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @example
    *   'Bans a player'
    */
-  setDescription(string: string) {
+  setDescription(string: Text) {
     this.sys.description = string
     return this
   }
@@ -392,12 +400,12 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     return this
   }
 
-  static getHelp(command: Command, description?: string): string[] {
+  static getHelp(lang: Language, command: Command, description?: string): string[] {
     const type = command.sys.type.toString()
     const base = command.sys.callback ? [`${type}${description ? `§7§o - ${description}` : ''}`] : []
     return base.concat(
       command.sys.children
-        .map(e => this.getHelp(e, command.sys.description))
+        .map(e => this.getHelp(lang, e, (e.sys.description || command.sys.description).to(lang)))
         .flat()
         .map(e => type + ' ' + e),
     )
@@ -407,7 +415,6 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
 type CommandModule = typeof Command
 
 declare global {
-  // eslint-disable-next-line no-var
   var Command: CommandModule
 }
 

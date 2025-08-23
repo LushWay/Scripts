@@ -5,7 +5,7 @@ import { registerAsync } from '@minecraft/server-gametest'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Enchantments, isKeyof, Temporary } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { t } from 'lib/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { TestStructures } from 'test/constants'
 
 const players: Player[] = []
@@ -32,8 +32,8 @@ registerAsync('test', 'damage', async test => {
         if (event.damageSource.damagingEntity instanceof Player) {
           const hp = event.hurtEntity.getComponent('health')?.currentValue ?? 0
           event.damageSource.damagingEntity.onScreenDisplay.setActionBar(
-            t`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`,
-            ActionbarPriority.UrgentNotificiation,
+            noI18n`Damage: ${event.damage.toFixed(2)}, HP: ${hp.toFixed(2)}`,
+            ActionbarPriority.Highest,
           )
         }
       }
@@ -71,10 +71,10 @@ function armorCommand() {
         [EquipmentSlot.Legs, `${type}Leggings`],
         [EquipmentSlot.Feet, `${type}Boots`],
       ]
-      let items: [EquipmentSlot, ItemStack][] = []
+      let items: [EquipmentSlot, ItemStack | undefined][] = []
 
       const enchs = levels[level]
-      if (typeof enchs === 'undefined') {
+      if (!enchs) {
         if (level <= 4 && level >= 0) {
           items = types.map(([slot, typeId]) => {
             const item = new ItemStack(MinecraftItemTypes[typeId])
@@ -93,7 +93,7 @@ function armorCommand() {
       }
 
       for (const player of players) {
-        if (!player.isValid()) continue
+        if (!player.isValid) continue
 
         const equippable = player.getComponent('equippable')
         if (!equippable) continue

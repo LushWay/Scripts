@@ -12,7 +12,7 @@ import {
 } from '@minecraft/server'
 
 import { MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { LockAction, Vector, util } from 'lib'
+import { LockAction, Vec, util } from 'lib'
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
   '§6Элитра перемещения',
@@ -73,7 +73,7 @@ export function randomTeleport(
   const z = Math.randomInt(from.z, to.z)
 
   try {
-    const hit = world[dimension].getBlockFromRay({ x, y: y - 2, z }, Vector.down)
+    const hit = world[dimension].getBlockFromRay({ x, y: y - 2, z }, Vec.down)
     if (hit) {
       const { block } = hit
       if ((y - block.y < fromYtoBlock || block.isLiquid) && c < 10) {

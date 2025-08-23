@@ -1,6 +1,7 @@
 import { ContainerSlot, InvalidContainerSlotError, ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
-import { t, textUnitColorize } from 'lib/text'
+import { Language } from 'lib/assets/lang'
+import { i18n, textUnitColorize } from 'lib/i18n/text'
 import { noBoolean, wrapLore } from 'lib/util'
 
 export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
@@ -36,8 +37,11 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   display(text: Text, prepareProperty?: PrepareProperty<ParsedSchemaProperty<L>>) {
     if (!this.currentProperty) throw new Error('Create property first!')
 
-    this.properties[this.currentProperty].text = text
-    if (prepareProperty) this.properties[this.currentProperty].prepareProperty = prepareProperty
+    const property = this.properties[this.currentProperty]
+    if (!property) throw new TypeError('Unknown property')
+
+    property.text = text
+    if (prepareProperty) property.prepareProperty = prepareProperty
 
     return this
   }
@@ -50,8 +54,8 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
     return this
   }
 
-  lore(prepareLore: PrepareLore<T> | string) {
-    this.prepareLore = typeof prepareLore === 'string' ? p => [prepareLore, ...p] : prepareLore
+  lore(prepareLore: PrepareLore<T> | Text) {
+    this.prepareLore = typeof prepareLore === 'function' ? prepareLore : p => [prepareLore, ...p]
 
     return this
   }
@@ -59,20 +63,24 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   build() {
     return new ItemLoreSchemaCompiled<T>(
       this.properties,
-      (i, s) => this.prepareItem(i, s),
+      (l, i, s) => this.prepareItem(l, i, s),
       this.itemTypeId,
       this.schemaId,
     )
   }
 
-  private prepareItem(itemStack: Item, storage: ParsedSchema<T>) {
-    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage)
-    itemStack.setLore(this.prepareLore(this.prepareProperties(storage), itemStack, storage).map(wrapLore).flat())
+  private prepareItem(lang: Language, itemStack: Item, storage: ParsedSchema<T>) {
+    if (this.prepareNameTag) itemStack.nameTag = '§r' + this.prepareNameTag(itemStack, storage).to(lang)
+    itemStack.setLore(
+      this.prepareLore(this.prepareProperties(lang, storage), itemStack, storage)
+        .map(e => wrapLore(e.to(lang)))
+        .flat(),
+    )
   }
 
   private prepareLore: PrepareLore<T> = properties => properties
 
-  private prepareProperties(storage: Partial<ParsedSchema<T>>): string[] {
+  private prepareProperties(lang: Language, storage: Partial<ParsedSchema<T>>): string[] {
     return Object.entries(this.properties)
       .map(([key, { text, prepareProperty }]) => {
         if (!text) return false
@@ -80,7 +88,7 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
         const unit = prepareProperty ? prepareProperty(storage[key], key) : storage[key]
         if (unit === false) return false
 
-        return `§7${text}: ${textUnitColorize(unit)}`
+        return `§7${text.to(lang)}: ${textUnitColorize(unit, undefined, lang)}`
       })
       .filter(noBoolean)
   }
@@ -91,23 +99,23 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
 
   constructor(
     private properties: Schema,
-    private prepareItem: (itemStack: Item, storage: ParsedSchema<T>) => void,
+    private prepareItem: (lang: Language, itemStack: Item, storage: ParsedSchema<T>) => void,
     private readonly itemTypeId: string,
     private readonly lsid: string,
   ) {}
 
-  create(config: ParsedSchema<T>, typeId = this.itemTypeId) {
+  create(lang: Language, config: ParsedSchema<T>, typeId = this.itemTypeId) {
     const item = new ItemStack(typeId)
     item.setDynamicProperty(ItemLoreSchemaCompiled.loreSchemaId, this.lsid)
 
-    const storage = this.parse(item, config)
+    const storage = this.parse(lang, item, config)
     if (!storage) throw new Error('Unable to create item using schema')
 
     for (const [key, value] of Object.entriesStringKeys(config)) storage[key] = value
     return { item, storage }
   }
 
-  parse(itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}, prepare = true) {
+  parse(lang: Language, itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}, prepare = true) {
     try {
       if (itemStack.isStackable) return
     } catch (e) {
@@ -119,7 +127,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
     if (typeof lsid === 'string') {
       if (lsid !== this.lsid) return
     } else {
-      if (lsid) console.warn(t.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${lsid}`)
+      if (lsid) console.warn(i18n.error`ItemLore: Invalid lsid, expected '${this.lsid}' but got ${lsid}`)
       return
     }
 
@@ -133,7 +141,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
       Object.defineProperty(storage, key, {
         set: (v: Schema.Property.Saveable) => {
           itemStack.setDynamicProperty(key, v === defaultValue ? undefined : JSON.stringify(v))
-          this.prepareItem(itemStack, storage)
+          this.prepareItem(lang, itemStack, storage)
         },
 
         get() {
@@ -147,14 +155,14 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema> {
       })
     }
 
-    if (prepare) this.prepareItem(itemStack, storage)
+    if (prepare) this.prepareItem(lang, itemStack, storage)
 
     return storage
   }
 
   is(itemStack: ItemStack | ContainerSlot) {
     if (itemStack instanceof ContainerSlot) {
-      if (!itemStack.isValid() || !itemStack.hasItem()) return false
+      if (!itemStack.isValid || !itemStack.hasItem()) return false
     }
     if (itemStack.isStackable) return false
 
@@ -208,8 +216,8 @@ type ParsedSchemaProperty<T extends Schema.Property.Any> = T extends StringConst
 
 type Item = Pick<ItemStack, 'getDynamicProperty' | 'setDynamicProperty' | 'setLore' | 'isStackable' | 'nameTag'>
 
-type PrepareProperty<U = any> = (unit: U, key: string) => string | false
+type PrepareProperty<U = any> = (unit: U, key: string) => Text | false
 
-type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => string[]
+type PrepareLore<T extends TypeSchema> = (properties: string[], itemStack: Item, storage: ParsedSchema<T>) => Text[]
 
-type PrepareNameTag<T extends TypeSchema> = (itemStack: Item, storage: ParsedSchema<T>) => string
+type PrepareNameTag<T extends TypeSchema> = (itemStack: Item, storage: ParsedSchema<T>) => Text

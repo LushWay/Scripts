@@ -1,8 +1,10 @@
 import { Player } from '@minecraft/server'
+import { defaultLang } from './assets/lang'
 import { Clan } from './clan/clan'
+import { i18n } from './i18n/text'
 import { getRole, ROLES } from './roles'
 import { EquippmentLevel } from './rpg/equipment-level'
-
+// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class// TODO Rewrite to class
 /**
  * Gets displayable the role of this player
  *
@@ -48,11 +50,11 @@ export function getFullname(
   let result = ''
   const add = (text: string) => (result += result ? ' ' + text : text)
 
-  if (useNewbie && Player.database[id].survival.newbie) add('§bНовичок')
+  if (useNewbie && Player.database.getImmutable(id).survival.newbie) add(i18n.nocolor`§bНовичок`.to(defaultLang))
 
   if (useRole) {
     const role = getRole(playerID)
-    if (role !== 'member') add(ROLES[role])
+    if (role !== 'member') add(ROLES[role].to(defaultLang))
   }
 
   if (equippment && playerID instanceof Player) {
@@ -71,7 +73,7 @@ export function getFullname(
       add(playerID.name)
     } else {
       const name = Player.name(playerID)
-      add(name ? name : noName)
+      add(name ?? noName)
     }
   }
 

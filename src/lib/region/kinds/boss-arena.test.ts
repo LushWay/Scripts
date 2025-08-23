@@ -1,11 +1,10 @@
-import { createPoint, Region } from 'lib'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 import { SphereArea } from '../areas/sphere'
 import { BossArenaRegion } from './boss-arena'
 
 describe('BossArenaRegion', () => {
   it('should create region', () => {
-    const region = BossArenaRegion.create(new SphereArea({ center: Vector.one, radius: 1 }, 'overworld'), {
+    const region = BossArenaRegion.create(new SphereArea({ center: Vec.one, radius: 1 }, 'overworld'), {
       bossName: 'Abc',
     })
 

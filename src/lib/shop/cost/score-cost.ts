@@ -1,10 +1,10 @@
 import { Player } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
-import { t } from 'lib/text'
+import { noI18n } from 'lib/i18n/text'
 import { separateNumberWithDots } from 'lib/util'
 import { Cost } from '../cost'
 
-export class ScoreboardCost extends Cost {
+export abstract class ScoreboardCost extends Cost {
   cost
 
   constructor(cost = 1) {
@@ -13,13 +13,13 @@ export class ScoreboardCost extends Cost {
     this.cost = cost
   }
 
-  scoreboard: import('@minecraft/server').ScoreName = 'money'
+  abstract scoreboard: import('@minecraft/server').ScoreName
 
   emoji = 'N'
 
   color = '§7'
 
-  toString(canBuy = true) {
+  toString(_: Player, canBuy = true) {
     return `${canBuy ? this.color : '§c'}${separateNumberWithDots(this.cost)}${this.emoji}`
   }
 
@@ -35,7 +35,7 @@ export class ScoreboardCost extends Cost {
   failed(player: Player) {
     super.failed(player)
     const have = player.scores[this.scoreboard]
-    return t.error`${have}/${this.cost}${this.emoji}`
+    return noI18n`${have}/${this.cost}${this.emoji}`
   }
 }
 

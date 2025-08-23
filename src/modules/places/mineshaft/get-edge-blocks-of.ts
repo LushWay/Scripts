@@ -1,4 +1,4 @@
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 /**
  * @example
@@ -30,4 +30,4 @@ export const getEdgeBlocksOf = (base: Vector3) =>
     { x: 0, z: 1, y: 0 },
     { x: 1, z: 0, y: 0 },
     { x: 0, z: 0, y: 1 },
-  ].map(e => Vector.add(base, e)) as Vector3[]
+  ].map(e => Vec.add(base, e)) as Vector3[]

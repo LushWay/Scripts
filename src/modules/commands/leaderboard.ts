@@ -2,7 +2,7 @@
 
 import { Player, world } from '@minecraft/server'
 import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
-import { Vector } from 'lib/vector'
+import { Vec } from 'lib/vector'
 
 new Command('leaderboard')
   .setAliases('leaderboards', 'lb')
@@ -15,10 +15,10 @@ new Command('leaderboard')
 function leaderboardMenu(player: Player) {
   const form = new ActionForm('Таблицы лидеров')
 
-  form.addButton('§3Добавить', BUTTON['+'], p => editLeaderboard(p))
+  form.button('§3Добавить', BUTTON['+'], p => editLeaderboard(p))
 
   for (const lb of Leaderboard.all.values()) {
-    form.addButton(info(lb), () => {
+    form.button(info(lb), () => {
       editLeaderboard(player, lb)
     })
   }
@@ -27,7 +27,7 @@ function leaderboardMenu(player: Player) {
 }
 
 function info(lb: Leaderboard) {
-  return lb.info.displayName + '\n' + Vector.string(Vector.floor(lb.info.location))
+  return lb.info.displayName + '\n' + Vec.string(Vec.floor(lb.info.location))
 }
 
 function editLeaderboard(
@@ -54,8 +54,8 @@ function editLeaderboard(
   }
 
   const form = new ActionForm('Таблица лидеров', lb ? info(lb) : '')
-    .addButtonBack(() => leaderboardMenu(player))
-    .addButton(action + 'целевую таблицу' + warn('displayName', 'objective'), () => {
+    .addButtonBack(() => leaderboardMenu(player), player.lang)
+    .button(action + 'целевую таблицу' + warn('displayName', 'objective'), () => {
       new ModalForm('Изменение целевой таблицы')
         .addDropdownFromObject(
           'Выбрать из списка',
@@ -87,14 +87,14 @@ function editLeaderboard(
           },
         )
     })
-    .addButton(action + 'позицию' + warn('location', 'dimension'), () => {
+    .button(action + 'позицию' + warn('location', 'dimension'), () => {
       const dimensions: Record<import('@minecraft/server').ShortcutDimensions, string> = {
         overworld: 'Верхний мир',
         nether: 'Нижний мир',
         end: 'Край',
       }
       new ModalForm('Позиция')
-        .addTextField('Позиция', 'Не изменится', Vector.string(data.location ?? Vector.floor(player.location)))
+        .addTextField('Позиция', 'Не изменится', Vec.string(data.location ?? Vec.floor(player.location)))
         .addDropdownFromObject('Измерение', dimensions, {
           defaultValueIndex: Object.keys(dimensions).findIndex(e => e === player.dimension.type),
         })
@@ -104,7 +104,7 @@ function editLeaderboard(
             if (l.length !== 3 || l.find(isNaN))
               return ctx.error("Неверная локация '" + location + "', ожидался формат 'x y z' с числами")
 
-            const [x, y, z] = l
+            const [x, y, z] = l as [number, number, number]
             data.location = { x, y, z }
           }
           data.dimension = dimension
@@ -112,7 +112,7 @@ function editLeaderboard(
           update()
         })
     })
-    .addButton(action + 'стиль' + warn('style'), () => {
+    .button(action + 'стиль' + warn('style'), () => {
       const styles: Record<keyof (typeof Leaderboard)['styles'], string> = {
         gray: '§7Серый',
         white: '§fБелый',
@@ -128,7 +128,7 @@ function editLeaderboard(
         })
     })
 
-  if (lb) form.addButtonPrompt('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
+  if (lb) form.ask('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
 
   form.show(player)
 }
