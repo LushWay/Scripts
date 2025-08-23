@@ -382,7 +382,7 @@ const tests: Record<
     system.runJob(
       (function* lush() {
         let i = 0
-        for (const vector of Vec.forEach(...Vec.around(ctx.player.location, 5))) {
+        for (const vector of Vec.forEach(...Vec.around(ctx.player.location, size))) {
           i++
           if (i % 100 === 0) yield
 
