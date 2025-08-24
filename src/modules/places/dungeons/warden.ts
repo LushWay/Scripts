@@ -23,6 +23,20 @@ const logger = createLogger('warden')
 class WardenDungeonRegion extends Region {
   protected priority = 3
 
+  protected defaultPermissions: RegionPermissions = {
+    allowedAllItem: true,
+    allowedEntities: PVP_ENTITIES,
+
+    doors: true,
+    gates: true,
+    pvp: true,
+    switches: true,
+    trapdoors: true,
+
+    owners: [],
+    openContainers: false,
+  }
+
   get displayName(): Text | undefined {
     return i18n.nocolor`§5Варден`
   }
@@ -52,7 +66,7 @@ class WardenDungeonLootRegion extends Region {
     trapdoors: true,
 
     owners: [],
-    openContainers: false,
+    openContainers: true,
   }
 
   protected onCreate(): void {
