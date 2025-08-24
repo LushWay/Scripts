@@ -111,6 +111,7 @@ system.runInterval(
     const newRegion = regions.randomElement()
     newRegion.area.forEachVector((location, isIn) => {
       if (!isIn) return
+      if (Vec.distance(location, newRegion.area.center) > newRegion.area.radius) return
       if (Math.randomInt(1, 6) === 1) return
       const below = newRegion.dimension.getBlock(Vec.add(location, Vec.down))
       if (!below || below.isAir) return
