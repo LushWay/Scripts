@@ -115,7 +115,14 @@ export class Npc {
       event.cancel = true
       system.run(() => {
         try {
-          const npc = Npc.npcs.find(e => e.entity?.id === event.target.id)
+          const npcId = event.target.getDynamicProperty(Npc.dynamicPropertyName)
+          const npc = Npc.npcs.find(e => {
+            if (e.entity?.id === event.target.id) return true
+            if (npcId === e.id) {
+              e.entity ??= event.target
+              return true
+            }
+          })
           const component = event.target.getComponent('npc')
           const npcName = component ? component.name : event.target.nameTag
           let nameParsed: RawText | RawMessage | string = { text: npcName }
