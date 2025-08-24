@@ -34,13 +34,18 @@ const db = table<{ enabled: boolean }>('regionBorders', () => ({ enabled: false 
 
 command
   .overload('borders')
-  .executes(ctx => ctx.player.tell(i18n`Borders enabled: ${db.get(ctx.player.id).enabled}`))
+  .executes(ctx => ctx.player.tell(noI18n`Borders enabled: ${db.get(ctx.player.id).enabled}`))
   .boolean('toggle', true)
   .executes((ctx, newValue = !db.get(ctx.player.id).enabled) => {
-    ctx.player.tell(i18n`${db.get(ctx.player.id).enabled} -> ${newValue}`)
+    ctx.player.tell(noI18n`${db.get(ctx.player.id).enabled} -> ${newValue}`)
     ctx.player.database
     db.get(ctx.player.id).enabled = newValue
   })
+
+command.overload('permdebug').executes(ctx => {
+  Region.permissionDebug = !Region.permissionDebug
+  ctx.reply(`Changed to ${Region.permissionDebug}`)
+})
 
 const variables = new MolangVariableMap()
 variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })

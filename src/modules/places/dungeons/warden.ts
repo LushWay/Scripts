@@ -10,6 +10,7 @@ import {
   RegionPermissions,
   registerRegionType,
   registerSaveableRegion,
+  Vec,
 } from 'lib'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
@@ -96,7 +97,9 @@ system.runInterval(
     const newRegion = regions.randomElement()
     newRegion.area.forEachVector((location, isIn) => {
       if (!isIn) return
-      if (Math.randomInt(0, 2) === 1) return
+      if (Math.randomInt(1, 6) === 1) return
+      const below = newRegion.dimension.getBlock(Vec.add(location, Vec.down))
+      if (!below || below.isAir) return
 
       ScheduleBlockPlace.set({
         restoreTime: 0,

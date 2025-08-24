@@ -7,7 +7,9 @@ import {
   PlayerPlaceBlockBeforeEvent,
   world,
 } from '@minecraft/server'
-import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { Items } from 'lib/assets/custom-items'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'
@@ -56,6 +58,7 @@ export function actionGuard(fn: InteractionAllowed, position: ActionGuardOrder) 
 }
 
 export enum ActionGuardOrder {
+  ProjectileUsePrevent = 12,
   // Place action. Interacting with block
   BlockAction = 11,
   // Region member permissions
@@ -90,27 +93,32 @@ actionGuard((player, region, ctx) => {
   if (BLOCK_CONTAINERS.includes(typeId)) return region.permissions.openContainers // allow
 }, ActionGuardOrder.Permission)
 
-const allowed: InteractionAllowed = (player, region, context, regions) => {
-  // Disable bow in regions where allowed entities does not allow spawning arrow or firework
+actionGuard((player, region, context) => {
   if (region && (context.type === 'interactWithEntity' || context.type === 'interactWithBlock')) {
-    const { typeId } = player.mainhand()
-    const { allowedEntities } = region.permissions
+    const { allowedEntities: ent } = region.permissions
 
-    if (
-      (typeId === MinecraftItemTypes.Bow || typeId === MinecraftItemTypes.Crossbow) &&
-      !(
-        allowedEntities === 'all' ||
-        allowedEntities.includes(MinecraftItemTypes.Arrow) ||
-        allowedEntities.includes(MinecraftItemTypes.FireworkRocket)
-      )
-    ) {
-      return false
+    if (ent !== 'all') {
+      const { typeId } = player.mainhand()
+      const arrow = ent.includes(MinecraftItemTypes.Arrow)
+      const firework = ent.includes(MinecraftItemTypes.FireworkRocket)
+
+      if (typeId === MinecraftItemTypes.Bow) return arrow
+      if (typeId === MinecraftItemTypes.Crossbow) return arrow || firework
+      if (typeId === MinecraftItemTypes.EnderPearl) return ent.includes(MinecraftEntityTypes.EnderPearl)
+      if (typeId === MinecraftItemTypes.WindCharge) return ent.includes(MinecraftEntityTypes.WindChargeProjectile)
+      if (typeId === MinecraftItemTypes.Snowball) return ent.includes(MinecraftEntityTypes.Snowball)
+      if (typeId === Items.Fireball) return ent.includes(CustomEntityTypes.Fireball)
     }
   }
+}, ActionGuardOrder.ProjectileUsePrevent)
 
+const allowed: InteractionAllowed = (player, region, context, regions) => {
   //
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
+    if (Region.permissionDebug) {
+      console.log('regionDebug', fn.toString().slice(0, 10), ' ', result)
+    }
     if (typeof result === 'boolean') {
       return result
     }

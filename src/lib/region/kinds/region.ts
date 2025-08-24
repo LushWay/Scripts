@@ -50,6 +50,8 @@ interface RegionConstructor<I extends Region>
 export class Region {
   static readonly kind: string
 
+  static permissionDebug = false
+
   protected static generateRegionKey(kind: string, area: string, radius: number) {
     const date = new Date()
     let key = `${kind}-${area}-${~~radius}-${date.toYYYYMMDD()}-${date.toHHMM()}`
