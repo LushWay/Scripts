@@ -102,6 +102,7 @@ export async function smoothVoxelData(
         const sizeX = voxelDataCopy.length
         const sizeY = voxelDataCopy[0]?.length ?? 0
         const sizeZ = voxelDataCopy[0]?.[0]?.length ?? 0
+        let i = 0
         for (let smooth = 0; smooth <= smoothLevel; smooth++) {
           // Apply smoothing
           for (let x = 1; x < sizeX - 1; x++) {
@@ -128,7 +129,12 @@ export async function smoothVoxelData(
                     }
                   }
                 }
-                yield
+
+                i++
+                if (i === 2) {
+                  i = 0
+                  yield
+                }
 
                 // If the sum is greater than the number of surrounding voxels / 2, set the voxel to solid
                 if (sum > 13 && cache.void) {
