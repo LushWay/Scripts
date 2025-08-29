@@ -12,7 +12,7 @@ const base = new Loot('base_airdrop')
   .weight('20%')
 
   .item('CookedBeef')
-  .amount({ '30...64': '40%', '65...128': '2%' })
+  .amount({ '25...50': '40%', '50...90': '2%' })
   .weight('20%')
 
   .itemStack(CannonShellItem.blueprint)

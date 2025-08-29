@@ -9,12 +9,12 @@ import { BaseItem } from '../base/base'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)
-  .weight('1%')
+  .weight('5%')
 
   .item('Apple')
-  .weight('5%')
+  .weight('10%')
   .amount({
-    '5...20': '1%',
+    '3...8': '1%',
   })
 
   .item(Items.Money)
@@ -25,23 +25,29 @@ const defaultLoot = new Loot('dungeon_default_loot')
   })
 
   .itemStack(FireBallItem)
-  .weight('10%')
+  .weight('20%')
   .amount({
     '10...32': '1%',
   })
 
   .itemStack(IceBombItem)
-  .weight('10%')
+  .weight('20%')
   .amount({
     '10...32': '1%',
   })
 
   .item('BakedPotato')
+  .weight('20%')
+  .amount({
+    '5...15': '1%',
+  })
+
+  .item('PoisonousPotato')
   .weight('10%')
   .amount({
-    '5...10': '80%',
-    '11...30': '20%',
+    '1...3': '1%',
   })
+
   .trash({ web: 3, string: 1 }).build
 
 const d = StructureDungeonsId

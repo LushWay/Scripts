@@ -22,8 +22,8 @@ export default new Loot('starter')
   .item('CookedBeef')
   .weight('100%')
   .amount({
-    '10...30': '50%',
-    '31...64': '10%',
+    '10...20': '50%',
+    '21...32': '10%',
   })
 
   .item(Items.Money)
