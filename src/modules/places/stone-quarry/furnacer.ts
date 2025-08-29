@@ -170,7 +170,7 @@ actionGuard((player, region, ctx) => {
   const entries = player.container?.slotEntries().sort((a, b) => (a[0] === player.selectedSlotIndex ? 1 : -1)) ?? []
   for (const [index, slot] of entries) {
     const result = tryItem(slot)
-    if (result === dontOpenFurnaceDialog || result) {
+    if (result === dontOpenFurnaceDialog || result === true) {
       player.info(i18n`Использован ключ из слота ${index}`)
       return result === dontOpenFurnaceDialog ? false : true
     } else if (typeof result === 'function') lastError = result

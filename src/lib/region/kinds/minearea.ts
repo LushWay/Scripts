@@ -63,33 +63,35 @@ export class MineareaRegion extends RegionWithStructure {
   async restoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
     if (this.restoringStructurePromise) return this.restoringStructurePromise
 
-    this.restoringStructurePromise = new Promise((resolve, reject) => {
-      const restoredRegions: MineareaRegion[] = []
-      this.area
-        .forEachVector(async (vector, isIn) => {
-          if (!isIn) return
-
-          for (const region of MineareaRegion.getManyAt({ location: vector, dimensionType: this.dimensionType })) {
-            // Prevent from region save conflicts
-            if (!restoredRegions.includes(region) && region !== this) {
-              restoredRegions.push(region)
-              await region.structure.place()
-            }
-          }
-
-          this.restoringStructureProgress++
-          eachVectorCallback?.(vector)
-        }, 500)
-        .then(() => {
-          this.deleteSchedules()
-          resolve(restoredRegions)
-        })
-        .finally(() => (this.restoringStructureProgress = 0))
-        .catch((e: unknown) => reject(e as Error))
-    })
+    this.restoringStructurePromise = this.internalRestoreStructure(eachVectorCallback)
     const result = await this.restoringStructurePromise
     delete this.restoringStructurePromise
     return result
+  }
+
+  private async internalRestoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
+    const restoredRegions: MineareaRegion[] = []
+    try {
+      await this.area.forEachVector(async (vector, isIn) => {
+        if (!isIn) return
+
+        for (const region of MineareaRegion.getManyAt({ location: vector, dimensionType: this.dimensionType })) {
+          // Prevent from region save conflicts
+          if (!restoredRegions.includes(region) && region !== this) {
+            restoredRegions.push(region)
+            await region.structure.place()
+          }
+        }
+
+        this.restoringStructureProgress++
+        eachVectorCallback?.(vector)
+      }, 500)
+
+      this.deleteSchedules()
+      return restoredRegions
+    } finally {
+      this.restoringStructureProgress = 0
+    }
   }
 
   deleteSchedules() {
