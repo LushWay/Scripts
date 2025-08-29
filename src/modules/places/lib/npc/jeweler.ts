@@ -17,6 +17,7 @@ export class Jeweler extends ShopNpc {
         .dynamicCostItem(i.GoldIngot)
         .dynamicCostItem(i.Diamond)
         .dynamicCostItem(i.Emerald)
+        .dynamicCostItem(i.Redstone)
     })
   }
 }
