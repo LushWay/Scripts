@@ -70,6 +70,7 @@ export class Mage extends ShopNpc {
           const ench = this.createEnch(form, item, slot, player)
           const enchs = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
 
+          ench(e.Unbreaking, level => new MultiCost().money(level * 30).xp(level * enchs))
           ench(e.Protection, level => new MultiCost().money(level * 20).xp(level * enchs))
           ench(e.ProjectileProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
           ench(e.FireProtection, level => new MultiCost().money(level * 20).xp(level * enchs))
