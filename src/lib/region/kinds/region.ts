@@ -72,6 +72,8 @@ export class Region {
   ): InstanceType<T> {
     if (this !== Region && this.regions === Region.regions) this.regions = []
 
+    if (!area.isValid()) throw new Error('Area ' + area.toString() + 'is invalid')
+
     const region = new this(area, options, key ?? this.generateRegionKey(this.kind, area.type, area.radius))
     this.regions.push(region)
     if (this !== Region) Region.regions.push(region)

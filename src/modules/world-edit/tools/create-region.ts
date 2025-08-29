@@ -63,12 +63,17 @@ class RegionTool extends WorldEditTool<Storage> {
 
     const regions = storage.minDistanceSameKind ? regionType.region.getAll() : Region.regions
     if (storage.minDistance !== -1 && regions.some(r => r.area.isNear(player, storage.minDistance)))
-      return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.High)
+      return player.onScreenDisplay.setActionBar(noI18n`§7Рядом другие регионы`, ActionbarPriority.High)
 
-    const create = () =>
-      regionType.region.create(
-        new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type),
-      )
+    const area = new SphereArea({ center: player.location, radius: storage.radius }, player.dimension.type)
+
+    if (!area.isValid()) {
+      const msg = noI18n.error`Area ${area.toString()} is invalid. Maybe too near to the world borders?`
+      player.onScreenDisplay.setActionBar(msg, ActionbarPriority.High)
+      return player.fail(msg)
+    }
+
+    const create = () => regionType.region.create(area)
 
     const region = create()
     const we = WorldEdit.forPlayer(player)

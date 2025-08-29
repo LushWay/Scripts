@@ -57,7 +57,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
   isValid() {
     const [min, max] = this.edges
-    return min.y > this.dimension.heightRange.min && max.y < this.dimension.heightRange.max
+    return min.y >= this.dimension.heightRange.min && max.y <= this.dimension.heightRange.max
   }
 
   /** Edges of the area */
