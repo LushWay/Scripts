@@ -1,5 +1,5 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
@@ -55,6 +55,11 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     return this.isNear(point, 0)
   }
 
+  isValid() {
+    const [min, max] = this.edges
+    return min.y > this.dimension.heightRange.min && max.y < this.dimension.heightRange.max
+  }
+
   /** Edges of the area */
   abstract get edges(): [min: Vector3, max: Vector3]
 
@@ -64,7 +69,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   abstract isNear(point: AbstractPoint, distance: number): boolean
 
   toString() {
-    return i18n`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
+    return noI18n`${Vec.string(Vec.floor(this.center), true)} radius=${Math.floor(this.radius)}`
   }
 
   abstract getFormDescription(): Text.Table

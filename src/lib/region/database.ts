@@ -2,7 +2,7 @@ import { system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { deepClone } from 'lib/database/defaults'
 import { EventLoader } from 'lib/event-signal'
-import { i18n } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { Area } from './areas/area'
 import './areas/cut'
 import { SphereArea } from './areas/sphere'
@@ -88,13 +88,18 @@ export function restoreRegionFromJSON([key, regionImmutable]: [string, Immutable
   const kind = kinds.find(e => e.kind === region.k)
   if (!kind) {
     console.warn(
-      i18n`[Region][Database] No kind found for ${region.k}. Available kinds: ${kinds.map(e => e.kind).join(', ')}. Maybe you forgot to register kind or import file?`,
+      noI18n`[Region][Database] No kind found for ${region.k}. Available kinds: ${kinds.map(e => e.kind).join(', ')}. Maybe you forgot to register kind or import file?`,
     )
     return
   }
 
   const area = Area.fromJson(region.a)
   if (!area) return
+
+  if (!area.isValid()) {
+    console.warn('[Region][Database] Area', area.toString(), 'is invalid')
+    return
+  }
 
   return kind.create(area, region, key)
 }
