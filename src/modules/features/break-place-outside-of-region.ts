@@ -21,7 +21,7 @@ function youCannot(player: Player) {
         i18n.error`Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи`.to(
           player.lang,
         ),
-        ActionbarPriority.Highest,
+        ActionbarPriority.High,
       ),
     )
   }

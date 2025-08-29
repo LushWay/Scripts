@@ -99,7 +99,7 @@ class DebugStick extends WorldEditTool<StorageSchema> {
       if (stateNames.length === 1)
         return player.onScreenDisplay.setActionBar(
           noI18n.error`Block ${block.typeId} has only one state`,
-          ActionbarPriority.Highest,
+          ActionbarPriority.High,
         )
 
       const nextStateName = nextValue(stateNames, stateName)

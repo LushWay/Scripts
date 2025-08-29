@@ -222,7 +222,7 @@ const tests: Record<
 
     player.onScreenDisplay.setActionBar(
       noI18n`Radius: ${lore.radius} Blending: ${lore.blending} Factor: ${lore.factor}`,
-      ActionbarPriority.Highest,
+      ActionbarPriority.High,
     )
 
     for (const vector of Vec.forEach(from, to)) {

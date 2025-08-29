@@ -3,6 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import {
   actionGuard,
   ActionGuardOrder,
+  disableAdventureNear,
   fromMsToTicks,
   ms,
   PVP_ENTITIES,
@@ -79,6 +80,7 @@ class WardenDungeonLootRegion extends Region {
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
 registerRegionType(noI18n`Лут данжа вардена`, WardenDungeonLootRegion)
+disableAdventureNear.push(WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {
   if (region instanceof WardenDungeonLootRegion) {

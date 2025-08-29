@@ -118,7 +118,7 @@ system.runPlayerInterval(
 
     player.onScreenDisplay.setActionBar(
       noI18n`rotation: ${rotation} size: ${Vec.subtract(from, to)}\nfrom: ${from} to: ${to}`,
-      ActionbarPriority.Highest,
+      ActionbarPriority.High,
     )
   },
   'dungeon place',

@@ -26,15 +26,18 @@ actionGuard((player, _, ctx) => {
   if (!durability) return
 
   const { damage, maxDurability } = durability
+
   const percent = (damage / maxDurability) * 100
 
-  if (settings.breakItemDurabilityCancel && percent >= 99) return false
-
-  system.delay(() => {
-    if (percent >= 90)
+  if (percent >= 90)
+    system.delay(() => {
       player.onScreenDisplay.setActionBar(
         i18n.error`Инструмент скоро сломается! ${damage}/${maxDurability} (${percent}%)`.to(player.lang),
         ActionbarPriority.Highest,
       )
-  })
+    })
+
+  if (settings.breakItemDurabilityCancel && maxDurability >= damage + 1) {
+    return false
+  }
 }, ActionGuardOrder.Feature)

@@ -285,7 +285,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   private static create(this: void, tool: WorldEditTool, player: Player) {
     if (tool.editToolForm) {
       tool.editToolForm(player.mainhand(), player)
-    } else player.onScreenDisplay.setActionBar('§cИспользуй .we', ActionbarPriority.Highest)
+    } else player.onScreenDisplay.setActionBar('§cИспользуй .we', ActionbarPriority.High)
   }
 
   private static intervalsJob() {

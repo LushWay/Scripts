@@ -50,7 +50,7 @@ export class RadioactiveZone {
 
           if (distance > rad) {
             sound(2, 2)
-            player.onScreenDisplay.setActionBar(i18n.warn`Высокая радиация!`.to(player.lang), ActionbarPriority.Highest)
+            player.onScreenDisplay.setActionBar(i18n.warn`Высокая радиация!`.to(player.lang), ActionbarPriority.High)
             player.addEffect(MinecraftEffectTypes.Poison, 10 * TicksPerSecond, { showParticles: true, amplifier: 1 })
           }
 
@@ -59,7 +59,7 @@ export class RadioactiveZone {
             played = true
             player.onScreenDisplay.setActionBar(
               i18n.error`Очень высокая радиация!`.to(player.lang),
-              ActionbarPriority.Highest,
+              ActionbarPriority.High,
             )
             player.applyDamage(2, { cause: EntityDamageCause.magic })
             if (!player.getEffects().find(e => e.typeId === MinecraftEffectTypes.Darkness))

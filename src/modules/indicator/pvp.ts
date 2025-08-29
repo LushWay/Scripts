@@ -216,14 +216,14 @@ function onDamage(
           // Player
           damagingEntity.onScreenDisplay.setActionBar(
             `${isBow ? emoji.custom.kill : emoji.custom.kill} ${hurtEntity.name}`,
-            ActionbarPriority.Highest,
+            ActionbarPriority.High,
           )
         } else {
           // Entity
           const entityName = hurtEntity.typeId.replace('minecraft:', '')
           damagingEntity.onScreenDisplay.setActionBar(
             { rawtext: [{ text: emoji.custom.kill + ' ' }, { translate: `entity.${entityName}.name` }] },
-            ActionbarPriority.Highest,
+            ActionbarPriority.High,
           )
         }
       }

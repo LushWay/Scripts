@@ -59,14 +59,11 @@ class RegionTool extends WorldEditTool<Storage> {
 
     const regionType = regionTypes.find(e => e.region.kind === storage.regionKind)
     if (!regionType)
-      return player.onScreenDisplay.setActionBar(
-        `§cUnknown region type: ${storage.regionKind}`,
-        ActionbarPriority.Highest,
-      )
+      return player.onScreenDisplay.setActionBar(`§cUnknown region type: ${storage.regionKind}`, ActionbarPriority.High)
 
     const regions = storage.minDistanceSameKind ? regionType.region.getAll() : Region.regions
     if (storage.minDistance !== -1 && regions.some(r => r.area.isNear(player, storage.minDistance)))
-      return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.Highest)
+      return player.onScreenDisplay.setActionBar(`§7Рядом другие регионы`, ActionbarPriority.High)
 
     const create = () =>
       regionType.region.create(
@@ -85,7 +82,7 @@ class RegionTool extends WorldEditTool<Storage> {
 
     const msg = noI18n`§aРегион создан!`
     player.success(msg)
-    player.onScreenDisplay.setActionBar(msg, ActionbarPriority.Highest)
+    player.onScreenDisplay.setActionBar(msg, ActionbarPriority.High)
   }
 }
 

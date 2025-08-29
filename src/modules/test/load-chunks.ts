@@ -72,7 +72,7 @@ new Command('chunkload')
 
       player.onScreenDisplay.setActionBar(
         noI18n`Loaded ${i}/${chunks.length} ${(i / chunks.length) * 100}% chunks ${new Vec(x, y, z)}\nSpeed: ${speedText}/chunk, remaining: ${noI18n.hhmmss(eta)} elapsed: ${noI18n.hhmmss(took)}`,
-        ActionbarPriority.Highest,
+        ActionbarPriority.High,
       )
     }
 

@@ -121,10 +121,7 @@ class ShovelTool extends WorldEditTool<Storage> {
         if (item?.typeId === this.typeId && this.isLookingUp(player)) {
           const lookingUp = this.isLookingUp(player)
           if (lookingUp)
-            return player.onScreenDisplay.setActionBar(
-              'Лопата выключена,\nможно настраивать',
-              ActionbarPriority.Highest,
-            )
+            return player.onScreenDisplay.setActionBar('Лопата выключена,\nможно настраивать', ActionbarPriority.High)
         }
       }
     })
@@ -153,7 +150,7 @@ class ShovelTool extends WorldEditTool<Storage> {
 
     const permutations = getBlocksInSet(storage.blocksSet)
     if (!permutations.length)
-      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.Highest)
+      return player.onScreenDisplay.setActionBar('§cНабор блоков лопаты пустой!', ActionbarPriority.High)
 
     const { offset, radius, height } = storage
     const replaceTargets = getReplaceTargets(storage.replaceBlocksSet)
