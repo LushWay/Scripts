@@ -28,10 +28,10 @@ export function build() {
                   .fork('tools/build.ts', args, {
                     cwd,
                     stdio: 'inherit',
-                    execArgv: ['--no-warnings', '--experimental-strip-types'],
+                    execArgv: ['--no-warnings', '--experimental-strip-types', '--experimental-transform-types'],
                   })
                   .on('message', message => {
-                    if (message === 'ready') onReady(build.outfile(outdir)), resolve(p)
+                    if (message === 'ready') (onReady(build.outfile(outdir)), resolve(p))
                     if (Array.isArray(message) && message[0] === 'reload' && typeof message[1] === 'string')
                       onReload?.(message[1])
                   })

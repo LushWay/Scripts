@@ -16,6 +16,8 @@ export class Gunsmith extends ShopNpc {
     this.shop.body(() => i18n`Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.`)
 
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.ChippedAnvil, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.DamagedAnvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
 
     this.shop.menu((form, player) => {

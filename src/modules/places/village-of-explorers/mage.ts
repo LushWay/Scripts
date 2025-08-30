@@ -29,6 +29,8 @@ export class Mage extends ShopNpc {
 
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.ChippedAnvil, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.DamagedAnvil, this.place.name)
 
     this.shop.body(() => i18n`Чего пожелаешь?`)
     this.shop.menu((form, player) => {
