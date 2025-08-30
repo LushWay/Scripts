@@ -37,7 +37,7 @@ actionGuard((player, _, ctx) => {
       )
     })
 
-  if (settings.breakItemDurabilityCancel && maxDurability >= damage + 1) {
+  if (settings.breakItemDurabilityCancel && damage + 1 >= maxDurability) {
     return false
   }
 }, ActionGuardOrder.Feature)
