@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { MinecraftItemTypes as i, MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { MinecraftItemTypes as i, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { translateTypeId } from 'lib'
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
@@ -56,10 +56,28 @@ export class Gunsmith extends ShopNpc {
 
             const enchantmentsLevels = item.enchantable?.getEnchantments().reduce((p, c) => p + c.level, 1) ?? 1
             const repairCost = ((item.durability.damage / 1000) * enchantmentsLevels) / 5
+
+            let type = MinecraftItemTypes.Cobblestone
+            let amount = 1
+            let money = 1
+
+            for (const [substr, itemType, itemAmount, itemMoney] of [
+              ['iron', MinecraftItemTypes.IronIngot, 1, 10],
+              ['gold', MinecraftItemTypes.GoldIngot, 1, 10],
+              ['diamond', MinecraftItemTypes.Diamond, 2, 100],
+              ['netherite', MinecraftItemTypes.NetheriteIngot, 1, 500],
+            ] as const) {
+              if (item.typeId.includes(substr)) {
+                type = itemType
+                money = itemMoney
+                amount = itemAmount
+              }
+            }
+
             const cost =
               item.durability.damage === 0
                 ? ErrorCost(i18n.error`Предмет целый, выберите другой`)
-                : new MultiCost().xp(repairCost)
+                : new MultiCost().xp(repairCost).item(type, amount).money(money)
 
             form
               .product()
