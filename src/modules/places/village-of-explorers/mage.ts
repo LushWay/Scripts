@@ -149,7 +149,7 @@ export class Mage extends ShopNpc {
       )
 
       form.section(i18n`Оружие со способностями`, (form, player) => {
-        const cost = new MultiCost().item(i.DiamondSword).item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10000)
+        const cost = new MultiCost().item(i.LapisLazuli, 100).item(i.Redstone, 100).money(10000)
         form
           .product()
           .name(i18nShared.nocolor`§r§fМеч со способностью §7${ItemAbility.names[ItemAbility.Ability.Vampire]}`)
