@@ -3,7 +3,6 @@ import { enchantData } from 'lib/assets/texture-data'
 import { ChestForm } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
 import { langToken, translateEnchantment, translateToken } from 'lib/i18n/lang'
-import { Message } from 'lib/i18n/message'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
 export type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
@@ -11,8 +10,8 @@ export type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
 export const eqSlots = [
   EquipmentSlot.Head,
   EquipmentSlot.Chest,
-  EquipmentSlot.Feet,
   EquipmentSlot.Legs,
+  EquipmentSlot.Feet,
   EquipmentSlot.Offhand,
 ]
 
