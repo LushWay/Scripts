@@ -295,7 +295,7 @@ export class Boss {
         const player = players.find(e => e.id === playerId)
         if (!player) return
 
-        givePlayerMoneyAndXp(player, ~~(damage * 10), ~~(damage / 4))
+        givePlayerMoneyAndXp(player, ~~(damage * 5), ~~(damage / 6))
         player.scores.pvp = 0
       }
       this.damage.clear()
