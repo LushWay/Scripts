@@ -28,6 +28,7 @@
 
         // Entity specific options
         "minecraft:behavior.nearest_attackable_target": {
+          "reselect_targets": true,
           "priority": 3,
           "entity_types": [
             {
