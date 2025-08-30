@@ -1,6 +1,5 @@
 import { Player } from '@minecraft/server'
 import { Sounds as CustomSounds, Sounds } from 'lib/assets/custom-sounds'
-import { Message } from 'lib/i18n/message'
 import { i18n } from 'lib/i18n/text'
 
 export enum CostType {
@@ -51,6 +50,7 @@ export abstract class Cost<T = unknown> {
    * @param player - Buyer
    */
   take(player: Player): T {
+    if (!this.has(player)) throw new Error('Dont have a cost')
     if (this.type === CostType.Action) player.playSound(CustomSounds.Pay)
     return undefined as T
   }
