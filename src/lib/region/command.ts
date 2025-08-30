@@ -42,10 +42,13 @@ command
     db.get(ctx.player.id).enabled = newValue
   })
 
-command.overload('permdebug').executes(ctx => {
-  Region.permissionDebug = !Region.permissionDebug
-  ctx.reply(`Changed to ${Region.permissionDebug}`)
-})
+command
+  .overload('permdebug')
+  .setPermissions('everybody')
+  .executes(ctx => {
+    Region.permissionDebug = !Region.permissionDebug
+    ctx.reply(`Changed to ${Region.permissionDebug}`)
+  })
 
 const variables = new MolangVariableMap()
 variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })

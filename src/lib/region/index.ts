@@ -14,6 +14,7 @@ import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'
 import { onPlayerMove } from 'lib/player-move'
+import { is } from 'lib/roles'
 import { isNotPlaying } from 'lib/utils/game'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
@@ -117,7 +118,8 @@ const allowed: InteractionAllowed = (player, region, context, regions) => {
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
     if (Region.permissionDebug) {
-      console.log('regionDebug', fn.toString().slice(0, 10), ' ', result)
+      if (is(player.id, 'techAdmin')) console.log('regionDebug', fn.toString().slice(0, 10), ' ', result)
+      player.info(`regionDebug ${fn.toString().slice(0, 10).replaceAll('\n', ' ')} ${result}`)
     }
     if (typeof result === 'boolean') {
       return result
