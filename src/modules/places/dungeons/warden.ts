@@ -13,12 +13,13 @@ import {
   registerSaveableRegion,
   Vec,
 } from 'lib'
+import { form } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { rollChance } from 'lib/rpg/random'
 import { createLogger } from 'lib/utils/logger'
+import { BaseItem } from '../base/base'
 
-// TODO Add chest generation
 const logger = createLogger('warden')
 
 class WardenDungeonRegion extends Region {
@@ -132,8 +133,11 @@ system.runInterval(
 
       if (!region.ldb.cleaned) {
         region.ldb.cleaned = true
-        for (const block of region.ldb.blocks) {
-          region.dimension.setBlockType(block, MinecraftBlockTypes.Air)
+        for (const location of region.ldb.blocks) {
+          const block = region.dimension.getBlock(location)
+          const container = block?.getComponent('inventory')?.container
+          if (container) container.clearAll()
+          block?.setType(MinecraftBlockTypes.Air)
         }
         region.ldb.blocks = []
         region.save()
@@ -145,15 +149,22 @@ system.runInterval(
       region.area.forEachVector((location, isIn) => {
         if (!isIn) return
         if (Vec.distance(location, region.area.center) > region.area.radius) return
-        if (!rollChance(90)) return
 
         const below = region.dimension.getBlock(Vec.add(location, Vec.down))
         if (!below || below.isAir) return
 
+        let chance = 50
+        if (below.typeId === MinecraftBlockTypes.AncientDebris) chance -= 20
+        else if (below.typeId === MinecraftBlockTypes.Chest) chance = 100
+
         if (!chest && rollChance(10)) {
           chest = true
-          region.dimension.setBlockType(location, MinecraftBlockTypes.Chest)
+          const block = region.dimension.getBlock(location)
+          block?.setType(MinecraftBlockTypes.Chest)
+          const container = block?.getComponent('inventory')?.container
+          if (container) container.setItem(15, BaseItem.blueprint)
         } else {
+          if (chance !== 100 && !rollChance(chance)) return
           region.dimension.setBlockType(location, MinecraftBlockTypes.AncientDebris)
         }
         region.ldb.blocks.push(location)
@@ -164,3 +175,21 @@ system.runInterval(
   'wardenDungeonUpdateLoot',
   fromMsToTicks(ms.from('sec', 3)),
 )
+
+const cmd = new Command('warden').setPermissions('techAdmin').executes(ctx => {
+  ctx.player.teleport(WardenDungeonRegion.getAll()[0]?.area.center ?? ctx.player.location)
+  ctx.reply('Tp to location')
+})
+
+const lootForm = form((f, { player }) => {
+  f.title('loot')
+  for (const region of WardenDungeonLootRegion.getAll().sort((a, b) =>
+    a.ldb.selected && b.ldb.selected ? 0 : a.ldb.selected && !b.ldb.selected ? 1 : -1,
+  )) {
+    f.button((region.ldb.selected ? '§aA!§r ' : '') + region.area.toString(), () => {
+      player.teleport(region.area.center)
+    })
+  }
+})
+
+cmd.overload('loot').executes(lootForm.command)
