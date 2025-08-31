@@ -162,5 +162,5 @@ system.runInterval(
     }
   },
   'wardenDungeonUpdateLoot',
-  fromMsToTicks(ms.from('min', 1)),
+  fromMsToTicks(ms.from('sec', 3)),
 )
