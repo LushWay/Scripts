@@ -1,5 +1,5 @@
 import { system } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import {
   actionGuard,
   ActionGuardOrder,
@@ -27,7 +27,7 @@ class WardenDungeonRegion extends Region {
 
   protected defaultPermissions: RegionPermissions = {
     allowedAllItem: true,
-    allowedEntities: PVP_ENTITIES,
+    allowedEntities: [...PVP_ENTITIES, MinecraftEntityTypes.Warden],
 
     doors: true,
     gates: true,
