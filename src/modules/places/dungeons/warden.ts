@@ -15,7 +15,7 @@ import {
 } from 'lib'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
-import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { rollChance } from 'lib/rpg/random'
 import { createLogger } from 'lib/utils/logger'
 
 // TODO Add chest generation
@@ -46,6 +46,8 @@ registerSaveableRegion('wardenDungeon', WardenDungeonRegion)
 registerRegionType(noI18n`Данж вардена`, WardenDungeonRegion)
 
 interface LinkedDatabase extends JsonObject {
+  selected: boolean
+  cleaned: boolean
   blocks: { x: number; y: number; z: number }[]
 }
 
@@ -54,7 +56,7 @@ class WardenDungeonLootRegion extends Region {
   get displayName(): Text | undefined {
     return i18n.nocolor`§dНезеритовая жила`
   }
-  ldb: LinkedDatabase = { blocks: [] }
+  ldb: LinkedDatabase = { selected: false, blocks: [], cleaned: false }
 
   protected defaultPermissions: RegionPermissions = {
     allowedAllItem: true,
@@ -93,40 +95,70 @@ actionGuard((player, region, ctx) => {
 
 system.runInterval(
   () => {
-    const regions = WardenDungeonLootRegion.getAll()
+    let regions = WardenDungeonLootRegion.getAll()
     if (!regions.length) return
 
     const dungeonRegions = WardenDungeonRegion.getAll()
     if (!dungeonRegions[0] || !anyPlayerNearRegion(dungeonRegions[0], 20)) return
 
-    const placedBefore = regions.find(e => !!e.ldb.blocks.length)
+    regions.forEach(e => ((e.ldb.selected = false), (e.ldb.cleaned = false), e.save()))
 
-    if (placedBefore) {
-      for (const location of placedBefore.ldb.blocks) {
-        if (!ScheduleBlockPlace.deleteAt(location, placedBefore.dimensionType))
-          ScheduleBlockPlace.setAir(location, placedBefore.dimensionType, 0)
-      }
-      placedBefore.ldb.blocks = []
-      placedBefore.save()
+    const percent = 50
+    const amount = Math.floor(regions.length * (percent / 100))
+
+    const selectedRegions: WardenDungeonLootRegion[] = []
+    while (selectedRegions.length <= amount) {
+      const newRegion = regions.randomElement()
+      regions = regions.filter(e => e !== newRegion)
+      newRegion.ldb.selected = true
+      selectedRegions.push(newRegion)
     }
+  },
+  'wardenDungeonUpdateLoot',
+  fromMsToTicks(ms.from('min', 1)),
+)
 
-    const newRegion = regions.randomElement()
-    newRegion.area.forEachVector((location, isIn) => {
-      if (!isIn) return
-      if (Vec.distance(location, newRegion.area.center) > newRegion.area.radius) return
-      if (Math.randomInt(1, 6) === 1) return
-      const below = newRegion.dimension.getBlock(Vec.add(location, Vec.down))
-      if (!below || below.isAir) return
+system.runInterval(
+  () => {
+    const regions = WardenDungeonLootRegion.getAll().slice()
+    if (!regions.length) return
 
-      ScheduleBlockPlace.set({
-        restoreTime: 0,
-        dimension: newRegion.dimensionType,
-        typeId: MinecraftBlockTypes.AncientDebris,
-        location,
-      })
-      newRegion.ldb.blocks.push(location)
-      newRegion.save()
-    }, 1000)
+    const dungeonRegions = WardenDungeonRegion.getAll()
+    if (!dungeonRegions[0] || !anyPlayerNearRegion(dungeonRegions[0], 20)) return
+
+    for (const region of regions) {
+      if (!anyPlayerNearRegion(region, 10)) continue
+
+      if (!region.ldb.cleaned) {
+        region.ldb.cleaned = true
+        for (const block of region.ldb.blocks) {
+          region.dimension.setBlockType(block, MinecraftBlockTypes.Air)
+        }
+        region.ldb.blocks = []
+        region.save()
+      }
+
+      if (!region.ldb.selected || region.ldb.blocks.length) continue
+
+      let chest = false
+      region.area.forEachVector((location, isIn) => {
+        if (!isIn) return
+        if (Vec.distance(location, region.area.center) > region.area.radius) return
+        if (!rollChance(90)) return
+
+        const below = region.dimension.getBlock(Vec.add(location, Vec.down))
+        if (!below || below.isAir) return
+
+        if (rollChance(10)) {
+          chest = true
+          region.dimension.setBlockType(location, MinecraftBlockTypes.Chest)
+        } else {
+          region.dimension.setBlockType(location, MinecraftBlockTypes.AncientDebris)
+        }
+        region.ldb.blocks.push(location)
+        region.save()
+      }, 1000)
+    }
   },
   'wardenDungeonUpdateLoot',
   fromMsToTicks(ms.from('min', 1)),
