@@ -111,6 +111,7 @@ system.runInterval(
       const newRegion = regions.randomElement()
       regions = regions.filter(e => e !== newRegion)
       newRegion.ldb.selected = true
+      console.log('Debris select', Vec.string(newRegion.area.center, false))
       selectedRegions.push(newRegion)
     }
   },
@@ -149,7 +150,7 @@ system.runInterval(
         const below = region.dimension.getBlock(Vec.add(location, Vec.down))
         if (!below || below.isAir) return
 
-        if (rollChance(10)) {
+        if (!chest && rollChance(10)) {
           chest = true
           region.dimension.setBlockType(location, MinecraftBlockTypes.Chest)
         } else {
