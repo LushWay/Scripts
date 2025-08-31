@@ -1,4 +1,5 @@
 import { Player, world } from '@minecraft/server'
+import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
@@ -8,7 +9,6 @@ import { is } from 'lib/roles'
 import { noNullable } from 'lib/util'
 import { Vec } from 'lib/vector'
 import { Quest } from './quest'
-import { EventSignal } from 'lib'
 
 const quest = new Command('q')
   .setAliases('quest')
