@@ -500,7 +500,7 @@ export class Player extends Entity {
   nameTag = this.name
   playSound = vi.fn()
 
-  private gamemode: GameMode = GameMode.survival
+  private gamemode: GameMode = GameMode.Survival
   getGameMode() {
     return this.gamemode
   }
@@ -799,10 +799,10 @@ export class Dimension {
 }
 
 export enum GameMode {
-  adventure = 'adventure',
-  creative = 'creative',
-  spectator = 'spectator',
-  survival = 'survival',
+  Adventure = 'Adventure',
+  Creative = 'Creative',
+  Spectator = 'Spectator',
+  Survival = 'Survival',
 }
 
 export class ContainerSlot {

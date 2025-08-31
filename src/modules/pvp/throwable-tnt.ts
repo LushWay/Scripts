@@ -8,7 +8,7 @@ import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entiti
 const cooldown = new Cooldown(ms.from('sec', 3))
 
 export function decreaseMainhandItemCount(player: Player) {
-  if (player.getGameMode() === GameMode.creative) return
+  if (player.getGameMode() === GameMode.Creative) return
 
   const slot = player.mainhand()
   if (slot.amount === 1) slot.setItem(undefined)
@@ -38,6 +38,6 @@ world.beforeEvents.itemUse.subscribe(event => {
 })
 
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
-  if (event.permutationBeingPlaced.type.id !== MinecraftBlockTypes.Tnt) return
+  if (event.permutationToPlace.type.id !== MinecraftBlockTypes.Tnt) return
   if (!event.player.isSneaking) event.cancel = true
 })

@@ -1,5 +1,6 @@
 import {
   Entity,
+  GameMode,
   LocationInUnloadedChunkError,
   PlayerInteractWithEntityBeforeEvent,
   RawMessage,
@@ -110,7 +111,7 @@ export class Npc {
   static {
     world.beforeEvents.playerInteractWithEntity.subscribe(event => {
       if (event.target.typeId !== MinecraftEntityTypes.Npc) return
-      if (event.player.isGamemode('creative') && event.player.isSneaking) return
+      if (event.player.getGameMode() === GameMode.Creative && event.player.isSneaking) return
 
       event.cancel = true
       system.run(() => {

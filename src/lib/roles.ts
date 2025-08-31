@@ -124,9 +124,9 @@ export function setRole(player: Player | string, role: Role): void {
 Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
   if (!player) return
   if (newRole === 'spectator') {
-    player.setGameMode(GameMode.spectator)
+    player.setGameMode(GameMode.Spectator)
   } else if (oldRole === 'spectator') {
-    player.setGameMode(GameMode.survival)
+    player.setGameMode(GameMode.Survival)
   }
 })
 
@@ -135,7 +135,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   if (player.isSimulated()) return
   if (initialSpawn) {
     if (player.database.role === 'spectator') {
-      player.setGameMode(GameMode.spectator)
+      player.setGameMode(GameMode.Spectator)
     }
   }
 })

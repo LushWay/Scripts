@@ -201,8 +201,8 @@ expand(Player.prototype, {
 
     // We need to switch player to gamemode where we can apply damage to them
     const been = this.getGameMode()
-    const damageable = been === GameMode.survival || been === GameMode.adventure
-    if (!damageable) this.setGameMode(GameMode.survival)
+    const damageable = been === GameMode.Survival || been === GameMode.Adventure
+    if (!damageable) this.setGameMode(GameMode.Survival)
 
     const equippable = this.getComponent('equippable')
     const damages =

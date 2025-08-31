@@ -110,8 +110,8 @@ class SpawnBuilder extends AreaWithInventory {
     RegionEvents.onInterval.subscribe(({ player, currentRegion: region }) => {
       if (player.isSimulated()) return
       if (region === this.region) {
-        if (player.getGameMode() === GameMode.survival) {
-          player.setGameMode(GameMode.adventure)
+        if (player.getGameMode() === GameMode.Survival) {
+          player.setGameMode(GameMode.Adventure)
         }
         player.addEffect(MinecraftEffectTypes.Saturation, 1, {
           amplifier: 255,
