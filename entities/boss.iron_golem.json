@@ -43,8 +43,8 @@
         },
 
         "minecraft:health": {
-          "value": 500,
-          "max": 500
+          "value": 1500,
+          "max": 1500
         }
       },
       "minecraft:player_created": {

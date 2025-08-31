@@ -1,4 +1,4 @@
-import { Player, system, world } from '@minecraft/server'
+import { GameMode, Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
@@ -42,7 +42,7 @@ export class Quest {
 
       return function (player: Player) {
         const step = Quest.getCurrentStepOf(player)
-        if (!step || player.database.inv === 'spawn') return ''
+        if (!step || player.database.inv === 'spawn' || player.getGameMode() !== GameMode.creative) return ''
 
         step.playerQuest.updateListeners.add(showSidebar)
 

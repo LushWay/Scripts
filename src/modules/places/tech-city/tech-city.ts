@@ -34,7 +34,7 @@ class TechCityBuilder extends City {
 
   private create() {
     if (this.safeArea) {
-      QuartzMineRegion.create(new CutArea({ parent: this.safeArea.area.toJSON(), cut: { axis: 'y', to: 56 } }))
+      QuartzMineRegion.create(new CutArea({ parent: this.safeArea.area.toJSON(), cut: { axis: 'y', to: 63 } }))
     }
 
     this.createKits(

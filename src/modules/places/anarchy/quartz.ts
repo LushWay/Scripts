@@ -24,7 +24,7 @@ export class QuartzMineRegion extends Region {
   }
 
   get displayName(): Text | undefined {
-    return i18n.nocolor`Озеро Технограда`
+    return i18n.nocolor`Кварцевое озеро`
   }
 }
 disableAdventureNear.push(QuartzMineRegion)
