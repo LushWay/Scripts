@@ -78,8 +78,14 @@ export class Airdrop {
   spawn(position: Vector3) {
     logger.info`Spawning at ${Vec.floor(position)}`
 
-    const spawn = (name: 'chicken' | 'chest', typeId: string, position: Vector3, tag: string) => {
-      this[name] = world.overworld.spawnEntity(typeId, position)
+    const spawn = (
+      name: 'chicken' | 'chest',
+      typeId: CustomEntityTypes | MinecraftEntityTypes,
+      position: Vector3,
+      tag: string,
+      event?: string,
+    ) => {
+      this[name] = world.overworld.spawnEntity<CustomEntityTypes>(typeId, position, { spawnEvent: event })
 
       new Temporary(({ world, cleanup }) => {
         world.afterEvents.entitySpawn.subscribe(event => {
@@ -92,7 +98,7 @@ export class Airdrop {
       })
     }
 
-    spawn('chicken', `${Airdrop.chickenTypeId}<chicken:drop>`, position, Airdrop.chickenTag)
+    spawn('chicken', Airdrop.chickenTypeId, position, Airdrop.chickenTag, 'chicken:drop')
     spawn('chest', Airdrop.chestTypeId, Vec.add(position, Airdrop.chestOffset), Airdrop.chestTag)
 
     this.status = 'falling'
@@ -111,7 +117,7 @@ export class Airdrop {
       setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)
     }
 
-    Airdrop.minimapedTemp?.cleanup();
+    Airdrop.minimapedTemp?.cleanup()
     Airdrop.minimapedTemp = new Temporary(() => {
       const event = onPlayerMove.subscribe(({ player }) => {
         setMinimapNpcPosition(player, MinimapNpc.Airdrop, x, z)

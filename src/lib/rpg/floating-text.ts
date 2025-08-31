@@ -58,7 +58,7 @@ export class FloatingText {
   }
 
   private create(location: Vector3) {
-    this.entity = world[this.dimensionType].spawnEntity(FloatingText.typeId, location)
+    this.entity = world[this.dimensionType].spawnEntity<CustomEntityTypes>(FloatingText.typeId, location)
     this.entity.setDynamicProperty(FloatingText.dynamicProperty, this.id)
   }
 

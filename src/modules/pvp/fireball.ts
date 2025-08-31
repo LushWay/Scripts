@@ -27,7 +27,10 @@ world.afterEvents.itemUse.subscribe(event => {
 
   decreaseMainhandItemCount(event.source)
 
-  const entity = event.source.dimension.spawnEntity(CustomEntityTypes.Fireball, event.source.getHeadLocation())
+  const entity = event.source.dimension.spawnEntity<CustomEntityTypes>(
+    CustomEntityTypes.Fireball,
+    event.source.getHeadLocation(),
+  )
   const projectile = entity.getComponent('projectile')
   if (!projectile) throw new TypeError('No projectile!')
 

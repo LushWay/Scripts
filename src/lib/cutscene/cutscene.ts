@@ -219,7 +219,7 @@ export class Cutscene {
       restorePlayerCamera(player, this.restoreCameraTime)
       system.runTimeout(
         () => {
-          if (player.isValid) player.onScreenDisplay.resetHudElements()
+          if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
           Compass.forceHide.delete(player)
           Sidebar.forceHide.delete(player)
         },

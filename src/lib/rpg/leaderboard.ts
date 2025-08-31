@@ -1,6 +1,5 @@
 import {
   Entity,
-  EntityComponentTypes,
   Player,
   RawMessage,
   RawText,
@@ -60,7 +59,7 @@ export class Leaderboard {
     style = 'green',
     displayName = objective,
   }: LeaderboardInfo) {
-    const entity = world.getDimension(dimension).spawnEntity(Leaderboard.entityId, Vec.floor(location))
+    const entity = world[dimension].spawnEntity<CustomEntityTypes>(Leaderboard.entityId, Vec.floor(location))
     entity.nameTag = 'updating...'
     entity.addTag(Leaderboard.tag)
 

@@ -17,19 +17,19 @@
     "@formatjs/intl-locale": "^4.2.11",
     "@formatjs/intl-numberformat": "^8.15.4",
     "@formatjs/intl-pluralrules": "^5.4.4",
-    "@minecraft/server": "2.0.0-beta.1.21.70-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.21.70-stable",
-    "@minecraft/server-net": "1.0.0-beta.1.21.70-stable",
-    "@minecraft/server-ui": "2.0.0-beta.1.21.70-stable",
-    "@minecraft/vanilla-data": "1.21.70",
+    "@minecraft/server": "2.0.0-beta.1.21.80-stable",
+    "@minecraft/server-gametest": "1.0.0-beta.1.21.80-stable",
+    "@minecraft/server-net": "1.0.0-beta.1.21.80-stable",
+    "@minecraft/server-ui": "2.0.0-beta.1.21.80-stable",
+    "@minecraft/vanilla-data": "1.21.80",
     "async-mutex": "^0.5.0"
   },
   "resolutions": {
-    "@minecraft/server": "2.0.0-beta.1.21.70-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.21.70-stable",
-    "@minecraft/server-net": "1.0.0-beta.1.21.70-stable",
-    "@minecraft/server-ui": "2.0.0-beta.1.21.70-stable",
-    "@minecraft/vanilla-data": "1.21.70"
+    "@minecraft/server": "2.0.0-beta.1.21.80-stable",
+    "@minecraft/server-gametest": "1.0.0-beta.1.21.80-stable",
+    "@minecraft/server-net": "1.0.0-beta.1.21.80-stable",
+    "@minecraft/server-ui": "2.0.0-beta.1.21.80-stable",
+    "@minecraft/vanilla-data": "1.21.80"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

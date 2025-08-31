@@ -201,8 +201,8 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
     return this.player[ScreenDisplaySymbol].hideAllExcept(hudElements)
   },
 
-  resetHudElements() {
-    return this.player[ScreenDisplaySymbol].resetHudElements()
+  resetHudElementsVisibility() {
+    return this.player[ScreenDisplaySymbol].resetHudElementsVisibility()
   },
 
   setHudVisibility(visible, hudElements) {

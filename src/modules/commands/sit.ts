@@ -11,7 +11,7 @@ new Command('sit')
   .executes(ctx => {
     if (ctx.player.getVelocity().y !== 0) return ctx.error(i18n.error`Вы не можете сесть в падении!`)
     if (LockAction.locked(ctx.player)) return
-    const entity = ctx.player.dimension.spawnEntity(CustomEntityTypes.Sit, ctx.player.location)
+    const entity = ctx.player.dimension.spawnEntity<CustomEntityTypes>(CustomEntityTypes.Sit, ctx.player.location)
     ctx.player.closeChat()
     // Rideable component doesnt works
     entity.runCommand('ride @p start_riding @s teleport_rider ')

@@ -86,7 +86,7 @@ export class DatabaseUtils {
 
   /** Creates a table entity that is used for data storage */
   static createTableEntity(tableType: string, tableName: string, index = 0): Entity {
-    const entity = world.overworld.spawnEntity(DatabaseUtils.entityTypeId, DatabaseUtils.entityLocation)
+    const entity = world.overworld.spawnEntity<string>(DatabaseUtils.entityTypeId, DatabaseUtils.entityLocation)
 
     entity.setDynamicProperty('tableName', tableName)
     entity.setDynamicProperty('tableType', tableType)
