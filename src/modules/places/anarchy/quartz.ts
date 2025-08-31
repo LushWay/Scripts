@@ -27,7 +27,6 @@ export class QuartzMineRegion extends Region {
     return i18n.nocolor`Озеро Технограда`
   }
 }
-disableAdventureNear.push(QuartzMineRegion)
 
 const quartzTypeId = MinecraftBlockTypes.SmoothQuartz
 
