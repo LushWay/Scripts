@@ -9,7 +9,7 @@ export abstract class ScoreboardCost extends Cost {
 
   constructor(cost = 1) {
     super()
-    if (cost < 0) throw new TypeError(`Invalid ScoreboardCost: §f${cost}§c < 0, positive number expected`)
+    if (cost < 0) throw new TypeError(noI18n.error`Invalid ScoreboardCost: ${cost} < 0, positive number expected`)
     this.cost = cost
   }
 
@@ -28,8 +28,9 @@ export abstract class ScoreboardCost extends Cost {
   }
 
   take(player: Player) {
-    player.scores[this.scoreboard] -= this.cost
     super.take(player)
+    if (!this.has(player)) throw new Error(`Double cost take! ${player.name} ${this.toString(player)}`)
+    player.scores[this.scoreboard] -= this.cost
   }
 
   failed(player: Player) {

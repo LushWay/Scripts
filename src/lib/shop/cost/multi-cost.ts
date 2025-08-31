@@ -48,11 +48,11 @@ export class MultiCost<T extends Cost[]> extends Cost {
         const failed = cost.failed(player)
         if (failed === '') continue
 
-        messages += failed
+        messages += failed + '\n'
       }
     }
 
-    return messages || i18n.error`Недостаточно средств.`.to(player.lang)
+    return messages.trim() || i18n.error`Недостаточно средств.`.to(player.lang)
   }
 
   item = this.createCostAlias(ItemCost)

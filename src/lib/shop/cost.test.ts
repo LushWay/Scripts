@@ -1,14 +1,13 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Cost, ItemCost, MoneyCost, MultiCost } from './cost'
+import { TEST_createPlayer } from 'test/utils'
+import { Cost, ItemCost, MultiCost } from './cost'
 
 describe('cost', () => {
   it('should create item cost', () => {
     // @ts-expect-error
     const player = new Player() as Player
     const cost = new ItemCost(MinecraftItemTypes.Apple, 2)
-
-    new MultiCost(new MoneyCost(100), new ItemCost(new ItemStack(MinecraftItemTypes.Apple)))
 
     expect(cost.has(player)).toBe(false) // 0 items
 
@@ -70,6 +69,27 @@ describe('cost', () => {
 })
 
 describe('MultiCost', () => {
+  it('should stringify', () => {
+    const player = TEST_createPlayer()
+    const cost = new MultiCost().money(1000).item(MinecraftItemTypes.Apple).item(MinecraftItemTypes.NetheriteAxe).xp(10)
+
+    expect(cost.toString(player)).toMatchInlineSnapshot(
+      `"§61.000, §7Яблоко §r§f§7x1, §7Незеритовый топор §r§f§7x1, §7§a10§7lvl"`,
+    )
+
+    expect(cost.toString(player, false)).toMatchInlineSnapshot(
+      `"§c1.000, §cЯблоко §r§f§cx1, §cНезеритовый топор §r§f§cx1, §4§c10§4lvl"`,
+    )
+
+    expect(cost.failed(player)).toMatchInlineSnapshot(`
+      "§7§60§7/§61.000§7§f§7
+      §c§70§c/§71§c §f§cЯблоко§c
+      §c§70§c/§71§c §f§cНезеритовый топор§c
+      §cНужно уровней опыта: §710§c, §70§c/§710§c
+      "
+    `)
+  })
+
   class StringCost extends Cost<string> {
     toString() {
       return ''

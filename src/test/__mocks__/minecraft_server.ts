@@ -511,6 +511,12 @@ export class Player extends Entity {
     return { x: 0, y: 0 }
   }
 
+  level = 0
+
+  addLevels(levels: number) {
+    this.level += levels
+  }
+
   sendMessage = vi.fn()
 
   location = { x: 0, y: 0, z: 0 }
