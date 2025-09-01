@@ -72,7 +72,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
     }
 
     this.args.push({ type: 'dropdown', options: options })
-    this.form.dropdown(label, options, defaultValueIndex)
+    this.form.dropdown(label, options, { defaultValueIndex })
 
     // @ts-expect-error AAAAAAAAAAAA
     return this
@@ -133,7 +133,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
     }
 
     this.args.push({ type: 'dropdown', options: objectKeys })
-    this.form.dropdown(label, visibleKeys, defaultValueIndex)
+    this.form.dropdown(label, visibleKeys, { defaultValueIndex })
 
     // @ts-expect-error AAAAAAAAAAAA
     return this
@@ -156,7 +156,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
     defaultValue = 0,
   ): ModalForm<AppendFormField<Callback, number>> {
     this.args.push({ type: 'slider' })
-    this.form.slider(label, minimumValue, maximumValue, valueStep, defaultValue)
+    this.form.slider(label, minimumValue, maximumValue, { defaultValue, valueStep })
 
     // @ts-expect-error AAAAAAAAAAAA
     return this
@@ -170,7 +170,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
    */
   addToggle(label: string, defaultValue: boolean): ModalForm<AppendFormField<Callback, boolean>> {
     this.args.push({ type: 'toggle' })
-    this.form.toggle(label, defaultValue)
+    this.form.toggle(label, { defaultValue })
 
     // @ts-expect-error AAAAAAAAAAAA
     return this
@@ -189,7 +189,7 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
     defaultValue?: string,
   ): ModalForm<AppendFormField<Callback, string>> {
     this.args.push({ type: 'textField' })
-    this.form.textField(label, placeholderText, defaultValue)
+    this.form.textField(label, placeholderText, { defaultValue })
 
     // @ts-expect-error AAAAAAAAAAAA
     return this

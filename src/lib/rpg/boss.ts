@@ -2,6 +2,7 @@
 
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
@@ -35,7 +36,7 @@ interface BossArenaDB {
 
 interface BossOptions {
   place: Place
-  typeId: string
+  typeId: MinecraftEntityTypes | CustomEntityTypes
   loot: LootTable
   spawnEvent: boolean | string
   respawnTime: number
@@ -53,7 +54,7 @@ export class Boss {
 
   static create() {
     return Group.placeCreator(place => ({
-      typeId: (typeId: string) => ({
+      typeId: (typeId: MinecraftEntityTypes | CustomEntityTypes) => ({
         loot: (loot: LootTable) => ({
           respawnTime: (respawnTime: number) => ({
             allowedEntities: (allowedEntities: string[] | 'all') => ({
@@ -216,9 +217,10 @@ export class Boss {
   private spawnEntity() {
     if (!this.location.valid) return
 
-    const entityTypeId = this.options.typeId + (this.options.spawnEvent ? '<lw:boss>' : '')
-    this.logger.info`Spawn: ${entityTypeId}`
-    this.entity = world[this.dimensionType].spawnEntity(entityTypeId, this.location)
+    this.logger.info`Spawn: ${this.options.typeId} ${this.options.spawnEvent ? '<lw:boss>' : ''}`
+    this.entity = world[this.dimensionType].spawnEntity<CustomEntityTypes>(this.options.typeId, this.location, {
+      spawnEvent: this.options.spawnEvent ? 'lw:boss' : undefined,
+    })
 
     try {
       new Temporary(({ world, cleanup }) => {

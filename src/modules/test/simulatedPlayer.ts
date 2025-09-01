@@ -137,7 +137,7 @@ new Command('player')
 GameTest.registerAsync(simulatedPlayer, 'spawn_many', async test => {
   let succeed = false
   for (let e = 0; e < 5; e++) {
-    const player = test.spawnSimulatedPlayer({ x: -1, y: 3, z: -1 }, `Tester (${e})`, GameMode.adventure)
+    const player = test.spawnSimulatedPlayer({ x: -1, y: 3, z: -1 }, `Tester (${e})`, GameMode.Adventure)
     player.applyImpulse({ x: rd(1, 0), y: rd(1), z: rd(1, 0) })
     await test.idle(Math.random() * 50)
     util.catch(async () => {

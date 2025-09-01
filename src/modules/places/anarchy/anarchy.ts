@@ -117,7 +117,7 @@ class AnarchyBuilder extends AreaWithInventory {
       InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
     }
 
-    if (player.getGameMode() === GameMode.adventure) player.setGameMode(GameMode.survival)
+    if (player.getGameMode() === GameMode.Adventure) player.setGameMode(GameMode.Survival)
     player.database.inv = this.inventoryName
   }
 

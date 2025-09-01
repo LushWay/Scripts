@@ -186,7 +186,7 @@ class BrushTool extends WorldEditToolBrush<Storage> {
 
         if (!this.brushLocators.has(player.id)) {
           try {
-            const entity = player.dimension.spawnEntity(CustomEntityTypes.FloatingText, location)
+            const entity = player.dimension.spawnEntity<CustomEntityTypes>(CustomEntityTypes.FloatingText, location)
             entity.addTag(player.name)
             entity.nameTag = WE_CONFIG.BRUSH_LOCATOR
 

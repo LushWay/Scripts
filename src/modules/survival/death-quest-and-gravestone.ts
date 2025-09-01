@@ -31,7 +31,7 @@ world.afterEvents.entityDie.subscribe(event => {
     const head = event.deadEntity.getHeadLocation()
     const pveRegion = Region.getManyAt(event.deadEntity).find(e => e.permissions.pvp === 'pve' || !e.permissions.pvp)
 
-    const gravestone = dimension.spawnEntity(gravestoneEntityTypeId, head)
+    const gravestone = dimension.spawnEntity<CustomEntityTypes>(gravestoneEntityTypeId, head)
     forceAllowSpawnInRegion(gravestone)
     gravestone.setDynamicProperty(gravestoneOwnerKey, playerId)
     gravestone.setDynamicProperty(gravestoneSpawnedAt, Date.now())

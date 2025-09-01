@@ -69,13 +69,13 @@ system.runPlayerInterval(
     const region = regions[0] as Region | undefined
 
     const gamemode = player.getGameMode()
-    const adventure = gamemode === GameMode.adventure
-    const survival = gamemode === GameMode.survival
+    const adventure = gamemode === GameMode.Adventure
+    const survival = gamemode === GameMode.Survival
 
     if (adventure && (!region || nearDisabledAdventureRegions(player))) {
-      player.setGameMode(GameMode.survival)
+      player.setGameMode(GameMode.Survival)
     } else if (survival && region && adventureModeRegion(region)) {
-      player.setGameMode(GameMode.adventure)
+      player.setGameMode(GameMode.Adventure)
     }
   },
   'safeAreaDisableAdventureNear',
@@ -87,12 +87,12 @@ RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
   const now = newest[0] && (adventureModeRegion(newest[0]) || !nearDisabledAdventureRegions(player))
 
   const gamemode = player.getGameMode()
-  const adventure = gamemode === GameMode.adventure
-  const survival = gamemode === GameMode.survival
+  const adventure = gamemode === GameMode.Adventure
+  const survival = gamemode === GameMode.Survival
 
   if (been && adventure && !now) {
-    player.setGameMode(GameMode.survival)
+    player.setGameMode(GameMode.Survival)
   } else if (now && survival) {
-    player.setGameMode(GameMode.adventure)
+    player.setGameMode(GameMode.Adventure)
   }
 })

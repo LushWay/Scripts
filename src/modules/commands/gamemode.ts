@@ -17,10 +17,10 @@ function fastGamemode(mode: GameMode, shorname: string) {
     })
 }
 
-fastGamemode(GameMode.adventure, 'a')
-fastGamemode(GameMode.creative, 'c')
-fastGamemode(GameMode.spectator, 'ss')
-fastGamemode(GameMode.survival, 's')
+fastGamemode(GameMode.Adventure, 'a')
+fastGamemode(GameMode.Creative, 'c')
+fastGamemode(GameMode.Spectator, 'ss')
+fastGamemode(GameMode.Survival, 's')
 
 new Command('repair')
   .setPermissions('techAdmin')

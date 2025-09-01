@@ -112,7 +112,7 @@ world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermut
 
 world.beforeEvents.playerInteractWithBlock.subscribe(event => {
   const { player, block } = event
-  if (player.getGameMode() !== GameMode.creative) return
+  if (player.getGameMode() !== GameMode.Creative) return
   if (!player.isSneaking) return
 
   const region = CustomDungeonRegion.getAt(block)

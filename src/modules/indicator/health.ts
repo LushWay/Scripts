@@ -193,7 +193,10 @@ class HealthIndicator {
   }
 
   private spawnIndicator(entity: Entity) {
-    const indicator = entity.dimension.spawnEntity(CustomEntityTypes.FloatingText, entity.getHeadLocation())
+    const indicator = entity.dimension.spawnEntity<CustomEntityTypes>(
+      CustomEntityTypes.FloatingText,
+      entity.getHeadLocation(),
+    )
     indicator.addTag(this.indicatorTag)
     return indicator
   }

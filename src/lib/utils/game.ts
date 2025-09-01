@@ -69,7 +69,7 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
 }
 
 export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
-const buildingGameModes = [GameMode.creative, GameMode.spectator]
+const buildingGameModes = [GameMode.Creative, GameMode.Spectator]
 
 /**
  * Check if player is currently building. Building player is player who is in the creative and whose role isn't member

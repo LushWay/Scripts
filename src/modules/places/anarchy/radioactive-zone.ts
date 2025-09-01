@@ -32,7 +32,7 @@ export class RadioactiveZone {
           if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) continue
 
           const gameMode = player.getGameMode()
-          if (gameMode === GameMode.creative || gameMode === GameMode.spectator) continue
+          if (gameMode === GameMode.Creative || gameMode === GameMode.Spectator) continue
 
           const distance = Vec.distance(player.location, center)
           let played = false
