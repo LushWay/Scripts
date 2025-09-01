@@ -42,7 +42,7 @@ export class Quest {
 
       return function (player: Player) {
         const step = Quest.getCurrentStepOf(player)
-        if (!step || player.database.inv === 'spawn' || player.getGameMode() == GameMode.creative) return ''
+        if (!step || player.database.inv === 'spawn' || player.getGameMode() == GameMode.Creative) return ''
 
         step.playerQuest.updateListeners.add(showSidebar)
 
