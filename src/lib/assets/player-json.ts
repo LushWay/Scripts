@@ -81,7 +81,7 @@ export const playerJson = {
               "duration": 3,
               "amplifier": 255,
               "visible": false,
-              "display_on_screen_animation": true
+              "display_on_screen_animation": false
             },
             {
               "effect": "fire_resistance",
@@ -108,7 +108,7 @@ export const playerJson = {
               "duration": 1,
               "amplifier": 255,
               "visible": false,
-              "display_on_screen_animation": true
+              "display_on_screen_animation": false
             },
             {
               "effect": "fire_resistance",
@@ -128,7 +128,7 @@ export const playerJson = {
               "duration": 1,
               "amplifier": 1,
               "visible": false,
-              "display_on_screen_animation": true
+              "display_on_screen_animation": false
             }
           ]
         }
