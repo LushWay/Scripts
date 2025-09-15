@@ -8,6 +8,8 @@ export interface StructureFile {
   size: Vector3,
   chestPositions: Vector3[]
   enderChestPositions: Vector3[]
+  structureVoidPoisitions: Vector3[]
+  shulkers: { loc: Vector3, inv: { typeId: string, amount: number, slot: number }[] }[]
 }
 
 export enum StructureRootId {
@@ -40,41 +42,243 @@ export const structureFiles: Record<StructureId, StructureFile> = {
       "z": 1
     },
     "chestPositions": [],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:dungeons/avanpost": {
     "size": {
-      "x": 19,
+      "x": 21,
       "y": 35,
-      "z": 19
+      "z": 21
     },
     "chestPositions": [
       {
         "x": 5,
-        "y": 9,
+        "y": 10,
+        "z": 6
+      },
+      {
+        "x": 6,
+        "y": 10,
         "z": 5
       },
       {
-        "x": 13,
-        "y": 9,
-        "z": 5
+        "x": 6,
+        "y": 23,
+        "z": 14
       },
       {
-        "x": 13,
+        "x": 10,
         "y": 16,
-        "z": 9
+        "z": 14
+      },
+      {
+        "x": 14,
+        "y": 10,
+        "z": 5
+      },
+      {
+        "x": 14,
+        "y": 16,
+        "z": 10
+      },
+      {
+        "x": 14,
+        "y": 23,
+        "z": 6
+      },
+      {
+        "x": 15,
+        "y": 10,
+        "z": 6
       }
     ],
     "enderChestPositions": [
       {
-        "x": 5,
+        "x": 6,
         "y": 23,
-        "z": 5
+        "z": 6
       },
       {
-        "x": 13,
+        "x": 14,
         "y": 23,
-        "z": 13
+        "z": 14
+      }
+    ],
+    "structureVoidPoisitions": [],
+    "shulkers": [
+      {
+        "loc": {
+          "x": 4,
+          "y": 23,
+          "z": 10
+        },
+        "inv": [
+          {
+            "amount": 2,
+            "typeId": "minecraft:vex_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:vindicator_spawn_egg",
+            "slot": 1
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:witch_spawn_egg",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 6,
+          "y": 1,
+          "z": 6
+        },
+        "inv": [
+          {
+            "amount": 2,
+            "typeId": "minecraft:pillager_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:vindicator_spawn_egg",
+            "slot": 1
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 6,
+          "y": 16,
+          "z": 6
+        },
+        "inv": [
+          {
+            "amount": 2,
+            "typeId": "minecraft:vex_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:witch_spawn_egg",
+            "slot": 1
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:evoker_spawn_egg",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 10,
+          "y": 10,
+          "z": 10
+        },
+        "inv": [
+          {
+            "amount": 1,
+            "typeId": "minecraft:vindicator_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:ravager_spawn_egg",
+            "slot": 1
+          },
+          {
+            "amount": 2,
+            "typeId": "minecraft:pillager_spawn_egg",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 10,
+          "y": 23,
+          "z": 4
+        },
+        "inv": [
+          {
+            "amount": 2,
+            "typeId": "minecraft:vex_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:evoker_spawn_egg",
+            "slot": 1
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 10,
+          "y": 23,
+          "z": 16
+        },
+        "inv": [
+          {
+            "amount": 2,
+            "typeId": "minecraft:vex_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:vindicator_spawn_egg",
+            "slot": 1
+          },
+          {
+            "amount": 2,
+            "typeId": "minecraft:pillager_spawn_egg",
+            "slot": 2
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 14,
+          "y": 1,
+          "z": 14
+        },
+        "inv": [
+          {
+            "amount": 2,
+            "typeId": "minecraft:pillager_spawn_egg",
+            "slot": 0
+          }
+        ]
+      },
+      {
+        "loc": {
+          "x": 14,
+          "y": 16,
+          "z": 14
+        },
+        "inv": [
+          {
+            "amount": 1,
+            "typeId": "minecraft:evoker_spawn_egg",
+            "slot": 0
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:vex_spawn_egg",
+            "slot": 1
+          },
+          {
+            "amount": 1,
+            "typeId": "minecraft:pillager_spawn_egg",
+            "slot": 2
+          }
+        ]
       }
     ]
   },
@@ -96,7 +300,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
         "z": 9
       }
     ],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:dungeons/gas_station_2": {
     "size": {
@@ -116,7 +322,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
         "z": 5
       }
     ],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:dungeons/gas_station_3": {
     "size": {
@@ -136,7 +344,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
         "z": 3
       }
     ],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:dungeons/gas_station_4": {
     "size": {
@@ -156,7 +366,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
         "z": 5
       }
     ],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:dungeons/gas_station_garage": {
     "size": {
@@ -176,7 +388,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
         "z": 3
       }
     ],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:floating_item": {
     "size": {
@@ -185,7 +399,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
       "z": 1
     },
     "chestPositions": [],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:spawn_v1": {
     "size": {
@@ -194,7 +410,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
       "z": 40
     },
     "chestPositions": [],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:test/empty": {
     "size": {
@@ -203,7 +421,9 @@ export const structureFiles: Record<StructureId, StructureFile> = {
       "z": 1
     },
     "chestPositions": [],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   },
   "mystructure:test/flat_5x5x5": {
     "size": {
@@ -212,6 +432,8 @@ export const structureFiles: Record<StructureId, StructureFile> = {
       "z": 5
     },
     "chestPositions": [],
-    "enderChestPositions": []
+    "enderChestPositions": [],
+    "structureVoidPoisitions": [],
+    "shulkers": []
   }
 }
