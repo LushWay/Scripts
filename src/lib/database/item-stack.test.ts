@@ -1,7 +1,7 @@
 import 'lib/extensions/enviroment'
 
-import { ItemLoreSchema } from './item-stack'
 import { defaultLang } from 'lib/assets/lang'
+import { ItemLoreSchema } from './item-stack'
 
 describe('item stack', () => {
   it('should create item', () => {
@@ -66,5 +66,27 @@ describe('item stack', () => {
       ]",
       ]
     `)
+  })
+
+  it('should have right types', () => {
+    const schema = new ItemLoreSchema('test 3')
+      .property('test', String)
+      .property('owned', Boolean)
+      .property('key', String)
+
+      .build()
+
+    const { storage } = schema.create(defaultLang, {
+      test: '',
+      owned: true,
+      key: '',
+    })
+
+    // @ts-expect-error Expect this to not allow arbitrary keys
+    storage.lol
+
+    expectTypeOf(storage.key).toBeString()
+    expectTypeOf(storage.owned).toBeBoolean()
+    expectTypeOf(storage.key).toBeString()
   })
 })

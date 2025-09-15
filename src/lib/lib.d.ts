@@ -4,6 +4,8 @@ import '../../tools/defines'
 declare global {
   type VoidFunction = () => void
 
+  type EmptyObject = Record<never, never>
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   type Vector3 = { x: number; y: number; z: number }
   type Vector2 = mc.Vector2

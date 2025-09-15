@@ -4,6 +4,9 @@ import { defaultLang } from 'lib/assets/lang'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { rollChance } from 'lib/rpg/random'
+import { createLogger } from 'lib/utils/logger'
+
+const logger = createLogger('ItemAbility')
 
 export enum Ability {
   Vampire = 'vamp',
@@ -57,7 +60,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   const storage = item && schema.parse(damagingEntity.lang, item)
   if (!storage) return
 
-  switch (storage.enchant) {
+  switch (storage.ability) {
     case Ability.Vampire: {
       const health = damagingEntity.getComponent('health')
       if (health) {
@@ -78,7 +81,8 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
       break
     }
     default: {
-      storage.enchant = Ability.Nothing
+      logger.warn('Unknown ability:', storage.ability)
+      // storage.ability = Ability.Nothing
     }
   }
 })

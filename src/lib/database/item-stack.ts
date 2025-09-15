@@ -4,7 +4,7 @@ import { Language } from 'lib/assets/lang'
 import { i18n, textUnitColorize } from 'lib/i18n/text'
 import { noBoolean, wrapLore } from 'lib/util'
 
-export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any> {
+export class ItemLoreSchema<T extends TypeSchema = EmptyObject, L extends Schema.Property.Any = Schema.Property.Any> {
   constructor(
     private schemaId: string,
     private itemTypeId = Items.Key,
@@ -94,8 +94,10 @@ export class ItemLoreSchema<T extends TypeSchema, L extends Schema.Property.Any>
   }
 }
 
-export class ItemLoreSchemaCompiled<T extends TypeSchema> {
+export class ItemLoreSchemaCompiled<T extends TypeSchema = EmptyObject> {
   static loreSchemaId = 'lsid'
+
+  public readonly aha!: T
 
   constructor(
     private properties: Schema,
