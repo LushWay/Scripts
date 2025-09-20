@@ -68,12 +68,11 @@ export function getFullname(
   }
 
   if (name) {
-    result += nameColor
     if (playerID instanceof Player) {
-      add(playerID.name)
+      add(nameColor + playerID.name)
     } else {
       const name = Player.name(playerID)
-      add(name ?? noName)
+      add(nameColor + (name ?? noName))
     }
   }
 
