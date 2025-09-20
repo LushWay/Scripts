@@ -1,4 +1,4 @@
-import { Player, system } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
@@ -32,7 +32,7 @@ export class Clan {
   }
 
   static create(player: Player, name: string, shortname: string) {
-    while (name in this.database) name += '-'
+    while (this.database.has(name)) name += '-'
 
     this.database.set(name, {
       members: [player.id],
@@ -53,9 +53,11 @@ export class Clan {
   private static instances = new Map<string, Clan>()
 
   static {
-    system.run(() => {
-      for (const [id, db] of this.database.entries()) new Clan(id, db)
-    })
+    world.afterEvents.worldLoad.subscribe(() =>
+      system.run(() => {
+        for (const [id, db] of this.database.entries()) new Clan(id, db)
+      }),
+    )
   }
 
   db!: StoredClan

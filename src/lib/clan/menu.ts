@@ -173,6 +173,10 @@ function clanInvites(player: Player, clan: Clan, back?: VoidFunction) {
 }
 function inviteToClan(player: Player, clan: Clan, back?: VoidFunction) {
   selectPlayer(player, i18n`пригласить в клан`.to(player.lang), back).then(({ id, name }) => {
+    if (clan.isMember(id)) return player.fail(i18n.error`Игрок ${name} уже состоит в вашем клане!`)
+    const playerClan = Clan.getPlayerClan(id)
+    if (playerClan) return player.fail(i18n.error`Игрок ${name} уже состоит в клане ${playerClan.db.name}!`)
+
     clan.invite(id)
     player.success(i18n`Игрок ${name} успешно приглашен в клан!`)
     back?.()
