@@ -29,6 +29,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   override ldb: CustomDungeonRegionDatabase = {
     chestLoot: [],
     chests: {},
+    spawnerCooldowns: {},
     structureId: '',
     name: '',
     rotation: StructureRotation.None,
@@ -46,6 +47,8 @@ export class CustomDungeonRegion extends DungeonRegion {
   protected override structureFile: StructureFile = {
     chestPositions: [],
     enderChestPositions: [],
+    structureVoidPoisitions: [],
+    shulkers: [],
     size: { x: 10, y: 10, z: 10 },
   }
 
@@ -72,11 +75,54 @@ export class CustomDungeonRegion extends DungeonRegion {
     this.createChest(location, lootTable, restoreTime)
     this.save()
   }
+
+  static {
+    world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
+      if (block.typeId !== MinecraftBlockTypes.Chest) return false
+
+      const region = getDungeonRegionForTechAdmin(player, block)
+      if (!region) return
+
+      editChest(player, block, region)
+    })
+
+    world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermutation }) => {
+      if (brokenBlockPermutation.type.id !== MinecraftBlockTypes.Chest) return false
+
+      const region = getDungeonRegionForTechAdmin(player, block)
+      if (!region) return
+
+      const location = block.location
+      const chest = getChest(region, location)
+      if (chest) {
+        region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
+        region.removeChest(location)
+        player.success(i18n`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime / 60_000}min`)
+      }
+    })
+
+    world.beforeEvents.playerInteractWithBlock.subscribe(event => {
+      const { player, block } = event
+      if (player.getGameMode() !== GameMode.Creative) return
+      if (!player.isSneaking) return
+
+      const region = CustomDungeonRegion.getAt(block)
+      if (!region) return
+
+      const chest = getChest(region, block.location)
+      if (chest) {
+        event.cancel
+        system.delay(() => {
+          editChest(player, block.location, region, chest)
+        })
+      }
+    })
+  }
 }
 registerSaveableRegion('customDungeon', CustomDungeonRegion)
 registerRegionType(noI18n`Кастомный данж`, CustomDungeonRegion, false, true)
 
-function eventHelper(player: Player, block: Block) {
+function getDungeonRegionForTechAdmin(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false
 
   const region = CustomDungeonRegion.getAt(block)
@@ -84,48 +130,6 @@ function eventHelper(player: Player, block: Block) {
 
   return region
 }
-
-world.afterEvents.playerPlaceBlock.subscribe(({ player, block }) => {
-  if (block.typeId !== MinecraftBlockTypes.Chest) return false
-
-  const region = eventHelper(player, block)
-  if (!region) return
-
-  editChest(player, block, region)
-})
-
-world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermutation }) => {
-  if (brokenBlockPermutation.type.id !== MinecraftBlockTypes.Chest) return false
-
-  const region = eventHelper(player, block)
-  if (!region) return
-
-  const location = block.location
-  const chest = getChest(region, location)
-  if (chest) {
-    region.ldb.chestLoot = region.ldb.chestLoot.filter(e => e !== chest)
-    region.chests = region.chests.filter(e => !Vec.equals(e.location, location))
-
-    player.success(i18n`Removed chest with loot ${chest.loot} and restore time ${chest.restoreTime / 60_000}min`)
-  }
-})
-
-world.beforeEvents.playerInteractWithBlock.subscribe(event => {
-  const { player, block } = event
-  if (player.getGameMode() !== GameMode.Creative) return
-  if (!player.isSneaking) return
-
-  const region = CustomDungeonRegion.getAt(block)
-  if (!region) return
-
-  const chest = getChest(region, block.location)
-  if (chest) {
-    event.cancel
-    system.delay(() => {
-      editChest(player, block.location, region, chest)
-    })
-  }
-})
 
 function editChest(
   player: Player,

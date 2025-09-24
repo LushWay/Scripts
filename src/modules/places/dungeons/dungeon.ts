@@ -1,4 +1,4 @@
-import { Player, StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
+import { EntityTypes, Player, StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import {
   ActionForm,
@@ -13,14 +13,17 @@ import {
 } from 'lib'
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { anyPlayerNear } from 'lib/player-move'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
+import { createLogger } from 'lib/utils/logger'
 import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Dungeon } from './loot'
 
 export interface DungeonRegionDatabase extends JsonObject {
   chests: Record<string, number | null>
+  spawnerCooldowns: Record<string, number>
   structureId: string
   rotation: StructureRotation
   terrainStructureId: string
@@ -39,8 +42,19 @@ export interface DungeonChest {
   location: Vector3
 }
 
+export interface DungeonSpawner {
+  id: string
+  restoreTime: number
+  location: Vector3
+  entities: { typeId: string; amount: number }[]
+}
+
 export class DungeonRegion extends Region {
+  static logger = createLogger('DungeonRegion')
+
   static dungeons: DungeonRegion[] = []
+
+  static oldChestLogPositions = new Set<string>()
 
   static {
     system.runInterval(
@@ -53,19 +67,34 @@ export class DungeonRegion extends Region {
             }
           }
 
+          for (const spawner of dungeon.spawners) {
+            const cooldown = dungeon.ldb.spawnerCooldowns[spawner.id]
+            if (!cooldown || Cooldown.isExpired(cooldown, spawner.restoreTime)) {
+              dungeon.spawn(spawner)
+            }
+          }
+
+          // Old chest
           for (const chest of Object.keys(dungeon.ldb.chests)) {
             const vector = Vec.parse(chest)
             if (!vector) continue
 
             if (dungeon.chests.find(e => Vec.equals(e.location, vector))) continue
 
-            // Old chest
-            console.log('Found old chest', Vec.string(vector, true))
-            try {
-              dungeon.dimension.setBlockType(vector, MinecraftBlockTypes.Air)
-              Reflect.deleteProperty(dungeon.ldb.chests, chest)
-              dungeon.save()
-            } catch (e) {}
+            const oldChestPosition = Vec.string(vector, true)
+            if (!this.oldChestLogPositions.has(oldChestPosition)) {
+              this.logger.info('Found old chest', oldChestPosition, 'removing once there is any player nearby...')
+              this.oldChestLogPositions.add(oldChestPosition)
+            }
+
+            if (anyPlayerNear(vector, dungeon.dimensionType, 20)) {
+              try {
+                this.logger.info('Trying to remove old chest', oldChestPosition)
+                dungeon.dimension.setBlockType(vector, MinecraftBlockTypes.Air)
+                Reflect.deleteProperty(dungeon.ldb.chests, chest)
+                dungeon.save()
+              } catch (e) {}
+            }
           }
         }
       },
@@ -82,6 +111,7 @@ export class DungeonRegion extends Region {
 
   ldb: DungeonRegionDatabase = {
     chests: {},
+    spawnerCooldowns: {},
     structureId: '',
     terrainStructureId: '',
     terrainStructurePosition: { x: 0, z: 0, y: 0 },
@@ -96,7 +126,7 @@ export class DungeonRegion extends Region {
 
   protected configureDungeon(): void {
     if (!this.structureFile) return
-    const { chestPositions, enderChestPositions } = this.structureFile
+    const { chestPositions, enderChestPositions, shulkers } = this.structureFile
     const toRotated = (f: Vector3[]) => this.rotate(f.map(e => this.fromRelativeToAbsolute(e)))
 
     const loot = Dungeon.loot[this.structureId] ?? Dungeon.defaultLoot
@@ -104,6 +134,16 @@ export class DungeonRegion extends Region {
 
     const powerfullLoot = Dungeon.powerfullLoot[this.structureId] ?? Dungeon.defaultLoot
     for (const f of toRotated(enderChestPositions)) this.createChest(f, powerfullLoot)
+
+    for (const { loc, inv } of shulkers) {
+      const [rotated] = this.rotate([this.fromRelativeToAbsolute(loc)])
+      if (!rotated) {
+        console.warn('Not rotated')
+        continue
+      }
+
+      this.createSpawnerFromShulkerInventory(inv, rotated)
+    }
   }
 
   private rotate(vectors: Vector3[]) {
@@ -144,7 +184,7 @@ export class DungeonRegion extends Region {
   }
 
   customFormButtons(form: ActionForm, player: Player): void {
-    form.button(noI18n`Установить структуру`, () => {
+    form.button(noI18n`Снова установить структуру`, () => {
       this.placeStructure()
     })
   }
@@ -223,7 +263,65 @@ export class DungeonRegion extends Region {
     allowedAllItem: true,
   }
 
-  chests: DungeonChest[] = []
+  private spawners: DungeonSpawner[] = []
+
+  protected createSpawnerFromShulkerInventory(
+    inv: { amount: number; typeId: string }[],
+    rotated: Vector3,
+    restoreTime?: number,
+  ) {
+    const entities: DungeonSpawner['entities'] = []
+    for (const value of inv) {
+      const entityTypeId = /^(?:minecraft:)(.+)_spawn_egg$/.exec(value.typeId)?.[1]
+      if (!entityTypeId) {
+        console.warn('No entity type id for', value.typeId)
+        continue
+      }
+
+      entities.push({ typeId: entityTypeId, amount: value.amount })
+    }
+    this.createSpawner(rotated, entities, restoreTime)
+  }
+
+  protected createSpawner(location: Vector3, entities: DungeonSpawner['entities'], restoreTime = ms.from('min', 20)) {
+    this.spawners.push({
+      id: Vec.string(location),
+      location,
+      entities,
+      restoreTime,
+    })
+  }
+
+  private static invalidSpawnerTypeIds = new Set<string>()
+
+  private spawn(spawner: DungeonSpawner) {
+    if (!anyPlayerNear(spawner.location, this.dimensionType, 20)) return
+
+    for (const { typeId, amount } of spawner.entities) {
+      const type = EntityTypes.get<string>(typeId)
+      if (!type) {
+        if (!DungeonRegion.invalidSpawnerTypeIds.has(typeId)) {
+          console.warn('Dungeon spawner invalid typeId', typeId, spawner)
+          DungeonRegion.invalidSpawnerTypeIds.add(typeId)
+        }
+        continue
+      }
+
+      const entities = this.dimension.getEntities({ location: spawner.location, maxDistance: 20 })
+      if (entities.length < amount) {
+        const toSpawn = amount - entities.length
+        for (let i = 0; i < toSpawn; i++) {
+          this.dimension.spawnEntity(type, spawner.location)
+        }
+      }
+    }
+  }
+
+  private chests: DungeonChest[] = []
+
+  protected removeChest(location: Vector3) {
+    this.chests = this.chests.filter(e => !Vec.equals(e.location, location))
+  }
 
   protected createChest(location: Vector3, loot: LootTable, restoreTime = ms.from('min', 20)) {
     // console.log(
