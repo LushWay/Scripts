@@ -1,63 +1,81 @@
 import { world } from '@minecraft/server'
-import { Cooldown, Settings } from 'lib'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { sendPacketToStdout } from 'lib/bds/api'
+import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
 import { getFullname } from 'lib/get-fullname'
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
+import { Settings } from 'lib/settings'
+import { muteInfo } from './mute'
 
-class ChatBuilder {
-  db = table<Record<string, number>>('chatCooldown', () => ({}))
+export class Chat {
+  static muteDb = table<{ mutedUntil: number; reason?: string }>('chatMute')
 
-  settings = Settings.world(...Settings.worldCommon, {
+  static settings = Settings.world(...Settings.worldCommon, {
     cooldown: {
-      name: 'Задержка чата',
+      name: 'Задержка чата (миллисекунды)',
       description: '0 что бы отключить',
       value: 0,
       onChange: () => this.updateCooldown(),
     },
     range: {
       name: 'Радиус чата',
-      description: 'Радиус для затемнения сообщений дальних игроков',
+      description: 'Радиус для скрытия сообщений дальних игроков',
       value: 30,
+    },
+    capsLimit: {
+      name: 'Макс больших букв в сообщении',
+      description: 'Не разрешает отправлять сообщения где слишком много капса',
+      value: 5,
     },
     role: {
       name: 'Роли в чате',
       value: true,
     },
-    armorAndSword: {
-      name: 'Эмодзи уровня экипировки в чате',
+  })
+
+  static playerSettings = Settings.player(i18n`Чат\n§7Звуки и внешний вид чата`, 'chat', {
+    sound: {
+      name: i18n`Звук`,
+      description: i18n`Звука сообщений от игроков поблизости`,
       value: true,
     },
   })
 
-  playerSettings = Settings.player(i18n`Чат\n§7Звуки и внешний вид чата`, 'chat', {
-    hightlightMessages: {
-      name: i18n`Подсветка моих сообщений`,
-      description: i18n`Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r`,
-      value: true,
-    },
-    disableSound: {
-      name: i18n`Выключение звука`,
-      description: i18n`Выключение звука чужих сообщений`,
-      value: false,
-    },
-  })
+  private static cooldown: Cooldown
 
-  // @ts-expect-error It is initialized
-  private cooldown: Cooldown
-
-  private updateCooldown() {
-    this.cooldown = new Cooldown(this.settings.cooldown, true, this.db.get('cooldown'))
+  private static updateCooldown() {
+    this.cooldown = new Cooldown(this.settings.cooldown, true, {})
   }
 
-  constructor() {
+  static {
     this.updateCooldown()
     Command.chatSendListener = event => {
       if (Command.isCommand(event.message)) return
 
       try {
         if (!this.cooldown.isExpired(event.sender)) return
+        const player = event.sender
+
+        if (!this.cooldown.isExpired(event.sender)) {
+          console.log('Spam chat', player.name, event.message)
+          return
+        }
+
+        const mute = this.muteDb.getImmutable(event.sender.id)
+        if (mute) {
+          if (mute.mutedUntil > Date.now()) {
+            console.log('Muted chat', player.name, event.message)
+            return muteInfo(player, mute)
+          }
+        }
+
+        const messageText = event.message.replace(/\\n/g, '\n').replace(/§./g, '').trim()
+
+        const caps = messageText.split('').reduce((p, c) => (c === c.toUpperCase() ? p + 1 : p), 0)
+        if (caps > this.settings.capsLimit) {
+          return event.sender.fail(noI18n.error`В сообщении слишком много капса (${caps}/${this.settings.capsLimit})`)
+        }
 
         const allPlayers = world.getAllPlayers()
 
@@ -75,8 +93,7 @@ class ChatBuilder {
 
         // Outranged players
         const otherPlayers = allPlayers.filter(e => !nID.includes(e.id))
-        const messageText = event.message.replace(/\\n/g, '\n')
-        const message = `${getFullname(event.sender, { nameColor: '§7', equippment: this.settings.armorAndSword })}§r: ${messageText}`
+        const message = `${getFullname(event.sender, { nameColor: '§7', equippment: true })}§r: ${messageText}`
         const fullrole = getFullname(event.sender, { name: false })
 
         if (__SERVER__) {
@@ -92,22 +109,17 @@ class ChatBuilder {
 
         for (const near of nearPlayers) {
           near.tell(message)
-          if (!this.playerSettings(near).disableSound) near.playSound(Sounds.Click)
+          if (this.playerSettings(near).sound) near.playSound(Sounds.Click)
         }
 
         for (const outranged of otherPlayers) {
           outranged.tell(`${getFullname(event.sender, { nameColor: '§8' })}§7: ${messageText}`)
         }
 
-        const doHightlight = this.playerSettings(event.sender).hightlightMessages
-        event.sender.tell(
-          doHightlight ? i18n.nocolor`${fullrole ? fullrole + ' ' : fullrole}§6§lЯ§r: §f${messageText}` : message,
-        )
+        event.sender.tell(message)
       } catch (error) {
         console.error(error)
       }
     }
   }
 }
-
-export const Chat = new ChatBuilder()

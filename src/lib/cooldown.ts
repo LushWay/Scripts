@@ -1,10 +1,13 @@
 import { Player } from '@minecraft/server'
+import { table } from './database/abstract'
 import { i18n } from './i18n/text'
 
 export class Cooldown {
   static isExpired(timestamp: number, cooldown: number) {
     return Date.now() - timestamp >= cooldown
   }
+
+  static defaultDb = table<Record<string, number>>('cooldowns', () => ({}))
 
   /**
    * Create class for manage player cooldowns
@@ -43,7 +46,7 @@ export class Cooldown {
    * @param player - Player to check
    * @returns - Whenether cooldown is expired or not
    */
-  isExpired(player: Player | string) {
+  isExpired(player: Player | string, updateTimestamp = true) {
     const id = player instanceof Player ? player.id : player
     const elapsed = this.getElapsed(id)
     if (elapsed) {
@@ -52,7 +55,7 @@ export class Cooldown {
 
       return false
     } else {
-      this.db[id] = Date.now()
+      if (updateTimestamp) this.db[id] = Date.now()
 
       return true
     }
