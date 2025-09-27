@@ -8,6 +8,7 @@ import { Boss } from 'lib/rpg/boss'
 import { Vec } from 'lib/vector'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
+import { NewFormCallback, NewFormCreator } from 'lib/form/new'
 
 interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: Text
@@ -59,7 +60,7 @@ export class BossArenaRegion extends Region {
     return
   }
 
-  customFormButtons(form: ActionForm, player: Player): void {
+  customFormButtons(form: NewFormCreator, player: Player): void {
     form.button(noI18n`Вызвать босса`, () => {
       if (this.boss) Boss.db.delete(this.boss.id)
     })

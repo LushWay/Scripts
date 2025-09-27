@@ -1,6 +1,6 @@
 import { Player, RawMessage, RawText } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { defaultLang, Language } from 'lib/assets/lang'
+import { Language } from 'lib/assets/lang'
 import { ask } from 'lib/form/message'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'

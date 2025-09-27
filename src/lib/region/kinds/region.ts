@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
 import { removeDefaults, setDefaults } from 'lib/database/defaults'
-import { ActionForm } from 'lib/form/action'
+import { NewFormCreator } from 'lib/form/new'
 import { noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
@@ -63,6 +63,11 @@ export class Region {
     return key
   }
 
+  /** Regions list specific to this type of region. Use {@link getAll} to get them */
+  static regions: Region[] = []
+
+  private static regionsListType = ''
+
   /** Creates a new region */
   static create<T extends typeof Region>(
     this: T,
@@ -70,7 +75,11 @@ export class Region {
     options: ConstructorParameters<T>[1] = {},
     key?: string,
   ): InstanceType<T> {
-    if (this !== Region && this.regions === Region.regions) this.regions = []
+    // Make region list actually specific to class
+    if (this !== Region && this.regionsListType !== this.name) {
+      this.regions = []
+      this.regionsListType = this.name
+    }
 
     // if (!area.isValid()) throw new Error('Area ' + area.toString() + 'is invalid')
 
@@ -109,9 +118,6 @@ export class Region {
     object => object.dimensionType,
     object => object.area.edges,
   )
-
-  /** Regions list */
-  static regions: Region[] = []
 
   /**
    * Filters an array of regions to return instances of a specific region type.
@@ -303,7 +309,7 @@ export class Region {
   }
 
   /** Can be overriden to add custom buttons to the .region edit form */
-  customFormButtons(form: ActionForm, player: Player) {
+  customFormButtons(form: NewFormCreator, player: Player) {
     // Can be overriden to add custom buttons
   }
 

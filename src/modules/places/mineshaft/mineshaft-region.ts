@@ -6,6 +6,7 @@ import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../../../lib/region/kinds/minearea'
 import { ores, placeOre } from './algo'
+import { NewFormCreator } from 'lib/form/new'
 
 const logger = createLogger('Shaft')
 
@@ -61,7 +62,7 @@ export class MineshaftRegion extends MineareaRegion {
     return i18n.nocolor`§7Шахта`
   }
 
-  customFormButtons(form: ActionForm, player: Player): void {
+  customFormButtons(form: NewFormCreator, player: Player): void {
     form.button(noI18n`Убрать все руды и сохранить структуру`, () => {
       player.info('Start')
       this.removeAllOresAndResaveStructure()

@@ -76,4 +76,41 @@ describe('Region', () => {
 
     expectTypeOf(TestRegion.getManyAt(createPoint(0, 0, 0))).toEqualTypeOf<TestRegion[]>()
   })
+
+  it('should store regions in different places', () => {
+    class TestRegion extends Region {}
+    class TestAbcRegion extends TestRegion {}
+
+    class OtherRegion extends Region {}
+
+    const a = new SphereArea({ center: Vec.zero, radius: 0 })
+
+    TestRegion.create(a)
+    TestAbcRegion.create(a)
+
+    OtherRegion.create(a)
+
+    expect(Region.getAll().map(e => e.creator.name)).toMatchInlineSnapshot(`
+      [
+        "TestRegion",
+        "TestAbcRegion",
+        "OtherRegion",
+      ]
+    `)
+    expect(TestRegion.getAll().map(e => e.creator.name)).toMatchInlineSnapshot(`
+      [
+        "TestRegion",
+      ]
+    `)
+    expect(TestAbcRegion.getAll().map(e => e.creator.name)).toMatchInlineSnapshot(`
+      [
+        "TestAbcRegion",
+      ]
+    `)
+    expect(OtherRegion.getAll().map(e => e.creator.name)).toMatchInlineSnapshot(`
+      [
+        "OtherRegion",
+      ]
+    `)
+  })
 })

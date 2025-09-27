@@ -61,7 +61,7 @@ class RegionTool extends WorldEditTool<Storage> {
     if (!regionType)
       return player.onScreenDisplay.setActionBar(`§cUnknown region type: ${storage.regionKind}`, ActionbarPriority.High)
 
-    const regions = storage.minDistanceSameKind ? regionType.region.getAll() : Region.regions
+    const regions = storage.minDistanceSameKind ? regionType.region.getAll() : Region.getAll()
     if (storage.minDistance !== -1 && regions.some(r => r.area.isNear(player, storage.minDistance)))
       return player.onScreenDisplay.setActionBar(noI18n`§7Рядом другие регионы`, ActionbarPriority.High)
 

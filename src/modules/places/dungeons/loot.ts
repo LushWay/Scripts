@@ -71,25 +71,25 @@ const powerfullLoot: Record<string, LootTable | undefined> = {
     .item('GoldenApple')
     .weight('10%')
     .amount({
-      '1...3': '1%',
+      '1...5': '1%',
     })
 
     .item('IronIngot')
     .weight('10%')
     .amount({
-      '2...5': '1%',
+      '5...10': '1%',
     })
 
     .item('GoldenCarrot')
     .weight('10%')
     .amount({
-      '1...4': '1%',
+      '1...10': '1%',
     })
 
     .item('GoldIngot')
     .weight('5%')
     .amount({
-      '1...5': '1%',
+      '5...10': '1%',
     })
 
     .item('TotemOfUndying')
@@ -118,20 +118,20 @@ const loot: Record<string, LootTable | undefined> = {
     .item('IronIngot')
     .weight('5%')
     .amount({
-      '1...3': '1%',
+      '5...10': '1%',
     })
 
     .item('Carrot')
     .weight('10%')
     .amount({
-      '5...20': '1%',
+      '1...5': '1%',
     })
 
     .item(Items.Money)
     .weight('100%')
     .amount({
-      '1...5': '80%',
-      '6...10': '20%',
+      '10...20': '80%',
+      '21...64': '20%',
     }).build,
   [d.GasStationGarage]: defaultLoot,
 } satisfies Record<StructureDungeonsId, LootTable>

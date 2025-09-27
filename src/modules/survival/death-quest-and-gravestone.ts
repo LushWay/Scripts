@@ -95,7 +95,7 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
 
   if (getSettings(player).restoreInvQuest) {
     // Exit previous death quest
-    quest.exit(player)
+    quest.exit(player, false, true)
     quest.enter(player)
   }
 })

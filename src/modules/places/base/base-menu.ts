@@ -1,6 +1,7 @@
-import { Vec, editRegionPermissions, manageRegionMembers } from 'lib'
+import { Vec } from 'lib'
 import { form } from 'lib/form/new'
 import { i18n } from 'lib/i18n/text'
+import { editRegionPermissions, manageRegionMembers } from 'lib/region/form'
 import { baseRottingButton } from './actions/rotting'
 import { baseUpgradeButton } from './actions/upgrade'
 import { BaseRegion } from './region'
