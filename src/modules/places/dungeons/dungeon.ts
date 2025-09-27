@@ -319,7 +319,7 @@ export class DungeonRegion extends Region {
   private brokenTypeIdsMap = new Map([['evoker', MinecraftEntityTypes.EvocationIllager]])
 
   private spawn(spawner: DungeonSpawner): boolean {
-    if (!anyPlayerNear(spawner.location, this.dimensionType, 50)) return true
+    if (!anyPlayerNear(spawner.location, this.dimensionType, 50)) return false
 
     // eslint-disable-next-line prefer-const
     for (let { typeId, amount } of spawner.entities) {
@@ -333,7 +333,7 @@ export class DungeonRegion extends Region {
         continue
       }
 
-      const entities = this.dimension.getEntities({ location: spawner.location, maxDistance: 20 })
+      const entities = this.dimension.getEntities({ location: spawner.location, type: typeId, maxDistance: 20 })
       if (entities.length < amount) {
         const toSpawn = amount - entities.length
         logger.info(

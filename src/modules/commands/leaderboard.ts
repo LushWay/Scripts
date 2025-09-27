@@ -1,7 +1,10 @@
 /* i18n-ignore */
 
 import { Player, world } from '@minecraft/server'
-import { ActionForm, BUTTON, Leaderboard, ModalForm } from 'lib'
+import { ActionForm } from 'lib/form/action'
+import { ModalForm } from 'lib/form/modal'
+import { BUTTON } from 'lib/form/utils'
+import { Leaderboard, LeaderboardInfo } from 'lib/rpg/leaderboard'
 import { Vec } from 'lib/vector'
 
 new Command('leaderboard')
@@ -30,11 +33,7 @@ function info(lb: Leaderboard) {
   return lb.info.displayName + '\n' + Vec.string(Vec.floor(lb.info.location))
 }
 
-function editLeaderboard(
-  player: Player,
-  lb?: Leaderboard,
-  data: Partial<import('lib').LeaderboardInfo> = lb?.info ?? {},
-) {
+function editLeaderboard(player: Player, lb?: Leaderboard, data: Partial<LeaderboardInfo> = lb?.info ?? {}) {
   const action = lb ? 'Изменить ' : 'Выбрать '
   function update() {
     if (!lb && isRequired(data)) {
@@ -108,7 +107,6 @@ function editLeaderboard(
             data.location = { x, y, z }
           }
           data.dimension = dimension
-          if (lb && data.location) lb.entity.teleport(data.location, { dimension: world[dimension] })
           update()
         })
     })
@@ -128,15 +126,18 @@ function editLeaderboard(
         })
     })
 
-  if (lb) form.ask('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
+  if (lb) {
+    form.button('Переместить к себе', () => {
+      data.location = Vec.floor(player.location).add(Vec.one.multiply(0.5))
+      data.dimension = player.dimension.type
+      update()
+    })
+    form.ask('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
+  }
 
   form.show(player)
 }
 
-/**
- * @param {Partial<import('lib').LeaderboardInfo>} data
- * @returns {data is import('lib').LeaderboardInfo}
- */
-function isRequired(data: Partial<import('lib').LeaderboardInfo>): data is import('lib').LeaderboardInfo {
+function isRequired(data: Partial<LeaderboardInfo>): data is LeaderboardInfo {
   return !!data.dimension && !!data.displayName && !!data.location && !!data.objective && !!data.style
 }

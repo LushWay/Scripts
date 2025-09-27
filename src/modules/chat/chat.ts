@@ -72,7 +72,7 @@ export class Chat {
 
         const messageText = event.message.replace(/\\n/g, '\n').replace(/§./g, '').trim()
 
-        const caps = messageText.split('').reduce((p, c) => (c === c.toUpperCase() ? p + 1 : p), 0)
+        const caps = messageText.split('').reduce((p, c) => (c !== c.toLowerCase() ? p + 1 : p), 0)
         if (caps > this.settings.capsLimit) {
           return event.sender.fail(noI18n.error`В сообщении слишком много капса (${caps}/${this.settings.capsLimit})`)
         }
@@ -85,7 +85,7 @@ export class Chat {
             location: event.sender.location,
             maxDistance: this.settings.range,
           })
-          .filter(e => e.id !== event.sender.id)
+          .filter(e => e.id !== event.sender.id && e.dimension.id === event.sender.dimension.id)
 
         // Array with ranged players (include sender id)
         const nID = nearPlayers.map(e => e.id)
