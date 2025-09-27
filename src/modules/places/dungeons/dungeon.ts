@@ -73,7 +73,10 @@ export class DungeonRegion extends Region {
             dungeon.ldb.spawnerCooldowns ??= {}
             const cooldown = dungeon.ldb.spawnerCooldowns[spawner.id]
             if (!cooldown || Cooldown.isExpired(cooldown, spawner.restoreTime)) {
-              if (dungeon.spawn(spawner)) dungeon.ldb.spawnerCooldowns[spawner.id] = Date.now()
+              if (dungeon.spawn(spawner)) {
+                dungeon.ldb.spawnerCooldowns[spawner.id] = Date.now()
+                dungeon.save()
+              }
             }
           }
 
@@ -192,6 +195,12 @@ export class DungeonRegion extends Region {
     form.button(noI18n`Снова установить структуру`, () => {
       this.placeStructure()
     })
+    form.button(noI18n`Сбросить кд`, () => {
+      this.ldb.spawnerCooldowns = {}
+      this.ldb.chests = {}
+      this.save()
+      player.success()
+    })
   }
 
   customFormDescription(player: Player): Text.Table {
@@ -309,8 +318,8 @@ export class DungeonRegion extends Region {
 
   private brokenTypeIdsMap = new Map([['evoker', MinecraftEntityTypes.EvocationIllager]])
 
-  private spawn(spawner: DungeonSpawner) {
-    if (!anyPlayerNear(spawner.location, this.dimensionType, 50)) return
+  private spawn(spawner: DungeonSpawner): boolean {
+    if (!anyPlayerNear(spawner.location, this.dimensionType, 50)) return true
 
     // eslint-disable-next-line prefer-const
     for (let { typeId, amount } of spawner.entities) {
@@ -333,13 +342,13 @@ export class DungeonRegion extends Region {
         for (let i = 0; i < toSpawn; i++) {
           try {
             this.dimension.spawnEntity(type, spawner.location)
-            return true
           } catch (e) {
             logger.error('spawn', e)
           }
         }
       }
     }
+    return true
   }
 
   private chests: DungeonChest[] = []
@@ -369,6 +378,7 @@ export class DungeonRegion extends Region {
     if (!block?.isValid) return
 
     this.ldb.chests[chest.id] = Date.now()
+    this.save()
 
     if (block.typeId !== MinecraftBlockTypes.Chest) block.setType(MinecraftBlockTypes.Chest)
 
