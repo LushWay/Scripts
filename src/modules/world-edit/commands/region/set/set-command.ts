@@ -11,7 +11,7 @@ const set = new Command('set')
 set
   .string('block')
   .array('mode', Object.keys(REPLACE_MODES), true)
-  .string('replaceBlock')
+  .string('replaceBlock', true)
   .executes((ctx, block, replaceMode = '', replaceBlock) => {
     const we = WorldEdit.forPlayer(ctx.player)
     if (!we.selection) return ctx.reply('§cЗона не выделена!')

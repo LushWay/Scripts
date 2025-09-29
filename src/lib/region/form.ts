@@ -1,5 +1,4 @@
 import { Player, world } from '@minecraft/server'
-import { ArrayForm, BUTTON, FormCallback, inspect, ModalForm, Region, Vec } from 'lib'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
 import { i18n, noI18n, textTable } from 'lib/i18n/text'
@@ -10,6 +9,12 @@ import { FlattenedSphereArea } from './areas/flattened-sphere'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 import { regionTypes } from './command'
+import { Region } from './kinds/region'
+import { ArrayForm } from 'lib/form/array'
+import { BUTTON, FormCallback } from 'lib/form/utils'
+import { ModalForm } from 'lib/form/modal'
+import { Vec } from 'lib/vector'
+import { inspect } from 'lib/utils/inspect'
 
 export const regionForm = form((f, { player, self }) => {
   f.title(noI18n`Управление регионами`)

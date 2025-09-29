@@ -2,11 +2,10 @@ import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
-import { showForm } from 'lib/form/utils'
-import { Message } from 'lib/i18n/message'
+import { FormCallback, showForm } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
-import { doNothing, util } from 'lib/util'
+import { doNothing } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => unknown
 
@@ -133,8 +132,6 @@ class Form {
   }
 
   show = async () => {
-    const callbackExecutor: (fn: VoidFunction) => void = __TEST__ ? f => f() : util.catch
-
     if (!this.buttons.length) this.button(noI18n`Empty`, undefined, this.show)
 
     const response = await showForm(this.form, this.player)
@@ -148,7 +145,17 @@ class Form {
       )
 
     if (typeof callback === 'function') {
-      return callbackExecutor(() => callback(this.player, this.show))
+      if (__TEST__) {
+        // Call right here to throw error
+        await callback(this.player, this.show)
+      } else {
+        try {
+          await callback(this.player, this.show)
+        } catch (e) {
+          new FormCallback(this.form, this.player, this.show).error(String(e))
+          console.error('Form error', e)
+        }
+      }
     }
   }
 }

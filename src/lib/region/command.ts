@@ -54,6 +54,7 @@ const tpdb = table<{ type: string; i: number; enabled: boolean }>('regionTpTest'
 command
   .overload('tp')
   .setPermissions('techAdmin')
+  .setDescription('Входит в режим телепортации по группе регионов. Полезно для поиска данжа')
   .setGroup('test')
   .executes(ctx => {
     const db = tpdb.get(ctx.player.id)
