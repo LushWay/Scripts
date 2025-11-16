@@ -211,10 +211,18 @@ export class Region {
    * @param o.key - The key of the region. This is used to identify the region.
    */
   constructor(
-    public area: Area,
+    readonly area: Area,
     options: RegionCreationOptions,
     readonly id: string,
   ) {}
+
+  public replaceArea(newArea: Area) {
+    // Area changed, need to update chunk query storages too
+    Region.chunkQuery.remove(this)
+    ;(this as { area: Area }).area = newArea
+    this.save()
+    Region.chunkQuery.add(this)
+  }
 
   /** Function that gets called on region creation after saving (once) */
   protected onCreate() {

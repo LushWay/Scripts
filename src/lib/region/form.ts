@@ -213,15 +213,7 @@ const editRegion = form.params<{ region: Region; displayName: boolean }>(
       noI18n`Заменить зону`,
       selectArea({
         title: noI18n`Заменить зону`,
-        onSelect: area => {
-          // Area changed, need to update chunk query storages too
-          Region.chunkQuery.remove(region)
-          region.area = area
-          region.save()
-          Region.chunkQuery.add(region)
-
-          return self
-        },
+        onSelect: area => (region.replaceArea(area), self),
       }),
     )
 
