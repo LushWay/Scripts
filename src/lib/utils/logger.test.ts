@@ -25,8 +25,8 @@ describe('Logger', () => {
         }
       ]§r
       §9name§r §fMessage Template§r
-      §9name §f§lTest player name§r §r Player message Common§r
-      §9name §f§lTest player name§r §r §fMessage Template§r"
+      §9name §f§lTest player name§r§r Player message Common§r
+      §9name §f§lTest player name§r§r §fMessage Template§r"
     `)
   })
 })

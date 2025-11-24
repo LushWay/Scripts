@@ -25,7 +25,7 @@ export function createLogger(name: string) {
       const cache = playerLoggers.get(player.id)
       if (cache) return cache
 
-      const logger = createSimpleLogger(`${name.trimEnd()} §f§l${player.isValid ? player.name : player.id}§r `)
+      const logger = createSimpleLogger(`${name.trimEnd()} §f§l${player.isValid ? player.name : player.id}§r`)
       playerLoggers.set(player.id, logger)
       return logger
     },
