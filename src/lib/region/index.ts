@@ -16,6 +16,7 @@ import { i18n, noI18n } from 'lib/i18n/text'
 import { onPlayerMove } from 'lib/player-move'
 import { is } from 'lib/roles'
 import { isNotPlaying } from 'lib/utils/game'
+import { createLogger } from 'lib/utils/logger'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
@@ -113,13 +114,19 @@ actionGuard((player, region, context) => {
   }
 }, ActionGuardOrder.ProjectileUsePrevent)
 
+const permdebugLogger = createLogger('region-perm')
+
 const allowed: InteractionAllowed = (player, region, context, regions) => {
   //
   for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
     if (Region.permissionDebug) {
-      if (is(player.id, 'techAdmin')) console.log('regionDebug', fn.toString().slice(0, 50), ' ', result)
-      player.info(noI18n`regionDebug ${fn.toString().slice(0, 50).replaceAll('\n', ' ')} ${result}`)
+      if (is(player.id, 'techAdmin')) {
+        let msg = noI18n`§5${fn.toString().slice(0, 100).replaceAll('\n', ' ')} -> ${typeof result === 'undefined' ? '§bSKIP' : result}`
+        if (typeof result === 'boolean') msg += noI18n`\n§fResult: ${result}`
+        permdebugLogger.info(msg)
+        player.tell(msg)
+      }
     }
     if (typeof result === 'boolean') {
       return result
