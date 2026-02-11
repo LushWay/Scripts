@@ -4,12 +4,13 @@ import { stringifyError } from 'lib/util'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 
-export type AreaCreator = new (o: any) => Area
+export type AreaCreator = new (db: any, dimensionType?: DimensionType) => Area
 export type AreaWithType<T = AreaCreator> = T & { type: string }
 
 export interface AreaAsJson extends JsonObject {
   t: string
   d: JsonObject
+  dd?: DimensionType
 }
 
 export abstract class Area<T extends JsonObject = JsonObject> {
@@ -19,15 +20,17 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
   static asSaveableArea<T extends AreaCreator>(this: T) {
     const b = this as AreaWithType<T>
-    b.type = new (this as unknown as AreaCreator)({}).type
+    world.afterEvents.worldLoad.subscribe(() => {
+      b.type = new (this as unknown as AreaCreator)({}).type
 
-    if ((this as unknown as typeof Area).loaded) {
-      throw new Error(
-        `Registering area type ${b.type} failed. Regions are already restored from json. Registering area should occur on the import-time.`,
-      )
-    }
+      if ((this as unknown as typeof Area).loaded) {
+        throw new Error(
+          `Registering area type ${b.type} failed. Regions are already restored from json. Registering area should occur on the import-time.`,
+        )
+      }
 
-    ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
+      ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
+    })
     return b
   }
 
@@ -40,7 +43,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
       return
     }
 
-    return new area(a.d)
+    return new area(a.d, a.dd)
   }
 
   constructor(
@@ -92,7 +95,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
    * restore the same state
    */
   toJSON(): AreaAsJson {
-    return { t: this.type, d: this.database }
+    return { t: this.type, d: this.database, dd: this.dimensionType === 'overworld' ? undefined : this.dimensionType }
   }
 
   protected get dimension() {
