@@ -1,7 +1,7 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { actionGuard, ActionGuardOrder, isNotPlaying } from 'lib'
-import { createLogger } from 'lib/utils/logger'
+import { antiCheatLogger } from './log-provider'
 
 const forbiddenItems: string[] = [
   MinecraftItemTypes.Barrier,
@@ -13,7 +13,9 @@ const forbiddenItems: string[] = [
   MinecraftItemTypes.RepeatingCommandBlock,
 ]
 
-const logger = createLogger('AntiCheat')
+const logger = antiCheatLogger
+
+// TODO Use inventorySlotChange + scan on startup and player join
 
 function interval() {
   try {
