@@ -6,9 +6,9 @@ import { stringify } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { MemoryTable, Table, table } from './database/abstract'
+import { Message } from './i18n/message'
 import { i18n, noI18n } from './i18n/text'
 import stringifyError from './utils/error'
-import { Message } from './i18n/message'
 
 // TODO refactor(leaftail1880): Move all types under the Settings namespace
 // TODO refactor(leaftail1880): Move everything into the lib/settings/ folder
@@ -99,6 +99,11 @@ export class Settings {
     fn.groupId = groupId
     fn.groupName = groupName
     fn.extend = [groupName, groupId] as const
+    fn.override = (setting: keyof Config, value: Partial<SettingsConfig<PlayerSettingValues>[string]>) => {
+      for (const [k, v] of Object.entries(value)) {
+        if (config[setting]) (config[setting] as unknown as Record<string, unknown>)[k] = v
+      }
+    }
 
     return fn
   }
