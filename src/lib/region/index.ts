@@ -8,15 +8,14 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { Items } from 'lib/assets/custom-items'
-import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
+// import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+// import { Items } from 'lib/assets/custom-items'
+// import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { onPlayerMove } from 'lib/player-move'
+// import { onPlayerMove } from 'lib/player-move'
 import { is } from 'lib/roles'
 import { isNotPlaying } from 'lib/utils/game'
-import { createLogger } from 'lib/utils/logger'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
@@ -30,14 +29,17 @@ import {
   SWITCHES,
   TRAPDOORS,
 } from './config'
+// import { RegionEvents } from './events'
+import { onPlayerMove } from 'lib/player-move'
+import { createLogger } from 'lib/utils/logger'
 import { RegionEvents } from './events'
+import './explosion'
 import { Region } from './kinds/region'
 
 export * from './command'
 export * from './config'
 export * from './database'
 
-export * from './kinds/boss-arena'
 export * from './kinds/region'
 export * from './kinds/road'
 export * from './kinds/safe-area'
@@ -71,6 +73,7 @@ export enum ActionGuardOrder {
   // Limits
   Permission = 7,
   Lowest = 6,
+  DefaultAllowAll = 5,
 }
 
 export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []
@@ -109,10 +112,13 @@ actionGuard((player, region, context) => {
       if (typeId === MinecraftItemTypes.EnderPearl) return ent.includes(MinecraftEntityTypes.EnderPearl)
       if (typeId === MinecraftItemTypes.WindCharge) return ent.includes(MinecraftEntityTypes.WindChargeProjectile)
       if (typeId === MinecraftItemTypes.Snowball) return ent.includes(MinecraftEntityTypes.Snowball)
-      if (typeId === Items.Fireball) return ent.includes(CustomEntityTypes.Fireball)
     }
   }
 }, ActionGuardOrder.ProjectileUsePrevent)
+
+actionGuard(() => {
+  return true
+}, ActionGuardOrder.DefaultAllowAll)
 
 const permdebugLogger = createLogger('region-perm')
 
@@ -180,10 +186,14 @@ world.afterEvents.entitySpawn.subscribe(({ entity }) => {
   if ((NOT_MOB_ENTITIES.includes(typeId) && typeId !== 'minecraft:item') || !entity.isValid) return
 
   const region = Region.getAt(entity)
+  if (!region) return // Allow entity spawn outside of region by default
 
-  if (isForceSpawnInRegionAllowed(entity) || (typeId === 'minecraft:item' && region?.permissions.allowedAllItem)) return
-  if (!region || region.permissions.allowedEntities === 'all' || region.permissions.allowedEntities.includes(typeId))
-    return
+  const { allowedAllItem, allowedEntities, disallowedFamilies } = region.permissions
+
+  if (isForceSpawnInRegionAllowed(entity)) return
+  if (allowedAllItem && typeId === 'minecraft:item') return
+  if (allowedEntities === 'all' || allowedEntities.includes(typeId)) return
+  if (disallowedFamilies?.length && entity.matches({ excludeFamilies: disallowedFamilies })) return
 
   entity.remove()
 })
@@ -198,20 +208,20 @@ onPlayerMove.subscribe(({ player, location, dimensionType }) => {
 
   RegionEvents.playerInRegionsCache.set(player, newest)
   const currentRegion = newest[0]
-  const isPlaying = !isNotPlaying(player)
+  // const isPlaying = !isNotPlaying(player)
 
-  const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
+  // const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
 
-  if (typeof currentRegion !== 'undefined' && isPlaying) {
-    if (currentRegion.permissions.pvp === false) {
-      player.triggerEvent(
-        player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
-      )
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (currentRegion.permissions.pvp === 'pve') {
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else resetNewbie()
-  } else resetNewbie()
+  // if (typeof currentRegion !== 'undefined' && isPlaying) {
+  //   if (currentRegion.permissions.pvp === false) {
+  //     player.triggerEvent(
+  //       player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
+  //     )
+  //     player.setProperty(PlayerProperties['lw:newbie'], true)
+  //   } else if (currentRegion.permissions.pvp === 'pve') {
+  //     player.setProperty(PlayerProperties['lw:newbie'], true)
+  //   } else resetNewbie()
+  // } else resetNewbie()
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
 })

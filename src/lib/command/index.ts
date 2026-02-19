@@ -1,11 +1,23 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
-import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { Language } from 'lib/assets/lang'
+import {
+  ChatSendAfterEvent,
+  CommandPermissionLevel,
+  CustomCommandOrigin,
+  CustomCommandParameter,
+  CustomCommandStatus,
+  Player,
+  PlayerPermissionLevel,
+  system,
+  world,
+} from '@minecraft/server'
+import { consoleLang, defaultLang, Language } from 'lib/assets/lang'
+import { Message } from 'lib/i18n/message'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { stringifyError } from 'lib/util'
+import { stringifyError, util } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
 import { createLogger } from 'lib/utils/logger'
-import { is } from '../roles'
+import { Vec } from 'lib/vector'
+import { getRole, is, ROLES } from '../roles'
 import {
   ArrayArgumentType,
   BooleanArgumentType,
@@ -31,6 +43,8 @@ type ArgReturn<Callback, Type, Optional> = Command<
 type CommandCallback = (ctx: CommandContext, ...args: any[]) => void
 
 export class Command<Callback extends CommandCallback = (ctx: CommandContext) => void> {
+  static loaded = false
+
   static prefixes = ['.', '-']
 
   static isCommand(message: string) {
@@ -50,7 +64,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     if (!parsed) {
       this.logger.player(event.sender).error`Unable to parse: ${event.message}`
       return event.sender.fail(noI18n`Failed to parse command`)
-    } else this.logger.player(event.sender).info`Command ${event.message}`
+    } else if (event.sender.name !== 'server') this.logger.player(event.sender).info`Command ${event.message}`
 
     const { cmd, args, input } = parsed
 
@@ -93,7 +107,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   }
 
   [stringifySymbol]() {
-    return `§f${Command.prefixes[0]}${this.getFullName()}`
+    return `§f/${this.getFullName()}`
   }
 
   private getFullName(name = ''): string {
@@ -115,6 +129,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   private stack: string
 
   sys = {
+    admin: false,
     /**
      * The name of the command
      *
@@ -140,14 +155,16 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
      * @param player This will return the player that uses this command
      * @returns If this player has permission to use this command
      */
-    requires: (player: Player) => is(player.id, 'admin'),
+    requires: ((player: Player) => is(player.id, 'admin')) as ((player: Player) => boolean) & {
+      onFail?: PlayerCallback
+    },
 
     /**
      * Minimal role required to run this command.
      *
      * This is an alias to `requires: (p) => is(player, role)`
      */
-    role: 'admin' as Role,
+    role: 'admin' as Role | undefined,
     /**
      * Other names that can call this command
      *
@@ -186,6 +203,10 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
     this.stack = stringifyError.stack.get(2)
     if (!parent && !__VITEST__) Command.checkIsUnique(name)
+
+    if (Command.loaded) {
+      Command.logger.warn('Commands are already loaded, tried registering ', name, new Error().stack)
+    }
 
     this.sys.name = name
 
@@ -237,7 +258,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @example
    *   "admin"
    */
-  setPermissions(arg?: Role | ((player: Player) => boolean) | 'everybody'): this
+  setPermissions(arg?: Role | (((player: Player) => boolean) & { onFail?: PlayerCallback }) | 'everybody'): this
 
   /**
    * Sets minimal role that allows player to execute the command. Default allowed role is admin.
@@ -270,11 +291,16 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     if (arg === 'everybody') {
       // Everybody
       this.sys.requires = () => true
+      this.sys.role = 'member'
+      this.sys.admin = false
     } else if (typeof arg === 'function') {
       // Custom permissions function
       this.sys.requires = arg
+      this.sys.admin = false
+      delete this.sys.role
     } else {
       // Role
+      this.sys.admin = arg === 'creator' || arg === 'techAdmin'
       this.sys.role = arg
       this.sys.requires = p => is(p.id, arg)
     }
@@ -420,9 +446,186 @@ declare global {
 
 globalThis.Command = Command
 
-world.beforeEvents.chatSend.subscribe(event => {
-  event.cancel = true
-  system.delay(() => {
-    Command.chatListener(event)
-  })
+// world.beforeEvents.chatSend.subscribe(event => {
+//   event.cancel = true
+//   system.delay(() => {
+//     Command.chatListener(event)
+//   })
+// })
+
+system.beforeEvents.startup.subscribe(load => {
+  const namespace = 'folkbe'
+  for (const command of Command.commands) {
+    if (command.sys.depth !== 0) continue
+    // Only simple commands are supported rn
+
+    try {
+      const mandatoryParameters: CustomCommandParameter[] = []
+      const optionalParameters: CustomCommandParameter[] = []
+
+      let callback = command.sys.callback
+      const locationIndexes: number[] = []
+      let i = 0
+
+      let nowOptional = false
+
+      function collectParams(command: Command) {
+        const child = command.sys.children[0]
+        if (!child || child instanceof LiteralArgumentType) return
+
+        // Location is split
+        if (child.sys.type.name.endsWith('*')) return collectParams(child)
+
+        child.sys.type.register(load.customCommandRegistry, namespace)
+        const param: CustomCommandParameter = { name: child.sys.type.name, type: child.sys.type.ctype }
+        if (child.sys.type.optional) {
+          nowOptional = true
+          optionalParameters.push(param)
+        } else {
+          if (nowOptional) throw new Error('Mandatory param cannot come after optional in command ' + command.sys.name)
+          mandatoryParameters.push(param)
+        }
+
+        if (child.sys.type instanceof LocationArgumentType) locationIndexes.push(i)
+        i++
+
+        if (child.sys.callback) callback = child.sys.callback
+
+        collectParams(child)
+      }
+      collectParams(command)
+
+      load.customCommandRegistry.registerCommand(
+        {
+          name: namespace + ':' + command.sys.name,
+          permissionLevel: command.sys.admin ? CommandPermissionLevel.GameDirectors : CommandPermissionLevel.Any,
+          description: command.sys.description.to(defaultLang),
+          mandatoryParameters,
+          optionalParameters,
+        },
+        (ctx, ...args) => {
+          if (!callback) {
+            return {
+              status: CustomCommandStatus.Failure,
+              message: 'Команда не готова',
+            }
+          }
+
+          const isServer = !(ctx.sourceEntity instanceof Player)
+          const output: CommandOutputBuffer = { output: '', isSync: isServer }
+          const player: Player =
+            ctx.sourceEntity instanceof Player ? ctx.sourceEntity : createPlayerProxy(ctx, command, output)
+
+          const allowed = command.sys.requires(player)
+          if (!allowed) {
+            if (command.sys.requires.onFail) {
+              command.sys.requires.onFail(player)
+            } else {
+              if (command.sys.role) {
+                player.fail(
+                  i18n.error`Команда доступна только начиная с роли ${ROLES[command.sys.role]}. Ваша роль: ${ROLES[getRole(player.id)]}`,
+                )
+              } else {
+                player.fail(i18n.error`Команда недоступна`)
+              }
+            }
+
+            return { status: CustomCommandStatus.Failure, message: output.output || undefined }
+          }
+
+          for (const i of locationIndexes) {
+            const arg: unknown = args[i]
+            if (Vec.isVec(arg)) args[i] = Vec.floor(arg)
+          }
+
+          if (isServer) {
+            execCmd(player, command, callback, args, output)
+          } else {
+            system.delay(() => {
+              if (!callback) throw new Error('no callback')
+              execCmd(player, command, callback, args, output)
+            })
+          }
+          return { status: CustomCommandStatus.Success, message: output.output || undefined }
+        },
+      )
+    } catch (e) {
+      Command.logger.error('Failed to load command', command.sys.name, e)
+    }
+  }
+
+  Command.loaded = true
 })
+
+interface CommandOutputBuffer {
+  output: string
+  isSync: boolean
+}
+
+function createPlayerProxy(
+  ctx: CustomCommandOrigin,
+  command: Command<(ctx: CommandContext) => void>,
+  output: CommandOutputBuffer,
+): Player {
+  const sendMessage = (...messages: unknown[]) => {
+    const translated = messages.map(e => (e instanceof Message ? e.to(consoleLang) : e))
+    const message = util.format([...translated])
+    if (output.isSync) {
+      output.output += `${message}\n`
+    } else {
+      Command.logger.info('server', 'async', `/${command.sys.name}`, message)
+    }
+  }
+  return new Proxy(
+    {
+      dimension: ctx.sourceEntity?.dimension ?? ctx.sourceBlock?.dimension ?? world.overworld,
+
+      commandPermissionLevel: CommandPermissionLevel.Owner,
+      playerPermissionLevel: PlayerPermissionLevel.Custom,
+      isValid: true,
+      fail: sendMessage,
+      success: sendMessage,
+      info: sendMessage,
+      warn: sendMessage,
+      sendMessage: sendMessage,
+      tell: sendMessage,
+      playSound: () => void 0,
+      id: 'server',
+      name: 'server',
+    } as Partial<Player>,
+    {
+      get(target, p, receiver) {
+        if (!(p in target)) {
+          throw new Error(
+            `Command is not supported to be run by server, tried to use ${String(p)}, only ${Object.keys(target).join(' | ')} are supported`,
+          )
+        }
+
+        return Reflect.get(target, p, receiver) as unknown
+      },
+    },
+  ) as unknown as Player
+}
+
+function execCmd(
+  player: Player,
+  command: Command<(ctx: CommandContext) => void>,
+  callback: (ctx: CommandContext, ...args: unknown[]) => void | Promise<void>,
+  args: unknown[],
+  output: CommandOutputBuffer,
+) {
+  try {
+    Command.logger.player(player).info(command.sys.name, ...args)
+    const result = callback(new CommandContext({ sender: player, message: '', targets: [] }, [], command, ''), ...args)
+    if (result && result instanceof Promise) {
+      output.isSync = false
+      result.catch((e: unknown) => {
+        Command.logger.player(player).error(command.sys.name, '[async]', ...args, e)
+        player.fail('Ошибка в асинхронной команде ' + String(e))
+      })
+    }
+  } catch (e) {
+    Command.logger.player(player).error(command.sys.name, ...args, e)
+    player.fail('Ошибка в команде ' + String(e))
+  }
+}

@@ -1,5 +1,5 @@
 import * as mc from '@minecraft/server'
-import '../../tools/defines'
+import '../../tools/defines.d.ts'
 
 declare global {
   type VoidFunction = () => void

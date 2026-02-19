@@ -382,6 +382,11 @@ export class InventoryStore {
     if (!keepInventory) entity.container?.clearAll()
   }
 
+  set(key: string, inventory: Inventory) {
+    this.inventories.set(key, inventory)
+    this.requestSave()
+  }
+
   /**
    * Checks if key was saved into this store
    *

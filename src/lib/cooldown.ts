@@ -9,6 +9,14 @@ export class Cooldown {
 
   static defaultDb = table<Record<string, number>>('cooldowns', () => ({}))
 
+  static getDb(cd: Cooldown) {
+    return cd.db
+  }
+
+  static getTime(cd: Cooldown) {
+    return cd.time
+  }
+
   /**
    * Create class for manage player cooldowns
    *
@@ -50,8 +58,10 @@ export class Cooldown {
     const id = player instanceof Player ? player.id : player
     const elapsed = this.getElapsed(id)
     if (elapsed) {
-      if (this.tell && player instanceof Player)
-        player.fail(i18n.error`Не так быстро! Попробуй через ${i18n.time(this.time - elapsed)}`)
+      if (this.tell && player instanceof Player) {
+        const after = this.time - elapsed
+        player.fail(i18n.error`Не так быстро! Попробуй через ${after > 1000 ? i18n.hhmmss(after) : i18n`${after}мсек`}`)
+      }
 
       return false
     } else {

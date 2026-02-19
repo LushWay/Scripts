@@ -89,7 +89,7 @@ export class Rewards {
    */
   give(player: Player, tell = true): Rewards {
     for (const reward of this.entries) Rewards.giveOne(player, reward)
-    if (tell) player.success(i18n`Вы получили награды!`)
+    if (tell && this.entries.length) player.success(i18n`Вы получили награды!`)
     return this
   }
 

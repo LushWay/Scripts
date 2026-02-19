@@ -33,6 +33,8 @@ export interface RegionPermissions extends Record<string | number | symbol, unkn
 
   /** Whenether to allow any items to spawn or only specific with the forceSpawn flag set */
   allowedAllItem: boolean
+
+  disallowedFamilies?: string[]
 }
 
 /** Options used in {@link Region.create} */
@@ -75,11 +77,11 @@ export class Region {
     options: ConstructorParameters<T>[1] = {},
     key?: string,
   ): InstanceType<T> {
-    // Make region list actually specific to class
-    if (this !== Region && this.regionsListType !== this.name) {
-      this.regions = []
-      this.regionsListType = this.name
-    }
+    // // Make region list actually specific to class
+    // if (this !== Region && this.regionsListType !== this.name) {
+    //   this.regions = []
+    //   this.regionsListType = this.name
+    // }
 
     // if (!area.isValid()) throw new Error('Area ' + area.toString() + 'is invalid')
 

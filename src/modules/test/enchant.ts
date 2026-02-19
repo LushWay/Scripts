@@ -1,6 +1,6 @@
 /* i18n-ignore */
-import { world } from '@minecraft/server'
 import { Enchantments } from 'lib/enchantments'
+import { stringify } from 'lib/util'
 
 new Command('enchant')
   .setDescription('Зачаровывает предмет')
@@ -37,7 +37,7 @@ new Command('enchant')
     newitem.lockMode = item.lockMode
     for (const prop of item.getDynamicPropertyIds()) newitem.setDynamicProperty(prop, item.getDynamicProperty(prop))
 
-    if (newitem.enchantable) world.debug('enchants', [...newitem.enchantable.getEnchantments()])
+    if (newitem.enchantable) ctx.player.tell('enchants ' + stringify([...newitem.enchantable.getEnchantments()]))
 
     mainhand.setItem(newitem)
   })

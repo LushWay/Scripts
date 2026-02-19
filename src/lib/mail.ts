@@ -55,7 +55,7 @@ export class Mail {
 
   private static inform(playerId: string, title: Message) {
     const player = Player.getById(playerId)
-    if (player) player.info(i18n`${i18n.header`Почта`}: ${title}, просмотреть: .mail`)
+    if (player) player.info(i18n`${i18n.header`Почта`}: ${title}, просмотреть: /mail`)
   }
 
   /**
@@ -156,6 +156,17 @@ export class Mail {
     if (!letter || letter.read) return
 
     letter.read = true
+  }
+
+  static readAllAndClaimRewards(player: Player) {
+    for (const { index, letter } of this.getLetters(player.id)) {
+      try {
+        this.readMessage(player.id, index)
+        this.claimRewards(player, index)
+      } catch (e) {
+        console.error('Failed to read and claim:', player.name, index, letter, e)
+      }
+    }
   }
 
   /**

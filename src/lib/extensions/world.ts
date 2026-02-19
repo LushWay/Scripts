@@ -1,6 +1,5 @@
-import { World, world } from '@minecraft/server'
+import { Dimension, World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
-import { stringify } from '../util'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -12,30 +11,41 @@ declare module '@minecraft/server' {
      * Logs given message once
      *
      * @param type Type of log
-     * @param messages Data to log using world.debug()
+     * @param messages Data to log
      */
     logOnce(type: string, ...messages: unknown[]): void
 
-    /** Prints data using world.say() and parses any object to string using toStr method. */
-    debug(...data: unknown[]): void
     overworld: Dimension
     end: Dimension
     nether: Dimension
   }
 }
 
+world.afterEvents.worldLoad.subscribe(() => {
+  expand(World.prototype, {
+    overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
+    nether: world.getDimension(MinecraftDimensionTypes.Nether),
+    end: world.getDimension(MinecraftDimensionTypes.TheEnd),
+  })
+})
+
 expand(World.prototype, {
   say: world.sendMessage.bind(world),
-  overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
-  nether: world.getDimension(MinecraftDimensionTypes.Nether),
-  end: world.getDimension(MinecraftDimensionTypes.TheEnd),
-  debug(...data: unknown[]) {
-    this.say(data.map(stringify).join(' '))
+  get overworld() {
+    // throw new Error('Dimensions are not available')
+    return undefined as unknown as Dimension
   },
-
+  get nether() {
+    // throw new Error('Dimensions are not available')
+    return undefined as unknown as Dimension
+  },
+  get end() {
+    // throw new Error('Dimensions are not available')
+    return undefined as unknown as Dimension
+  },
   logOnce(name, ...data: unknown[]) {
     if (logs.has(name)) return
-    world.debug(...data)
+    console.log(name, ...data)
     logs.add(name)
   },
 })

@@ -57,7 +57,9 @@
     "printWidth": 120,
     "endOfLine": "crlf",
     "quoteProps": "consistent",
-    "plugins": [],
+    "plugins": [
+      "prettier-plugin-jsdoc"
+    ],
     "jsdocTagsOrder": "{\"template\": 24.5}"
   },
   "packageManager": "yarn@4.9.1",

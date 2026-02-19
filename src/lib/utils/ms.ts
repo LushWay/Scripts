@@ -1,6 +1,6 @@
 /* i18n-ignore */
 
-type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'
+export type Time = 'year' | 'month' | 'day' | 'hour' | 'min' | 'sec' | 'ms'
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class ms {

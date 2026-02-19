@@ -1,3 +1,5 @@
+import { CustomCommandParamType, CustomCommandRegistry } from '@minecraft/server'
+
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export abstract class IArgumentType<T extends boolean = false> {
   /** The return type */
@@ -19,6 +21,12 @@ export abstract class IArgumentType<T extends boolean = false> {
    *   number
    */
   abstract typeName: string
+
+  abstract ctype: CustomCommandParamType
+
+  register(ctx: CustomCommandRegistry, namespace: string) {
+    return true
+  }
 
   /** The name this argument is */
   abstract name: string
@@ -46,6 +54,8 @@ export class LiteralArgumentType<T extends boolean = false> extends IArgumentTyp
     super()
   }
 
+  ctype: CustomCommandParamType = CustomCommandParamType.String
+
   type = null
 
   typeName = 'literal'
@@ -69,6 +79,8 @@ export class StringArgumentType<T extends boolean = false> extends IArgumentType
     super()
   }
 
+  ctype = CustomCommandParamType.String
+
   type = 'string'
 
   typeName = '§3string'
@@ -88,6 +100,8 @@ export class IntegerArgumentType<T extends boolean = false> extends IArgumentTyp
   ) {
     super()
   }
+
+  ctype: CustomCommandParamType = CustomCommandParamType.Integer
 
   type = 1
 
@@ -109,6 +123,8 @@ export class LocationArgumentType<T extends boolean = false> extends IArgumentTy
   ) {
     super()
   }
+
+  ctype: CustomCommandParamType = CustomCommandParamType.Location
 
   type = { x: 0, y: 0, z: 0 } as Vector3
 
@@ -132,6 +148,8 @@ export class BooleanArgumentType<T extends boolean = false> extends IArgumentTyp
     super()
   }
 
+  ctype: CustomCommandParamType = CustomCommandParamType.Boolean
+
   type = false as boolean
 
   typeName = 'boolean'
@@ -152,6 +170,14 @@ export class ArrayArgumentType<const T extends string[], B extends boolean = fal
   ) {
     super()
     this.typeName = types.join(' | ').replace(/(.{25})..+/, '$1...')
+  }
+
+  ctype: CustomCommandParamType = CustomCommandParamType.Enum
+
+  register(ctx: CustomCommandRegistry, namespace: string): boolean {
+    this.name = namespace + ':' + this.name
+    ctx.registerEnum(this.name, this.types)
+    return true
   }
 
   type = this.types[0] as T[number]

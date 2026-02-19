@@ -219,7 +219,7 @@ const actionbarLock = new WeakPlayerMap<{ priority: ActionbarPriority; expires: 
 const defaultOptions = { fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 0 }
 const defaultTitleOptions = { ...defaultOptions, stayDuration: -1 }
 
-run()
+world.afterEvents.worldLoad.subscribe(run)
 
 function run() {
   system.run(() => {

@@ -85,6 +85,7 @@ export class Leaderboard {
   }
 
   update() {
+    if (this.entity.isValid) this.entity.teleport(this.info.location, { dimension: world[this.info.dimension] })
     Leaderboard.db.set(this.entity.id, this.info)
   }
 
@@ -174,7 +175,7 @@ system.runInterval(
     }
   },
   'leaderboardsInterval',
-  40,
+  100,
 )
 
 const types = ['', i18nShared`к`, i18nShared`млн`, i18nShared`млрд`, i18nShared`трлн`]

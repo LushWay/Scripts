@@ -7,7 +7,7 @@ import { Area } from './areas/area'
 import './areas/cut'
 import { SphereArea } from './areas/sphere'
 import { RegionEvents } from './events'
-import { RegionIsSaveable, type Region, type RegionPermissions } from './kinds/region'
+import { Region, RegionIsSaveable, type RegionPermissions } from './kinds/region'
 
 export type RLDB = JsonObject | undefined
 
@@ -70,6 +70,9 @@ export function registerSaveableRegion(kind: string, region: typeof Region) {
   // @ts-expect-error Yes, we ARE breaking typescript
   region.prototype[RegionIsSaveable] = true
 
+  // Unique to each region type
+  if (region.regions === Region.regions) region.regions = []
+
   kinds.push(region)
 }
 
@@ -96,10 +99,10 @@ export function restoreRegionFromJSON([key, regionImmutable]: [string, Immutable
   const area = Area.fromJson(region.a)
   if (!area) return
 
-  if (!area.isValid()) {
-    console.warn('[Region][Database] Area', area.toString(), 'is invalid')
-    return
-  }
+  // if (!area.isValid()) {
+  //   console.warn('[Region][Database] Area', area.toString(), 'is invalid')
+  //   return
+  // }
 
   return kind.create(area, region, key)
 }

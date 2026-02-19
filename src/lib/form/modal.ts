@@ -195,6 +195,10 @@ export class ModalForm<Callback extends (ctx: FormCallback, ...args: any[]) => v
     return this
   }
 
+  submitButton(text: string) {
+    this.form.submitButton(text)
+  }
+
   /**
    * Shows this form to a player
    *

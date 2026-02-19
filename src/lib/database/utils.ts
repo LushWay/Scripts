@@ -23,7 +23,7 @@ export class DatabaseUtils {
 
   static chunkRegexp = /.{1,50}/g
 
-  static propertyChunkRegexp = /.{1,32767}/g
+  static propertyChunkRegexp = /.{1,20000}/g
 
   private static allEntities: TableEntity[]
 
@@ -54,31 +54,30 @@ export class DatabaseUtils {
       .filter(e => e.tableName !== 'NOTDB')
   }
 
-  private static readonly tablesDimension = world.overworld
-
   private static tables(): TableEntity[] {
     if (typeof this.allEntities !== 'undefined') return this.allEntities
     this.allEntities = this.getEntities()
 
     if (this.allEntities.length < 1) {
       console.warn(noI18n`§6Не удалось найти базы данных. Попытка загрузить бэкап...`)
+      if (world.structureManager.get(this.backupName)) {
+        world.overworld
+          .getEntities({
+            location: DatabaseUtils.entityLocation,
+            type: DatabaseUtils.entityTypeId,
+            maxDistance: 2,
+          })
 
-      world.overworld
-        .getEntities({
-          location: DatabaseUtils.entityLocation,
-          type: DatabaseUtils.entityTypeId,
-          maxDistance: 2,
-        })
+          .forEach(e => e.remove())
 
-        .forEach(e => e.remove())
+        world.structureManager.place(this.backupName, world.overworld, this.entityLocation)
+        this.allEntities = this.getEntities()
 
-      world.structureManager.place(this.backupName, this.tablesDimension, this.entityLocation)
-      this.allEntities = this.getEntities()
-
-      if (this.allEntities.length < 1) {
-        console.warn(noI18n`§cНе удалось загрузить базы данных из бэкапа.`)
-        return []
-      } else console.warn(`Бэкап успешно загружен! Всего баз данных: ${this.allEntities.length}`)
+        if (this.allEntities.length < 1) {
+          console.warn(noI18n`§cНе удалось загрузить базы данных из бэкапа.`)
+          return []
+        } else console.warn(`Бэкап успешно загружен! Всего баз данных: ${this.allEntities.length}`)
+      } else console.error('Backup does not exists, initializing empty tables...')
     }
 
     return this.allEntities
@@ -121,7 +120,7 @@ export class DatabaseUtils {
         world.structureManager.delete(this.backupName)
         world.structureManager.createFromWorld(
           this.backupName,
-          this.tablesDimension,
+          world.overworld,
           this.entityLocation,
           this.entityLocation,
           { includeBlocks: false, includeEntities: true, saveMode: StructureSaveMode.World },

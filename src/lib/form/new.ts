@@ -1,10 +1,10 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { defaultLang } from 'lib/assets/lang'
 import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
-import { FormCallback, showForm } from 'lib/form/utils'
+import { showForm } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { Quest } from 'lib/quest'
 import { doNothing } from 'lib/util'
 
 export type NewFormCallback = (player: Player, back?: NewFormCallback) => unknown
@@ -42,6 +42,8 @@ class Form {
   }
 
   private buttons: NewFormCallback[] = []
+
+  private buttonText: string[] = []
 
   /**
    * Adds a button to this form
@@ -98,18 +100,12 @@ class Form {
 
     this.form.button(text.to(this.player.lang), icon ?? undefined)
     this.buttons.push(finalCallback)
+    this.buttonText.push(text.to(defaultLang))
     return this
   }
 
-  quest(quest: Quest, textOverride?: Text, descriptionOverride?: Text) {
-    const rendered = quest.button.render(this.player, () => this.show(), descriptionOverride)
-    if (!rendered) return
-
-    this.button(textOverride && rendered[0] === quest.name ? textOverride : rendered[0], rendered[1], rendered[2])
-  }
-
   /**
-   * Adds ask button to the form. Alias to {@link Form.button}
+   * Adds ask button to the form. Alias to {@link button}
    *
    * Ask is alias to {@link ask}
    *
@@ -144,17 +140,17 @@ class Form {
         `Callback for ${response.selection} does not exists, only ${this.buttons.length} callbacks are available`,
       )
 
-    if (typeof callback === 'function') {
-      if (__TEST__) {
-        // Call right here to throw error
+    if (__TEST__) {
+      await callback(this.player, this.show)
+    } else {
+      try {
+        if (typeof callback !== 'function') throw new Error('Callback is undefined')
         await callback(this.player, this.show)
-      } else {
-        try {
-          await callback(this.player, this.show)
-        } catch (e) {
-          new FormCallback(this.form, this.player, this.show).error(String(e))
-          console.error('Form error', e)
-        }
+      } catch (e) {
+        console.error('FORM BUTTON ERROR', this.player.name, this.buttonText[response.selection], callback, e)
+        this.player.fail(
+          noI18n.error`Button error: ${this.buttonText[response.selection]}, erorr: ${e}. Сообщите администрации.`,
+        )
       }
     }
   }
@@ -187,8 +183,31 @@ export class ShowForm<T extends FormParams = undefined> {
 
   title(player: Player) {
     const form = new Form(player)
-    this.create(form, { player, back: doNothing, params: this.params, self: doNothing })
-    return form.currentTitle ?? 'No title'
+    const error = new Error('STOP FORM CREATION WE GOT TITLE')
+    let title: undefined | Text
+
+    try {
+      this.create(
+        Object.setPrototypeOf(
+          {
+            title(f) {
+              title = f
+              throw error
+            },
+          } satisfies Partial<typeof Form.prototype>,
+          form,
+        ) as Form,
+        {
+          player,
+          back: doNothing,
+          params: this.params,
+          self: doNothing,
+        },
+      )
+    } catch (e) {
+      if (e !== error) throw e
+    }
+    return title ?? 'No title'
   }
 
   get command() {

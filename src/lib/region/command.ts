@@ -1,4 +1,4 @@
-import { GameMode, LocationInUnloadedChunkError, MolangVariableMap, Player, system, world } from '@minecraft/server'
+import { GameMode, LocationInUnloadedChunkError, MolangVariableMap, Player, system } from '@minecraft/server'
 import 'lib/command'
 import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
@@ -13,18 +13,20 @@ import { regionForm } from './form'
 
 export const regionTypes: { name: string; region: typeof Region; creatable: boolean; displayName: boolean }[] = []
 export function registerRegionType(name: string, region: typeof Region, creatable = true, displayName = !creatable) {
+  // Unique to each region type
+  if (region.regions === Region.regions) region.regions = []
+
   regionTypes.push({ name, region, creatable, displayName })
 }
 
-const command = new Command('region')
+new Command('region')
   .setDescription(i18n`Управляет регионами`)
-  .setPermissions('techAdmin')
+  .setPermissions('admin')
   .setGroup('public')
   .executes(regionForm.command)
 
-command
-  .overload('permdebug')
-  .setPermissions('everybody')
+new Command('regionpermdebug')
+  .setPermissions('admin')
   .setGroup('test')
   .executes(ctx => {
     Region.permissionDebug = !Region.permissionDebug
@@ -51,9 +53,8 @@ const tpdb = table<{ type: string; i: number; enabled: boolean }>('regionTpTest'
   i: 0,
   enabled: false,
 }))
-command
-  .overload('tp')
-  .setPermissions('techAdmin')
+new Command('regiontp')
+  .setPermissions('admin')
   .setDescription('Входит в режим телепортации по группе регионов. Полезно для поиска данжа')
   .setGroup('test')
   .executes(ctx => {
@@ -125,9 +126,8 @@ function updateTpTitle(player: Player) {
 
 const db = table<{ enabled: boolean }>('regionBorders', () => ({ enabled: false }))
 
-command
-  .overload('borders')
-  .executes(ctx => ctx.player.tell(noI18n`Borders enabled: ${db.get(ctx.player.id).enabled}`))
+new Command('regionborders')
+  .setPermissions('admin')
   .boolean('toggle', true)
   .executes((ctx, newValue = !db.get(ctx.player.id).enabled) => {
     ctx.player.tell(noI18n`${db.get(ctx.player.id).enabled} -> ${newValue}`)
@@ -135,43 +135,44 @@ command
     db.get(ctx.player.id).enabled = newValue
   })
 
-const variables = new MolangVariableMap()
-variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })
-
 system.runInterval(
   () => {
     if (!db.values().some(e => e.enabled)) return
-    const players = world.getAllPlayers()
 
-    for (const region of Region.getAll()) {
-      if (!(region.area instanceof SphereArea)) continue
+    for (const [playerId, value] of db.entriesImmutable()) {
+      if (!value.enabled) continue
+      const player = Player.getById(playerId)
+      if (!player) continue
 
-      const playersNearRegion = players.filter(e => region.area.isNear(e, 30))
-      if (!playersNearRegion.length) continue
+      const regions = Region.getNear(player, 30)
 
-      let skip = 0
-      region.area.forEachVector((vector, isIn) => {
-        skip++
-        if (skip % 2 === 0) return
-        if (!Region.getAll().includes(region)) return // deleted
+      const variables = new MolangVariableMap()
+      variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })
 
-        try {
-          const r = Vec.distance(region.area.center, vector)
-          if (isIn && r > region.area.radius - 1) {
-            for (const player of playersNearRegion) {
-              if (!player.isValid) continue
-              if (!db.get(player.id).enabled) continue
+      for (const region of regions) {
+        if (!(region.area instanceof SphereArea)) continue
+
+        let skip = 0
+        region.area.forEachVector((vector, isIn) => {
+          skip++
+          if (skip % 2 === 0) return
+          if (!Region.getAll().includes(region)) return // deleted
+
+          try {
+            const r = Vec.distance(region.area.center, vector)
+            if (isIn && r > region.area.radius - 1) {
+              if (!player.isValid) return
 
               player.spawnParticle('minecraft:wax_particle', vector, variables)
             }
+          } catch (e) {
+            if (e instanceof LocationInUnloadedChunkError) return
+            throw e
           }
-        } catch (e) {
-          if (e instanceof LocationInUnloadedChunkError) return
-          throw e
-        }
-      }, 100)
+        }, 200)
+      }
     }
   },
   'region borders',
-  40,
+  60,
 )

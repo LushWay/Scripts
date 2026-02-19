@@ -1,11 +1,10 @@
-import { ItemPotionComponent, ItemStack, Player } from '@minecraft/server'
-import {
-  MinecraftPotionEffectTypes as PotionEffects,
-  MinecraftPotionModifierTypes as PotionModifiers,
-} from '@minecraft/vanilla-data'
+import { ItemStack, Player } from '@minecraft/server'
+// import {
+//   MinecraftPotionEffectTypes as PotionEffects,
+//   MinecraftPotionDeliveryTypes as PotionDelivery,
+// } from '@minecraft/vanilla-data'
 import { Language } from 'lib/assets/lang'
 import { langToken, translateToken } from 'lib/i18n/lang'
-import { i18n } from 'lib/i18n/text'
 
 /** Returns <item name>\nx<count> */
 export function itemNameXCount(
@@ -15,17 +14,17 @@ export function itemNameXCount(
   player: Player | Language,
 ): string {
   const locale = player instanceof Player ? player.lang : player
-  const potion = item instanceof ItemStack && item.getComponent(ItemPotionComponent.componentId)
-  if (potion) {
-    const { potionEffectType: effect, potionLiquidType: liquid, potionModifierType: modifier } = potion
+  // const potion = item instanceof ItemStack && item.getComponent(ItemPotionComponent.componentId)
+  // if (potion) {
+  //   const { potionEffectType: effect } = potion
 
-    const token = langToken(`minecraft:${liquid.id}_${effect.id}_potion`)
-    const modifierIndex = modifier.id === PotionModifiers.Normal ? 0 : modifier.id === PotionModifiers.Long ? 1 : 2
-    const time = potionModifierToTime[effect.id]?.[modifierIndex]
-    const modifierS = modifierIndexToS[modifierIndex]?.to(locale) ?? ''
+  //   const token = langToken(`minecraft:${liquid.id}_${effect.id}_potion`)
+  //   const modifierIndex = modifier.id === PotionModifiers.Normal ? 0 : modifier.id === PotionModifiers.Long ? 1 : 2
+  //   const time = potionModifierToTime[effect.id]?.[modifierIndex]
+  //   const modifierS = modifierIndexToS[modifierIndex]?.to(locale) ?? ''
 
-    return `${c}${item.nameTag ?? translateToken(token, locale)}${modifierS}${time ? ` §7${time}` : ''}`
-  }
+  //   return `${c}${item.nameTag ?? translateToken(token, locale)}${modifierS}${time ? ` §7${time}` : ''}`
+  // }
 
   return `${c}${item.nameTag ? (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') : translateToken(langToken(item), locale)}${amount && item.amount ? ` §r§f${c}x${item.amount}` : ''}`
 }
@@ -34,30 +33,58 @@ function uncolor(t: string) {
   return t.replaceAll(/§./g, '')
 }
 
-const modifierIndexToS = ['', i18n` (долгое)`, ' II']
+// const modifierIndexToS = ['', i18n` (долгое)`, ' II']
 
-// TODO Ensure it works properly for all modifiers
-const potionModifierToTime: Record<string, undefined | [normal: string, longPlus: string, levelTwo: string]> = {
-  [PotionEffects.Healing]: ['0:45', '2:00', '0:22'],
-  [PotionEffects.Swiftness]: ['3:00', '8:00', '1:30'],
-  [PotionEffects.FireResistance]: ['3:00', '8:00', ''],
-  [PotionEffects.NightVision]: ['3:00', '8:00', ''],
-  [PotionEffects.Strength]: ['3:00', '8:00', '1:30'],
-  [PotionEffects.Leaping]: ['3:00', '8:00', '1:30'],
-  [PotionEffects.WaterBreath]: ['3:00', '8:00', ''],
-  [PotionEffects.Invisibility]: ['3:00', '8:00', ''],
-  [PotionEffects.SlowFalling]: ['1:30', '4:00', ''],
+// // TODO Ensure it works properly for all modifiers
+// const potionModifierToTime: Record<string, undefined | [normal: string, longPlus: string, levelTwo: string]> = {
+//   [PotionEffects.Healing]: ['0:45', '2:00', '0:22'],
+//   [PotionEffects.Swiftness]: ['3:00', '8:00', '1:30'],
+//   [PotionEffects.FireResistance]: ['3:00', '8:00', ''],
+//   [PotionEffects.LongFireResistance]: [],
 
-  [PotionEffects.Poison]: ['0:45', '2:00', '0:22'],
-  [PotionEffects.Weakness]: ['1:30', '4:00', ''],
-  [PotionEffects.Slowing]: ['1:30', '4:00', ''],
-  [PotionEffects.Harming]: ['', '', ''],
-  [PotionEffects.Wither]: ['0:40', '', ''],
-  [PotionEffects.Infested]: ['3:00', '', ''],
-  [PotionEffects.Weaving]: ['3:00', '', ''],
-  [PotionEffects.Oozing]: ['3:00', '', ''],
-  [PotionEffects.WindCharged]: ['3:00', '', ''],
+//   [PotionEffects.Nightvision]: ['3:00', '8:00', ''],
+//   [PotionEffects.Strength]: ['3:00', '8:00', '1:30'],
+//   [PotionEffects.Leaping]: ['3:00', '8:00', '1:30'],
+//   [PotionEffects.WaterBreathing]: ['3:00', '8:00', ''],
+//   [PotionEffects.Invisibility]: ['3:00', '8:00', ''],
+//   [PotionEffects.SlowFalling]: ['1:30', '4:00', ''],
 
-  [PotionEffects.TurtleMaster]: ['0:20', '0:40', '0:20'],
-  [PotionEffects.None]: ['', '', ''],
-} satisfies Record<PotionEffects, [normal: string, longPlus: string, levelTwo: string]>
+//   [PotionEffects.Poison]: ['0:45', '2:00', '0:22'],
+//   [PotionEffects.Weakness]: ['1:30', '4:00', ''],
+//   [PotionEffects.Slowness]: ['1:30', '4:00', ''],
+//   [PotionEffects.Harming]: ['', '', ''],
+//   [PotionEffects.Wither]: ['0:40', '', ''],
+//   [PotionEffects.Infested]: ['3:00', '', ''],
+//   [PotionEffects.Weaving]: ['3:00', '', ''],
+//   [PotionEffects.Oozing]: ['3:00', '', ''],
+//   [PotionEffects.WindCharged]: ['3:00', '', ''],
+
+//   [PotionEffects.TurtleMaster]: ['0:20', '0:40', '0:20'],
+//   [PotionEffects.Awkward]: ['', '', ''],
+//   [PotionEffects.LongInvisibility]: [],
+//   [PotionEffects.LongLeaping]: [],
+//   [PotionEffects.LongMundane]: [],
+//   [PotionEffects.LongNightvision]: [],
+//   [PotionEffects.LongPoison]: [],
+//   [PotionEffects.LongRegeneration]: [],
+//   [PotionEffects.LongSlowFalling]: [],
+//   [PotionEffects.LongSlowness]: [],
+//   [PotionEffects.LongStrength]: [],
+//   [PotionEffects.LongSwiftness]: [],
+//   [PotionEffects.LongTurtleMaster]: [],
+//   [PotionEffects.LongWaterBreathing]: [],
+//   [PotionEffects.LongWeakness]: [],
+//   [PotionEffects.Mundane]: [],
+//   [PotionEffects.Regeneration]: [],
+//   [PotionEffects.StrongHarming]: [],
+//   [PotionEffects.StrongHealing]: [],
+//   [PotionEffects.StrongLeaping]: [],
+//   [PotionEffects.StrongPoison]: [],
+//   [PotionEffects.StrongRegeneration]: [],
+//   [PotionEffects.StrongSlowness]: [],
+//   [PotionEffects.StrongStrength]: [],
+//   [PotionEffects.StrongSwiftness]: [],
+//   [PotionEffects.StrongTurtleMaster]: [],
+//   [PotionEffects.Thick]: [],
+//   [PotionEffects.Water]: []
+// } satisfies Record<PotionEffects, [normal: string, longPlus: string, levelTwo: string]>

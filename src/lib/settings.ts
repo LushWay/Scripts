@@ -24,9 +24,19 @@ interface ConfigMeta {
   [SETTINGS_GROUP_NAME]?: Text
 }
 
+// TODO Create global PaidFeaturesProvider
+type SettingsPayCheck = ((player: Player) => boolean) & { onFail: PlayerCallback }
+
 export type SettingsConfig<T extends SettingValue = SettingValue> = Record<
   string,
-  { name: Text; description?: Text; value: T; onChange?: VoidFunction }
+  {
+    name: Text
+    description?: Text
+    value: T
+    onChange?: VoidFunction
+    paid?: SettingsPayCheck
+    whenNotPaidDefault?: NoInfer<T>
+  }
 > &
   ConfigMeta
 
@@ -172,7 +182,10 @@ export class Settings {
         configurable: false,
         enumerable: true,
         get() {
+          const paid = player ? (config[prop]?.paid?.(player) ?? true) : true
           const value = config[prop]?.value
+          if (!paid) return config[prop]?.whenNotPaidDefault ?? (typeof value === 'boolean' ? !value : value)
+
           if (typeof value === 'undefined') throw new TypeError(`No config value for prop ${prop}`)
           return (
             (database.getImmutable(groupId) as SettingsDatabaseValue | undefined)?.[key] ??
@@ -254,8 +267,9 @@ export function settingsGroupMenu(
 
   const store = Settings.parseConfig(storeSource, groupName, config, forRegularPlayer ? player : null)
   const buttons: [string, (input: string | boolean) => string][] = []
+  const displayName = (config[SETTINGS_GROUP_NAME] ?? groupName).to(player.lang)
   const form = new ModalForm<(ctx: FormCallback<ModalForm>, ...options: (string | boolean)[]) => void>(
-    (config[SETTINGS_GROUP_NAME] ?? groupName).to(player.lang),
+    `${displayName.split('\n')[0]}`,
   )
 
   for (const key in config) {
@@ -265,6 +279,8 @@ export function settingsGroupMenu(
 
     const value = saved ?? setting.value
 
+    const paid = setting.paid?.(player) ?? true
+
     const isUnset = typeof saved === 'undefined'
     const isRequired = (Reflect.get(setting, 'requires') as boolean) && isUnset
     const isToggle = typeof value === 'boolean'
@@ -272,6 +288,8 @@ export function settingsGroupMenu(
     let label = ''
 
     label += hints[key] ? `${hints[key]}\n` : ''
+
+    if (!paid) label += `§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n`
 
     if (isRequired) label += '§c(!) '
     label += `§f§l${setting.name.to(player.lang)}§r§f` //§r
@@ -336,6 +354,8 @@ export function settingsGroupMenu(
       },
     ])
   }
+
+  form.submitButton('Сохранить')
 
   form.show(player, (_, ...settings) => {
     const hints: Record<string, string> = {}

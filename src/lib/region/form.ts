@@ -1,7 +1,12 @@
 import { Player, world } from '@minecraft/server'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
+import { ArrayForm } from 'lib/form/array'
+import { ModalForm } from 'lib/form/modal'
 import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
+import { BUTTON, FormCallback } from 'lib/form/utils'
 import { i18n, noI18n, textTable } from 'lib/i18n/text'
+import { inspect } from 'lib/utils/inspect'
+import { Vec } from 'lib/vector'
 import { Area } from './areas/area'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { CylinderArea } from './areas/cylinder'
@@ -10,11 +15,6 @@ import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
 import { regionTypes } from './command'
 import { Region } from './kinds/region'
-import { ArrayForm } from 'lib/form/array'
-import { BUTTON, FormCallback } from 'lib/form/utils'
-import { ModalForm } from 'lib/form/modal'
-import { Vec } from 'lib/vector'
-import { inspect } from 'lib/utils/inspect'
 
 export const regionForm = form((f, { player, self }) => {
   f.title(noI18n`Управление регионами`)
@@ -77,20 +77,43 @@ function regionList(
     })
     .show(player)
 }
-const selectArea = form.params<{ onSelect: (area: Area) => NewFormCallback; title: Text }>(
+
+let getPlayerSelection = (player: Player): { min: Vector3; max: Vector3 } | undefined => {
+  return
+}
+
+import('../../modules/world-edit/lib/world-edit').then(({ WorldEdit }) => {
+  getPlayerSelection = player => WorldEdit.forPlayer(player).selection
+})
+
+export const selectArea = form.params<{ onSelect: (area: Area) => NewFormCallback; title: Text }>(
   (f, { player, self, params: { onSelect: onS, title } }) => {
     function onSelect(area: Area) {
       onS(area)(player, self)
     }
     f.title(title)
+
+    const selection = getPlayerSelection(player)
+    if (selection) {
+      f.button(
+        noI18n.accent`Выделенная зона (${Vec.size(selection.min, selection.max)})\n(куб без ограничения высоты)`,
+        () => onSelect(new ChunkCubeArea({ from: selection.min, to: selection.max }, player.dimension.type)),
+      )
+
+      f.button(noI18n.accent`Выделенная зона (${Vec.size(selection.min, selection.max)})\n(куб)`, () =>
+        onSelect(new RectangleArea({ from: selection.min, to: selection.max }, player.dimension.type)),
+      )
+    }
+
     f.button(noI18n`Сфера`, BUTTON['+'], () => {
       new ModalForm(noI18n`Сфера`)
         .addTextField(noI18n`Центр`, '~~~', '~~~')
-        .addSlider(noI18n`Радиус`, 1, 100, 1)
+        .addSlider(noI18n`Радиус`, 1, 200, 1)
         .show(player, (ctx, rawCenter, radius) => {
           const center = parseLocationFromForm(ctx, rawCenter, player)
           if (!center) return
 
+          // TODO: Just ignore the underradius
           if (center.y - radius <= -64)
             return player.fail(
               i18n`Нельзя создать регион, область которого ниже -64 (y: ${center.y} radius: ${radius} result: ${center.y - radius})`,
@@ -183,7 +206,7 @@ const regionStructureForm = form.params<{ region: Region; title: Text }>((f, { p
   })
   if (exists) f.ask(noI18n`§cУдалить структуру`, noI18n`§cУдалить`, () => region.structure?.delete())
 })
-const editRegion = form.params<{ region: Region; displayName: boolean }>(
+export const editRegion = form.params<{ region: Region; displayName: boolean }>(
   (f, { player, back, self, params: { region, displayName } }) => {
     const title = displayName ? (region.displayName ?? region.creator.name) : region.name
     f.title(title)

@@ -1,13 +1,14 @@
 /* i18n-ignore */
 /* eslint-disable */
 
-import { ItemStack, MolangVariableMap, Player, ScriptEventSource, system, world } from '@minecraft/server'
+import { MolangVariableMap, Player, Potions, ScriptEventSource, system, world } from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
   MinecraftEnchantmentTypes,
   MinecraftEntityTypes,
   MinecraftItemTypes,
+  MinecraftPotionDeliveryTypes,
   MinecraftPotionEffectTypes,
 } from '@minecraft/vanilla-data'
 
@@ -195,7 +196,7 @@ const tests: Record<
   },
   potionAux(ctx) {
     for (const effect of Object.values(MinecraftPotionEffectTypes)) {
-      const item = ItemStack.createPotion({ effect })
+      const item = Potions.resolve(effect, MinecraftPotionDeliveryTypes.ThrownSplash)
       getAuxTextureOrPotionAux(item)
     }
   },
@@ -396,7 +397,7 @@ const tests: Record<
   },
 
   dbinspect(ctx) {
-    world.debug(
+    console.log(
       'test41',
       { DatabaseUtils },
       world.overworld.getEntities({ type: DatabaseUtils.entityTypeId }).map(e => {

@@ -3,7 +3,6 @@ import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { Language } from 'lib/assets/lang'
 import { ask } from 'lib/form/message'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { util } from 'lib/util'
 import { NewFormCallback } from './new'
 import { BUTTON, showForm } from './utils'
 
@@ -82,7 +81,7 @@ export class ActionForm {
   }
 
   /**
-   * Adds back button to the form. Alias to {@link ActionForm.button}
+   * Adds back button to the form. Alias to {@link button}
    *
    * @param backCallback - Callback function that will be called when back button is pressed.
    */
@@ -92,7 +91,7 @@ export class ActionForm {
   }
 
   /**
-   * Adds ask button to the form. Alias to {@link ActionForm.button}
+   * Adds ask button to the form. Alias to {@link button}
    *
    * Ask is alias to {@link ask}
    *
@@ -133,12 +132,21 @@ export class ActionForm {
     if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
       return false
 
-    const callback = this.buttons[response.selection]?.callback
-    if (typeof callback === 'function') {
-      util.catch(() => callback(player, () => this.show(player)) as void)
+    const button = this.buttons[response.selection]
+    if (__TEST__) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await button?.callback!(player, () => this.show(player))
       return true
+    } else {
+      try {
+        if (typeof button?.callback !== 'function') throw new Error('Callback is undefined')
+        button.callback(player, () => this.show(player))
+        return true
+      } catch (e) {
+        console.error('OLD FORM BUTTON ERROR', player.name, button?.text, button?.callback, e)
+        player.fail(noI18n.error`Old button error: ${button?.text}, erorr: ${e}. Сообщите администрации.`)
+        return false
+      }
     }
-
-    return false
   }
 }

@@ -92,14 +92,14 @@ export class MessageForm {
 /** Shows MessageForm to the player */
 export function ask(
   player: Player,
-  text: Text,
+  messageFormBody: Text,
   yesText: Text,
   yesAction?: VoidFunction,
   noText: Text = i18n`Отмена`,
   noAction?: VoidFunction,
 ) {
   return new Promise<boolean>(resolve => {
-    new MessageForm(i18n`Вы уверены?`.to(player.lang), text.to(player.lang))
+    new MessageForm(i18n`Вы уверены?`.to(player.lang), messageFormBody.to(player.lang))
       .setButton1(yesText.to(player.lang), () => {
         yesAction?.()
         resolve(true)

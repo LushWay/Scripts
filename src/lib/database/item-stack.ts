@@ -97,8 +97,6 @@ export class ItemLoreSchema<T extends TypeSchema = EmptyObject, L extends Schema
 export class ItemLoreSchemaCompiled<T extends TypeSchema = EmptyObject> {
   static loreSchemaId = 'lsid'
 
-  public readonly aha!: T
-
   constructor(
     private properties: Schema,
     private prepareItem: (lang: Language, itemStack: Item, storage: ParsedSchema<T>) => void,

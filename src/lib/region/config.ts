@@ -1,4 +1,4 @@
-import { BlockTypes, Entity } from '@minecraft/server'
+import { BlockTypes, Entity, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 
@@ -14,16 +14,18 @@ export const SWITCHES: string[] = []
 /** All gates in minecraft */
 export const GATES: string[] = []
 
-const blocks = BlockTypes.getAll()
+world.afterEvents.worldLoad.subscribe(() => {
+  const blocks = BlockTypes.getAll()
 
-function fill(target: string[], filter: (params: { id: string }) => boolean) {
-  for (const value of blocks) if (filter(value)) target.push(value.id)
-}
+  function fill(target: string[], filter: (params: { id: string }) => boolean) {
+    for (const value of blocks) if (filter(value)) target.push(value.id)
+  }
 
-fill(DOORS, e => e.id.endsWith('door'))
-fill(TRAPDOORS, e => e.id.endsWith('trapdoor'))
-fill(SWITCHES, e => /button|lever$/.test(e.id))
-fill(GATES, e => e.id.includes('fence_gate'))
+  fill(DOORS, e => e.id.endsWith('door'))
+  fill(TRAPDOORS, e => e.id.endsWith('trapdoor'))
+  fill(SWITCHES, e => /button|lever$/.test(e.id))
+  fill(GATES, e => e.id.includes('fence_gate'))
+})
 
 /** A list of all containers a item could be in */
 export const BLOCK_CONTAINERS = [

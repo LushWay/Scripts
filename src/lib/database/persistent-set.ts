@@ -1,3 +1,4 @@
+import { world } from '@minecraft/server'
 import { LongDynamicProperty } from './properties'
 
 export class LimitedSet<T> extends Set<T> {
@@ -17,7 +18,9 @@ export class PersistentSet<T extends Json> extends LimitedSet<T> {
     protected limit = 1_000,
   ) {
     super()
-    this.load()
+    world.afterEvents.worldLoad.subscribe(() => {
+      this.load()
+    })
   }
 
   private load() {

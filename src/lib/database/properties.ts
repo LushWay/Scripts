@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 
@@ -13,7 +13,10 @@ class DynamicPropertyDB<Value = unknown, Key extends string = string> extends Pr
   ) {
     super(id, defaultValue)
     if (id in DynamicPropertyDB.tables) throw new DatabaseError(`Table ${this.id} already initialized!`)
-    this.init()
+
+    world.afterEvents.worldLoad.subscribe(() => {
+      this.init()
+    })
     DynamicPropertyDB.tables[id] = this as UnknownTable
   }
 
@@ -56,7 +59,22 @@ export class LongDynamicProperty {
 
     world.setDynamicProperty(propertyId, strings.length)
     for (const [i, string] of strings.entries()) {
-      world.setDynamicProperty(`${propertyId}${separator}${i}`, string)
+      try {
+        world.setDynamicProperty(`${propertyId}${separator}${i}`, string)
+      } catch (e) {
+        console.error(
+          'DATABASE SAVE FAIL',
+          propertyId,
+          'index',
+          i,
+          'of',
+          strings.length,
+          'SIZE',
+          string.length,
+          'error:',
+          e,
+        )
+      }
     }
   }
 

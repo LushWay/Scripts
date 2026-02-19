@@ -16,30 +16,32 @@ export const Core = {
 }
 
 if (!__VITEST__) {
-  system.run(function waiter() {
-    const entities = world.overworld.getEntities()
-    if (entities.length < 1) {
-      // No entity found, re-run waiter
-      return system.run(waiter)
-    }
-
-    try {
-      EventLoader.load(Core.afterEvents.worldLoad)
-    } catch (e) {
-      console.error(e)
-    }
-  })
-
-  system.afterEvents.scriptEventReceive.subscribe(
-    data => {
-      if (data.id === 'SERVER:SAY') {
-        world.say(decodeURI(data.message))
+  world.afterEvents.worldLoad.subscribe(() => {
+    system.run(function waiter() {
+      const entities = world.overworld.getEntities()
+      if (entities.length < 1) {
+        // No entity found, re-run waiter
+        return system.run(waiter)
       }
-    },
-    {
-      namespaces: ['SERVER'],
-    },
-  )
+
+      try {
+        EventLoader.load(Core.afterEvents.worldLoad)
+      } catch (e) {
+        console.error(e)
+      }
+    })
+
+    system.afterEvents.scriptEventReceive.subscribe(
+      data => {
+        if (data.id === 'SERVER:SAY') {
+          world.say(decodeURI(data.message))
+        }
+      },
+      {
+        namespaces: ['SERVER'],
+      },
+    )
+  })
 } else {
   EventLoader.load(Core.afterEvents.worldLoad)
 }

@@ -1,10 +1,41 @@
 import { Player, system, world } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
+import { I18nMessage } from 'lib/i18n/message'
+import { i18n } from 'lib/i18n/text'
 import './command'
 
-interface StoredClan {
-  members: string[]
-  owners: string[]
+interface ClanTemporalMember {
+  until: number
+}
+
+export enum ClanRole {
+  Member = 'member',
+  Helper = 'helper',
+  Owner = 'owner',
+}
+
+const roleNames: Record<ClanRole, I18nMessage> = {
+  [ClanRole.Member]: i18n`Участник`,
+  [ClanRole.Helper]: i18n`Помошник`,
+  [ClanRole.Owner]: i18n`Владелец`,
+}
+
+export interface ClanMember {
+  id: string
+  createdAt: number
+  updatedAt: number
+  role: ClanRole
+}
+
+interface ClanJSON {
+  members2: ClanMember[]
+
+  /** @deprecated Use {@link members2} instead */
+  members?: string[]
+  /** @deprecated Use {@link members2} instead */
+  owners?: string[]
+
+  temporalMembers?: Record<string, ClanTemporalMember>
 
   name: string
   shortname: string
@@ -16,7 +47,11 @@ interface StoredClan {
 }
 
 export class Clan {
-  private static database = table<StoredClan>('clan')
+  private static database = table<ClanJSON>('clan')
+
+  static roleToString(role: ClanRole) {
+    return roleNames[role]
+  }
 
   static getPlayerClan(playerId: string) {
     for (const clan of this.instances.values()) {
@@ -28,12 +63,15 @@ export class Clan {
     return this.instances.values()
   }
 
+  static get(id: string) {
+    return this.instances.get(id)
+  }
+
   static create(player: Player, name: string, shortname: string) {
     while (this.database.has(name)) name += '-'
 
     this.database.set(name, {
-      members: [player.id],
-      owners: [player.id],
+      members2: [],
 
       name,
       shortname,
@@ -45,7 +83,9 @@ export class Clan {
     })
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return new Clan(name, this.database.get(name)!)
+    const clan = new Clan(name, this.database.get(name)!)
+    clan.addMember(player.id, ClanRole.Owner)
+    return clan
   }
 
   static getInvites(playerId: string) {
@@ -57,15 +97,31 @@ export class Clan {
   static {
     world.afterEvents.worldLoad.subscribe(() =>
       system.run(() => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        for (const [id, db] of this.database.entries()) new Clan(id, db!)
+        for (const [id, db] of this.database.entries()) {
+          if (!db) continue
+
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          db.members2 ??= []
+
+          const clan = new Clan(id, db)
+
+          // Migrate old format
+          if (db.owners?.length) {
+            for (const m of db.owners) clan.addMember(m, ClanRole.Owner)
+            delete db.owners
+          }
+          if (db.members?.length) {
+            for (const m of db.members) clan.addMember(m)
+            delete db.members
+          }
+        }
       }),
     )
   }
 
   constructor(
-    private readonly id: string,
-    public readonly db: StoredClan,
+    public readonly id: string,
+    public readonly db: ClanJSON,
   ) {
     const clan = Clan.instances.get(this.id)
     if (clan) return clan
@@ -91,41 +147,54 @@ export class Clan {
   }
 
   get members() {
-    return this.db.members as Readonly<StoredClan['members']>
+    return this.db.members2 as readonly ClanMember[]
+  }
+
+  get membersIds() {
+    return this.db.members2.map(e => e.id) as readonly string[]
   }
 
   get owners() {
-    return this.db.owners as Readonly<StoredClan['owners']>
+    return this.db.members2.filter(e => e.role === ClanRole.Owner).map(e => e.id) as readonly string[]
   }
 
   get joinRequests() {
-    return this.db.joinRequests as Readonly<StoredClan['joinRequests']>
+    return this.db.joinRequests as Readonly<ClanJSON['joinRequests']>
   }
 
   get invites() {
-    return this.db.invites as Readonly<StoredClan['invites']>
+    return this.db.invites as Readonly<ClanJSON['invites']>
   }
 
   isMember(playerId: string) {
-    return this.db.members.includes(playerId)
+    return !!this.getMember(playerId)
   }
 
   isOwner(playerId: string) {
-    return this.db.owners.includes(playerId)
+    return this.getMember(playerId)?.role === ClanRole.Owner
+  }
+
+  isHelper(playerId: string) {
+    return this.getMember(playerId)?.role === ClanRole.Helper
   }
 
   isInvited(playerId: string) {
     return this.db.invites.includes(playerId)
   }
 
-  setRole(playerId: string, role: 'member' | 'owner') {
-    if (role === 'member') this.db.owners = this.db.owners.filter(e => e !== playerId)
-    if (role === 'owner') this.db.owners.push(playerId)
+  getMember(playerId: string) {
+    return this.db.members2.find(e => e.id === playerId)
+  }
+
+  setMemberRole(playerId: string, role: ClanRole) {
+    const member = this.getMember(playerId)
+
+    if (!member) return
+    member.role = role
   }
 
   remove(playerId: string) {
-    this.db.members = this.db.members.filter(e => e !== playerId)
-    this.db.owners = this.db.owners.filter(e => e !== playerId)
+    this.db.members2 = this.db.members2.filter(e => e.id !== playerId)
   }
 
   sendInvite(playerId: string) {
@@ -151,16 +220,61 @@ export class Clan {
     this.db.invites = this.db.invites.filter(e => e !== id)
   }
 
-  add(id: string) {
+  addMember(id: string, role: ClanRole = ClanRole.Member) {
+    if (this.isMember(id)) return
+
     for (const clan of Clan.getAll()) {
       clan.db.joinRequests = clan.db.joinRequests.filter(e => e !== id)
       clan.db.invites = clan.db.invites.filter(e => e !== id)
     }
-    this.db.members.push(id)
+    this.db.members2.push({ id, role, createdAt: Date.now(), updatedAt: Date.now() })
   }
 
   delete() {
     Clan.database.delete(this.id)
     Clan.instances.delete(this.id)
+  }
+
+  addTemporalMember(id: string, until: number) {
+    this.db.temporalMembers ??= {}
+    this.db.temporalMembers[id] = { until }
+  }
+
+  removeTemporalMember(id: string) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    if (this.db.temporalMembers) delete this.db.temporalMembers[id]
+  }
+
+  isTemporalMemberValid(id: string, member?: ClanTemporalMember) {
+    if (!member) return false
+
+    // 0 means forever
+    if (member.until === 0) return true
+
+    if (Date.now() > member.until) {
+      this.removeTemporalMember(id)
+      return false
+    }
+
+    return true
+  }
+
+  get temporalMembers() {
+    if (!this.db.temporalMembers) return []
+
+    const members: { id: string; until: number }[] = []
+    for (const [id, member] of Object.entries(this.db.temporalMembers)) {
+      if (this.isTemporalMemberValid(id, member)) members.push({ id, until: member.until })
+    }
+    return members
+  }
+
+  isTemporalMember(id: string): boolean {
+    return this.isTemporalMemberValid(id, this.db.temporalMembers?.[id])
+  }
+
+  getTemporalMember(id: string) {
+    const member = this.db.temporalMembers?.[id]
+    if (this.isTemporalMemberValid(id, member)) return member
   }
 }

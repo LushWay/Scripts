@@ -26,11 +26,14 @@ export class BigRegionStructure extends RegionStructure {
       false,
       regionId,
       Array.isArray(saved) ? (saved as BigStructureSaved[]) : undefined,
+      false, // entities
     )
   }
 
   get exists(): boolean {
-    return !!world.structureManager.get(`mystructure:${this.bigStructure.prefix}|0`)
+    return (
+      !!world.structureManager.get(`mystructure:${this.bigStructure.prefix}|0`) && this.bigStructure.toJSON().length > 0
+    )
   }
 
   protected get bigStructurePos() {

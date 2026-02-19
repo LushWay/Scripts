@@ -108,6 +108,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   ) {
     const { edges, dimension } = this
     const isIn = (vector: Vector3) => this.isIn({ location: vector, dimensionType: this.dimensionType })
+    const { max, min } = this.dimension.heightRange
 
     return new Promise<void>((resolve, reject) => {
       system.runJob(
@@ -115,6 +116,8 @@ export abstract class Area<T extends JsonObject = JsonObject> {
           try {
             let i = 0
             for (const vector of Vec.forEach(...edges)) {
+              if (vector.y < min || vector.y > max) continue
+
               callback(vector, isIn(vector), dimension)
               i++
               if (i % yieldEach === 0) yield

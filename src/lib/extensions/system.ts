@@ -105,7 +105,11 @@ expand(System.prototype, {
     function jobInterval() {
       system.runJob(
         (function* job() {
-          for (const _ of callback()) yield
+          try {
+            for (const _ of callback()) yield
+          } catch (e) {
+            console.error('Error in job interval', e)
+          }
           if (stopped) return
           if (tickInterval === 0) system.delay(jobInterval)
           else system.runTimeout(jobInterval, 'jobInterval', tickInterval)

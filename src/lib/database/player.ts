@@ -48,7 +48,11 @@ declare module '@minecraft/server' {
 }
 
 expand(Player, {
-  database: table<PlayerDatabase>('player', () => ({ role: DEFAULT_ROLE, inv: 'spawn', survival: {} })),
+  database: table<PlayerDatabase>('player', () => ({
+    role: DEFAULT_ROLE,
+    inv: 'spawn',
+    survival: {},
+  })),
   name(id) {
     if (!id) return void 0
 

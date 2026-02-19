@@ -27,6 +27,7 @@ export class BigStructure extends Cuboid {
     saveOnCreate = true,
     date = Date.now().toString(32),
     private structures: BigStructureSaved[] = [],
+    private entities = false,
   ) {
     super(pos1, pos2)
     this.prefix = `${prefix}|${date}`
@@ -52,7 +53,7 @@ export class BigStructure extends Cuboid {
       } catch {}
 
       world.structureManager.createFromWorld(id, this.dimension, min, max, {
-        includeEntities: false,
+        includeEntities: this.entities,
         includeBlocks: true,
         saveMode: this.saveMode,
       })

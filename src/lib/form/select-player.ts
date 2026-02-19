@@ -1,6 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { BUTTON } from 'lib/form/utils'
+import { getFullname } from 'lib/get-fullname'
 import { i18n } from 'lib/i18n/text'
 import { NewFormCallback } from './new'
 
@@ -121,7 +122,7 @@ export function selectPlayer(
         return players
       })
       .button(({ id, name, online }) => {
-        return [(online ? '§f' : '§8') + name, () => resolve({ id, name })]
+        return [getFullname(id, { nameColor: online ? '§f' : '§8' }), () => resolve({ id, name })]
       })
       .back(back)
       .show(player)
