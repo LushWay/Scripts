@@ -1,5 +1,5 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
-import { ModalForm, Region, regionTypes, Vec } from 'lib'
+
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { noI18n } from 'lib/i18n/text'

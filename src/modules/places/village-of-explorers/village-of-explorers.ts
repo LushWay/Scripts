@@ -1,4 +1,3 @@
-import { Loot } from 'lib'
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { City } from '../lib/city'
 import { Butcher } from '../lib/npc/butcher'

@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { is, ModalForm } from 'lib'
+
 import { selectPlayer } from 'lib/form/select-player'
 import { i18n, noI18n } from 'lib/i18n/text'
 

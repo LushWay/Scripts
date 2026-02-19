@@ -1,12 +1,12 @@
 import { LocationOutOfWorldBoundariesError, Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
-import { ActionForm, ms, registerRegionType, Vec } from 'lib'
+
+import { NewFormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../../../lib/region/kinds/minearea'
 import { ores, placeOre } from './algo'
-import { NewFormCreator } from 'lib/form/new'
 
 const logger = createLogger('Shaft')
 

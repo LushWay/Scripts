@@ -1,5 +1,5 @@
 import { Direction, ItemStack, Player } from '@minecraft/server'
-import { Vec } from 'lib'
+import { Vec } from 'lib/vector'
 import { Items } from 'lib/assets/custom-items'
 import { ToolsDataStorage, WorldEditMultiTool } from '../lib/world-edit-multi-tool'
 import { WorldEditTool } from '../lib/world-edit-tool'

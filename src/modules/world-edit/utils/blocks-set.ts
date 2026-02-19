@@ -1,10 +1,11 @@
 import { Block, BlockPermutation, Player } from '@minecraft/server'
 
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
-import { noNullable, translateTypeId } from 'lib'
 import { table } from 'lib/database/abstract'
 import { DEFAULT_BLOCK_SETS, DEFAULT_REPLACE_TARGET_SETS, REPLACE_MODES } from './default-block-sets'
 import { Language } from 'lib/assets/lang'
+import { noNullable } from 'lib/util'
+import { translateTypeId } from 'lib/i18n/lang'
 
 export type BlockStateWeight = [...Parameters<typeof BlockPermutation.resolve>, number]
 

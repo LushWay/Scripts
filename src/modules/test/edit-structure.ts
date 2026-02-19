@@ -1,6 +1,6 @@
 import { BlockVolume, LocationInUnloadedChunkError, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Region, Vec } from 'lib'
+
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { form } from 'lib/form/new'
 import { noI18n } from 'lib/i18n/text'

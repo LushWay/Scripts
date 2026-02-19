@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Loot } from 'lib'
+
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'

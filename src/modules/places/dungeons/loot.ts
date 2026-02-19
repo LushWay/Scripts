@@ -1,4 +1,3 @@
-import { Loot, LootTable } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { i18n } from 'lib/i18n/text'

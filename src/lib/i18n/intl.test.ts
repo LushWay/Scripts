@@ -1,4 +1,3 @@
-import { ms } from 'lib'
 import { Language, supportedLanguages } from 'lib/assets/lang'
 import { intlListFormat, intlRemaining } from './intl'
 import { i18n } from './text'
@@ -62,4 +61,3 @@ describe('intlRemaining', () => {
     ).toMatchInlineSnapshot(`"1,001 days, 6 hours, 4 minutes"`)
   })
 })
-

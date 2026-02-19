@@ -1,5 +1,4 @@
 import { system, TicksPerSecond, world } from '@minecraft/server'
-import { Settings } from 'lib'
 import { emoji } from 'lib/assets/emoji'
 
 const socials = [

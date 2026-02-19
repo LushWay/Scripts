@@ -1,4 +1,3 @@
-import { Loot } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 
 export default new Loot('starter')

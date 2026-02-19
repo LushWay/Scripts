@@ -1,6 +1,6 @@
 import { Entity, EntityDamageCause, ExplosionOptions, Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vec } from 'lib'
+import { Vec } from 'lib/vector'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 import { createBlockExplosionChecker } from './raid'
 

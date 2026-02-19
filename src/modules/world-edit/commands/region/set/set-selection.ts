@@ -1,7 +1,7 @@
 import { Player } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { BUTTON } from 'lib'
+
 import { ChestForm } from 'lib/form/chest'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { ReplaceMode } from 'modules/world-edit/utils/blocks-set'

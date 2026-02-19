@@ -1,5 +1,5 @@
 import { StructureRotation } from '@minecraft/server'
-import { Vec } from 'lib'
+import { Vec } from 'lib/vector'
 import { structureLikeRotate, toAbsolute, toRelative } from './structure'
 
 describe('structureLikeRotate', () => {

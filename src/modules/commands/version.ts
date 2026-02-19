@@ -1,4 +1,3 @@
-import { is } from 'lib'
 import { i18n, textTable } from 'lib/i18n/text'
 
 new Command('version')

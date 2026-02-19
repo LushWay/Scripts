@@ -1,6 +1,6 @@
 import { BlockPermutation, BlockTypes, LiquidType } from '@minecraft/server'
 import { BlockStateSuperset, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { noNullable } from 'lib'
+import { noNullable } from 'lib/util'
 import {
   BlockStateWeight,
   BlocksSets,

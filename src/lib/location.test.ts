@@ -1,6 +1,6 @@
 import { Player } from '@minecraft/server'
-import { Vec } from 'lib'
 import 'lib/database/scoreboard'
+import { Vec } from 'lib/vector'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
 import { Group } from './rpg/place'
 import { Settings } from './settings'

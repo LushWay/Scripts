@@ -1,5 +1,5 @@
 import { GameMode, Player } from '@minecraft/server'
-import { EventSignal, InventoryStore, Portal, ValidLocation, Vec, location } from 'lib'
+
 import { consoleLang } from 'lib/assets/lang'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'

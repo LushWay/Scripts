@@ -1,5 +1,5 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
-import { stringifyError } from 'lib'
+
 import { i18n } from 'lib/i18n/text'
 import { selectByChance } from 'lib/rpg/random'
 

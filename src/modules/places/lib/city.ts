@@ -1,4 +1,3 @@
-import { location, LootTable } from 'lib'
 import { Crate } from 'lib/crates/crate'
 import { Cutscene } from 'lib/cutscene'
 import { i18n, i18nShared } from 'lib/i18n/text'

@@ -8,7 +8,7 @@ import {
   MinecraftPotionEffectTypes,
   MinecraftPotionModifierTypes,
 } from '@minecraft/vanilla-data'
-import { addNamespace, doNothing, Enchantments, getAuxOrTexture } from 'lib'
+
 import { Sounds } from 'lib/assets/custom-sounds'
 import { translateEnchantment, translateTypeId } from 'lib/i18n/lang'
 import { i18n, i18nShared } from 'lib/i18n/text'

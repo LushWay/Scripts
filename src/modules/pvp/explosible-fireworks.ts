@@ -1,6 +1,6 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vec } from 'lib'
+import { Vec } from 'lib/vector'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 
 const fireworks = new Set<{ date: number; entity: Entity }>()

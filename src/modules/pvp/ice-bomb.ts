@@ -1,6 +1,6 @@
 import { Entity, EntityComponentTypes, ItemStack, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vec, ms } from 'lib'
+
 import { i18n } from 'lib/i18n/text'
 import { customItems } from 'lib/rpg/custom-item'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'

@@ -3,7 +3,7 @@
 // TODO Update
 
 import { Player, system, world } from '@minecraft/server'
-import { Command } from 'lib'
+
 import { br } from './game'
 import { BATTLE_ROYAL_EVENTS, BR_QUENE } from './var'
 

@@ -1,8 +1,8 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vec } from 'lib'
 import { Cooldown } from 'lib/cooldown'
 import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 
 const cooldown = new Cooldown(ms.from('sec', 3))

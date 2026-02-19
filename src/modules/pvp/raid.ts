@@ -1,5 +1,5 @@
 import { Block, Entity, system, world } from '@minecraft/server'
-import { LockAction, ms, Region } from 'lib'
+
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { i18n } from 'lib/i18n/text'
 import { MineareaRegion } from 'lib/region/kinds/minearea'

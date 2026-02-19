@@ -9,7 +9,7 @@
 //   TicksPerSecond,
 //   world,
 // } from '@minecraft/server'
-// import { ms, Settings } from 'lib'
+//
 // import { i18n } from 'lib/i18n/text'
 // import { createLogger } from 'lib/utils/logger'
 // import { gravestoneEntityTypeId, gravestoneGetOwner } from './death-quest-and-gravestone'

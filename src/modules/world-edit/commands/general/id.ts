@@ -1,6 +1,5 @@
 import {} from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Vec, inspect } from 'lib'
 
 const root = new Command('id').setDescription('Выдает айди').setPermissions('builder').setGroup('we')
 

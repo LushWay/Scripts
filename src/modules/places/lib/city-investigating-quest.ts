@@ -1,4 +1,3 @@
-import { isNotPlaying } from 'lib'
 import { i18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { RegionEvents } from 'lib/region/events'

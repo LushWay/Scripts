@@ -1,5 +1,5 @@
 import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
-import { Airdrop, isNotPlaying, Loot, Vec } from 'lib'
+
 import { Items } from 'lib/assets/custom-items'
 import { i18n } from 'lib/i18n/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'

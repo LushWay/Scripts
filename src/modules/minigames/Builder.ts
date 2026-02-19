@@ -1,5 +1,4 @@
 import { Player } from '@minecraft/server'
-import { LockAction, Sidebar } from 'lib'
 
 // TODO Add minigame place
 

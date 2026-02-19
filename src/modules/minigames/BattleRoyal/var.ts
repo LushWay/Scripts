@@ -1,4 +1,3 @@
-import { Settings } from 'lib'
 import { table } from 'lib/database/abstract'
 import { EventSignal } from 'lib/event-signal'
 

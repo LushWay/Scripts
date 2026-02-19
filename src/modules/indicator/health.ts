@@ -1,7 +1,6 @@
 import { Entity, system, world } from '@minecraft/server'
 
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, ms, Vec } from 'lib'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ClosingChatSet } from 'lib/extensions/player'

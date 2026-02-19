@@ -1,6 +1,7 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { getAuxOrTexture, langToken } from 'lib'
+import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
+import { langToken } from 'lib/i18n/lang'
 import { i18n, textTable } from 'lib/i18n/text'
 import { selectByChance } from 'lib/rpg/random'
 import { ores } from 'modules/places/mineshaft/algo'

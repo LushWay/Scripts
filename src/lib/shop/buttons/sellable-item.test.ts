@@ -2,7 +2,6 @@ import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { TEST_createPlayer, TEST_onFormOpen } from 'test/utils'
 import { Shop } from '../shop'
 
-import { doNothing } from 'lib'
 import 'lib/database/scoreboard'
 
 describe('sellableItem', () => {

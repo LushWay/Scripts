@@ -1,7 +1,12 @@
 import { BlockPermutation, BlockTypes, Player } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ActionForm, BUTTON, ChestForm, ModalForm, inspect, translateTypeId } from 'lib'
+import { ActionForm } from 'lib/form/action'
+import { ChestForm } from 'lib/form/chest'
+import { ModalForm } from 'lib/form/modal'
+import { BUTTON } from 'lib/form/utils'
+import { translateTypeId } from 'lib/i18n/lang'
 import { i18n } from 'lib/i18n/text'
+import { inspect } from 'lib/util'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { WEeditBlockStatesMenu } from 'modules/world-edit/menu'
 import {

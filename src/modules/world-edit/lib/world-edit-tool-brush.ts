@@ -1,6 +1,7 @@
 import { BlockRaycastHit, ItemStack, Player } from '@minecraft/server'
-import { isLocationError } from 'lib'
+import { noI18n } from 'lib/i18n/text'
 import stringifyError from 'lib/utils/error'
+import { isLocationError } from 'lib/utils/game'
 import { worldEditPlayerSettings } from 'modules/world-edit/settings'
 import { BlocksSetRef } from '../utils/blocks-set'
 import { WorldEditTool } from './world-edit-tool'
@@ -29,7 +30,7 @@ export abstract class WorldEditToolBrush<MoreStorage extends object> extends Wor
     if (!this.isOurBrush(storage)) return
 
     const hit = player.getBlockFromViewDirection({ maxDistance: storage.maxDistance })
-    const fail = (reason: string) => player.fail(`§7Кисть§f: §c${reason}`)
+    const fail = (reason: string) => player.fail(noI18n.error`Кисть: ${reason}`)
     if (!hit) return fail('Блок слишком далеко.')
 
     try {

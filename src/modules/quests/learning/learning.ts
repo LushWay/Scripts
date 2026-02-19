@@ -1,8 +1,7 @@
 import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
-import { ActionForm, ActionGuardOrder, location, Temporary, Vec } from 'lib'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { actionGuard } from 'lib'
+
 import { Sounds } from 'lib/assets/custom-sounds'
 import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/index'

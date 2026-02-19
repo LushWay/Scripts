@@ -1,7 +1,6 @@
 /* i18n-ignore */
 
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
-import { ActionForm, BUTTON, Leaderboard, ModalForm, noBoolean } from 'lib'
 import { defaultLang } from 'lib/assets/lang'
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'

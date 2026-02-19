@@ -1,7 +1,7 @@
 /* i18n-ignore */
 
 import { MolangVariableMap, Player, StructureRotation, system, world } from '@minecraft/server'
-import { ArrayForm, isKeyof, Vec } from 'lib'
+
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'

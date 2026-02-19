@@ -1,7 +1,7 @@
 import { Block, Dimension, Player } from '@minecraft/server'
 import { MinecraftBlockTypes as b, MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vec } from 'lib'
 import { EventSignal } from 'lib/event-signal'
+import { Vec } from 'lib/vector'
 import { getEdgeBlocksOf } from './get-edge-blocks-of'
 import { MineshaftRegion } from './mineshaft-region'
 import { Ore, OreCollector, OreEntry } from './ore-collector'

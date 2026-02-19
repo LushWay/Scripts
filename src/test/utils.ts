@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Player, system } from '@minecraft/server'
-import { EventSignal } from 'lib'
+import { EventSignal } from 'lib/event-signal'
 import type { Table } from 'lib/database/abstract'
 import type { TestFormCallback, TFD } from 'test/__mocks__/minecraft_server-ui'
 

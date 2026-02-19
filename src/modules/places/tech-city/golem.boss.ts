@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Boss, Loot, ms, Vec } from 'lib'
-import { i18n, i18nShared } from 'lib/i18n/text'
+
+import { i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Chip } from './engineer'
 

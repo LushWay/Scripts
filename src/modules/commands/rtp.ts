@@ -1,6 +1,5 @@
 import { Player, TicksPerSecond } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { LockAction, Vec } from 'lib'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'
 import { WeakPlayerMap } from 'lib/weak-player-storage'

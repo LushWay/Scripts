@@ -1,6 +1,6 @@
 import { world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import { Loot, ms } from 'lib'
+
 import { i18nShared } from 'lib/i18n/text'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'

@@ -1,4 +1,3 @@
-import { Loot } from 'lib'
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { CutArea } from 'lib/region/areas/cut'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'

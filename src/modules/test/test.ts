@@ -10,42 +10,35 @@ import {
   MinecraftItemTypes,
   MinecraftPotionEffectTypes,
 } from '@minecraft/vanilla-data'
-import {
-  Airdrop,
-  BUTTON,
-  ChestForm,
-  DatabaseUtils,
-  FormNpc,
-  LootTable,
-  Mail,
-  Region,
-  RoadRegion,
-  SafeAreaRegion,
-  Settings,
-  Vec,
-  getAuxOrTexture,
-  getAuxTextureOrPotionAux,
-  inspect,
-  is,
-  isKeyof,
-  restorePlayerCamera,
-  util,
-} from 'lib'
+
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CommandContext } from 'lib/command/context'
 import { parseArguments } from 'lib/command/utils'
 import { Cutscene } from 'lib/cutscene'
+import { DatabaseUtils } from 'lib/database/utils'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
+import { ChestForm, getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
+import { FormNpc } from 'lib/form/npc'
+import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { Mail } from 'lib/mail'
+import { Region, RoadRegion, SafeAreaRegion } from 'lib/region'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
+import { is } from 'lib/roles'
+import { Airdrop } from 'lib/rpg/airdrop'
+import { LootTable } from 'lib/rpg/loot-table'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
+import { Settings } from 'lib/settings'
+import { inspect, isKeyof, util } from 'lib/util'
+import { restorePlayerCamera } from 'lib/utils/game'
 import { toPoint } from 'lib/utils/point'
 import { Rewards } from 'lib/utils/rewards'
+import { Vec } from 'lib/vector'
 import { requestAirdrop } from 'modules/places/anarchy/airdrop'
 import { BaseRegion } from 'modules/places/base/region'
 import { skipForBlending } from 'modules/world-edit/utils/blending'

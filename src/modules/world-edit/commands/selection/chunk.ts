@@ -1,5 +1,5 @@
 import { Entity, Player } from '@minecraft/server'
-import { Vec } from 'lib'
+import { Vec } from 'lib/vector'
 import { WorldEdit } from '../../lib/world-edit'
 
 /**

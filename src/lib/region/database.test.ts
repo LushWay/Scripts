@@ -1,4 +1,3 @@
-import { Region, RegionIsSaveable } from 'lib'
 import { ChunkCubeArea } from './areas/chunk-cube'
 import { SphereArea } from './areas/sphere'
 import {

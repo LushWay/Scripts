@@ -1,8 +1,11 @@
 import { ContainerSlot, MolangVariableMap, Player, system, world } from '@minecraft/server'
-import { ActionForm, ModalForm, Vec, inspect } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ListParticles } from 'lib/assets/particles'
 import { ListSounds } from 'lib/assets/sounds'
+import { ActionForm } from 'lib/form/action'
+import { ModalForm } from 'lib/form/modal'
+import { inspect } from 'lib/utils/inspect'
+import { Vec } from 'lib/vector'
 import { WorldEditTool } from '../lib/world-edit-tool'
 
 const actions: Record<string, string[]> = {

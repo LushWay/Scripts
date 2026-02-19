@@ -1,7 +1,6 @@
 /* i18n-ignore */
 
 import { Player, ScoreName, world } from '@minecraft/server'
-import { ActionForm, Mail, ModalForm } from 'lib'
 import { createSelectPlayerMenu } from 'lib/form/select-player'
 import { i18n } from 'lib/i18n/text'
 import { Rewards } from 'lib/utils/rewards'

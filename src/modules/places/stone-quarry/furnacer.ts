@@ -1,6 +1,6 @@
 import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Vec, getAuxOrTexture, ms } from 'lib'
+
 import { Sounds } from 'lib/assets/custom-sounds'
 import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'

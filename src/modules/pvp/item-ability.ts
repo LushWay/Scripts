@@ -1,5 +1,5 @@
 import { EntityDamageCause, world } from '@minecraft/server'
-import { isKeyof } from 'lib'
+
 import { defaultLang } from 'lib/assets/lang'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'

@@ -3,7 +3,7 @@
 import { EnchantmentType, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { registerAsync } from '@minecraft/server-gametest'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Enchantments, isKeyof, Temporary } from 'lib'
+
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { noI18n } from 'lib/i18n/text'
 import { TestStructures } from 'test/constants'

@@ -1,9 +1,10 @@
 import { Block, BlockStates, ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { BlockStateSuperset } from '@minecraft/vanilla-data'
-import { ModalForm, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { ModalForm } from 'lib/form/modal'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { Vec } from 'lib/vector'
 import { WorldEditTool } from '../lib/world-edit-tool'
 import { WEeditBlockStatesMenu } from '../menu'
 

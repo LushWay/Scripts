@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { doNothing, noNullable } from 'lib'
+
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { intlListFormat } from 'lib/i18n/intl'
@@ -114,7 +114,10 @@ questMenuCustomButtons.subscribe(({ player, form }) => {
     })
   ) {
     const playerDb = db.get(player.id)
-    form.button(i18n.accent`Ежедневные задания`.badge(dailyQuests - playerDb.today).to(player.lang), dailyQuestsForm.show)
+    form.button(
+      i18n.accent`Ежедневные задания`.badge(dailyQuests - playerDb.today).to(player.lang),
+      dailyQuestsForm.show,
+    )
   }
 })
 

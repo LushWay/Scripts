@@ -1,6 +1,6 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { translateTypeId } from 'lib'
+
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { rollChance } from 'lib/rpg/random'

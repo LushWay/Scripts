@@ -1,4 +1,3 @@
-import { RegionDatabase, registerSaveableRegion } from 'lib'
 import { createPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { TEST_clearDatabase, TEST_createPlayer } from 'test/utils'

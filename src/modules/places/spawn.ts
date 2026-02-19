@@ -1,7 +1,6 @@
 import { GameMode, Player, system, world } from '@minecraft/server'
 
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
-import { InventoryStore, Portal, Settings, locationWithRotation, util } from 'lib'
 
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'

@@ -1,5 +1,5 @@
 import { BlockPermutation, Player, StructureMirrorAxis, StructureRotation, system, world } from '@minecraft/server'
-import { Vec, ask, getRole, isLocationError } from 'lib'
+
 import { Sounds } from 'lib/assets/custom-sounds'
 import { table } from 'lib/database/abstract'
 import { i18n } from 'lib/i18n/text'

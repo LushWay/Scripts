@@ -1,5 +1,5 @@
 import { Player, system, TicksPerSecond, world } from '@minecraft/server'
-import { Menu, Region, separateNumberWithDots, Settings, Sidebar } from 'lib'
+
 import { emoji } from 'lib/assets/emoji'
 import { i18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest/quest'

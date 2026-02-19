@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { disableAdventureNear } from 'lib'
+
 import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { registerRegionType } from 'lib/region/command'

@@ -1,7 +1,7 @@
 import {} from '@minecraft/server'
-import { Vec } from 'lib'
 import { CommandContext } from 'lib/command/context'
 import { i18n } from 'lib/i18n/text'
+import { Vec } from 'lib/vector'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 
 function getSelection(ctx: CommandContext) {

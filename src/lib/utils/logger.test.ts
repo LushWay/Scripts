@@ -1,4 +1,3 @@
-import { util } from 'lib'
 import { TEST_createPlayer } from 'test/utils'
 import { createLogger } from './logger'
 

@@ -1,6 +1,6 @@
 import { Player, system } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { Cooldown, ms } from 'lib'
+
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'
 import { actionGuard, ActionGuardOrder, BLOCK_CONTAINERS, DOORS, GATES, SWITCHES, TRAPDOORS } from 'lib/region/index'

@@ -1,5 +1,5 @@
 import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
-import { ModalForm, Vec, is, isKeyof, isLocationError } from 'lib'
+
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { i18n } from 'lib/i18n/text'

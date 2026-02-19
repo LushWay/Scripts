@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { InventoryInterval, ScoreboardDB } from 'lib'
+
 import { defaultLang } from 'lib/assets/lang'
 import { form } from 'lib/form/new'
 import { i18n, i18nShared } from 'lib/i18n/text'

@@ -4,7 +4,8 @@ import { GameMode, system, world } from '@minecraft/server'
 import * as GameTest from '@minecraft/server-gametest'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { Vec, util } from 'lib'
+import { util } from 'lib/util'
+import { Vec } from 'lib/vector'
 import { TestStructures } from 'test/constants'
 const time = 9999999
 

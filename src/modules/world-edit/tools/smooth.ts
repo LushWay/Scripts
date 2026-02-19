@@ -1,8 +1,11 @@
 import { Block, BlockPermutation, ContainerSlot, Player, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { is, ModalForm, util, Vec } from 'lib'
 import { Items } from 'lib/assets/custom-items'
+import { ModalForm } from 'lib/form/modal'
+import { is } from 'lib/roles'
+import { util } from 'lib/util'
+import { Vec } from 'lib/vector'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import {
   BlocksSetRef,

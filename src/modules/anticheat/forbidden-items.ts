@@ -1,6 +1,6 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { actionGuard, ActionGuardOrder, isNotPlaying } from 'lib'
+
 import { antiCheatLogger } from './log-provider'
 
 const forbiddenItems: string[] = [

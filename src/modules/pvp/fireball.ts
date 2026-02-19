@@ -1,10 +1,10 @@
 import { ItemStack, system, world } from '@minecraft/server'
 
-import { Vec } from 'lib'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { i18n } from 'lib/i18n/text'
 import { customItems } from 'lib/rpg/custom-item'
+import { Vec } from 'lib/vector'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
 

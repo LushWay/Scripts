@@ -1,5 +1,5 @@
 import { Block, Player, system, world } from '@minecraft/server'
-import { actionGuard, ActionGuardOrder, LockAction, Region, Vec } from 'lib'
+
 import { i18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { askForExitingNewbieMode, isNewbie } from 'lib/rpg/newbie'

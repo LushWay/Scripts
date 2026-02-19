@@ -1,5 +1,5 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
-import { Boss, BossArenaRegion, LockAction, ms, Settings } from 'lib'
+
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
