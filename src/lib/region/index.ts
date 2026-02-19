@@ -8,6 +8,8 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { Items } from 'lib/assets/custom-items'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, noI18n } from 'lib/i18n/text'
@@ -68,7 +70,6 @@ export enum ActionGuardOrder {
   // Limits
   Permission = 7,
   Lowest = 6,
-  DefaultAllowAll = 5,
 }
 
 export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []
@@ -107,13 +108,10 @@ actionGuard((player, region, context) => {
       if (typeId === MinecraftItemTypes.EnderPearl) return ent.includes(MinecraftEntityTypes.EnderPearl)
       if (typeId === MinecraftItemTypes.WindCharge) return ent.includes(MinecraftEntityTypes.WindChargeProjectile)
       if (typeId === MinecraftItemTypes.Snowball) return ent.includes(MinecraftEntityTypes.Snowball)
+      if (typeId === Items.Fireball) return ent.includes(CustomEntityTypes.Fireball)
     }
   }
 }, ActionGuardOrder.ProjectileUsePrevent)
-
-actionGuard(() => {
-  return true
-}, ActionGuardOrder.DefaultAllowAll)
 
 const permdebugLogger = createLogger('region-perm')
 
