@@ -22,7 +22,8 @@ export const SHAPES = {
   'customMountain': ({ x, y, z }) => y <= 0.5 * Math.sin(x / 10) + 0.5 * Math.cos(z / 10),
 
   'tetrahedron': ({ x, y, z, yMin, zMin }) => (
-    Math.abs(-x) + Math.abs(x) + Math.abs(y) + Math.abs(z) - yMin, zMin === 0
+    Math.abs(-x) + Math.abs(x) + Math.abs(y) + Math.abs(z) - yMin,
+    zMin === 0
   ),
 
   'triangle_prism': ({ x, y, z, yMin }) =>

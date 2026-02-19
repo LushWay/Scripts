@@ -31,4 +31,3 @@ describe('command utils', () => {
     `)
   })
 })
-

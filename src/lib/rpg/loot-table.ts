@@ -236,7 +236,7 @@ export class LootTable {
     let i = length
     return Array.from({ length }, () => {
       i--
-      if (air > 0) return air--, undefined
+      if (air > 0) return (air--, undefined)
 
       air = Math.randomInt(0, i - (explictItems.length + randomizableItems.length))
 
