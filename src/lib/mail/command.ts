@@ -1,11 +1,14 @@
-import { Player } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
+import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { ask } from 'lib/form/message'
-import { i18n, i18nPlural } from 'lib/i18n/text'
+import { ModalForm } from 'lib/form/modal'
+import { BUTTON } from 'lib/form/utils'
+import { i18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
-import { Menu } from 'lib/rpg/menu'
+import { is } from 'lib/roles'
 import { Settings } from 'lib/settings'
 import { Rewards } from 'lib/utils/rewards'
 
@@ -14,7 +17,9 @@ const command = new Command('mail')
   .setPermissions('member')
   .executes(ctx => mailMenu(ctx.player))
 
-const getSettings = Settings.player(...Menu.settings, {
+const mailGroup = [i18n`Почта\n§7Прочтение сообщения, инфо при входе`, 'mail'] as const
+
+const getSettings = Settings.player(...mailGroup, {
   mailReadOnOpen: {
     name: i18n`Читать письмо при открытии`,
     description: i18n`Помечать ли письмо прочитанным при открытии`,
@@ -27,7 +32,7 @@ const getSettings = Settings.player(...Menu.settings, {
   },
 })
 
-const getJoinSettings = Settings.player(...Join.settings.extend, {
+const getJoinSettings = Settings.player(...Join.getPlayerSettings.extend, {
   unreadMails: {
     name: i18n`Почта`,
     description: i18n`Показывать ли при входе сообщение с кол-вом непрочитанных`,
@@ -35,8 +40,18 @@ const getJoinSettings = Settings.player(...Join.settings.extend, {
   },
 })
 
+world.afterEvents.playerSpawn.subscribe(({ player }) => {
+  if (!getJoinSettings(player).unreadMails) return
+
+  const unreadCount = Mail.getUnreadMessagesCount(player.id)
+  if (unreadCount === 0) return
+
+  player.info(i18n.join`${i18n.header`Почта:`} ${i18n`У вас ${unreadCount} непрочитанных сообщений!`} ${command}`)
+})
+
 export function mailMenu(player: Player, back?: VoidFunction) {
-  new ArrayForm(i18n`Почта`.badge(Mail.getUnreadMessagesCount(player.id)), Mail.getLetters(player.id))
+  const letters = Mail.getLetters(player.id)
+  new ArrayForm(i18n`Почта`.badge(Mail.getUnreadMessagesCount(player.id)), letters)
     .filters({
       unread: {
         name: i18n`Непрочитанные`,
@@ -49,15 +64,51 @@ export function mailMenu(player: Player, back?: VoidFunction) {
         value: false,
       },
       sort: {
-        name: i18n`Соритровать по`,
+        name: i18n`Сортировать по`,
         value: [
           ['date', i18n`Дате`],
           ['name', i18n`Имени`],
         ],
       },
     })
+    .addCustomButtonBeforeArray((f, _, back) => {
+      if (letters.length) {
+        f.button('Прочитать все\n§7(и собрать награды если есть)', () => {
+          Mail.readAllAndClaimRewards(player)
+          player.success()
+          mailMenu(player)
+        })
+      } else {
+        f.button('Все прочитано', back)
+      }
+
+      if (is(player.id, 'moderator')) {
+        f.button('Объявление', BUTTON['+'], () => {
+          new ModalForm('Объявление для всего сервера')
+            .addTextField('Заголовок', 'вы крутые там д0а')
+            .addTextField('Строка 1', 'мы вас поздравляем')
+            .addTextField('Строка2', 'вы теперь можете')
+            .addTextField('Строка3', 'читать все сообщения в почте')
+            .addTextField('Строка 4', 'да')
+            .addTextField('Строка5', 'вот.')
+            .addSlider('Алмазов за прочтение', 0, 100, 1, 5)
+            .show(player, (ctx, ...args) => {
+              const diamonds = args.pop() as number
+              const rewards = new Rewards()
+              if (diamonds) rewards.item(MinecraftItemTypes.Diamond, diamonds)
+              Mail.sendMultiple(
+                [...Player.database.keys()],
+                i18n`${args[0]}`,
+                i18n`${args.slice(1).filter(Boolean).join('\n')}`,
+                rewards,
+              )
+              mailMenu(player)
+            })
+        })
+      }
+    })
     .button(({ letter, index }) => {
-      const name = `${letter.read ? '§7' : '§f'}${letter.title}${letter.read ? '\n§8' : '§c*\n§7'}${letter.content}`
+      const name = `${letter.read ? '§7' : '§f'}${letter.title.replace(/§./g, '')}${letter.read ? '\n§8' : '§c*\n§7'}${letter.content.replace(/§./g, '')}`
       return [
         name,
         () => {
@@ -144,12 +195,3 @@ function letterDetailsMenu(
 
   form.show(player)
 }
-
-Join.onMoveAfterJoin.subscribe(({ player }) => {
-  if (!getJoinSettings(player).unreadMails) return
-
-  const unreadCount = Mail.getUnreadMessagesCount(player.id)
-  if (unreadCount === 0) return
-
-  player.info(i18n.join`${i18n.header`Почта:`} ${i18nPlural`У вас ${unreadCount} непрочитанных сообщений!`} ${command}`)
-})

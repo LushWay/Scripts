@@ -4,6 +4,7 @@ import { table } from 'lib/database/abstract'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 import { msold } from 'lib/utils/ms-old'
+import { Singleton } from 'lib/utils/singleton'
 import './command'
 
 export declare namespace Chat {
@@ -20,14 +21,7 @@ export declare namespace Chat {
   }
 }
 
-export abstract class Chat {
-  private static instance?: Chat
-
-  static getInstance(): Chat {
-    if (!this.instance) throw new Error('Chat.getInstance: Chat is not configured!')
-    return this.instance
-  }
-
+export abstract class Chat extends Singleton {
   muteDb = table<Chat.MuteInfo>('chatMute')
 
   settings = Settings.world(...Settings.worldCommon, {
@@ -82,8 +76,7 @@ export abstract class Chat {
   chatListener: (arg0: ChatSendBeforeEvent) => void
 
   constructor() {
-    if (Chat.instance) throw new Error('Chat was already initialized!')
-    Chat.instance = this
+    super()
 
     world.afterEvents.worldLoad.subscribe(() => {
       this.updateCooldown()

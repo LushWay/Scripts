@@ -98,10 +98,6 @@ declare module '@minecraft/server' {
     prevRole?: Role
     quests?: import('./quest/quest').Quest.DB
     achivs?: import('./achievements/achievement').Achievement.DB
-    join?: {
-      position?: number[]
-      stage?: number
-    }
     unlockedPortals?: string[]
   }
 }

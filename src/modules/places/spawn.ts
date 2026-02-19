@@ -71,12 +71,12 @@ class SpawnBuilder extends AreaWithInventory {
         .setPermissions('everybody')
         .setDescription(i18n.nocolor`§r§bПеремещает на спавн`)
 
-      world.afterEvents.playerSpawn.unsubscribe(Join.eventsDefaultSubscribers.playerSpawn)
+      world.afterEvents.playerSpawn.unsubscribe(Join.getInstance().playerSpawnEventSubscriber)
       world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
         // Skip after death respawns
         if (!initialSpawn) return
         if (player.isSimulated()) return
-        if (isNotPlaying(player)) return Join.setPlayerJoinPosition(player)
+        if (isNotPlaying(player)) return Join.getInstance().setPlayerJoinPosition(player)
 
         // Check settings
         if (!this.settings(player).teleportToSpawnOnJoin)
@@ -86,7 +86,11 @@ class SpawnBuilder extends AreaWithInventory {
         util.catch(() => {
           this.logger.player(player).info`Teleporting player to spawn on join`
           this.portal?.teleport(player)
-          system.runTimeout(() => Join.setPlayerJoinPosition(player), 'Spawn set player position after join', 10)
+          system.runTimeout(
+            () => Join.getInstance().setPlayerJoinPosition(player),
+            'Spawn set player position after join',
+            10,
+          )
         })
       })
 

@@ -3,7 +3,7 @@ import 'lib/extensions/player'
 import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/utils/rewards'
 import { TEST_clearDatabase } from 'test/utils'
-import { i18n } from './i18n/text'
+import { i18n } from '../i18n/text'
 
 describe('mail', () => {
   beforeEach(() => {

@@ -238,7 +238,7 @@ function wipe(player: Player) {
 
   for (let i = 0; i <= 26; i++) player.runCommand(`replaceitem entity @s slot.enderchest ${i} air`)
 
-  system.runTimeout(() => Join.emitFirstJoin(player), 'clear', 30)
+  system.runTimeout(() => Join.getInstance().emitFirstJoin(player), 'clear', 30)
 }
 
 function exitFromAllQuests(player: Player) {

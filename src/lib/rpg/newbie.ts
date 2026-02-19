@@ -56,7 +56,6 @@ export function enterNewbieMode(player: Player, resetAnarchyOnlineTime = true) {
   player.setProperty(property, true)
 }
 
-Join.onFirstTimeSpawn.subscribe(enterNewbieMode)
 Join.onMoveAfterJoin.subscribe(({ player }) => {
   const value = isNewbie(player)
   if (value !== player.getProperty(property)) player.setProperty(property, value)

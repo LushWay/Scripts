@@ -1,10 +1,10 @@
 import { Player } from '@minecraft/server'
 
 import { Rewards } from 'lib/utils/rewards'
-import { defaultLang } from './assets/lang'
-import { table } from './database/abstract'
-import { Message } from './i18n/message'
-import { i18n, noI18n } from './i18n/text'
+import { defaultLang } from '../assets/lang'
+import { table } from '../database/abstract'
+import { Message } from '../i18n/message'
+import { i18n, noI18n } from '../i18n/text'
 
 /** A global letter is a letter sent to multiple players */
 interface GlobalLetter {
@@ -44,6 +44,7 @@ export class Mail {
     this.dbPlayers
       .get(playerId)
       // TODO Use player offline lang once added
+
       .push({
         read: false,
         title: title.to(defaultLang),
@@ -61,10 +62,10 @@ export class Mail {
   /**
    * Sends a mail to multiple players
    *
-   * @param playerIds The recievers
-   * @param title The letter title
-   * @param content The letter content
-   * @param rewards The attached rewards
+   * @param {string[]} playerIds The recievers
+   * @param {string} title The letter title
+   * @param {string} content The letter content
+   * @param {Rewards} rewards The attached rewards
    */
   static sendMultiple(playerIds: readonly string[], title: Message, content: Message, rewards = new Rewards()) {
     let id = new Date().toISOString()
