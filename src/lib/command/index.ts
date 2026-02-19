@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import {
   ChatSendAfterEvent,
+  ChatSendBeforeEvent,
   CommandPermissionLevel,
   CustomCommandOrigin,
   CustomCommandParameter,
@@ -57,7 +58,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
 
   static logger = createLogger('Command')
 
-  static chatListener(event: ChatSendAfterEvent) {
+  private static chatListener(event: ChatSendAfterEvent) {
     if (!this.isCommand(event.message)) return this.chatSendListener(event)
 
     const parsed = parseCommand(event.message, 1)
@@ -97,6 +98,21 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     if (getChilds(command, 0) === 'fail') return
 
     sendCallback(args, childs, event, command, input)
+  }
+
+  // TODO Better registration, global event etc
+  static registerChatListener(chat: (arg0: ChatSendBeforeEvent) => void) {
+    this.chatSendListener = chat
+    world.beforeEvents.chatSend.subscribe(event => {
+      event.cancel = true
+      system.delay(() => {
+        Command.chatListener(event)
+      })
+    })
+  }
+
+  static register(namespace: string) {
+    register(namespace)
   }
 
   /** An array of all active commands */
@@ -446,116 +462,111 @@ declare global {
 
 globalThis.Command = Command
 
-// world.beforeEvents.chatSend.subscribe(event => {
-//   event.cancel = true
-//   system.delay(() => {
-//     Command.chatListener(event)
-//   })
-// })
+function register(namespace: string) {
+  system.beforeEvents.startup.subscribe(load => {
+    for (const command of Command.commands) {
+      if (command.sys.depth !== 0) continue
+      // Only simple commands are supported rn
 
-system.beforeEvents.startup.subscribe(load => {
-  const namespace = 'folkbe'
-  for (const command of Command.commands) {
-    if (command.sys.depth !== 0) continue
-    // Only simple commands are supported rn
+      try {
+        const mandatoryParameters: CustomCommandParameter[] = []
+        const optionalParameters: CustomCommandParameter[] = []
 
-    try {
-      const mandatoryParameters: CustomCommandParameter[] = []
-      const optionalParameters: CustomCommandParameter[] = []
+        let callback = command.sys.callback
+        const locationIndexes: number[] = []
+        let i = 0
 
-      let callback = command.sys.callback
-      const locationIndexes: number[] = []
-      let i = 0
+        let nowOptional = false
 
-      let nowOptional = false
+        function collectParams(command: Command) {
+          const child = command.sys.children[0]
+          if (!child || child instanceof LiteralArgumentType) return
 
-      function collectParams(command: Command) {
-        const child = command.sys.children[0]
-        if (!child || child instanceof LiteralArgumentType) return
+          // Location is split
+          if (child.sys.type.name.endsWith('*')) return collectParams(child)
 
-        // Location is split
-        if (child.sys.type.name.endsWith('*')) return collectParams(child)
-
-        child.sys.type.register(load.customCommandRegistry, namespace)
-        const param: CustomCommandParameter = { name: child.sys.type.name, type: child.sys.type.ctype }
-        if (child.sys.type.optional) {
-          nowOptional = true
-          optionalParameters.push(param)
-        } else {
-          if (nowOptional) throw new Error('Mandatory param cannot come after optional in command ' + command.sys.name)
-          mandatoryParameters.push(param)
-        }
-
-        if (child.sys.type instanceof LocationArgumentType) locationIndexes.push(i)
-        i++
-
-        if (child.sys.callback) callback = child.sys.callback
-
-        collectParams(child)
-      }
-      collectParams(command)
-
-      load.customCommandRegistry.registerCommand(
-        {
-          name: namespace + ':' + command.sys.name,
-          permissionLevel: command.sys.admin ? CommandPermissionLevel.GameDirectors : CommandPermissionLevel.Any,
-          description: command.sys.description.to(defaultLang),
-          mandatoryParameters,
-          optionalParameters,
-        },
-        (ctx, ...args) => {
-          if (!callback) {
-            return {
-              status: CustomCommandStatus.Failure,
-              message: 'Команда не готова',
-            }
+          child.sys.type.register(load.customCommandRegistry, namespace)
+          const param: CustomCommandParameter = { name: child.sys.type.name, type: child.sys.type.ctype }
+          if (child.sys.type.optional) {
+            nowOptional = true
+            optionalParameters.push(param)
+          } else {
+            if (nowOptional)
+              throw new Error('Mandatory param cannot come after optional in command ' + command.sys.name)
+            mandatoryParameters.push(param)
           }
 
-          const isServer = !(ctx.sourceEntity instanceof Player)
-          const output: CommandOutputBuffer = { output: '', isSync: isServer }
-          const player: Player =
-            ctx.sourceEntity instanceof Player ? ctx.sourceEntity : createPlayerProxy(ctx, command, output)
+          if (child.sys.type instanceof LocationArgumentType) locationIndexes.push(i)
+          i++
 
-          const allowed = command.sys.requires(player)
-          if (!allowed) {
-            if (command.sys.requires.onFail) {
-              command.sys.requires.onFail(player)
-            } else {
-              if (command.sys.role) {
-                player.fail(
-                  i18n.error`Команда доступна только начиная с роли ${ROLES[command.sys.role]}. Ваша роль: ${ROLES[getRole(player.id)]}`,
-                )
-              } else {
-                player.fail(i18n.error`Команда недоступна`)
+          if (child.sys.callback) callback = child.sys.callback
+
+          collectParams(child)
+        }
+        collectParams(command)
+
+        load.customCommandRegistry.registerCommand(
+          {
+            name: namespace + ':' + command.sys.name,
+            permissionLevel: command.sys.admin ? CommandPermissionLevel.GameDirectors : CommandPermissionLevel.Any,
+            description: command.sys.description.to(defaultLang),
+            mandatoryParameters,
+            optionalParameters,
+          },
+          (ctx, ...args) => {
+            if (!callback) {
+              return {
+                status: CustomCommandStatus.Failure,
+                message: 'Команда не готова',
               }
             }
 
-            return { status: CustomCommandStatus.Failure, message: output.output || undefined }
-          }
+            const isServer = !(ctx.sourceEntity instanceof Player)
+            const output: CommandOutputBuffer = { output: '', isSync: isServer }
+            const player: Player =
+              ctx.sourceEntity instanceof Player ? ctx.sourceEntity : createPlayerProxy(ctx, command, output)
 
-          for (const i of locationIndexes) {
-            const arg: unknown = args[i]
-            if (Vec.isVec(arg)) args[i] = Vec.floor(arg)
-          }
+            const allowed = command.sys.requires(player)
+            if (!allowed) {
+              if (command.sys.requires.onFail) {
+                command.sys.requires.onFail(player)
+              } else {
+                if (command.sys.role) {
+                  player.fail(
+                    i18n.error`Команда доступна только начиная с роли ${ROLES[command.sys.role]}. Ваша роль: ${ROLES[getRole(player.id)]}`,
+                  )
+                } else {
+                  player.fail(i18n.error`Команда недоступна`)
+                }
+              }
 
-          if (isServer) {
-            execCmd(player, command, callback, args, output)
-          } else {
-            system.delay(() => {
-              if (!callback) throw new Error('no callback')
+              return { status: CustomCommandStatus.Failure, message: output.output || undefined }
+            }
+
+            for (const i of locationIndexes) {
+              const arg: unknown = args[i]
+              if (Vec.isVec(arg)) args[i] = Vec.floor(arg)
+            }
+
+            if (isServer) {
               execCmd(player, command, callback, args, output)
-            })
-          }
-          return { status: CustomCommandStatus.Success, message: output.output || undefined }
-        },
-      )
-    } catch (e) {
-      Command.logger.error('Failed to load command', command.sys.name, e)
+            } else {
+              system.delay(() => {
+                if (!callback) throw new Error('no callback')
+                execCmd(player, command, callback, args, output)
+              })
+            }
+            return { status: CustomCommandStatus.Success, message: output.output || undefined }
+          },
+        )
+      } catch (e) {
+        Command.logger.error('Failed to load command', command.sys.name, e)
+      }
     }
-  }
 
-  Command.loaded = true
-})
+    Command.loaded = true
+  })
+}
 
 interface CommandOutputBuffer {
   output: string

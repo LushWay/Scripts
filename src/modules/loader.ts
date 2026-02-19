@@ -3,7 +3,7 @@ import 'lib'
 import './anticheat/index'
 import './survival/import'
 
-import './chat/chat'
+import './lushway/chat'
 import './test/test'
 import './wiki/wiki'
 import './world-edit/builder'
