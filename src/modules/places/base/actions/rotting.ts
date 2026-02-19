@@ -1,17 +1,6 @@
 import { Block, BlockPermutation, ContainerSlot, Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import {
-  actionGuard,
-  ActionGuardOrder,
-  Cooldown,
-  getBlockStatus,
-  isEmpty,
-  isLocationError,
-  isNotPlaying,
-  Mail,
-  ms,
-  Vec,
-} from 'lib'
+
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { Message } from 'lib/i18n/message'
@@ -21,6 +10,13 @@ import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { spawnParticlesInArea } from 'modules/world-edit/config'
 import { BaseRegion, RottingState } from '../region'
+import { Cooldown } from 'lib/cooldown'
+import { Mail } from 'lib/mail'
+import { actionGuard, ActionGuardOrder } from 'lib/region'
+import { isEmpty } from 'lib/util'
+import { getBlockStatus, isLocationError, isNotPlaying } from 'lib/utils/game'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 
 const takeMaterialsTime = __DEV__ ? ms.from('day', 1) : ms.from('day', 1)
 const blocksReviseTime = __DEV__ ? ms.from('min', 1) : ms.from('min', 2)

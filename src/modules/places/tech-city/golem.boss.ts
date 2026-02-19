@@ -4,6 +4,10 @@ import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-d
 import { i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
 import { Chip } from './engineer'
+import { Vec } from 'lib/vector'
+import { ms } from 'lib/utils/ms'
+import { Loot } from 'lib/rpg/loot-table'
+import { Boss } from 'lib/rpg/boss'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()

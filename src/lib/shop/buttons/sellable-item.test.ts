@@ -3,6 +3,7 @@ import { TEST_createPlayer, TEST_onFormOpen } from 'test/utils'
 import { Shop } from '../shop'
 
 import 'lib/database/scoreboard'
+import { doNothing } from 'lib/util'
 
 describe('sellableItem', () => {
   it('should sell items', () => {

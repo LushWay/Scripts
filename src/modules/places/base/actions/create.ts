@@ -7,6 +7,11 @@ import { BaseItem, baseLogger } from '../base'
 import { baseLevels } from '../base-levels'
 import { baseCommand } from '../base-menu'
 import { BaseRegion } from '../region'
+import { Vec } from 'lib/vector'
+import { Region } from 'lib/region'
+import { LockAction } from 'lib/action'
+import { ActionGuardOrder } from 'lib/region'
+import { actionGuard } from 'lib/region'
 
 actionGuard((_, __, ctx) => {
   if (

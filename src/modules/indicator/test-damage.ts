@@ -3,9 +3,12 @@
 import { EnchantmentType, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { registerAsync } from '@minecraft/server-gametest'
 import { MinecraftEnchantmentTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Enchantments } from 'lib/enchantments'
 
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { noI18n } from 'lib/i18n/text'
+import { isKeyof } from 'lib/util'
+import { Temporary } from 'lib/temporary'
 import { TestStructures } from 'test/constants'
 
 const players: Player[] = []

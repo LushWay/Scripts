@@ -6,6 +6,11 @@ import { i18n } from 'lib/i18n/text'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
+import { Vec } from 'lib/vector'
+import { ActionGuardOrder } from 'lib/region'
+import { actionGuard } from 'lib/region'
+import { ms } from 'lib/utils/ms'
+import { Cooldown } from 'lib/cooldown'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')

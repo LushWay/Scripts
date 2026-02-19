@@ -8,6 +8,7 @@ import { techCityInvestigating } from '../tech-city/quests/investigating'
 import { MagicSlimeBall } from './items'
 import { Mage } from './mage'
 import { createBossSlime } from './slime.boss'
+import { Loot } from 'lib/rpg/loot-table'
 
 class VillageOfExporersBuilder extends City {
   constructor() {

@@ -13,6 +13,11 @@ import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from './lib/area-with-inventory'
+import { InventoryStore } from 'lib/database/inventory'
+import { util } from 'lib/util'
+import { Settings } from 'lib/settings'
+import { locationWithRotation } from 'lib/location'
+import { Portal } from 'lib/portals'
 
 class SpawnBuilder extends AreaWithInventory {
   group = new Group('common', i18nShared`Общее`)

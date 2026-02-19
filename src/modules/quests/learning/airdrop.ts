@@ -1,4 +1,5 @@
 import { Items } from 'lib/assets/custom-items'
+import { Loot } from 'lib/rpg/loot-table'
 
 export default new Loot('starter')
   .item('WoodenSword')

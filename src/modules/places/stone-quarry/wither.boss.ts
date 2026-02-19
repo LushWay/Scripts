@@ -3,7 +3,10 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { i18nShared, noI18n } from 'lib/i18n/text'
 import { BigRegionStructure } from 'lib/region/big-structure'
+import { Loot } from 'lib/rpg/loot-table'
+import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
+import { ms } from 'lib/utils/ms'
 
 export function createBossWither(group: Group) {
   const boss = Boss.create()

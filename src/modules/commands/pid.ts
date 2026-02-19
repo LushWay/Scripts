@@ -1,7 +1,9 @@
 import { Player } from '@minecraft/server'
+import { ModalForm } from 'lib/form/modal'
 
 import { selectPlayer } from 'lib/form/select-player'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { is } from 'lib/roles'
 
 new Command('pid')
   .setDescription(i18n`Выдает ваш айди`)

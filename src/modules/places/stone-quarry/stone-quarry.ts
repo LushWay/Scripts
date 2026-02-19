@@ -12,6 +12,7 @@ import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 import { createBossWither } from './wither.boss'
+import { Loot } from 'lib/rpg/loot-table'
 
 class StoneQuarryBuilder extends City {
   constructor() {

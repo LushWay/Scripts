@@ -6,6 +6,10 @@ import { noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { WeBackup, WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
+import { Vec } from 'lib/vector'
+import { Region } from 'lib/region'
+import { regionTypes } from 'lib/region'
+import { ModalForm } from 'lib/form/modal'
 
 interface Storage {
   version: number

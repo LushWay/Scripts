@@ -10,6 +10,7 @@ import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Engineer } from './engineer'
 import { createBossGolem } from './golem.boss'
+import { Loot } from 'lib/rpg/loot-table'
 
 class TechCityBuilder extends City {
   constructor() {

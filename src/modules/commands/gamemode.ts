@@ -5,6 +5,9 @@ import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { Temporary } from 'lib/temporary'
+import { is } from 'lib/roles'
+import { isNotPlaying } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 function fastGamemode(mode: GameMode, shorname: string) {

@@ -4,6 +4,8 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { form } from 'lib/form/new'
 import { noI18n } from 'lib/i18n/text'
+import { Region } from 'lib/region'
+import { Vec } from 'lib/vector'
 
 const f = form((f, { player }) => {
   for (const [name, id] of Object.entries(StructureDungeonsId)) {

@@ -1,5 +1,6 @@
 import { system, TicksPerSecond, world } from '@minecraft/server'
 import { emoji } from 'lib/assets/emoji'
+import { Settings } from 'lib/settings'
 
 const socials = [
   [`${emoji.custom.socials.discord} §9Discord§7: §b§ldsc.gg/lushway`, 'discord'],

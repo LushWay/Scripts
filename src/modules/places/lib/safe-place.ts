@@ -1,28 +1,22 @@
 import { Player, system, TicksPerSecond } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import {
-  actionGuard,
-  ActionGuardOrder,
-  ArrayForm,
-  debounceMenu,
-  location,
-  locationWithRadius,
-  locationWithRotation,
-  Portal,
-  SafeAreaRegion,
-  Vec,
-  Vector3Radius,
-} from 'lib'
+
 import { Sounds } from 'lib/assets/custom-sounds'
 import { emoji } from 'lib/assets/emoji'
+import { ArrayForm } from 'lib/form/array'
+import { debounceMenu } from 'lib/form/utils'
 import { SharedI18nMessage } from 'lib/i18n/message'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { locationWithRadius, locationWithRotation, location, Vector3Radius } from 'lib/location'
+import { Portal } from 'lib/portals'
+import { SafeAreaRegion, actionGuard, ActionGuardOrder } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { Group } from 'lib/rpg/place'
 import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
 import { Product } from 'lib/shop/product'
+import { Vec } from 'lib/vector'
 
 export class SafePlace {
   static places: SafePlace[] = []

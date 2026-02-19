@@ -4,6 +4,7 @@ import { defaultLang } from 'lib/assets/lang'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { rollChance } from 'lib/rpg/random'
+import { isKeyof } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 
 const logger = createLogger('ItemAbility')

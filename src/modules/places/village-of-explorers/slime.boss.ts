@@ -5,6 +5,8 @@ import { i18nShared } from 'lib/i18n/text'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
 import { MagicSlimeBall } from './items'
+import { ms } from 'lib/utils/ms'
+import { Loot } from 'lib/rpg/loot-table'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()

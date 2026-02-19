@@ -12,6 +12,9 @@ import {
 } from '@minecraft/server'
 
 import { MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { util } from 'lib/util'
+import { Vec } from 'lib/vector'
+import { LockAction } from 'lib/action'
 
 const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
   '§6Элитра перемещения',

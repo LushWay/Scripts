@@ -1,24 +1,24 @@
 import { system } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import {
-  actionGuard,
-  ActionGuardOrder,
-  disableAdventureNear,
-  fromMsToTicks,
-  ms,
-  PVP_ENTITIES,
-  Region,
-  RegionPermissions,
-  registerRegionType,
-  registerSaveableRegion,
-  Vec,
-} from 'lib'
+
 import { form } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
 import { rollChance } from 'lib/rpg/random'
 import { createLogger } from 'lib/utils/logger'
 import { BaseItem } from '../base/base'
+import {
+  Region,
+  RegionPermissions,
+  PVP_ENTITIES,
+  registerSaveableRegion,
+  registerRegionType,
+  disableAdventureNear,
+  actionGuard,
+  ActionGuardOrder,
+} from 'lib/region'
+import { fromMsToTicks, ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 
 const logger = createLogger('warden')
 

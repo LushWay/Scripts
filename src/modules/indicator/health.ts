@@ -5,7 +5,10 @@ import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ClosingChatSet } from 'lib/extensions/player'
 import { NOT_MOB_ENTITIES } from 'lib/region/config'
+import { Boss } from 'lib/rpg/boss'
 import { isNotPlaying } from 'lib/utils/game'
+import { Vec } from 'lib/vector'
+import { ms } from 'lib/utils/ms'
 import { PlayerNameTagModifiers, setNameTag } from 'modules/indicator/player-name-tag'
 
 interface BaseHurtEntity {

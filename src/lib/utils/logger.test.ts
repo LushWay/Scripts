@@ -1,5 +1,6 @@
 import { TEST_createPlayer } from 'test/utils'
 import { createLogger } from './logger'
+import { util } from 'lib/util'
 
 describe('Logger', () => {
   it('should create logger that prints debug info', () => {

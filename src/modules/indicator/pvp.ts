@@ -1,10 +1,15 @@
 import { EntityDamageCause, EntityHurtAfterEvent, Player, system, world } from '@minecraft/server'
+import { LockAction } from 'lib/action'
 
 import { emoji } from 'lib/assets/emoji'
 import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'
+import { BossArenaRegion } from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
+import { Boss } from 'lib/rpg/boss'
+import { ms } from 'lib/utils/ms'
+import { Settings } from 'lib/settings'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 

@@ -23,6 +23,12 @@ import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
+import { ActionForm } from 'lib/form/action'
+import { Temporary } from 'lib/temporary'
+import { ActionGuardOrder } from 'lib/region'
+import { actionGuard } from 'lib/region'
+import { location } from 'lib/location'
+import { Vec } from 'lib/vector'
 
 const logger = createLogger('Learning Quest')
 

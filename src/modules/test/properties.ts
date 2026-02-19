@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 
 import { playerJson } from 'lib/assets/player-json'
+import { ArrayForm } from 'lib/form/array'
 
 new Command('props')
   .setDescription('Player properties menu')

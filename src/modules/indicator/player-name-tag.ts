@@ -1,6 +1,7 @@
 import { Entity, Player, system } from '@minecraft/server'
 
 import { getFullname } from 'lib/get-fullname'
+import { isNotPlaying } from 'lib/utils/game'
 
 export const PlayerNameTagModifiers: ((player: Player) => string | false)[] = [
   player => {

@@ -7,6 +7,9 @@ import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
 import { MineareaRegion } from '../../../lib/region/kinds/minearea'
 import { ores, placeOre } from './algo'
+import { registerRegionType } from 'lib/region'
+import { Vec } from 'lib/vector'
+import { ms } from 'lib/utils/ms'
 
 const logger = createLogger('Shaft')
 

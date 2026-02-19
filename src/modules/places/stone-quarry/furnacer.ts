@@ -12,6 +12,9 @@ import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
+import { Vec } from 'lib/vector'
+import { getAuxOrTexture } from 'lib/form/chest'
+import { ms } from 'lib/utils/ms'
 
 const furnaceExpireTime = ms.from('hour', 1)
 const furnaceExpireTimeText = i18n`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`

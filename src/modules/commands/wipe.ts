@@ -1,22 +1,20 @@
 import { GameMode, Player, PlayerDatabase, ScoreNames, ShortcutDimensions, system, world } from '@minecraft/server'
-import {
-  Airdrop,
-  ArrayForm,
-  BUTTON,
-  Compass,
-  InventoryStore,
-  is,
-  Join,
-  ModalForm,
-  pick,
-  scoreboardObjectiveNames,
-  sizeOf,
-} from 'lib'
+
 import { table } from 'lib/database/abstract'
+import { InventoryStore } from 'lib/database/inventory'
+import { scoreboardObjectiveNames } from 'lib/database/scoreboard'
+import { ArrayForm } from 'lib/form/array'
+import { ModalForm } from 'lib/form/modal'
 import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
+import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest'
+import { is } from 'lib/roles'
+import { Airdrop } from 'lib/rpg/airdrop'
+import { Compass } from 'lib/rpg/menu'
 import { enterNewbieMode, isNewbie } from 'lib/rpg/newbie'
+import { pick, sizeOf } from 'lib/util'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { Spawn } from 'modules/places/spawn'
 import { updateBuilderStatus } from 'modules/world-edit/builder'

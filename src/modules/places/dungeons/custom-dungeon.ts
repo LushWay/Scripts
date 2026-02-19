@@ -6,6 +6,13 @@ import { i18n, noI18n } from 'lib/i18n/text'
 import { Area } from 'lib/region/areas/area'
 import { DungeonRegion, DungeonRegionDatabase } from './dungeon'
 import { Dungeon } from './loot'
+import { Vec } from 'lib/vector'
+import { ModalForm } from 'lib/form/modal'
+import { is } from 'lib/roles'
+import { registerRegionType } from 'lib/region'
+import { registerSaveableRegion } from 'lib/region'
+import { ms } from 'lib/utils/ms'
+import { RegionCreationOptions } from 'lib/region'
 
 interface CustomDungeonRegionDatabase extends DungeonRegionDatabase {
   chestLoot: {

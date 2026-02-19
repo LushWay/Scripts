@@ -2,6 +2,9 @@ import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 
 import { antiCheatLogger } from './log-provider'
+import { ActionGuardOrder } from 'lib/region'
+import { actionGuard } from 'lib/region'
+import { isNotPlaying } from 'lib/utils/game'
 
 const forbiddenItems: string[] = [
   MinecraftItemTypes.Barrier,

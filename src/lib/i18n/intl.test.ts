@@ -1,6 +1,7 @@
 import { Language, supportedLanguages } from 'lib/assets/lang'
 import { intlListFormat, intlRemaining } from './intl'
 import { i18n } from './text'
+import { ms } from 'lib/utils/ms'
 
 describe('intlListFormat', () => {
   it('should translate', () => {

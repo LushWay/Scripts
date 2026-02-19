@@ -1,8 +1,11 @@
 /* i18n-ignore */
 
 import { Player, ScoreName, world } from '@minecraft/server'
+import { ActionForm } from 'lib/form/action'
+import { ModalForm } from 'lib/form/modal'
 import { createSelectPlayerMenu } from 'lib/form/select-player'
 import { i18n } from 'lib/i18n/text'
+import { Mail } from 'lib/mail'
 import { Rewards } from 'lib/utils/rewards'
 
 interface SendState {

@@ -1,4 +1,5 @@
 import { system, world } from '@minecraft/server'
+import { LockAction } from 'lib/action'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'

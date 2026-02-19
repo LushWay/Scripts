@@ -5,6 +5,10 @@ import { i18n } from 'lib/i18n/text'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../pvp/cannon'
 import { randomLocationInAnarchy } from './random-location-in-anarchy'
+import { Vec } from 'lib/vector'
+import { isNotPlaying } from 'lib/utils/game'
+import { Airdrop } from 'lib/rpg/airdrop'
+import { Loot } from 'lib/rpg/loot-table'
 
 const base = new Loot('base_airdrop')
   .item('Gunpowder')

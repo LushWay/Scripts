@@ -2,6 +2,7 @@ import { i18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { RegionEvents } from 'lib/region/events'
 import { City } from './city'
+import { isNotPlaying } from 'lib/utils/game'
 
 export class CityInvestigating<T extends City> {
   static list: CityInvestigating<City>[] = []

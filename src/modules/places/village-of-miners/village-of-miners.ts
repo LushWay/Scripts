@@ -6,6 +6,8 @@ import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { stoneQuarryInvestigating } from '../stone-quarry/quests/investigating'
 import { createMineQuests } from './quests/mine-x-blocks'
+import { Loot } from 'lib/rpg/loot-table'
+import { migrateLocationName } from 'lib/location'
 
 class VillageOfMinersBuilder extends City {
   constructor() {

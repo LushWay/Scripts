@@ -8,6 +8,7 @@ import { ReplaceMode } from 'modules/world-edit/utils/blocks-set'
 import { WorldEdit } from '../../../lib/world-edit'
 import { SelectedBlock, useBlockSelection } from './use-block-selection'
 import { useReplaceMode } from './use-replace-mode'
+import { BUTTON } from 'lib/form/utils'
 
 const selection = {
   block: new WeakPlayerMap<SelectedBlock>(),

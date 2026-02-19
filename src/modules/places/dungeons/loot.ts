@@ -5,6 +5,8 @@ import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { BaseItem } from '../base/base'
+import { LootTable } from 'lib/rpg/loot-table'
+import { Loot } from 'lib/rpg/loot-table'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(CannonShellItem.blueprint)

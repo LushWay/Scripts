@@ -23,6 +23,11 @@ import {
 } from '../utils/blocks-set'
 import { shortenBlocksSetName } from '../utils/default-block-sets'
 import { SHAPES, ShapeFormula } from '../utils/shapes'
+import { isLocationError } from 'lib/utils/game'
+import { isKeyof } from 'lib/util'
+import { is } from 'lib/roles'
+import { ModalForm } from 'lib/form/modal'
+import { Vec } from 'lib/vector'
 
 interface Storage {
   shape: string

@@ -7,6 +7,11 @@ import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyBenchmarkResult } from './stringifyBenchmarkReult'
+import { util } from 'lib/util'
+import { inspect } from 'lib/util'
+import { getRole } from 'lib/roles'
+import { ROLES } from 'lib/roles'
+import { ArrayForm } from 'lib/form/array'
 
 new Command('db')
   .setDescription('Просматривает базу данных')

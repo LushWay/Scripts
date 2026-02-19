@@ -1,5 +1,6 @@
 import { RGBA, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { removeNamespace } from 'lib/util'
 
 system.afterEvents.scriptEventReceive.subscribe(
   ({ id }) => {

@@ -3,6 +3,8 @@ import { Vec } from 'lib/vector'
 import { TEST_clearDatabase, TEST_createPlayer } from 'test/utils'
 import { SphereArea } from '../areas/sphere'
 import { Region } from './region'
+import { registerSaveableRegion } from '../database'
+import { RegionDatabase } from '../database'
 
 describe('Region', () => {
   beforeAll(() => {

@@ -11,6 +11,9 @@ import { SphereArea } from 'lib/region/areas/sphere'
 import { DungeonRegion } from 'modules/places/dungeons/dungeon'
 import { CustomDungeonRegion } from './custom-dungeon'
 import { Dungeon } from './loot'
+import { Vec } from 'lib/vector'
+import { ArrayForm } from 'lib/form/array'
+import { isKeyof } from 'lib/util'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
   .property('type', String)

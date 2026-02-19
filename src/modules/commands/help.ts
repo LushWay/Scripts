@@ -5,6 +5,8 @@ import { CmdLet } from 'lib/command/cmdlet'
 import { Command } from 'lib/command/index'
 import { commandNoPermissions, commandNotFound } from 'lib/command/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { ROLES } from 'lib/roles'
+import { getRole } from 'lib/roles'
 
 const help = new Command('help')
   .setDescription(i18n`Выводит список команд`)

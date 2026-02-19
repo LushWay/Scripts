@@ -1,9 +1,12 @@
 import { Block, Entity, system, world } from '@minecraft/server'
+import { LockAction } from 'lib/action'
 
 import { ScoreboardDB } from 'lib/database/scoreboard'
 import { i18n } from 'lib/i18n/text'
+import { Region } from 'lib/region'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { ms } from 'lib/utils/ms'
 import { BaseRegion } from 'modules/places/base/region'
 
 const notify = new Map<string, { time: number; reason: Text }>()

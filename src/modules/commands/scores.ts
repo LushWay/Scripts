@@ -3,9 +3,14 @@
 import { Player, ScoreboardIdentityType, ScoreboardObjective, world } from '@minecraft/server'
 import { defaultLang } from 'lib/assets/lang'
 import { ScoreboardDB } from 'lib/database/scoreboard'
+import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
+import { ModalForm } from 'lib/form/modal'
 import { selectPlayer } from 'lib/form/select-player'
+import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n, textTable } from 'lib/i18n/text'
+import { noBoolean } from 'lib/util'
+import { Leaderboard } from 'lib/rpg/leaderboard'
 
 new Command('scores')
   .setDescription('Управляет счетом игроков (монеты, листья)')

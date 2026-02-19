@@ -7,6 +7,8 @@ import { Npc } from 'lib/rpg/npc'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
+import { location } from 'lib/location'
+import { LootTable } from 'lib/rpg/loot-table'
 
 export abstract class City extends SafePlace {
   protected createKits(normalLoot: LootTable, donutLoot: LootTable) {

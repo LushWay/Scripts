@@ -12,6 +12,12 @@ import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from '../lib/area-with-inventory'
 import { RadioactiveZone } from './radioactive-zone'
+import { EventSignal } from 'lib/event-signal'
+import { Vec } from 'lib/vector'
+import { ValidLocation } from 'lib/location'
+import { InventoryStore } from 'lib/database/inventory'
+import { location } from 'lib/location'
+import { Portal } from 'lib/portals'
 import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {

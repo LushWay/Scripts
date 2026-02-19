@@ -1,5 +1,6 @@
 import { table } from 'lib/database/abstract'
 import { EventSignal } from 'lib/event-signal'
+import { Settings } from 'lib/settings'
 
 export const BATTLE_ROYAL_EVENTS = {
   join: new EventSignal(),

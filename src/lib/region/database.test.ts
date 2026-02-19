@@ -7,6 +7,8 @@ import {
   restoreRegionFromJSON,
   TEST_clearSaveableRegions,
 } from './database'
+import { RegionIsSaveable } from './kinds/region'
+import { Region } from './kinds/region'
 
 class TestK1Region extends Region {
   method() {}

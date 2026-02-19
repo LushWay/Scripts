@@ -17,6 +17,10 @@ import {
   toPermutation,
   toReplaceTarget,
 } from '../utils/blocks-set'
+import { isLocationError } from 'lib/utils/game'
+import { ask } from 'lib/form/message'
+import { getRole } from 'lib/roles'
+import { Vec } from 'lib/vector'
 
 // TODO Add WorldEdit.runMultipleAsyncJobs
 

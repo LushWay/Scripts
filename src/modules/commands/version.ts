@@ -1,4 +1,5 @@
 import { i18n, textTable } from 'lib/i18n/text'
+import { is } from 'lib/roles'
 
 new Command('version')
   .setAliases('v')

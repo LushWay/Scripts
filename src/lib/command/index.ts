@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 import { ChatSendAfterEvent, Player, system, world } from '@minecraft/server'
-import { defaultLang, Language } from 'lib/assets/lang'
+import { Language } from 'lib/assets/lang'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { stringifyError } from 'lib/util'
 import { stringifySymbol } from 'lib/utils/inspect'
@@ -72,8 +72,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
           v => v.sys.type.matches(args[i]!).success || (!args[i] && v.sys.type.optional),
         )
         if (!child && !args[i] && start.sys.callback) return 'success'
-        if (!child) return commandSyntaxFail(event.sender, command, args, i), 'fail'
-        if (!child.sys.requires(event.sender)) return commandNoPermissions(event.sender, child), 'fail'
+        if (!child) return (commandSyntaxFail(event.sender, command, args, i), 'fail')
+        if (!child.sys.requires(event.sender)) return (commandNoPermissions(event.sender, child), 'fail')
         childs.push(child)
         return getChilds(child, i + 1)
       }

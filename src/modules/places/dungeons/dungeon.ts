@@ -1,15 +1,6 @@
 import { EntityTypes, Player, StructureRotation, StructureSaveMode, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
-import {
-  adventureModeRegions,
-  Cooldown,
-  isKeyof,
-  LootTable,
-  ms,
-  registerRegionType,
-  registerSaveableRegion,
-  Vec,
-} from 'lib'
+
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
 import { NewFormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
@@ -20,6 +11,12 @@ import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kin
 import { createLogger } from 'lib/utils/logger'
 import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Dungeon } from './loot'
+import { Cooldown } from 'lib/cooldown'
+import { registerSaveableRegion, registerRegionType, adventureModeRegions } from 'lib/region'
+import { LootTable } from 'lib/rpg/loot-table'
+import { isKeyof } from 'lib/util'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 
 const logger = createLogger('dungeon')
 

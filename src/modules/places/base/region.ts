@@ -7,6 +7,7 @@ import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { getSafeFromRottingTime, materialsToRString } from './actions/rotting'
 import { baseLevels } from './base-levels'
+import { disableAdventureNear } from 'lib/region'
 
 interface BaseLDB extends JsonObject {
   level: number
