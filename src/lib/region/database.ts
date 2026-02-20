@@ -43,7 +43,7 @@ export const RegionDatabase = table<RegionSave>('region-v2', () => ({
   permissions: {},
 }))
 
-system.delay(() => {
+RegionDatabase.onLoad(() => {
   system.runJob(
     (function* regionRestore() {
       let i = 0

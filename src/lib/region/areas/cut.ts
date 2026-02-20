@@ -14,8 +14,6 @@ interface CutDatabase extends JsonObject {
 }
 
 class Cut extends Area<CutDatabase> {
-  type = 'cut'
-
   protected parent?: Area
 
   constructor(database: CutDatabase, dimensionType?: DimensionType) {
@@ -63,4 +61,4 @@ class Cut extends Area<CutDatabase> {
   }
 }
 
-export const CutArea = Cut.asSaveableArea()
+export const CutArea = Cut.asSaveableArea('cut')

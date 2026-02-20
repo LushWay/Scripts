@@ -48,35 +48,42 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
   }
 
   delete(key: Key): boolean {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const deleted = this.value.delete(key)
     if (deleted) this.needSave()
     return deleted
   }
 
   set(key: Key, value: Value): void {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     this.value.set(key, value)
     this.needSave()
   }
 
   keys(): MapIterator<Key> {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return this.value.keys()
   }
 
   values() {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return [...this.value.values()] as Immutable<Value>[]
   }
 
   valuesIterator() {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return this.value.values() as MapIterator<Immutable<Value>>
   }
 
   entries(): [Key, Value][] {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const entries: [Key, Value][] = []
     for (const [key, value] of this.value.entries()) entries.push([key, this.wrap(value, '') as Value])
     return entries
   }
 
   entriesImmutable(): MapIterator<[Key, Immutable<Value>]> {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return this.value.entries() as MapIterator<[Key, Immutable<Value>]>
   }
 

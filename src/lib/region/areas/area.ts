@@ -1,7 +1,6 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { stringifyError, util } from 'lib/util'
-import { onLoad } from 'lib/utils/load-ref'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 
@@ -19,19 +18,18 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
   static loaded = false
 
-  static asSaveableArea<T extends AreaCreator>(this: T) {
+  static asSaveableArea<T extends AreaCreator>(this: T, type: string) {
     const b = this as AreaWithType<T>
-    onLoad(() => {
-      b.type = new (this as unknown as AreaCreator)({}).type
+    b.type = type
+    ;(b.prototype as Area).type = type
 
-      if ((this as unknown as typeof Area).loaded) {
-        throw new Error(
-          `Registering area type ${b.type} failed. Regions are already restored from json. Registering area should occur on the import-time.`,
-        )
-      }
+    if ((this as unknown as typeof Area).loaded) {
+      throw new Error(
+        `Registering area type ${b.type} failed. Regions are already restored from json. Registering area should occur on the import-time.`,
+      )
+    }
 
-      ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
-    })
+    ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
     return b
   }
 
@@ -40,7 +38,9 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
     const area = Area.areas.find(e => e.type === a.t)
     if (!area) {
-      console.warn(i18n`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
+      console.warn(
+        noI18n.warn`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`,
+      )
       return
     }
 
@@ -52,7 +52,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     public dimensionType: DimensionType = 'overworld',
   ) {}
 
-  abstract type: string
+  type!: string
 
   /** Checks if the point is inside the area */
   isIn(point: AbstractPoint) {

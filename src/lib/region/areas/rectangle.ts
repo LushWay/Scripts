@@ -19,8 +19,6 @@ class Rectangle extends Area<RectangleDatabase> {
     super(database, dimensionType)
   }
 
-  type = 'rect'
-
   isNear(point: AbstractPoint, distance: number): boolean {
     const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
@@ -53,4 +51,4 @@ class Rectangle extends Area<RectangleDatabase> {
   }
 }
 
-export const RectangleArea = Rectangle.asSaveableArea()
+export const RectangleArea = Rectangle.asSaveableArea('rect')

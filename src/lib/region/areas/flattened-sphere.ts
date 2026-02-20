@@ -8,8 +8,6 @@ class FlattenedSphere extends Area<{
   rx: number
   ry: number
 }> {
-  type = 'fs'
-
   isNear(point: AbstractPoint, distance: number): boolean {
     const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
@@ -69,4 +67,4 @@ class FlattenedSphere extends Area<{
   }
 }
 
-export const FlattenedSphereArea = FlattenedSphere.asSaveableArea()
+export const FlattenedSphereArea = FlattenedSphere.asSaveableArea('fs')

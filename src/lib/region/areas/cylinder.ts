@@ -3,8 +3,6 @@ import { Vec, VecXZ } from 'lib/vector'
 import { Area } from './area'
 
 class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radius: number; yradius: number }> {
-  type = 'ss'
-
   isNear(point: AbstractPoint, distance: number): boolean {
     const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
@@ -45,4 +43,4 @@ class Cylinder extends Area<{ center: { x: number; z: number; y: number }; radiu
   }
 }
 
-export const CylinderArea = Cylinder.asSaveableArea()
+export const CylinderArea = Cylinder.asSaveableArea('ss')

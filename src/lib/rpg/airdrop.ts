@@ -8,7 +8,6 @@ import { createLogger } from 'lib/utils/logger'
 import { toPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { table } from '../database/abstract'
-import { Core } from '../extensions/core'
 import { Temporary } from '../temporary'
 import { isLocationError } from '../utils/game'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapNpcPosition } from './minimap'
@@ -300,7 +299,7 @@ const findAndRemove = (arr: Entity[], id: string) => {
   if (i !== -1) return arr.splice(i, 1)[0]
 }
 
-Core.afterEvents.worldLoad.subscribe(() => {
+Airdrop.db.onLoad(() => {
   for (const [key, saved] of Airdrop.db.entries()) {
     if (typeof saved === 'undefined') continue
     const loot = LootTable.instances.get(saved.loot)
