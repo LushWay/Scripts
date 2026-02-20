@@ -11,7 +11,9 @@ interface CooldownController {
 // After compilation the initialization of this variable is placed lower then the hoisted call of the function below for some reason
 let cds: { name: string; cd: CooldownController }[] | undefined
 
-/** Use cooldown controller when the cooldown IS NOT AN INSTANCE OF COOLDOWN, e.g. its some custom data structure */
+/**
+ * Use cooldown controller when the cooldown IS NOT AN INSTANCE OF COOLDOWN, e.g. its some custom data structure
+ */
 export function registerResettableCooldown(name: string, cd: CooldownController | Cooldown) {
   cds ??= []
 

@@ -11,7 +11,7 @@ declare module '@minecraft/server' {
      * Logs given message once
      *
      * @param type Type of log
-     * @param messages Data to log
+     * @param messages Data to log using world.debug()
      */
     logOnce(type: string, ...messages: unknown[]): void
 

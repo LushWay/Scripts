@@ -5,6 +5,7 @@ import { defaultLang } from '../assets/lang'
 import { table } from '../database/abstract'
 import { Message } from '../i18n/message'
 import { i18n, noI18n } from '../i18n/text'
+import './command'
 
 /** A global letter is a letter sent to multiple players */
 interface GlobalLetter {

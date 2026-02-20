@@ -3,6 +3,8 @@ import { TerminalColors } from './assets/terminal-colors'
 import stringifyError from './utils/error'
 import { inspect, stringify } from './utils/inspect'
 
+import './utils/benchmark'
+
 export { inspect, stringify, stringifyError }
 
 export const util = {
