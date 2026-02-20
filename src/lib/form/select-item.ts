@@ -69,6 +69,8 @@ function addItem(
   const nameTagPrefix = enchanted ? '§b' : ''
   const lore = [...enchantmentsToLore(item, player), ...slot.getLore(), ...addItemDurabilityToLore(item)]
 
+  // TODO Potion icons
+
   chestForm.button({
     slot: i,
     icon: typeId,

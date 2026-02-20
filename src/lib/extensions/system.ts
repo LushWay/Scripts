@@ -65,24 +65,23 @@ expand(System.prototype, {
 
   runJob(generator, name) {
     const id = name ?? stringifyError.parent()
-    const source = stringifyError.stack.get()
+    const source = new Error().stack
     return super.runJob(
       (function* runJobWrapper() {
-        try {
-          let v
-          do {
-            const end = util.benchmark(id, 'job')
-            v = generator.next()
-            if ((v.value as unknown) instanceof Promise)
-              (v.value as unknown as Promise<void>).catch((e: unknown) =>
-                console.error('Error in async job', name, e, source),
-              )
-            end()
-            yield
-          } while (!v.done)
-        } catch (e) {
-          console.error('Error in job', name, e, source)
-        }
+        let v: IteratorResult<void> | undefined
+        do {
+          const end = util.benchmark(id, 'job')
+          util.catch(
+            () => {
+              v = generator.next()
+              return v.value
+            },
+            'runJob',
+            source,
+          )
+          end()
+          yield
+        } while (!v?.done)
       })(),
     )
   },
@@ -103,7 +102,7 @@ expand(System.prototype, {
   },
 
   delay(fn) {
-    const origin = stringifyError.stack.get(1)
+    const origin = new Error().stack
     this.run(function delay() {
       util.catch(fn, 'system.delay', origin)
     })

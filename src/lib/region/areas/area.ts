@@ -118,7 +118,10 @@ export abstract class Area<T extends JsonObject = JsonObject> {
           try {
             let i = 0
             for (const vector of Vec.forEach(...edges)) {
-              if (vector.y < min || vector.y > max) continue
+              if (vector.y < min || vector.y > max) {
+                yield
+                continue
+              }
 
               util.catch(() => callback(vector, isIn(vector), dimension), 'Area.forEachVector', stack)
               i++

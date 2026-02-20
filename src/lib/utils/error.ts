@@ -71,8 +71,6 @@ const stringifyError = Object.assign(
             .join('\n')
         }
 
-        stack = stack.slice(0, 1000)
-
         const stackArray = stack.split('\n')
 
         const mappedStack = stackArray
