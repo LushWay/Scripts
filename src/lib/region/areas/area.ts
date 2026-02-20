@@ -1,6 +1,7 @@
 import { Dimension, system, world } from '@minecraft/server'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { stringifyError } from 'lib/util'
+import { stringifyError, util } from 'lib/util'
+import { onLoad } from 'lib/utils/load-ref'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 
@@ -20,7 +21,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
   static asSaveableArea<T extends AreaCreator>(this: T) {
     const b = this as AreaWithType<T>
-    world.afterEvents.worldLoad.subscribe(() => {
+    onLoad(() => {
       b.type = new (this as unknown as AreaCreator)({}).type
 
       if ((this as unknown as typeof Area).loaded) {
@@ -103,12 +104,13 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   }
 
   forEachVector(
-    callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | Promise<void> | symbol,
+    callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | Promise<void>,
     yieldEach = 10,
   ) {
     const { edges, dimension } = this
     const isIn = (vector: Vector3) => this.isIn({ location: vector, dimensionType: this.dimensionType })
     const { max, min } = this.dimension.heightRange
+    const stack = new Error().stack
 
     return new Promise<void>((resolve, reject) => {
       system.runJob(
@@ -118,7 +120,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
             for (const vector of Vec.forEach(...edges)) {
               if (vector.y < min || vector.y > max) continue
 
-              callback(vector, isIn(vector), dimension)
+              util.catch(() => callback(vector, isIn(vector), dimension), 'Area.forEachVector', stack)
               i++
               if (i % yieldEach === 0) yield
             }

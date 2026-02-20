@@ -1,15 +1,14 @@
 import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { i18n } from 'lib/i18n/text'
+import { Loot, LootTable } from 'lib/rpg/loot-table'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { BaseItem } from '../base/base'
-import { LootTable } from 'lib/rpg/loot-table'
-import { Loot } from 'lib/rpg/loot-table'
 
 const defaultLoot = new Loot('dungeon_default_loot')
-  .itemStack(CannonShellItem.blueprint)
+  .itemStack(() => CannonShellItem.blueprint)
   .weight('5%')
 
   .item('Apple')
@@ -178,18 +177,18 @@ const customLoot: Record<string, LootTable | undefined> = {
       Sharpness: { '1...3': '1%', '4...5': '10%' },
     })
 
-    .itemStack(CannonItem.itemStack)
+    .itemStack(CannonItem)
     .weight('40%')
     .amount({ '1...2': '1%' })
 
-    .itemStack(CannonShellItem.itemStack)
+    .itemStack(CannonShellItem)
     .weight('60%')
     .amount({
       '1...9': '10%',
       '10...16': '1%',
     })
 
-    .itemStack(BaseItem.itemStack)
+    .itemStack(BaseItem)
     .weight('5%')
     .amount({ '0...1': '1%' })
 

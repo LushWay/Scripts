@@ -1,6 +1,4 @@
-import { Player, world } from '@minecraft/server'
-import { Cooldown } from 'lib/cooldown'
-import { registerResettableCooldown } from 'lib/cooldownreset'
+import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { ask, MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
@@ -11,16 +9,8 @@ import { getFullname } from 'lib/get-fullname'
 import { i18n, textTable } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { is } from 'lib/roles'
-import { ms } from 'lib/utils/ms'
 import { Clan, ClanMember, ClanRole } from './clan'
 import { getClanButtonName, promptClanNameShortname, selectOrCreateClanMenu } from './create'
-
-export let cd: Cooldown
-
-world.afterEvents.worldLoad.subscribe(() => {
-  cd = new Cooldown(ms.from('day', 1), true, Cooldown.defaultDb.get('clan'))
-  registerResettableCooldown('Изменение/создание клана', cd)
-})
 
 export function clanMenu(player: Player, back?: VoidFunction) {
   const clan = Clan.getPlayerClan(player.id)
@@ -69,7 +59,6 @@ export const inClanMenu = form.params<{ clan: Clan }>((f, formContext) => {
 
   if (isOwner || isHelper) {
     f.button(i18n`Заявки на вступление`.badge(clan.joinRequests.length), () => clanJoinRequests(player, clan, self))
-
     f.button(i18n`Приглашения`.badge(clan.invites.length), () => clanInvites(player, clan, self))
   }
 

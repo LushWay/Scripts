@@ -2,7 +2,12 @@ import { ContainerSlot, Entity, Player, system, world } from '@minecraft/server'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
+import { ModalForm } from 'lib/form/modal'
 import { i18n } from 'lib/i18n/text'
+import { is } from 'lib/roles'
+import { isKeyof } from 'lib/util'
+import { isLocationError, onLoad } from 'lib/utils/game'
+import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Cuboid } from '../../../lib/utils/cuboid'
 import { WE_CONFIG } from '../config'
@@ -23,11 +28,6 @@ import {
 } from '../utils/blocks-set'
 import { shortenBlocksSetName } from '../utils/default-block-sets'
 import { SHAPES, ShapeFormula } from '../utils/shapes'
-import { isLocationError } from 'lib/utils/game'
-import { isKeyof } from 'lib/util'
-import { is } from 'lib/roles'
-import { ModalForm } from 'lib/form/modal'
-import { Vec } from 'lib/vector'
 
 interface Storage {
   shape: string
@@ -170,12 +170,14 @@ class BrushTool extends WorldEditToolBrush<Storage> {
         ctx.player.success()
       })
 
-    world.overworld
-      .getEntities({
-        type: CustomEntityTypes.FloatingText,
-        name: WE_CONFIG.BRUSH_LOCATOR,
-      })
-      .forEach(e => e.remove())
+    onLoad(() => {
+      world.overworld
+        .getEntities({
+          type: CustomEntityTypes.FloatingText,
+          name: WE_CONFIG.BRUSH_LOCATOR,
+        })
+        .forEach(e => e.remove())
+    })
 
     this.onGlobalInterval('global', (player, _, slot) => {
       if (slot.typeId !== this.typeId && this.brushLocators.has(player.id)) {

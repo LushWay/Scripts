@@ -6,14 +6,15 @@ import { Items } from 'lib/assets/custom-items'
 import { StructureDungeonsId } from 'lib/assets/structures'
 import { ItemLoreSchema } from 'lib/database/item-stack'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { ArrayForm } from 'lib/form/array'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { SphereArea } from 'lib/region/areas/sphere'
+import { isKeyof } from 'lib/util'
+import { onLoad } from 'lib/utils/load-ref'
+import { Vec } from 'lib/vector'
 import { DungeonRegion } from 'modules/places/dungeons/dungeon'
 import { CustomDungeonRegion } from './custom-dungeon'
 import { Dungeon } from './loot'
-import { Vec } from 'lib/vector'
-import { ArrayForm } from 'lib/form/array'
-import { isKeyof } from 'lib/util'
 
 const toolSchema = new ItemLoreSchema('dungeonCreationTool', Items.WeTool)
   .property('type', String)
@@ -116,7 +117,7 @@ system.runPlayerInterval(
     for (const l of Vec.forEach(from, to)) {
       if (!Vec.isEdge(from, to, l)) continue
 
-      player.spawnParticle('minecraft:balloon_gas_particle', l, particle)
+      player.spawnParticle('minecraft:balloon_gas_particle', l, particle.value)
     }
 
     player.onScreenDisplay.setActionBar(
@@ -128,10 +129,13 @@ system.runPlayerInterval(
   15,
 )
 
-const particle = new MolangVariableMap()
+const particle = onLoad(() => {
+  const vars = new MolangVariableMap()
 
-particle.setVector3('direction', {
-  x: 0,
-  y: 0,
-  z: 0,
+  vars.setVector3('direction', {
+    x: 0,
+    y: 0,
+    z: 0,
+  })
+  return vars
 })

@@ -1,3 +1,5 @@
+export * from './load-ref'
+
 import {
   Block,
   GameMode,

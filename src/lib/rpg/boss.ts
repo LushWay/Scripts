@@ -126,10 +126,10 @@ export class Boss {
     if (Array.isArray(this.options.allowedEntities))
       this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
-    const areadb = Boss.arenaDb.get(this.options.place.id)
-
     this.location = location(options.place)
     this.location.onLoad.subscribe(center => {
+      const areadb = Boss.arenaDb.get(this.options.place.id)
+
       this.check()
       const area =
         (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??

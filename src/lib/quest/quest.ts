@@ -12,6 +12,12 @@ import { QuestButton } from './button'
 import { PlayerQuest } from './player'
 import { QS } from './step'
 
+declare module '@minecraft/server' {
+  interface PlayerDatabase {
+    quests?: Quest.DB
+  }
+}
+
 export declare namespace Quest {
   interface DB {
     active: { id: string; i: number; db?: unknown }[]

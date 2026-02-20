@@ -4,6 +4,7 @@ import { fromMsToTicks } from 'lib/utils/ms'
 import { table } from './database/abstract'
 import { setDefaults } from './database/defaults'
 import later, { Later } from './utils/later'
+import { onLoad } from './utils/load-ref'
 
 later.runtime = {
   setTimeout: (fn, delayMs) => system.runTimeout(fn, 'laterSetTimeout', fromMsToTicks(delayMs)),
@@ -31,11 +32,11 @@ type RecurringEventCallback<T extends JsonObject = JsonObject> = (storage: T, ct
 export class RecurringEvent<T extends JsonObject = JsonObject> {
   static db = table<DB>('recurringEvents', () => ({ lastRun: '', storage: {} }))
 
-  protected db: DB<T>
-
   protected schedule: Later.Schedule
 
-  protected interval: Later.Timer
+  protected db!: DB<T>
+
+  protected interval!: Later.Timer
 
   stop() {
     this.interval.clear()
@@ -57,12 +58,14 @@ export class RecurringEvent<T extends JsonObject = JsonObject> {
     { runAfterOffline = false }: RecurringOptions = {},
   ) {
     this.schedule = later.schedule(scheduleData)
-    this.db = RecurringEvent.db.get(id) as DB<T>
-    this.db.storage = setDefaults(this.db.storage, this.createStorage())
+    onLoad(() => {
+      this.db = RecurringEvent.db.get(id) as DB<T>
+      this.db.storage = setDefaults(this.db.storage, this.createStorage())
 
-    this.interval = later.setInterval(this.run.bind(this), scheduleData)
+      this.interval = later.setInterval(this.run.bind(this), scheduleData)
 
-    if (runAfterOffline) this.run(this.db.lastRun === this.getLastRunDate().toString())
+      if (runAfterOffline) this.run(this.db.lastRun === this.getLastRunDate().toString())
+    })
   }
 
   protected run(restoreAfterOffline = false) {

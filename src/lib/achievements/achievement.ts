@@ -4,6 +4,12 @@ import { i18n } from 'lib/i18n/text'
 import { isNotPlaying } from 'lib/utils/game'
 import { Rewards } from 'lib/utils/rewards'
 
+declare module '@minecraft/server' {
+  interface PlayerDatabase {
+    achivs?: Achievement.DB
+  }
+}
+
 export namespace Achievement {
   export interface DBSingle<T = unknown> {
     id: string

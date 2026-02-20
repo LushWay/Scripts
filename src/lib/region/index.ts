@@ -8,15 +8,14 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { Items } from 'lib/assets/custom-items'
-import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
+// import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+// import { Items } from 'lib/assets/custom-items'
+// import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { onPlayerMove } from 'lib/player-move'
+// import { onPlayerMove } from 'lib/player-move'
 import { is } from 'lib/roles'
 import { isNotPlaying } from 'lib/utils/game'
-import { createLogger } from 'lib/utils/logger'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
@@ -30,7 +29,11 @@ import {
   SWITCHES,
   TRAPDOORS,
 } from './config'
+// import { RegionEvents } from './events'
+import { onPlayerMove } from 'lib/player-move'
+import { createLogger } from 'lib/utils/logger'
 import { RegionEvents } from './events'
+import './explosion'
 import { Region } from './kinds/region'
 
 export * from './command'
@@ -108,7 +111,6 @@ actionGuard((player, region, context) => {
       if (typeId === MinecraftItemTypes.EnderPearl) return ent.includes(MinecraftEntityTypes.EnderPearl)
       if (typeId === MinecraftItemTypes.WindCharge) return ent.includes(MinecraftEntityTypes.WindChargeProjectile)
       if (typeId === MinecraftItemTypes.Snowball) return ent.includes(MinecraftEntityTypes.Snowball)
-      if (typeId === Items.Fireball) return ent.includes(CustomEntityTypes.Fireball)
     }
   }
 }, ActionGuardOrder.ProjectileUsePrevent)
@@ -201,21 +203,20 @@ onPlayerMove.subscribe(({ player, location, dimensionType }) => {
 
   RegionEvents.playerInRegionsCache.set(player, newest)
   const currentRegion = newest[0]
-  // TODO Replace with proper damage cancel on beforeEntityHurt once we update
-  const isPlaying = !isNotPlaying(player)
+  // const isPlaying = !isNotPlaying(player)
 
-  const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
+  // const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
 
-  if (typeof currentRegion !== 'undefined' && isPlaying) {
-    if (currentRegion.permissions.pvp === false) {
-      player.triggerEvent(
-        player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
-      )
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (currentRegion.permissions.pvp === 'pve') {
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else resetNewbie()
-  } else resetNewbie()
+  // if (typeof currentRegion !== 'undefined' && isPlaying) {
+  //   if (currentRegion.permissions.pvp === false) {
+  //     player.triggerEvent(
+  //       player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
+  //     )
+  //     player.setProperty(PlayerProperties['lw:newbie'], true)
+  //   } else if (currentRegion.permissions.pvp === 'pve') {
+  //     player.setProperty(PlayerProperties['lw:newbie'], true)
+  //   } else resetNewbie()
+  // } else resetNewbie()
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
 })

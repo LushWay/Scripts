@@ -6,7 +6,7 @@ import { table } from 'lib/database/abstract'
 import { noI18n } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
-import { restorePlayerCamera } from 'lib/utils/game'
+import { onLoad, restorePlayerCamera } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 /**
@@ -64,7 +64,9 @@ export class Cutscene {
   ) {
     Cutscene.all.set(id, this)
 
-    this.sections = Cutscene.db.get(this.id).slice()
+    onLoad(() => {
+      this.sections = Cutscene.db.get(this.id).slice()
+    })
   }
 
   private get defaultSection() {
@@ -295,6 +297,6 @@ function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: k
 
 function getVector5(player: Player): Vector5 {
   const { x: rx, y: ry } = player.getRotation()
-  const { x, y, z } = Vec.floor(player.getHeadLocation())
+  const { x, y, z } = player.getHeadLocation()
   return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }
 }

@@ -1,9 +1,8 @@
-import { ItemStack } from '@minecraft/server'
+import { ItemStack, Potions } from '@minecraft/server'
 import {
   MinecraftPotionEffectTypes as e,
   MinecraftItemTypes as i,
-  MinecraftPotionLiquidTypes as lt,
-  MinecraftPotionModifierTypes as mt,
+  MinecraftPotionDeliveryTypes as lt,
 } from '@minecraft/vanilla-data'
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
@@ -19,40 +18,23 @@ export class Barman extends ShopNpc {
       form.itemStack(new ItemStack(i.MilkBucket), new MoneyCost(10))
       form.itemStack(new ItemStack(i.HoneyBottle), new MoneyCost(20))
 
-      form.itemStack(
-        ItemStack.createPotion({ effect: e.FireResistance, liquid: lt.Lingering }).setInfo(i18n`Квас`, undefined),
-        new MoneyCost(40),
-      )
+      form.itemStack(Potions.resolve(e.FireResistance, lt.Consume).setInfo(i18n`Квас`, undefined), new MoneyCost(40))
 
       form.itemStack(
-        ItemStack.createPotion({ effect: e.FireResistance, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
-          i18n`Пиво`,
-          undefined,
-        ),
+        Potions.resolve(e.LongFireResistance, lt.Consume).setInfo(i18n`Пиво`, undefined),
         new MoneyCost(50),
       )
 
-      form.itemStack(
-        ItemStack.createPotion({ effect: e.Invisibility, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
-          i18n`Сидр`,
-          undefined,
-        ),
-        new MoneyCost(500),
-      )
+      form.itemStack(Potions.resolve(e.LongInvisibility, lt.Consume).setInfo(i18n`Сидр`, undefined), new MoneyCost(500))
 
       form.itemStack(
-        ItemStack.createPotion({ effect: e.WaterBreath, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
-          i18n`Настойка из шпината`,
-          undefined,
-        ),
+        Potions.resolve(e.LongWaterBreathing, lt.Consume).setInfo(i18n`Настойка из шпината`, undefined),
         new MoneyCost(300),
       )
 
+      form.potion
       form.itemStack(
-        ItemStack.createPotion({ effect: e.TurtleMaster, liquid: lt.Lingering, modifier: mt.Long }).setInfo(
-          i18n`Вино`,
-          undefined,
-        ),
+        Potions.resolve(e.LongTurtleMaster, lt.Consume).setInfo(i18n`Вино`, undefined),
         new MoneyCost(1000),
       )
     })

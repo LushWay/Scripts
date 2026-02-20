@@ -10,25 +10,25 @@ import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { ActionForm } from 'lib/form/action'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
+import { location } from 'lib/location'
+import { actionGuard, ActionGuardOrder } from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { enterNewbieMode } from 'lib/rpg/newbie'
 import { noGroup } from 'lib/rpg/place'
+import { Temporary } from 'lib/temporary'
+import { onLoad } from 'lib/utils/load-ref'
 import { createLogger } from 'lib/utils/logger'
 import { createPointVec } from 'lib/utils/point'
+import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { OrePlace, ores } from 'modules/places/mineshaft/algo'
 import { Spawn } from 'modules/places/spawn'
 import { VillageOfMiners } from 'modules/places/village-of-miners/village-of-miners'
 import airdropTable from './airdrop'
-import { ActionForm } from 'lib/form/action'
-import { Temporary } from 'lib/temporary'
-import { ActionGuardOrder } from 'lib/region'
-import { actionGuard } from 'lib/region'
-import { location } from 'lib/location'
-import { Vec } from 'lib/vector'
 
 const logger = createLogger('Learning Quest')
 
@@ -69,8 +69,8 @@ class Learning {
             // in spawn inventory that will be replaced with
             // anarchy
             system.delay(() => {
-              this.startAxeGiveCommand.ensure(player)
-              player.getComponent('equippable')?.setEquipment(EquipmentSlot.Offhand, Menu.itemStack)
+              this.startAxeGiveCommand.value.ensure(player)
+              player.getComponent('equippable')?.setEquipment(EquipmentSlot.Offhand, Menu.itemStack.value)
             })
           }
 
@@ -276,11 +276,13 @@ class Learning {
 
   craftingTableLocation = location(this.quest.group.place('crafting table').name(noI18n`Верстак`))
 
-  startAxeGiveCommand = createPublicGiveItemCommand(
-    'startwand',
-    new ItemStack(MinecraftItemTypes.WoodenAxe),
-    s => s.typeId === MinecraftItemTypes.WoodenAxe && s.getDynamicProperty('startwand') === true,
-    i18n`§r§6Начальный топор`,
+  startAxeGiveCommand = onLoad(() =>
+    createPublicGiveItemCommand(
+      'startwand',
+      new ItemStack(MinecraftItemTypes.WoodenAxe),
+      s => s.typeId === MinecraftItemTypes.WoodenAxe && s.getDynamicProperty('startwand') === true,
+      i18n`§r§6Начальный топор`,
+    ),
   )
 
   blockedOre = new WeakPlayerMap<string[]>()

@@ -1,5 +1,6 @@
 import { Dimension, World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
+import { onLoad } from 'lib/utils/load-ref'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -21,7 +22,7 @@ declare module '@minecraft/server' {
   }
 }
 
-world.afterEvents.worldLoad.subscribe(() => {
+onLoad(() => {
   expand(World.prototype, {
     overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
     nether: world.getDimension(MinecraftDimensionTypes.Nether),
@@ -32,15 +33,15 @@ world.afterEvents.worldLoad.subscribe(() => {
 expand(World.prototype, {
   say: world.sendMessage.bind(world),
   get overworld() {
-    // throw new Error('Dimensions are not available')
+    throw new Error('Dimensions are not available')
     return undefined as unknown as Dimension
   },
   get nether() {
-    // throw new Error('Dimensions are not available')
+    throw new Error('Dimensions are not available')
     return undefined as unknown as Dimension
   },
   get end() {
-    // throw new Error('Dimensions are not available')
+    throw new Error('Dimensions are not available')
     return undefined as unknown as Dimension
   },
   logOnce(name, ...data: unknown[]) {

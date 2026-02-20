@@ -240,7 +240,7 @@ const scheduledDimensionForm = (
       system.runJob(
         (function* placeNow() {
           let i = 0
-          for (const immutableSchedule of schedules.valuesImmutable()) {
+          for (const immutableSchedule of schedules.valuesIterator()) {
             if (!immutableSchedule) continue
             i++
             if (i % 100 === 0) yield

@@ -1,7 +1,8 @@
-import { Player, system, world } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { I18nMessage } from 'lib/i18n/message'
 import { i18n } from 'lib/i18n/text'
+import { onLoad } from 'lib/utils/load-ref'
 import './command'
 
 interface ClanTemporalMember {
@@ -95,7 +96,7 @@ export class Clan {
   private static instances = new Map<string, Clan>()
 
   static {
-    world.afterEvents.worldLoad.subscribe(() =>
+    onLoad(() =>
       system.run(() => {
         for (const [id, db] of this.database.entries()) {
           if (!db) continue

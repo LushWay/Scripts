@@ -64,6 +64,7 @@ export class MineareaRegion extends RegionWithStructure {
     if (this.restoringStructurePromise) return this.restoringStructurePromise
 
     this.restoringStructurePromise = this.internalRestoreStructure(eachVectorCallback)
+    this.restoringStructurePromise.catch((e: unknown) => console.error('MineareaRegion.restoreStructure', e))
     const result = await this.restoringStructurePromise
     delete this.restoringStructurePromise
     return result

@@ -6,6 +6,7 @@ import { EventSignal } from 'lib/event-signal'
 import { inspect, isKeyof, pick } from 'lib/util'
 import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { selectByChance } from './random'
+import { CustomItem } from './custom-item'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
@@ -54,18 +55,18 @@ export class Loot {
    * @param type Keyof MinecraftItemTypes
    */
   item(type: Exclude<keyof typeof MinecraftItemTypes, 'prototype' | 'string'> | Items) {
-    this.create(new ItemStack(isKeyof(type, MinecraftItemTypes) ? MinecraftItemTypes[type] : type))
+    this.create(() => new ItemStack(isKeyof(type, MinecraftItemTypes) ? MinecraftItemTypes[type] : type))
 
     return this
   }
 
-  itemStack(item: ItemStack | (() => ItemStack)) {
-    this.create(item)
+  itemStack(item: CustomItem | (() => ItemStack)) {
+    this.create(item instanceof CustomItem ? () => item.itemStack : item)
 
     return this
   }
 
-  private create(itemStack: ItemStack | (() => ItemStack)) {
+  private create(itemStack: () => ItemStack) {
     if (this.current) this.items.push(this.current)
     this.current = { itemStack, weight: 100, amount: [1], damage: [0], enchantments: {}, custom: [] }
   }

@@ -1,6 +1,7 @@
-import { BlockTypes, Entity, world } from '@minecraft/server'
+import { BlockTypes, Entity } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { onLoad } from 'lib/utils/load-ref'
 
 /** All doors and switches in minecraft */
 export const DOORS: string[] = []
@@ -14,7 +15,7 @@ export const SWITCHES: string[] = []
 /** All gates in minecraft */
 export const GATES: string[] = []
 
-world.afterEvents.worldLoad.subscribe(() => {
+onLoad(() => {
   const blocks = BlockTypes.getAll()
 
   function fill(target: string[], filter: (params: { id: string }) => boolean) {

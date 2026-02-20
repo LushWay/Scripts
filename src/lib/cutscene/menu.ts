@@ -1,4 +1,4 @@
-import { Player, world } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import { PersistentSet } from 'lib/database/persistent-set'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
@@ -19,7 +19,7 @@ export const cutscene = new Command('cutscene')
 
 const cutscenes = new PersistentSet<string>('cutscenesIds')
 
-world.afterEvents.worldLoad.subscribe(() => {
+cutscenes.onLoad(() => {
   for (const c of cutscenes) new Cutscene(c, c)
 })
 

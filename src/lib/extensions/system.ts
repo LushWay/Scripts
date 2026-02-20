@@ -1,5 +1,6 @@
 import { system, System, world } from '@minecraft/server'
 import stringifyError from 'lib/utils/error'
+import { LoadRef } from 'lib/utils/load-ref'
 import { capitalize, util } from '../util'
 import { expand } from './extend'
 
@@ -64,15 +65,24 @@ expand(System.prototype, {
 
   runJob(generator, name) {
     const id = name ?? stringifyError.parent()
+    const source = stringifyError.stack.get()
     return super.runJob(
       (function* runJobWrapper() {
-        let v
-        do {
-          const end = util.benchmark(id, 'job')
-          v = generator.next()
-          end()
-          yield
-        } while (!v.done)
+        try {
+          let v
+          do {
+            const end = util.benchmark(id, 'job')
+            v = generator.next()
+            if ((v.value as unknown) instanceof Promise)
+              (v.value as unknown as Promise<void>).catch((e: unknown) =>
+                console.error('Error in async job', name, e, source),
+              )
+            end()
+            yield
+          } while (!v.done)
+        } catch (e) {
+          console.error('Error in job', name, e, source)
+        }
       })(),
     )
   },
@@ -156,6 +166,7 @@ function Timer(
   TIMERS_PATHES[visualId] = path
 
   function timer() {
+    if (type !== 'timeout' && !LoadRef.loadFinished) return
     util.catch(fn, capitalize(type))
   }
 

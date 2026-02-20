@@ -2,12 +2,13 @@ import { Player, system, TicksPerSecond, world } from '@minecraft/server'
 
 import { emoji } from 'lib/assets/emoji'
 import { i18n } from 'lib/i18n/text'
+import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/quest'
-import { separateNumberWithDots } from 'lib/util'
 import { Region } from 'lib/region'
-import { Sidebar } from 'lib/sidebar'
 import { Menu } from 'lib/rpg/menu'
 import { Settings } from 'lib/settings'
+import { Sidebar } from 'lib/sidebar'
+import { separateNumberWithDots } from 'lib/util'
 import { Minigame } from 'modules/minigames/Builder'
 import { BaseRegion } from 'modules/places/base/region'
 
@@ -142,7 +143,7 @@ export function showSurvivalHud(player: Player) {
 
 system.runPlayerInterval(
   player => {
-    if (player.database.join) return // Do not show sidebar until player actually joins the world
+    if (Join.getInstance().isJoining(player)) return // Do not show sidebar until player actually joins the world
 
     const settings = getSidebarSettings(player)
 

@@ -95,7 +95,7 @@ export class RegionStructure {
     yieldEach?: number,
   ) {
     const structure = world.structureManager.get(this.id)
-    if (!structure) throw new ReferenceError('No structure found!')
+    if (!structure) throw new ReferenceError(`No structure found! ${this.id}`)
 
     const [from] = this.region.area.edges
     const offset = this.offset ? { x: this.offset, y: this.offset, z: this.offset } : undefined

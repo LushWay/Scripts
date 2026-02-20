@@ -1,19 +1,14 @@
-import { ItemStack, system, world } from '@minecraft/server'
+import { system, world } from '@minecraft/server'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { i18n } from 'lib/i18n/text'
-import { customItems } from 'lib/rpg/custom-item'
+import { CustomItem } from 'lib/rpg/custom-item'
 import { Vec } from 'lib/vector'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
 
-export const FireBallItem = new ItemStack(Items.Fireball).setInfo(
-  undefined,
-  i18n`Используйте, чтобы отправить все в огненный ад`,
-)
-
-customItems.push(FireBallItem)
+export const FireBallItem = new CustomItem(Items.Fireball).lore(i18n`Используйте, чтобы отправить все в огненный ад`)
 
 const fireballExplosion: ExplosibleEntityOptions = {
   damage: 3,
@@ -23,7 +18,7 @@ const fireballExplosion: ExplosibleEntityOptions = {
 }
 
 world.afterEvents.itemUse.subscribe(event => {
-  if (!FireBallItem.is(event.itemStack)) return
+  if (!FireBallItem.isItem(event.itemStack)) return
 
   decreaseMainhandItemCount(event.source)
 

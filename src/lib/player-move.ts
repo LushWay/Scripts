@@ -2,6 +2,7 @@ import { Player, ShortcutDimensions, system, world } from '@minecraft/server'
 import type { Region } from 'lib/region'
 import { Vec } from 'lib/vector'
 import { EventSignal } from './event-signal'
+import { onLoad } from './utils/game'
 import { VectorInDimension } from './utils/point'
 import { WeakPlayerMap } from './weak-player-storage'
 
@@ -31,7 +32,7 @@ export function anyPlayerNearRegion(region: Region, radius: number) {
   return false
 }
 
-world.afterEvents.worldLoad.subscribe(() => {
+onLoad(() => {
   // Do it sync on first run because some of the funcs above use it sync. It will start interval too
   for (const _ of jobPlayerPosition()) void 0
 })

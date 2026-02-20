@@ -136,7 +136,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     for (const command of this.commands) {
       if (!command.sys.parent && command.sys.name === name) {
         Command.logger
-          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? i18n.warn`And:\n${command.stack}` : ''}`
+          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(0)}${command.stack ? i18n.warn`And:\n${command.stack}` : ''}`
         return
       }
     }
@@ -217,7 +217,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param {string} name - Name of the new command
    */
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
-    this.stack = stringifyError.stack.get(2)
+    this.stack = stringifyError.stack.get(0)
     if (!parent && !__VITEST__) Command.checkIsUnique(name)
 
     if (Command.loaded) {

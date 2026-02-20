@@ -66,10 +66,9 @@ declare module '@minecraft/server' {
   }
 }
 
-const baseTypeId = BaseItem.itemStack.typeId
 InventoryInterval.slots.subscribe(({ player, slot }) => {
   if (!isSpeedRunningFor(player, SpeedRunTarget.GetBaseItem)) return
-  if (slot.isValid && slot.typeId === baseTypeId && BaseItem.isItem(slot.getItem())) {
+  if (slot.isValid && BaseItem.isItem(slot.getItem())) {
     finishSpeedRun(player, SpeedRunTarget.GetBaseItem)
   }
 })

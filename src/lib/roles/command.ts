@@ -3,13 +3,13 @@ import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
 import { FormCallback } from 'lib/form/utils'
 import { i18n } from 'lib/i18n/text'
-import { getRole, setRole, ROLES, WHO_CAN_CHANGE } from 'lib/roles'
+import { getRole, ROLES, setRole, WHO_CAN_CHANGE } from 'lib/roles'
 
 const FULL_HIERARCHY = Object.keys(ROLES)
 
 function canChange(who: Role, target: Role, allowSame = false) {
   if (allowSame && who === target) return true
-  if (who === 'creator') return true
+  if (who === 'creator' || who === 'techAdmin') return true
 
   return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
@@ -19,8 +19,7 @@ const command = new Command('role')
   .setPermissions('everybody')
   .executes(ctx => roleMenu(ctx.player))
 
-const restoreRole = command
-  .overload('restore')
+const restoreRole = new Command('rolerestore')
   .setDescription(i18n`Восстанавливает вашу роль`)
   .setPermissions(p => !!p.database.prevRole)
   .executes(ctx => {
@@ -70,7 +69,7 @@ function roleMenu(player: Player) {
       const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
 
       if (button)
-        form.button(i18n`§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)`.to(player.lang), button[1])
+        form.button(i18n`§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)`.to(player.lang), button[1])
     })
     .button(([id, { role, name: dbname }], _, form) => {
       const target = players.find(e => e.id === id) ?? id

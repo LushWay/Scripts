@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
-import { util, wrap } from 'lib/util'
+import { wrap } from 'lib/util'
 import { ActionbarPriority } from './extensions/on-screen-display'
+import { onLoad } from './utils/game'
 import { WeakPlayerSet } from './weak-player-storage'
 
 type Format =
@@ -25,7 +26,7 @@ export class Sidebar<E = any> {
 
   static forceHide = new WeakPlayerSet()
 
-  content
+  content!: SidebarVariables<E>
 
   getExtra
 
@@ -54,7 +55,9 @@ export class Sidebar<E = any> {
     this.name = name
     this.getExtra = getExtra
     this.getOptions = getOptions
-    this.content = this.init(content)
+    onLoad(() => {
+      this.content = this.init(content)
+    })
     Sidebar.instances.push(this)
   }
 

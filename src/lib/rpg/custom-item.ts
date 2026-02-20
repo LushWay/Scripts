@@ -1,22 +1,21 @@
-import { ItemStack, system } from '@minecraft/server'
+import { ItemStack } from '@minecraft/server'
 import { Items } from 'lib/assets/custom-items'
 import { defaultLang } from 'lib/assets/lang'
 import { translateTypeId } from 'lib/i18n/lang'
 import { i18n } from 'lib/i18n/text'
+import { MaybeRef, onLoad } from 'lib/utils/game'
 
-export const customItems: ItemStack[] = []
+export const customItems: MaybeRef<ItemStack>[] = []
 
-class CustomItem {
-  constructor(public id: string) {
-    system.run(() => this.onBuild())
+export class CustomItem {
+  constructor(protected _typeId?: string) {
+    onLoad(() => this.onBuild())
   }
 
   protected onBuild() {
     this.cache = this.itemStack
     customItems.push(this.cache)
   }
-
-  protected _typeId: string | undefined
 
   typeId(typeId: string) {
     this._typeId = typeId
@@ -38,7 +37,7 @@ class CustomItem {
   }
 
   get itemStack() {
-    if (!this._typeId) throw new TypeError('No type id specified for custom item ' + this.id)
+    if (!this._typeId) throw new TypeError('No type id specified for custom item')
 
     const item = new ItemStack(this._typeId).setInfo(
       this._nameTag && `§6${this._nameTag}`,

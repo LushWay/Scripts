@@ -51,6 +51,10 @@ export abstract class Join extends Singleton {
     this.joinPositions.set(player, { position: this.playerAt(player) })
   }
 
+  isJoining(player: Player) {
+    return this.joinPositions.has(player)
+  }
+
   protected joinPositions = new WeakPlayerMap<Join.Database>({ removeOnLeave: true })
 
   private onInterval(player: Player) {

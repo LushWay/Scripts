@@ -1,11 +1,15 @@
 import { Player } from '@minecraft/server'
+import { Cooldown } from 'lib/cooldown'
+import { registerResettableCooldown } from 'lib/cooldownreset'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { i18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
+import { onLoad } from 'lib/utils/load-ref'
+import { ms } from 'lib/utils/ms'
 import { Clan } from './clan'
-import { cd, clanInvites, clanMenu, inClanMenu } from './menu'
+import { clanInvites, clanMenu, inClanMenu } from './menu'
 
 export function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
   new ArrayForm(i18n`Выбор клана`, [...Clan.getAll()].reverse())
@@ -61,6 +65,13 @@ export function selectOrCreateClanMenu(player: Player, back?: VoidFunction) {
 export function getClanButtonName(clan: Clan, style: Text.Fn<Text, unknown> = i18n): Text {
   return style`[${clan.shortname}] ${clan.name}\nУчастники: ${clan.members.length} ${clan.owners.map(id => Player.nameOrUnknown(id)).join(', ')}`
 }
+
+const cooldown = onLoad(() => {
+  const cd = new Cooldown(ms.from('day', 1), true, Cooldown.defaultDb.get('clan'))
+  registerResettableCooldown('Создание/изменение названия клана', cd)
+  return cd
+})
+
 export function promptClanNameShortname(
   player: Player,
   title: Text,
@@ -70,7 +81,7 @@ export function promptClanNameShortname(
   defaultName?: string,
   defaultShortname?: string,
 ) {
-  if (!cd.isExpired(player, false)) return
+  if (!cooldown.value.isExpired(player, false)) return
   new ModalForm(title.to(player.lang))
     .addTextField(
       i18n`Название клана`.to(player.lang),
@@ -109,7 +120,7 @@ export function promptClanNameShortname(
         if (c.shortname === shortname) return err(i18n.error`Короткое имя '${shortname}' уже занято.`)
       }
 
-      if (!cd.isExpired(player)) return
+      if (!cooldown.value.isExpired(player)) return
 
       onDone(name, shortname)
     })

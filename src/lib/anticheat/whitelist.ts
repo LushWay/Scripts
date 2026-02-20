@@ -2,10 +2,9 @@ import { system, world } from '@minecraft/server'
 
 import { defaultLang } from 'lib/assets/lang'
 import { noI18n } from 'lib/i18n/text'
-import { is } from 'lib/roles'
-import { DEFAULT_ROLE } from 'lib/roles'
-import { ROLES } from 'lib/roles'
+import { DEFAULT_ROLE, is, ROLES } from 'lib/roles'
 import { Settings } from 'lib/settings'
+import { onLoad } from 'lib/utils/load-ref'
 import { createLogger } from 'lib/utils/logger'
 
 // Delay execution to move whitelist settings to the end of the settings menu
@@ -41,7 +40,7 @@ system.delay(() => {
     }
   })
 
-  system.delay(() => {
+  onLoad(() => {
     if (whitelist.enabled) {
       logger.info('To disable, use /scriptevent whitelist:disable')
     }

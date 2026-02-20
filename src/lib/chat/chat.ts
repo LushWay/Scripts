@@ -3,6 +3,7 @@ import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
+import { onLoad } from 'lib/utils/load-ref'
 import { msold } from 'lib/utils/ms-old'
 import { Singleton } from 'lib/utils/singleton'
 import './command'
@@ -78,7 +79,7 @@ export abstract class Chat extends Singleton {
   constructor() {
     super()
 
-    world.afterEvents.worldLoad.subscribe(() => {
+    onLoad(() => {
       this.updateCooldown()
     })
 

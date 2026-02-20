@@ -6,7 +6,12 @@ declare global {
   const afterAll: (typeof import('@vitest/runner'))['afterAll']
   const afterEach: (typeof import('@vitest/runner'))['afterEach']
 
-  const expect: import('@vitest/expect').ExpectStatic
+  const expect: (<T>(
+    actual: T,
+    message?: string,
+  ) => import('@vitest/expect').Assertion<T> & { not: import('@vitest/expect').Assertion<T> }) &
+    import('@vitest/expect').ExpectStatic
+
   const expectTypeOf: typeof import('expect-type').expectTypeOf
 
   const vi: typeof import('@vitest/spy') & {

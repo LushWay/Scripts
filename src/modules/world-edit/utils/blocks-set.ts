@@ -93,7 +93,7 @@ export function getBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
 }
 
 export function getReplaceTargets(ref: BlocksSetRef): ReplaceTarget[] {
-  const defaultReplaceTarget = DEFAULT_REPLACE_TARGET_SETS[ref[1]]
+  const defaultReplaceTarget = DEFAULT_REPLACE_TARGET_SETS.value[ref[1]]
   if (defaultReplaceTarget) return defaultReplaceTarget
 
   return getActiveBlocksInSet(ref)?.map(fromBlockStateWeightToReplaceTarget) ?? []

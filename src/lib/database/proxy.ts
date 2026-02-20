@@ -8,7 +8,7 @@ const PROXY_TARGET = Symbol('proxy_target')
 type DynamicObject = Record<string | number | symbol, unknown>
 type ProxiedDynamicObject = DynamicObject & { [IS_PROXIED]?: boolean }
 
-export class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
+export abstract class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
   static tables: Record<string, UnknownTable> = {}
 
   constructor(
@@ -17,6 +17,8 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   ) {
     ProxyDatabase.tables[id] = this as UnknownTable
   }
+
+  abstract onLoad(waiter: (value: void) => void): void
 
   get size(): number {
     return this.value.size
@@ -35,6 +37,7 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   }
 
   getImmutable(key: Key): Immutable<Value> {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const value = this.value.get(key)
     if (this.defaultValue && typeof value === 'undefined') {
       this.value.set(key, this.defaultValue(key))
@@ -59,13 +62,11 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
     return this.value.keys()
   }
 
-  values(): Value[] {
-    const values: Value[] = []
-    for (const value of this.value.values()) values.push(value)
-    return values
+  values() {
+    return [...this.value.values()] as Immutable<Value>[]
   }
 
-  valuesImmutable() {
+  valuesIterator() {
     return this.value.values() as MapIterator<Immutable<Value>>
   }
 
@@ -139,6 +140,8 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   }
 
   protected value = new Map<Key, Value>()
+
+  protected loaded = false
 
   private proxyCache = new WeakMap<DynamicObject, DynamicObject>()
 

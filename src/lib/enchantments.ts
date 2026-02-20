@@ -6,7 +6,6 @@ import { enchantmentsJson } from './assets/enchantments'
 import { Core } from './extensions/core'
 
 const location = { x: 0, y: -10, z: 0 }
-const dimension = world.overworld
 
 export const Enchantments = {
   custom: {} as Record<string, Record<number, Record<string, ItemStack>>>,
@@ -15,6 +14,8 @@ export const Enchantments = {
 }
 
 function load() {
+  const dimension = world.overworld
+
   let expecting = enchantmentsJson.items as number
   for (let i = 1; i <= enchantmentsJson.files; i++) {
     const structure = `mystructure:generated/${i}`

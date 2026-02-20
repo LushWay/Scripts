@@ -2,13 +2,13 @@ import { LocationInUnloadedChunkError, system, world } from '@minecraft/server'
 
 import { Items } from 'lib/assets/custom-items'
 import { i18n } from 'lib/i18n/text'
+import { Airdrop } from 'lib/rpg/airdrop'
+import { Loot } from 'lib/rpg/loot-table'
+import { isNotPlaying } from 'lib/utils/game'
+import { Vec } from 'lib/vector'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
 import { CannonItem, CannonShellItem } from '../../pvp/cannon'
 import { randomLocationInAnarchy } from './random-location-in-anarchy'
-import { Vec } from 'lib/vector'
-import { isNotPlaying } from 'lib/utils/game'
-import { Airdrop } from 'lib/rpg/airdrop'
-import { Loot } from 'lib/rpg/loot-table'
 
 const base = new Loot('base_airdrop')
   .item('Gunpowder')
@@ -19,10 +19,10 @@ const base = new Loot('base_airdrop')
   .amount({ '25...50': '40%', '51...90': '2%' })
   .weight('20%')
 
-  .itemStack(CannonShellItem.blueprint)
+  .itemStack(() => CannonShellItem.blueprint)
   .weight('10%')
 
-  .itemStack(CannonItem.blueprint)
+  .itemStack(() => CannonItem.blueprint)
   .weight('5%')
 
   .item(Items.Money)
@@ -39,10 +39,10 @@ const powerfull = new Loot('powerfull_airdrop')
   .amount({ '30...64': '40%', '65...128': '2%' })
   .weight('20%')
 
-  .itemStack(CannonShellItem.itemStack)
+  .itemStack(CannonShellItem)
   .weight('10%')
 
-  .itemStack(CannonItem.itemStack)
+  .itemStack(CannonItem)
   .weight('5%')
 
   .item(Items.Money)

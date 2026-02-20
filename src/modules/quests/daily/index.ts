@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
+import { QuestForm } from 'lib/form/quest'
 import { intlListFormat } from 'lib/i18n/intl'
 import { i18n, textTable } from 'lib/i18n/text'
 import { questMenuCustomButtons } from 'lib/quest/menu'
@@ -68,7 +69,7 @@ new RecurringEvent(
     currentDailyQuestCity = mostPopular
     storage.cityId = mostPopular?.group.id ?? ''
 
-    for (const value of db.values()) {
+    for (const [, value] of db.entries()) {
       if (!value.takenToday) value.streak = 0
       value.today = 0
       value.takenToday = false
@@ -122,7 +123,7 @@ questMenuCustomButtons.subscribe(({ player, form }) => {
   }
 })
 
-export const dailyQuestsForm = form((f, { player }) => {
+export const dailyQuestsForm = form((f, { player, self }) => {
   const playerDb = db.get(player.id)
   f.title(i18n`Ежедневные задания`)
   f.body(
@@ -154,6 +155,6 @@ export const dailyQuestsForm = form((f, { player }) => {
   }
 
   for (const quest of currentDailyQuests) {
-    f.quest(quest)
+    new QuestForm(f, player, self).quest(quest)
   }
 })

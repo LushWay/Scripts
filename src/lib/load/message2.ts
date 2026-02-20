@@ -8,8 +8,10 @@ system.delay(() => {
 
   if (__GIT__)
     import('lib/roles').then(({ is }) => {
-      for (const player of world.getAllPlayers())
-        if (is(player.id, 'techAdmin')) player.tell(`§sCommit: §f${__GIT__.replace(/^Commit: /, '')}`)
+      world.afterEvents.worldLoad.subscribe(() => {
+        for (const player of world.getAllPlayers())
+          if (is(player.id, 'techAdmin')) player.tell(`§sCommit: §f${__GIT__.replace(/^Commit: /, '')}`)
+      })
     })
 
   globalThis.loaded = 0

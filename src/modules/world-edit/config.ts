@@ -4,6 +4,7 @@ import {
   MolangVariableMap,
   world,
 } from '@minecraft/server'
+import { onLoad } from 'lib/utils/load-ref'
 import { Vec } from 'lib/vector'
 
 export const WE_CONFIG = {
@@ -17,14 +18,12 @@ export const WE_CONFIG = {
 
   DRAW_SELECTION_PARTICLE: 'minecraft:balloon_gas_particle',
   DRAW_SELECTION_MAX_SIZE: 5000,
-  DRAW_SELECTION_PARTICLE_OPTIONS: new MolangVariableMap(),
+  DRAW_SELECTION_PARTICLE_OPTIONS: onLoad(() => {
+    const map = new MolangVariableMap()
+    map.setVector3('direction', { x: 0, y: 0, z: 0 })
+    return map
+  }),
 }
-
-WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.setVector3('direction', {
-  x: 0,
-  y: 0,
-  z: 0,
-})
 
 export function spawnParticlesInArea(
   pos1: Vector3,
@@ -44,7 +43,7 @@ export function spawnParticlesInArea(
         world.overworld.spawnParticle(
           WE_CONFIG.DRAW_SELECTION_PARTICLE,
           { x, y, z },
-          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS,
+          WE_CONFIG.DRAW_SELECTION_PARTICLE_OPTIONS.value,
         )
       } catch (e) {
         if (e instanceof LocationInUnloadedChunkError || e instanceof LocationOutOfWorldBoundariesError) continue

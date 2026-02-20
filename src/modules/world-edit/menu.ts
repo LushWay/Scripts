@@ -12,6 +12,7 @@ import { translateTypeId } from 'lib/i18n/lang'
 import { i18n } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { inspect, noNullable, stringify } from 'lib/util'
+import { onLoad } from 'lib/utils/load-ref'
 import { Vec } from 'lib/vector'
 import { WorldEdit } from 'modules/world-edit/lib/world-edit'
 import { weRandomizerTool } from 'modules/world-edit/tools/randomizer'
@@ -543,7 +544,7 @@ function WEeditBlocksSetMenu(o: {
   form.show(player)
 }
 
-const allStates = BlockStates.getAll()
+const allStates = onLoad(() => BlockStates.getAll())
 
 export function WEeditBlockStatesMenu(
   player: Player,
@@ -563,7 +564,7 @@ export function WEeditBlockStatesMenu(
 
     // eslint-disable-next-line prefer-const
     for (let [stateName, stateValue] of Object.entries(states)) {
-      const stateDef = allStates.find(e => e.id === stateName)
+      const stateDef = allStates.value.find(e => e.id === stateName)
       if (!stateDef) continue
 
       form.button(

@@ -1,6 +1,5 @@
 import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player } from '@minecraft/server'
 import { eqSlots } from 'lib/form/select-item'
-import { Message } from 'lib/i18n/message'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { itemNameXCount } from '../../utils/item-name-x-count'
 import { Cost } from '../cost'
@@ -19,10 +18,11 @@ export class ItemCost extends Cost {
    * @param amount - Amount of items to search for.
    */
   constructor(
-    private readonly item: string | ItemStack,
+    private readonly item: string | ItemStack | (() => ItemStack),
     private readonly amount = item instanceof ItemStack ? item.amount : 1,
     protected is = (itemStack: ItemStack) => {
       if (typeof this.item === 'string') return itemStack.typeId === this.item
+      if (typeof this.item === 'function') return this.item().is(itemStack)
       return this.item.is(itemStack)
     },
   ) {
@@ -79,7 +79,11 @@ export class ItemCost extends Cost {
 
   toString(player: Player, canBuy?: boolean, amount = true): string {
     return itemNameXCount(
-      this.item instanceof ItemStack ? this.item : { typeId: this.item, amount: this.amount },
+      this.item instanceof ItemStack
+        ? this.item
+        : typeof this.item === 'function'
+          ? this.item()
+          : { typeId: this.item, amount: this.amount },
       canBuy ? '§7' : '§c',
       amount,
       player.lang,

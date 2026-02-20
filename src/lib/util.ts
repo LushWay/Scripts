@@ -3,25 +3,22 @@ import { TerminalColors } from './assets/terminal-colors'
 import stringifyError from './utils/error'
 import { inspect, stringify } from './utils/inspect'
 
-import './utils/benchmark'
-
 export { inspect, stringify, stringifyError }
 
 export const util = {
   /** Runs the given callback safly. If it throws any error it will be handled */
   catch(this: void, fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
     const prefix = `§6${subtype}: `
+    const add = originalStack ? '\n\n' + stringifyError.stack.get(0, originalStack) : ''
     try {
       const promise = fn()
       if (promise instanceof Promise) {
         promise.catch((e: unknown) => {
-          console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
+          console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }) + add)
         })
       }
     } catch (e: unknown) {
-      console.error(
-        prefix + stringifyError(e as Error, { omitStackLines: 1 }) + (originalStack ? '\n\n' + originalStack : ''),
-      )
+      console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }) + add)
     }
   },
 

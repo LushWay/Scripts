@@ -2,7 +2,7 @@ import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Items } from 'lib/assets/custom-items'
 import { i18n, i18nShared } from 'lib/i18n/text'
-import { customItems, CustomItemWithBlueprint } from 'lib/rpg/custom-item'
+import { CustomItem, CustomItemWithBlueprint } from 'lib/rpg/custom-item'
 import { isNewbie } from 'lib/rpg/newbie'
 import { Group } from 'lib/rpg/place'
 import { Cost, ItemCost, MultiCost } from 'lib/shop/cost'
@@ -11,16 +11,11 @@ import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { BaseItem } from '../base/base'
 import { MagicSlimeBall } from '../village-of-explorers/items'
 
-export const CircuitBoard = new ItemStack(Items.CircuitBoard).setInfo(
-  undefined,
+export const CircuitBoard = new CustomItem(Items.CircuitBoard).lore(
   i18n`Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота`,
 )
 
-export const Chip = new ItemStack(Items.Chip).setInfo(
-  undefined,
-  i18n`Используется для создания платы у Инжинера в Технограде`,
-)
-customItems.push(CircuitBoard, Chip)
+export const Chip = new CustomItem(Items.Chip).lore(i18n`Используется для создания платы у Инжинера в Технограде`)
 
 export const NotNewbieCost = new (class NotNewbieCost extends Cost {
   toString(player: Player, canBuy?: boolean): string {
@@ -48,25 +43,25 @@ export class Engineer extends ShopNpc {
       menu.itemStack(
         BaseItem.itemStack,
         new MultiCost(NotNewbieCost)
-          .item(CircuitBoard)
+          .item(CircuitBoard.itemStack)
           .item(MinecraftItemTypes.NetherStar)
           .item(BaseItem.blueprint)
           .item(MinecraftItemTypes.EnderPearl, 5)
-          .item(MagicSlimeBall, 30)
+          .item(MagicSlimeBall.itemStack, 30)
           .money(4_000),
       )
 
       for (const [item, cost] of [
-        [CannonItem, new MultiCost().item(Chip).money(200)],
+        [CannonItem, new MultiCost().item(Chip.itemStack).money(200)],
         [CannonShellItem, new MultiCost().item(MinecraftItemTypes.Gunpowder, 20).money(100)],
       ] as [CustomItemWithBlueprint, Cost][]) {
         menu.itemStack(item.itemStack, new MultiCost(new ItemCost(item.blueprint), cost))
       }
 
       menu.itemStack(
-        CircuitBoard,
+        CircuitBoard.itemStack,
         new MultiCost()
-          .item(Chip)
+          .item(Chip.itemStack)
           .item(MinecraftItemTypes.IronIngot, 20)
           .item(MinecraftItemTypes.GoldIngot, 10)
           .item(MinecraftItemTypes.Quartz, 10)

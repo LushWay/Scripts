@@ -94,11 +94,6 @@ type Narrowable = string | number | bigint | boolean
 declare module '@minecraft/server' {
   interface PlayerDatabase {
     name?: string | undefined
-    readonly role: Role
-    prevRole?: Role
-    quests?: import('./quest/quest').Quest.DB
-    achivs?: import('./achievements/achievement').Achievement.DB
-    unlockedPortals?: string[]
   }
 }
 

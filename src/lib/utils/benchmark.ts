@@ -1,3 +1,4 @@
+import { Command } from 'lib/command'
 import { TIMERS_PATHES } from 'lib/extensions/system'
 import { ActionForm } from 'lib/form/action'
 import { util } from 'lib/util'
