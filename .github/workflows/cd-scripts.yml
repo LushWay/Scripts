@@ -6,7 +6,7 @@ on:
     branches:
       - main
     tags:
-      - '!*' # Do not execute on tags
+      - "!*" # Do not execute on tags
     paths:
       - src/**
       - tools/**
@@ -41,14 +41,6 @@ jobs:
       - run: node --no-warnings --experimental-strip-types --experimental-transform-types tools/build.ts
 
       - run: yarn test --run --coverage
-
-      - name: Upload coverage
-        # Run only on push on main repo
-        if: github.repository == 'LushWay/Scripts' && github.ref == 'refs/heads/main'
-        uses: qltysh/qlty-action/coverage@v1
-        with:
-          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: coverage/lcov.info
 
   lint:
     name: Lint
