@@ -50,7 +50,7 @@ const cdform = form.params<{ cd: CooldownController; name: string }>((f, { param
   for (const [id, time] of Object.entries(list)) {
     const elapsed = time - Date.now()
     if (elapsed < 0) continue
-    f.button(i18n`${getFullname(id)}\n${i18n.hhmmss(elapsed)}`, () => {
+    f.button(i18n`${getFullname(id)}\n${i18n.time(elapsed)}`, () => {
       params.cd.reset(id)
       self()
     })

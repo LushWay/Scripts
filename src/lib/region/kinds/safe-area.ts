@@ -48,8 +48,47 @@ export class SafeAreaRegion extends Region {
   get displayName() {
     return this.safeAreaName
   }
+
+  static enableGamemodeChange() {
+    system.runPlayerInterval(
+      player => {
+        const regions = RegionEvents.playerInRegionsCache.get(player)
+        if (!regions) return
+
+        const region = regions[0] as Region | undefined
+
+        const gamemode = player.getGameMode()
+        const adventure = gamemode === GameMode.Adventure
+        const survival = gamemode === GameMode.Survival
+
+        if (adventure && (!region || nearDisabledAdventureRegions(player))) {
+          player.setGameMode(GameMode.Survival)
+        } else if (survival && region && adventureModeRegion(region)) {
+          player.setGameMode(GameMode.Adventure)
+        }
+      },
+      'safeAreaDisableAdventureNear',
+      50,
+    )
+
+    RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
+      const been = previous[0] && adventureModeRegion(previous[0])
+      const now = newest[0] && (adventureModeRegion(newest[0]) || !nearDisabledAdventureRegions(player))
+
+      const gamemode = player.getGameMode()
+      const adventure = gamemode === GameMode.Adventure
+      const survival = gamemode === GameMode.Survival
+
+      if (been && adventure && !now) {
+        player.setGameMode(GameMode.Survival)
+      } else if (now && survival) {
+        player.setGameMode(GameMode.Adventure)
+      }
+    })
+  }
 }
 registerRegionType(noI18n`Мирные зоны`, SafeAreaRegion)
+
 export const disableAdventureNear: (typeof Region)[] = []
 export const adventureModeRegions: (typeof Region)[] = [SafeAreaRegion]
 
@@ -60,39 +99,3 @@ function nearDisabledAdventureRegions(player: Player): boolean {
 function adventureModeRegion(region: Region) {
   return adventureModeRegions.some(e => region instanceof e)
 }
-
-system.runPlayerInterval(
-  player => {
-    const regions = RegionEvents.playerInRegionsCache.get(player)
-    if (!regions) return
-
-    const region = regions[0] as Region | undefined
-
-    const gamemode = player.getGameMode()
-    const adventure = gamemode === GameMode.Adventure
-    const survival = gamemode === GameMode.Survival
-
-    if (adventure && (!region || nearDisabledAdventureRegions(player))) {
-      player.setGameMode(GameMode.Survival)
-    } else if (survival && region && adventureModeRegion(region)) {
-      player.setGameMode(GameMode.Adventure)
-    }
-  },
-  'safeAreaDisableAdventureNear',
-  40,
-)
-
-RegionEvents.onPlayerRegionsChange.subscribe(({ player, previous, newest }) => {
-  const been = previous[0] && adventureModeRegion(previous[0])
-  const now = newest[0] && (adventureModeRegion(newest[0]) || !nearDisabledAdventureRegions(player))
-
-  const gamemode = player.getGameMode()
-  const adventure = gamemode === GameMode.Adventure
-  const survival = gamemode === GameMode.Survival
-
-  if (been && adventure && !now) {
-    player.setGameMode(GameMode.Survival)
-  } else if (now && survival) {
-    player.setGameMode(GameMode.Adventure)
-  }
-})

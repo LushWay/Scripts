@@ -8,8 +8,6 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { onPlayerMove } from 'lib/player-move'
@@ -94,21 +92,27 @@ actionGuard((player, region, ctx) => {
   if (BLOCK_CONTAINERS.includes(typeId)) return region.permissions.openContainers // allow
 }, ActionGuardOrder.Permission)
 
+const itemToProjectile = new Map<string, string>([
+  [MinecraftItemTypes.EnderPearl, MinecraftEntityTypes.EnderPearl],
+  [MinecraftItemTypes.WindCharge, MinecraftEntityTypes.WindChargeProjectile],
+  [MinecraftItemTypes.Snowball, MinecraftEntityTypes.SnowGolem],
+])
+
 actionGuard((player, region, context) => {
   if (region && (context.type === 'interactWithEntity' || context.type === 'interactWithBlock')) {
     const { allowedEntities: ent } = region.permissions
 
     if (ent !== 'all') {
       const { typeId } = player.mainhand()
+      if (!typeId) return
+
       const arrow = ent.includes(MinecraftItemTypes.Arrow)
       const firework = ent.includes(MinecraftItemTypes.FireworkRocket)
 
       if (typeId === MinecraftItemTypes.Bow) return arrow
       if (typeId === MinecraftItemTypes.Crossbow) return arrow || firework
-      if (typeId === MinecraftItemTypes.EnderPearl) return ent.includes(MinecraftEntityTypes.EnderPearl)
-      if (typeId === MinecraftItemTypes.WindCharge) return ent.includes(MinecraftEntityTypes.WindChargeProjectile)
-      if (typeId === MinecraftItemTypes.Snowball) return ent.includes(MinecraftEntityTypes.Snowball)
-      if (typeId === CustomEntityTypes.Fireball) return ent.includes(CustomEntityTypes.Fireball)
+      const projectile = itemToProjectile.get(typeId)
+      if (projectile) return ent.includes(projectile)
     }
   }
 }, ActionGuardOrder.ProjectileUsePrevent)
@@ -201,24 +205,11 @@ onPlayerMove.subscribe(({ player, location, dimensionType }) => {
 
   RegionEvents.playerInRegionsCache.set(player, newest)
   const currentRegion = newest[0]
-  const isPlaying = !isNotPlaying(player)
-
-  const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
-
-  if (typeof currentRegion !== 'undefined' && isPlaying) {
-    if (currentRegion.permissions.pvp === false) {
-      player.triggerEvent(
-        player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
-      )
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (currentRegion.permissions.pvp === 'pve') {
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else resetNewbie()
-  } else resetNewbie()
 
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
 })
 
+// TODO Migrate to entityHurtBeforeEvent
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
   if (!damagingEntity?.isValid || !hurtEntity.isValid) return
 
@@ -245,6 +236,10 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { da
   } else {
     health.setCurrentValue(health.currentValue - damage)
     damagingEntity.applyDamage(0)
-    if (health.currentValue >= 0) damagingEntity.applyKnockback(direction, direction.y)
+    //if (health.currentValue >= 0) damagingEntity.applyKnockback(direction, direction.y)
   }
 })
+
+export const regionPermissions = {
+  itemToProjectile,
+}

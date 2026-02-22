@@ -1,6 +1,7 @@
 import { ChatSendAfterEvent, Player } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { developersAreWarned } from 'lib/assets/text'
+import { intlListFormat } from 'lib/i18n/intl'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { ROLES } from 'lib/roles'
 import { inaccurateSearch } from '../utils/search'
@@ -79,10 +80,12 @@ export function suggest(player: Pick<Player, 'tell' | 'lang'>, input: string, op
   if (!search[0] || search[0][1] < settings.minMatchTriggerValue) return
 
   player.tell(
-    i18n.error`Вы имели ввиду ${search
-      .slice(0, settings.maxSuggestionsCount)
-      .map(e => noI18n.nocolor`${e[0]} (${~~(e[1] * 100)}%%)`)
-      .join(', ')}?`,
+    i18n.error`Вы имели ввиду ${intlListFormat(
+      i18n.error.style,
+      player.lang,
+      'or',
+      search.slice(0, settings.maxSuggestionsCount).map(e => noI18n.nocolor`${e[0]} (${~~(e[1] * 100)}%%)`),
+    )}?`,
   )
 }
 

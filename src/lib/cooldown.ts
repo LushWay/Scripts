@@ -60,7 +60,7 @@ export class Cooldown {
     if (elapsed) {
       if (this.tell && player instanceof Player) {
         const after = this.time - elapsed
-        player.fail(i18n.error`Не так быстро! Попробуй через ${after > 1000 ? i18n.hhmmss(after) : i18n`${after}мсек`}`)
+        player.fail(i18n.error`Не так быстро! Попробуй через ${i18n.time(after)}`)
       }
 
       return false
