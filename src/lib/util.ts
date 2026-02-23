@@ -78,7 +78,7 @@ export const util = {
     const r = TerminalColors.r
     if (!r) throw new TypeError('Broken terminal colors: no r')
 
-    return __SERVER__ ? text.replace(/§(.)/g, (_, a: string) => TerminalColors[a] ?? r) + r : text.replace(/§(.)/g, '')
+    return text.replace(/§(.)/g, (_, a: string) => TerminalColors[a] ?? r) + r
   },
 
   fromTerminalColorsToMinecraft(string: string) {

@@ -3,9 +3,9 @@ import { Items } from 'lib/assets/custom-items'
 import { defaultLang } from 'lib/assets/lang'
 import { translateTypeId } from 'lib/i18n/lang'
 import { i18n } from 'lib/i18n/text'
-import { MaybeRef, onLoad } from 'lib/utils/game'
+import { onLoad } from 'lib/utils/game'
 
-export const customItems: MaybeRef<ItemStack>[] = []
+export const customItems: ItemStack[] = []
 
 export class CustomItem {
   constructor(protected _typeId?: string) {

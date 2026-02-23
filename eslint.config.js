@@ -27,7 +27,6 @@ export default ts.config(
       'src/lib/lang/**',
       'src/test/__mocks__/**',
       'coverage/**',
-      '.yarn/**',
     ],
   },
   { plugins: { tr }, rules: { 'tr/tr': I18N ? 'error' : 'off', 'tr/export-boundaries': 'error' } },

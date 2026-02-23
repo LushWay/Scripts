@@ -120,7 +120,7 @@ export class LongDynamicProperty {
   }
 }
 
-if (!__VITEST__)
+if (!__TEST__)
   configureDatabase({
     createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
       new DynamicPropertyDB<unknown, string>(name, defaultValue),

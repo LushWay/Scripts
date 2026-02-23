@@ -16,7 +16,7 @@ export const Core = {
   },
 }
 
-if (!__VITEST__) {
+if (!__TEST__) {
   onLoad(() => {
     system.run(function waiter() {
       const entities = world.overworld.getEntities()

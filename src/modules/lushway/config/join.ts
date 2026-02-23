@@ -6,14 +6,13 @@ import { JoinWithMessage } from 'lib/player-join'
 
 export class LushWayJoin extends JoinWithMessage {
   onJoinMoveMessage(player: Player, where: 'air' | 'ground', message: Text): void {
-    __SERVER__ &&
-      sendPacketToStdout('joinOrLeave', {
-        name: player.name,
-        role: getFullname(player, { name: false }),
-        status: 'move',
-        where,
-        print: noI18n.nocolor`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
-      })
+    sendPacketToStdout('joinOrLeave', {
+      name: player.name,
+      role: getFullname(player, { name: false }),
+      status: 'move',
+      where,
+      print: noI18n.nocolor`${'§l§f' + player.name} ${getFullname(player, { name: false })}: ${message}`,
+    })
   }
 }
 

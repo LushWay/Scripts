@@ -19,7 +19,7 @@ const stringifyError = Object.assign(
       t.name = 'StringError'
     }
 
-    __PRODUCTION__ &&
+    !__DEV__ &&
       s?.('error', {
         name: t.name ?? 'Error',
         stack: t.stack ?? '',

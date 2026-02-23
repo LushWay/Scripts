@@ -140,7 +140,7 @@ Core.beforeEvents.roleChange.subscribe(({ newRole, oldRole, player }) => {
 })
 
 /* istanbul ignore next */
-if (!__VITEST__) {
+if (!__TEST__) {
   // Allow recieving roles from scriptevent function run by console
   system.afterEvents.scriptEventReceive.subscribe(
     event => {

@@ -22,7 +22,7 @@ export async function request<Path extends keyof ScriptServerRpc.OutgoingRoutes>
 
     const stringifiedBody = body ? JSON.stringify(body) : ''
     const response = await http.request(
-      new HttpRequest(`http://localhost:${__SERVER_PORT__}/` + path)
+      new HttpRequest(`http://localhost:9797/` + path)
         .setMethod(HttpRequestMethod.Post)
         .addHeader('content-type', 'text/plain')
         .addHeader('content-length', stringifiedBody.length.toString())

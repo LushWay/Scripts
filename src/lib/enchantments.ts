@@ -68,4 +68,4 @@ function load() {
   EventLoader.load(Enchantments.onLoad)
 }
 
-if (!__VITEST__) Core.afterEvents.worldLoad.subscribe(load)
+if (!__TEST__) Core.afterEvents.worldLoad.subscribe(load)

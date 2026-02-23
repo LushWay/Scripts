@@ -8,7 +8,7 @@ import { langToken, translateToken } from 'lib/i18n/lang'
 
 /** Returns <item name>\nx<count> */
 export function itemNameXCount(
-  item: Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'> | ItemStack,
+  item: (Pick<ItemStack, 'typeId' | 'nameTag' | 'amount'> & { localizationKey?: string }) | ItemStack,
   c = '§7',
   amount = true,
   player: Player | Language,
@@ -26,7 +26,7 @@ export function itemNameXCount(
   //   return `${c}${item.nameTag ?? translateToken(token, locale)}${modifierS}${time ? ` §7${time}` : ''}`
   // }
 
-  return `${c}${item.nameTag ? (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') : translateToken(langToken(item), locale)}${amount && item.amount ? ` §r§f${c}x${item.amount}` : ''}`
+  return `${c}${item.nameTag ? (c ? uncolor(item.nameTag) : item.nameTag).replace(/\n.*/, '') : translateToken(item.localizationKey ?? langToken(item.typeId), locale)}${amount && item.amount ? ` §r§f${c}x${item.amount}` : ''}`
 }
 
 function uncolor(t: string) {

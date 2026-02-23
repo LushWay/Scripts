@@ -218,7 +218,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    */
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
     this.stack = stringifyError.stack.get(0)
-    if (!parent && !__VITEST__) Command.checkIsUnique(name)
+    if (!parent && !__TEST__) Command.checkIsUnique(name)
 
     if (Command.loaded) {
       Command.logger.warn('Commands are already loaded, tried registering ', name, new Error().stack)

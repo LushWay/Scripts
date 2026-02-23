@@ -7,16 +7,14 @@ class LushWayChat extends Chat {
   protected onMessage(ctx: Chat.Context): void {
     const message = `${getFullname(ctx.sender, { nameColor: '§7', equippment: true })}§r: ${ctx.text}`
     const fullrole = getFullname(ctx.sender, { name: false })
-    if (__SERVER__) {
-      // This is handled/parsed by ServerCore
-      // Dont really want to do request each time here
-      sendPacketToStdout('chatMessage', {
-        name: ctx.sender.name,
-        role: fullrole,
-        print: message,
-        message: ctx.text,
-      })
-    }
+    // This is handled/parsed by ServerCore
+    // Dont really want to do request each time here
+    sendPacketToStdout('chatMessage', {
+      name: ctx.sender.name,
+      role: fullrole,
+      print: message,
+      message: ctx.text,
+    })
 
     for (const near of ctx.nearPlayers) {
       near.tell(message)
