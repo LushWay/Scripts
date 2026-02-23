@@ -9,7 +9,15 @@ export async function generateManifestJson({ world, outfile, outdir }: import('.
     .map(([name, version]) => {
       const match = (version as string).match(/\d+\.\d+\.\d+-(?:beta|stable)/)
 
-      if (!match && name !== '@minecraft/vanilla-data' && name !== 'async-mutex' && !name.startsWith('@formatjs')) {
+      const manifestPackages = [
+        '@minecraft/server',
+        '@minecraft/server-ui',
+        '@minecraft/server-net',
+        '@minecraft/server-admin',
+        '@minecraft/server-gametest',
+      ]
+
+      if (!match && manifestPackages.includes(name)) {
         logger.warn(
           "Version of the package '" +
             name +
@@ -21,8 +29,8 @@ export async function generateManifestJson({ world, outfile, outdir }: import('.
     })
     .filter(e => !!e[1])
 
-  if (!Object.entries(packagejson.content.resolutions).every(([k, v]) => packagejson.content.dependencies[k] === v)) {
-    packagejson.content.resolutions = packagejson.content.dependencies
+  if (!Object.entries(packagejson.content.overrides).every(([k, v]) => packagejson.content.dependencies[k] === v)) {
+    packagejson.content.overrides = packagejson.content.dependencies
     await packagejson.write()
   }
 
