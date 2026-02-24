@@ -4,31 +4,31 @@
 // Do not modify manually.
     
 // intl-locale
-import '@formatjs/intl-locale/polyfill-force';
+import '@formatjs/intl-locale/polyfill-force.js';
 
 // intl-getcanonicallocales
-import '@formatjs/intl-getcanonicallocales/polyfill-force';
+import '@formatjs/intl-getcanonicallocales/polyfill-force.js';
 
 // intl-enumerator
-import '@formatjs/intl-enumerator/polyfill-force';
+import '@formatjs/intl-enumerator/polyfill-force.js';
 
 // intl-pluralrules
-import '@formatjs/intl-pluralrules/polyfill-force';
+import '@formatjs/intl-pluralrules/polyfill-force.js';
 
 import '@formatjs/intl-pluralrules/locale-data/en';
 import '@formatjs/intl-pluralrules/locale-data/ru';
 
 // intl-listformat
-import '@formatjs/intl-listformat/polyfill-force';
+import '@formatjs/intl-listformat/polyfill-force.js';
 
 import '@formatjs/intl-listformat/locale-data/en';
 import '@formatjs/intl-listformat/locale-data/ru';
 
 // intl-numberformat
-import '@formatjs/intl-numberformat/polyfill-force';
+import '@formatjs/intl-numberformat/polyfill-force.js';
 
 import '@formatjs/intl-numberformat/locale-data/en';
 import '@formatjs/intl-numberformat/locale-data/ru';
 
 // intl-durationformat
-import '@formatjs/intl-durationformat/polyfill-force';
+import '@formatjs/intl-durationformat/polyfill-force.js';
