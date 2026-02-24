@@ -42,10 +42,10 @@ class TechCityBuilder extends City {
 
     this.createKits(
       new Loot()
-        .itemStack(CannonItem.blueprint)
+        .itemStack(() => CannonItem.blueprint)
         .weight('10%')
 
-        .itemStack(CannonShellItem.blueprint)
+        .itemStack(() => CannonShellItem.blueprint)
         .weight('10%')
 
         .item('RedTerracotta')
@@ -56,22 +56,22 @@ class TechCityBuilder extends City {
         .weight('10%').build,
 
       new Loot()
-        .itemStack(CannonShellItem.blueprint)
+        .itemStack(() => CannonShellItem.blueprint)
         .weight('3%')
 
-        .itemStack(CannonShellItem.itemStack)
+        .itemStack(CannonShellItem)
         .weight('3%')
 
-        .itemStack(CannonItem.blueprint)
+        .itemStack(() => CannonItem.blueprint)
         .weight('2%')
 
-        .itemStack(CannonItem.itemStack)
+        .itemStack(CannonItem)
         .weight('2%')
 
-        .itemStack(BaseItem.blueprint)
+        .itemStack(() => BaseItem.blueprint)
         .weight('1%')
 
-        .itemStack(BaseItem.itemStack)
+        .itemStack(BaseItem)
         .weight('1%').build,
     )
   }

@@ -77,5 +77,5 @@ const secondPage = form(f => {
 })
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-  if (firstJoin) Menu.item.give(player, { mode: 'ensure' })
+  if (firstJoin) Menu.item.value.give(player, { mode: 'ensure' })
 })

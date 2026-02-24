@@ -6,7 +6,6 @@ import { Settings } from 'lib/settings'
 import { onLoad } from 'lib/utils/load-ref'
 import { msold } from 'lib/utils/ms-old'
 import { Singleton } from 'lib/utils/singleton'
-import './command'
 
 export declare namespace Chat {
   interface MuteInfo {
