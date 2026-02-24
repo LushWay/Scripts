@@ -8,32 +8,11 @@
     "scripts:test": "vitest",
     "scripts:coverage": "vitest --coverage",
     "scripts:cov": "vitest --coverage --ui",
-    "postinstall": "node  tools/patches.ts",
-    "scripts:build": "node  tools/build.ts"
+    "postinstall": "node tools/patches.ts",
+    "scripts:build": "node tools/build.ts"
   },
   "dependencies": {
-    "@formatjs/intl-durationformat": "^0.7.4",
-    "@formatjs/intl-listformat": "^7.7.11",
-    "@formatjs/intl-locale": "^4.2.11",
-    "@formatjs/intl-numberformat": "^8.15.4",
-    "@formatjs/intl-pluralrules": "^5.4.4",
-    "@minecraft/common": "^1.2.0",
-    "@minecraft/server": "2.4.0-beta.1.21.120-stable",
-    "@minecraft/server-admin": "1.0.0-beta.1.21.124-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.21.120-stable",
-    "@minecraft/server-net": "1.0.0-beta.1.21.120-stable",
-    "@minecraft/server-ui": "2.1.0-beta.1.21.120-stable",
-    "@minecraft/vanilla-data": "1.21.120",
     "async-mutex": "^0.5.0"
-  },
-  "overrides": {
-    "@minecraft/server": "2.4.0-beta.1.21.120-stable",
-    "@minecraft/server-admin": "1.0.0-beta.1.21.124-stable",
-    "@minecraft/server-gametest": "1.0.0-beta.1.21.120-stable",
-    "@minecraft/server-net": "1.0.0-beta.1.21.120-stable",
-    "@minecraft/server-ui": "2.1.0-beta.1.21.120-stable",
-    "@minecraft/vanilla-data": "1.21.120",
-    "@minecraft/common": "^1.2.0"
   },
   "prettier": {
     "singleQuote": true,
@@ -48,3 +27,4 @@
     "jsdocTagsOrder": "{\"template\": 24.5}"
   }
 }
+
