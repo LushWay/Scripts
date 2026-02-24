@@ -23,13 +23,13 @@ describe('area reg', () => {
     const mock = vi.spyOn(console, 'warn').mockImplementation(() => {})
     expect(TestArea.fromJson({ t: 'unknown', d: {} })).toMatchInlineSnapshot(`undefined`)
     expect(mock.mock.calls[0]?.[0]).toMatchInlineSnapshot(
-      `"§7[Area][Database] No area found for §funknown§7. Maybe you forgot to register kind or import file?"`,
+      `"§e[Area][Database] No area found for §funknown§e. Maybe you forgot to register kind or import file?"`,
     )
     mock.mockClear()
 
     Area.loaded = true
     expect(() => {
-      TestArea.asSaveableArea()
+      TestArea.asSaveableArea('test')
     }).toThrowErrorMatchingInlineSnapshot(
       `[Error: Registering area type test failed. Regions are already restored from json. Registering area should occur on the import-time.]`,
     )

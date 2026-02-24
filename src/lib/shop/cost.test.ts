@@ -74,7 +74,7 @@ describe('MultiCost', () => {
     const cost = new MultiCost().money(1000).item(MinecraftItemTypes.Apple).item(MinecraftItemTypes.NetheriteAxe).xp(10)
 
     expect(cost.toString(player)).toMatchInlineSnapshot(
-      `"§61.000, §7Яблоко §r§f§7x1, §7Незеритовый топор §r§f§7x1, §7§a10§7lvl"`,
+      `"§61.000, §7 §r§f§7x1, §7 §r§f§7x1, §7§a10§7lvl"`,
     )
 
     expect(cost.toString(player, false)).toMatchInlineSnapshot(

@@ -22,14 +22,6 @@ declare module '@minecraft/server' {
   }
 }
 
-onLoad(() => {
-  expand(World.prototype, {
-    overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
-    nether: world.getDimension(MinecraftDimensionTypes.Nether),
-    end: world.getDimension(MinecraftDimensionTypes.TheEnd),
-  })
-})
-
 expand(World.prototype, {
   say: world.sendMessage.bind(world),
   get overworld() {
@@ -52,3 +44,13 @@ expand(World.prototype, {
 })
 
 const logs = new Set()
+
+onLoad(() => {
+  expand(World.prototype, {
+    overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
+    nether: world.getDimension(MinecraftDimensionTypes.Nether),
+    end: world.getDimension(MinecraftDimensionTypes.TheEnd),
+  })
+
+  // console.log('DIME', world.overworld.runCommand)
+})

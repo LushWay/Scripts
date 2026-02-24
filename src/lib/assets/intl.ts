@@ -10,7 +10,7 @@ import '@formatjs/intl-locale/polyfill-force.js';
 import '@formatjs/intl-getcanonicallocales/polyfill-force.js';
 
 // intl-enumerator
-import '@formatjs/intl-enumerator/polyfill-force.js';
+import '@formatjs/intl-enumerator';
 
 // intl-pluralrules
 import '@formatjs/intl-pluralrules/polyfill-force.js';

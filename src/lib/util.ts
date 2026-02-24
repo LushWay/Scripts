@@ -5,23 +5,23 @@ import { inspect, stringify } from './utils/inspect'
 
 export { inspect, stringify, stringifyError }
 
-function onError(e: unknown, subtype: string, originalStack?: string) {
-  const prefix = `§6${subtype}: `
-  const add = originalStack ? '\n\n' + stringifyError.stack.get(0, originalStack) : ''
-  console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }) + add)
-}
-
 export const util = {
   /** Runs the given callback safly. If it throws any error it will be handled */
   catch(this: void, fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
     try {
       const promise = fn()
       if (promise instanceof Promise) {
-        promise.catch((e: unknown) => onError(e, subtype, originalStack))
+        promise.catch((e: unknown) => util.onError(e, subtype, originalStack))
       }
     } catch (e: unknown) {
-      onError(e, subtype, originalStack)
+      util.onError(e, subtype, originalStack)
     }
+  },
+
+  onError(e: unknown, subtype: string, originalStack?: string) {
+    const prefix = `§6${subtype}: `
+    const add = originalStack ? '\n\n' + stringifyError.stack.get(0, originalStack) : ''
+    console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }) + add)
   },
 
   benchmark: Object.assign(

@@ -65,13 +65,15 @@ export class LoadRef<T> {
 export type MaybeRef<T> = T | LoadRef<T>
 
 export function onLoad<T>(loader: () => T) {
-  if (LoadRef.loadStarted)
+  if (LoadRef.loadStarted) {
+    // console.log('LOADING', new Error())
     return {
       value: loader(),
       onLoad(v: (v: T) => void) {
         v(this.value)
       },
     }
+  }
 
   return new LoadRef(loader)
 }

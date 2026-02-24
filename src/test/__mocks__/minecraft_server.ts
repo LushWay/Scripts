@@ -477,8 +477,7 @@ export enum CustomCommandParamType {
   ItemType = 'ItemType',
   /**
    * @remarks
-   *   Location parameter provides a {@link
-   * @minecraft/server.Location}.
+   *   Location parameter provides a {@link @minecraft/server.Location}.
    */
   Location = 'Location',
   /**
@@ -854,6 +853,8 @@ export class Dimension {
     min: -64,
     max: 365,
   }
+
+  runCommand(cmd: string) {}
 
   constructor(public id: MinecraftDimensionTypes) {}
 }

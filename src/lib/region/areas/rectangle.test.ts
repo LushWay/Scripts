@@ -1,5 +1,6 @@
 import { consoleLang } from 'lib/assets/lang'
 import { textTable } from 'lib/i18n/text'
+import { util } from 'lib/util'
 import { createPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { RectangleArea } from './rectangle'
@@ -82,6 +83,7 @@ describe('rectangle', () => {
   it('should call forEachVector', async () => {
     const rect = new RectangleArea({ from: { x: 0, y: 0, z: 0 }, to: { x: 2, y: 3, z: 2 } }, 'overworld')
     const v = vi.fn()
+    vi.spyOn(util, 'onError').mockImplementation(() => {})
 
     try {
       await rect.forEachVector(() => {

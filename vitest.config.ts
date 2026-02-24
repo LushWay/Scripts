@@ -1,9 +1,9 @@
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
-import { generateDefine } from './tools/define'
+import { generateDefine } from '../tools/define'
 
 export default defineConfig({
-  define: generateDefine({ dev: true, test: true, world: false, port: '1000', vitest: true }),
+  define: generateDefine({ dev: true, test: true }),
   test: {
     globals: true,
 
