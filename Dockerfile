@@ -4,6 +4,7 @@ WORKDIR /build
 
 COPY scripts scripts
 COPY functions functions
+COPY server/bds/development_behavior_packs/core/items/* items/
 COPY items items
 COPY entities entities
 COPY structures structures
