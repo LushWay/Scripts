@@ -12,3 +12,5 @@ import './config/core'
 import './config/chat'
 import './config/join'
 import './config/region'
+
+console.log('Hello from autoupdated script!')
