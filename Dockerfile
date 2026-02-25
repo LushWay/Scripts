@@ -1,4 +1,4 @@
-FROM scratch
+FROM busybox
 
 WORKDIR /build
 
@@ -9,4 +9,4 @@ COPY entities entities
 COPY structures structures
 COPY manifest.json manifest.json
 
-CMD cp -r /build/* /target/ && cp -r /build/* /target2/
+CMD cp -r /build/* /target/
