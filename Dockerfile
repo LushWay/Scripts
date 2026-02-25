@@ -9,4 +9,4 @@ COPY entities entities
 COPY structures structures
 COPY manifest.json manifest.json
 
-CMD cp -r /build/* /target/
+CMD [ "cp", "-r", "/build/*", "/target/" ]

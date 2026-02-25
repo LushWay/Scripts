@@ -80,7 +80,7 @@ export class MineareaRegion extends RegionWithStructure {
           // Prevent from region save conflicts
           if (!restoredRegions.includes(region) && region !== this) {
             restoredRegions.push(region)
-            await region.structure.place()
+            if (region.structure.exists) await region.structure.place()
           }
         }
 
@@ -237,9 +237,14 @@ export function onFullRegionTypeRestore<T extends typeof Region>(
 }
 
 onFullRegionTypeRestore(MineareaRegion, region => {
-  logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
-  region.deleteSchedules()
-  region.structure.place()
+  if (region.structure.exists) {
+    logger.info`All blocks in region ${region.name} kind ${region.creator.kind} are restored.`
+
+    region.deleteSchedules()
+    region.structure.place()
+  } else {
+    logger.warn`All blocks in region ${region.name} kind ${region.creator.kind} are restored. BUT NO STRUCTURE EXISTS`
+  }
 })
 
 function notifyBuilder(player: Player, region: MineareaRegion) {
