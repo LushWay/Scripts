@@ -10,25 +10,25 @@ import '@formatjs/intl-locale/polyfill-force.js';
 import '@formatjs/intl-getcanonicallocales/polyfill-force.js';
 
 // intl-enumerator
-import '@formatjs/intl-enumerator';
+import '@formatjs/intl-enumerator/polyfill-force.js';
 
 // intl-pluralrules
 import '@formatjs/intl-pluralrules/polyfill-force.js';
 
-import '@formatjs/intl-pluralrules/locale-data/en';
-import '@formatjs/intl-pluralrules/locale-data/ru';
+import '@formatjs/intl-pluralrules/locale-data/en.js';
+import '@formatjs/intl-pluralrules/locale-data/ru.js';
 
 // intl-listformat
 import '@formatjs/intl-listformat/polyfill-force.js';
 
-import '@formatjs/intl-listformat/locale-data/en';
-import '@formatjs/intl-listformat/locale-data/ru';
+import '@formatjs/intl-listformat/locale-data/en.js';
+import '@formatjs/intl-listformat/locale-data/ru.js';
 
 // intl-numberformat
 import '@formatjs/intl-numberformat/polyfill-force.js';
 
-import '@formatjs/intl-numberformat/locale-data/en';
-import '@formatjs/intl-numberformat/locale-data/ru';
+import '@formatjs/intl-numberformat/locale-data/en.js';
+import '@formatjs/intl-numberformat/locale-data/ru.js';
 
 // intl-durationformat
 import '@formatjs/intl-durationformat/polyfill-force.js';
