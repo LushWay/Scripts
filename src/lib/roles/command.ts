@@ -1,4 +1,4 @@
-import { Player, world } from '@minecraft/server'
+import { Player, PlayerDatabase, world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
 import { FormCallback } from 'lib/form/utils'
@@ -45,7 +45,7 @@ function roleMenu(player: Player) {
 
   const players = world.getAllPlayers()
 
-  new ArrayForm('Roles $page/$max', Player.database.entries().reverse())
+  new ArrayForm('Roles $page/$max', [...Player.database.entriesImmutable()].reverse())
     .description(i18n`§3Ваша роль: ${ROLES[prole]}`)
     .filters({
       sort: {
@@ -66,7 +66,12 @@ function roleMenu(player: Player) {
       } else return keys
     })
     .addCustomButtonBeforeArray(function (this, form, _, back) {
-      const button = this.button?.([player.id, player.database], { sort: 'role' }, form, back)
+      const button = this.button?.(
+        [player.id, player.database as Immutable<PlayerDatabase>],
+        { sort: 'role' },
+        form,
+        back,
+      )
 
       if (button)
         form.button(i18n`§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)`.to(player.lang), button[1])

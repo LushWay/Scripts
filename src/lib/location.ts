@@ -169,7 +169,7 @@ export const locationWithRadius = LocationWithRadius.creator<Vector3 & { radius:
 
 onLoad(() => {
   system.delay(() => {
-    for (const [k, d] of Settings.worldDatabase.entries()) {
+    for (const [k, d] of Settings.worldDatabase.entriesImmutable()) {
       if (!Object.keys(d).length) {
         Settings.worldDatabase.delete(k)
       }
