@@ -52,6 +52,10 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     return this.prefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
   }
 
+  static isServer(player: Player) {
+    return player.id === 'server'
+  }
+
   static chatSendListener(event: ChatSendAfterEvent) {
     // Hook
   }

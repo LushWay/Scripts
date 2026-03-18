@@ -11,9 +11,7 @@ interface CooldownController {
 // After compilation the initialization of this variable is placed lower then the hoisted call of the function below for some reason
 let cds: { name: string; cd: CooldownController }[] | undefined
 
-/**
- * Use cooldown controller when the cooldown IS NOT AN INSTANCE OF COOLDOWN, e.g. its some custom data structure
- */
+/** Use cooldown controller when the cooldown IS NOT AN INSTANCE OF COOLDOWN, e.g. its some custom data structure */
 export function registerResettableCooldown(name: string, cd: CooldownController | Cooldown) {
   cds ??= []
 
@@ -37,7 +35,7 @@ export function registerResettableCooldown(name: string, cd: CooldownController 
   }
 }
 
-const cdsform = form(f => {
+export const cooldownResetForm = form(f => {
   f.title('Кулдауны')
   for (const cd of cds ?? []) {
     f.button(cdform(cd))
@@ -58,6 +56,6 @@ const cdform = form.params<{ cd: CooldownController; name: string }>((f, { param
 })
 
 new Command('cooldownreset')
-  .setPermissions('techAdmin')
+  .setPermissions('moderator')
   .setDescription('Сбрасывает разные кулдауны')
-  .executes(cdsform.command)
+  .executes(cooldownResetForm.command)
