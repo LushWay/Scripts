@@ -1,4 +1,4 @@
-import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
+import { EquipmentSlot, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 
@@ -390,3 +390,9 @@ class Learning {
 }
 
 export const learningQuest = new Learning()
+
+onLoad(() => {
+  for (const player of world.getAllPlayers()) {
+    console.log(player.clientSystemInfo.maxRenderDistance)
+  }
+})
