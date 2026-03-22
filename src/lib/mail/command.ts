@@ -1,4 +1,4 @@
-import { GraphicsMode, Player, world } from '@minecraft/server'
+import { Player, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { ArrayForm } from 'lib/form/array'
 import { ask } from 'lib/form/message'
