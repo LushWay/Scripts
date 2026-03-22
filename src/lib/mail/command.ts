@@ -1,11 +1,11 @@
 import { Player, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { ask } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
+import { form } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
-import { i18n } from 'lib/i18n/text'
+import { i18n, textTable } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { is } from 'lib/roles'
@@ -20,11 +20,6 @@ const command = new Command('mail')
 const mailGroup = [i18n`Почта\n§7Прочтение сообщения, инфо при входе`, 'mail'] as const
 
 const getSettings = Settings.player(...mailGroup, {
-  mailReadOnOpen: {
-    name: i18n`Читать письмо при открытии`,
-    description: i18n`Помечать ли письмо прочитанным при открытии`,
-    value: true,
-  },
   mailClaimOnDelete: {
     name: i18n`Собирать награды при удалении`,
     description: i18n`Собирать ли награды при удалении письма`,
@@ -108,14 +103,8 @@ export function mailMenu(player: Player, back?: VoidFunction) {
       }
     })
     .button(({ letter, index }) => {
-      const name = `${letter.read ? '§7' : '§f'}${letter.title.replace(/§./g, '')}${letter.read ? '\n§8' : '§c*\n§7'}${letter.content.replace(/§./g, '')}`
-      return [
-        name,
-        () => {
-          letterDetailsMenu({ letter, index }, player)
-          if (getSettings(player).mailReadOnOpen) Mail.readMessage(player.id, index)
-        },
-      ]
+      const name = `${letterOneLineName(letter)}${letter.read ? '\n§8' : '\n§7'}${letter.content.replace(/§./g, '')}`
+      return [name, letterDetailsMenu({ letter, index, letters }).show]
     })
     .sort((keys, filters) => {
       if (filters.unread) keys = keys.filter(letter => !letter.letter.read)
@@ -132,66 +121,64 @@ export function mailMenu(player: Player, back?: VoidFunction) {
     .show(player)
 }
 
-function letterDetailsMenu(
-  { letter, index }: ReturnType<(typeof Mail)['getLetters']>[number],
-  player: Player,
-  back = () => mailMenu(player),
-  message = '',
-) {
-  const settings = getSettings(player)
-  // TODO Fix collors
-  // TODO Rewrite to use new form
-  const form = new ActionForm(
-    letter.title,
-    i18n`${message}${letter.content}\n\n§l§fНаграды:§r\n${Rewards.restore(letter.rewards).toString(player)}`.to(
-      player.lang,
-    ),
-  ).addButtonBack(back, player.lang)
+function letterOneLineName(letter: Mail.Letter.Local) {
+  return `${letter.read ? '§7' : '§f'}${letter.title.replace(/§./g, '')}${letter.read ? '' : '§c*'}`
+}
+
+const letterDetailsMenu = form.params<{
+  index: number
+  letter: Mail.Letter.Local
+  letters: { letter: Mail.Letter.Local; index: number }[]
+  message?: Text
+}>((f, { player, back, params: { index, letter, letters, message } }) => {
+  f.title(letterOneLineName(letter))
+  f.body(
+    i18n`${message}${letter.content}\n\n${textTable([[i18n`Награды`, Rewards.restore(letter.rewards).toString(player)]])}`,
+  )
+  const withMessage = (message: Text) => letterDetailsMenu({ index, letter, letters, message }).show(player, back)
 
   if (!letter.rewardsClaimed && letter.rewards.length)
     if (player.database.inv !== 'anarchy') {
-      form.button(i18n.disabled`Забрать награду`.to(player.lang), () =>
-        letterDetailsMenu(
-          { letter, index },
-          player,
-          back,
-          i18n.error`Вы не можете забрать награды не находясь на анархии`.to(player.lang),
-        ),
+      f.button(i18n.disabled`Забрать награду`, () =>
+        withMessage(i18n.error`Вы не можете забрать награды не находясь на анархии`),
       )
     } else {
-      form.button(i18n`Забрать награду`.to(player.lang), () => {
+      f.button(i18n`Забрать награду`, () => {
         Mail.claimRewards(player, index)
-        letterDetailsMenu(
-          { letter, index },
-          player,
-          back,
-          message + i18n.success`Награда успешно забрана!\n\n`.to(player.lang),
-        )
+        withMessage(i18n.join`${message}${i18n.success`Награда успешно забрана!\n\n`}`)
       })
     }
 
-  if (!letter.read && !settings.mailReadOnOpen)
-    form.button(i18n`Пометить как прочитанное`.to(player.lang), () => {
-      Mail.readMessage(player.id, index)
-      back()
-    })
+  const next = letters[index + 1]
+  if (next) {
+    f.button(i18n.nocolor`Следующее письмо\n${letterOneLineName(next.letter)}`, BUTTON['>'], () =>
+      letterDetailsMenu({ ...next, letters }).show(player, back),
+    )
+  }
 
-  let deleteDescription = i18n.error`Удалить письмо?`.to(player.lang)
+  const prev = letters[index - 1]
+  if (prev) {
+    f.button(i18n.nocolor`Предыдущее письмо\n${letterOneLineName(prev.letter)}`, BUTTON['<'], () =>
+      letterDetailsMenu({ ...prev, letters }).show(player, back),
+    )
+  }
+
+  let deleteDescription = i18n.error`Удалить письмо?`
   if (!letter.rewardsClaimed) {
     if (getSettings(player).mailClaimOnDelete) {
-      deleteDescription += i18n` Все награды будут собраны автоматически`.to(player.lang)
+      deleteDescription = i18n`${deleteDescription} Все награды будут собраны автоматически`
     } else {
-      deleteDescription += i18n` Вы потеряете все награды, прикрепленные к письму!`.to(player.lang)
+      deleteDescription = i18n.error`${deleteDescription} Вы потеряете все награды, прикрепленные к письму!`
     }
   }
 
-  form.button(i18n.error`Удалить письмо`.to(player.lang), null, () => {
+  f.button(i18n.error`Удалить письмо`, null, () => {
     ask(player, deleteDescription, i18n`Удалить`, () => {
       if (getSettings(player).mailClaimOnDelete) Mail.claimRewards(player, index)
       Mail.deleteMessage(player, index)
-      back()
+      back?.(player)
     })
   })
 
-  form.show(player)
-}
+  Mail.readMessage(player.id, index)
+})

@@ -7,30 +7,34 @@ import { Message } from '../i18n/message'
 import { i18n, noI18n } from '../i18n/text'
 import './command'
 
-/** A global letter is a letter sent to multiple players */
-interface GlobalLetter {
-  title: string
-  content: string
-  rewards: import('lib/utils/rewards').Rewards.DatabaseEntry[]
+export namespace Mail {
+  export namespace Letter {
+    export interface Metadata {
+      read: boolean
+      rewardsClaimed: boolean
+    }
+
+    /** "pointer" to a global letter */
+    export type Link = Metadata & { readonly id: string }
+
+    /** A global letter is a letter sent to multiple players */
+    export interface Global {
+      readonly title: string
+      readonly content: string
+      readonly rewards: import('lib/utils/rewards').Rewards.DatabaseEntry[]
+    }
+
+    /** A local letter is a letter sent to a specific player */
+    export type Local = Global & Metadata
+  }
 }
-
-interface LocalLetterMetadata {
-  read: boolean
-  rewardsClaimed: boolean
-}
-
-/** "pointer" to a global letter */
-type LetterLink = LocalLetterMetadata & { id: string }
-
-/** A local letter is a letter sent to a specific player */
-type LocalLetter = GlobalLetter & LocalLetterMetadata
 
 export class Mail {
-  static dbPlayers = table<(LocalLetter | LetterLink)[]>('mailPlayers', () => [])
+  static dbPlayers = table<(Mail.Letter.Local | Mail.Letter.Link)[]>('mailPlayers', () => [])
 
-  static dbGlobal = table<GlobalLetter>('mailGlobal')
+  static dbGlobal = table<Mail.Letter.Global>('mailGlobal')
 
-  static globalNotFound: GlobalLetter = { title: noI18n`Not found`, content: noI18n`404 Error`, rewards: [] }
+  static globalNotFound: Mail.Letter.Global = { title: noI18n`Not found`, content: noI18n`404 Error`, rewards: [] }
 
   /**
    * Sends the mail for the player
@@ -63,12 +67,17 @@ export class Mail {
   /**
    * Sends a mail to multiple players
    *
-   * @param {string[]} playerIds The recievers
-   * @param {string} title The letter title
-   * @param {string} content The letter content
-   * @param {Rewards} rewards The attached rewards
+   * @param playerIds The recievers
+   * @param title The letter title
+   * @param content The letter content
+   * @param rewards The attached rewards
    */
-  static sendMultiple(playerIds: readonly string[], title: Message, content: Message, rewards = new Rewards()) {
+  static sendMultiple(
+    playerIds: readonly string[],
+    title: Message,
+    content: Message,
+    rewards: Rewards = new Rewards(),
+  ) {
     let id = new Date().toISOString()
 
     if (this.dbGlobal.has(id)) {
@@ -93,8 +102,8 @@ export class Mail {
   /**
    * This function returns the unread messages count for a player
    *
-   * @param {string} playerId
-   * @returns {number} Unread messages count
+   * @param playerId
+   * @returns Unread messages count
    */
   static getUnreadMessagesCount(playerId: string): number {
     return this.dbPlayers.get(playerId).filter(letter => !letter.read).length
@@ -105,22 +114,22 @@ export class Mail {
    *
    * @param letter - Letter pointer or the local letter
    */
-  static toLocalLetter(letter: LetterLink | LocalLetter | undefined) {
+  static toLocalLetter(letter: Mail.Letter.Link | Mail.Letter.Local | undefined) {
     if (!letter) return
     if ('id' in letter) {
       const global = Mail.dbGlobal.get(letter.id)
       if (typeof global === 'undefined') return
 
       // We cannot use spread syntax here because it will create new
-      // object, so canges will not be saved to the database
-      return Object.setPrototypeOf(global, letter) as LocalLetter
+      // object, so changes will not be saved to the database
+      return Object.setPrototypeOf(letter, global) as Mail.Letter.Local
     } else return letter
   }
 
   /**
    * Returns the letters array for a player (with indexes)
    *
-   * @param {string} playerId The player ID
+   * @param playerId The player ID
    */
   static getLetters(playerId: string) {
     const letters = []
@@ -136,8 +145,8 @@ export class Mail {
   /**
    * Claims the rewards attached to a letter
    *
-   * @param {Player} player The player to give out the rewards to
-   * @param {number} index The index of the message in the player's mailbox
+   * @param player The player to give out the rewards to
+   * @param index The index of the message in the player's mailbox
    */
   static claimRewards(player: Player, index: number) {
     const letter = this.toLocalLetter(this.dbPlayers.get(player.id)[index])
