@@ -135,6 +135,48 @@ export function wrap(string: string, maxLength: number) {
   return lines
 }
 
+/**
+ * Wraps the line
+ *
+ * @param string
+ * @param maxLength
+ */
+export function wordWrap(string: string, maxLength: number) {
+  /** @type {string[]} */
+  const lines: string[] = []
+  const rawlines = string.split('')
+
+  for (const char of rawlines) {
+    if (!char) continue
+
+    // Empty lines, add first char
+    if (!lines.length) {
+      lines.push(char)
+      continue
+    }
+
+    // Last element index
+    const i = lines.length - 1
+    const line = lines[i] ?? ''
+    const lastLineChar = line[line.length - 1]
+
+    if (lastLineChar === '§' || char === '§') {
+      // Ignore limit for invisible chars
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      lines[i] += char
+    } else if ((char + line).replace(/§./g, '').length > maxLength && !char.trim()) {
+      // Limit exceeded, newline
+      lines.push('')
+    } else {
+      // No limit, add char to the line
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      lines[i] += char
+    }
+  }
+
+  return lines
+}
+
 export function wrapLore(lore: string) {
   let color = '§7'
   return wrap(lore, 30).map(e => {

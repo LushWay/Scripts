@@ -1,4 +1,4 @@
-import { EquipmentSlot, ItemStack, system } from '@minecraft/server'
+import { EquipmentSlot, ItemStack, system, world } from '@minecraft/server'
 
 import { MinecraftBlockTypes as b, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 
@@ -14,7 +14,7 @@ import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { location } from 'lib/location'
-import { actionGuard, ActionGuardOrder } from 'lib/region'
+import { actionGuard, ActionGuardOrder, Region } from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { enterNewbieMode } from 'lib/rpg/newbie'
@@ -278,15 +278,27 @@ class Learning {
 
   blockedOre = new WeakPlayerMap<string[]>()
 
+  regions: Region[] = []
+
   constructor() {
     RegionEvents.onLoad.subscribe(() => {
       this.learningLocation.onLoad.subscribe(location => {
-        for (const region of MineareaRegion.getManyAt(location.toPoint())) {
+        for (const region of MineareaRegion.getNear(location.toPoint(), 25)) {
           region.newbie = true
           region.permissions.pvp = false
+          this.regions.push(region)
         }
       })
     })
+
+    system.runInterval(() => {
+      if (!this.learningLocation.valid) return
+      world[this.learningLocation.dimensionType]
+        .getEntities({ location: this.learningLocation, maxDistance: 25 })
+        .forEach(e => {
+          if (!e.nameTag) e.remove()
+        })
+    }, 'clear learning monsters')
 
     actionGuard((player, region, ctx) => {
       if (ctx.type !== 'break') return

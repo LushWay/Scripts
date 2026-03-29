@@ -16,6 +16,11 @@ export default defineConfig({
       include: ['src/lib', 'src/modules'],
       exclude: ['src/lib/assets', 'src/lib/bds', 'src/test', '**/*.test.ts', '**/*.spec.ts'],
     },
+    server: {
+      deps: {
+        inline: [/@formatjs/],
+      },
+    },
     setupFiles: ['src/test/setup.ts'],
     globalSetup: ['src/test/global.ts'],
     alias: {
