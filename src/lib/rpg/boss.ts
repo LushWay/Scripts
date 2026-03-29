@@ -16,7 +16,7 @@ import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
-import { getBlockStatus } from 'lib/utils/game'
+import { getBlockStatus, onLoad } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
@@ -127,28 +127,30 @@ export class Boss {
       this.options.allowedEntities.push(options.typeId, MinecraftEntityTypes.Player)
 
     this.location = location(options.place)
-    this.location.onLoad.subscribe(center => {
-      const areadb = Boss.arenaDb.get(this.options.place.id)
+    Boss.arenaDb.onLoad(() => {
+      this.location.onLoad.subscribe(center => {
+        const areadb = Boss.arenaDb.get(this.options.place.id)
 
-      this.check()
-      const area =
-        (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??
-        new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
+        this.check()
+        const area =
+          (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??
+          new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
 
-      this.region = BossArenaRegion.create(area, {
-        boss: this,
-        bossName: this.options.place.name,
-        permissions: { allowedEntities: this.options.allowedEntities },
+        this.region = BossArenaRegion.create(area, {
+          boss: this,
+          bossName: this.options.place.name,
+          permissions: { allowedEntities: this.options.allowedEntities },
+        })
+
+        if (areadb?.ldb) this.region.ldb = areadb.ldb
+
+        this.region.onSave.subscribe(() => {
+          if (this.region) {
+            Boss.arenaDb.set(this.options.place.id, { area: this.region.area.toJSON(), ldb: this.region.ldb })
+          }
+        })
+        EventLoaderWithArg.load(this.onRegionCreate, this.region)
       })
-
-      if (areadb?.ldb) this.region.ldb = areadb.ldb
-
-      this.region.onSave.subscribe(() => {
-        if (this.region) {
-          Boss.arenaDb.set(this.options.place.id, { area: this.region.area.toJSON(), ldb: this.region.ldb })
-        }
-      })
-      EventLoaderWithArg.load(this.onRegionCreate, this.region)
     })
 
     Boss.all.push(this)

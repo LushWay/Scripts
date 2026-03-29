@@ -81,7 +81,7 @@ export const inClanMenu = form.params<{ clan: Clan }>((f, formContext) => {
         clan.shortname,
       ),
     )
-    f.ask(i18n.error`Удалить клан`, i18n.error`Удалить`, () => {
+    f.ask(i18n.error`Удалить клан`, i18n.error`Удалить клан без возможности восстановления?`, () => {
       Mail.sendMultiple(
         clan.membersIds,
         i18n.nocolor`Клан '${clan.name}' распущен`,
@@ -90,11 +90,15 @@ export const inClanMenu = form.params<{ clan: Clan }>((f, formContext) => {
       clan.delete()
     })
   } else {
-    f.ask(i18n.error`Покинуть клан`, i18n.error`Покинуть`, () => {
-      clan.remove(player.id)
-      Mail.sendMultiple(clan.owners, i18n.nocolor`Игрок ${player.name} покинул ваш клан`, i18n`Хз почему`)
-      player.success(i18n`Клан '${clan.name}' покинут успешно`)
-    })
+    f.ask(
+      i18n.error`Покинуть клан`,
+      i18n.error`Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку.`,
+      () => {
+        clan.remove(player.id)
+        Mail.sendMultiple(clan.owners, i18n.nocolor`Игрок ${player.name} покинул ваш клан`, i18n`Хз почему`)
+        player.success(i18n`Клан '${clan.name}' покинут успешно`)
+      },
+    )
   }
 
   f.button(i18n`Другие кланы\n§7Посмотреть`, () => {
@@ -211,13 +215,17 @@ const clanMember = form.params<{ clan: Clan; member: ClanMember; memberName: Tex
     if (isSelf) {
       if (isOwner) {
         const otherOwners = clan.owners.length > 1
-        f.ask((otherOwners ? i18n.error : i18n.disabled)`Отказаться от владения`, i18n`Да`, () => {
-          if (!otherOwners)
-            return player.fail(
-              i18n.error`Вы не можете отказаться от владения клана являясь единственным его владельцем`,
-            )
-          clan.setMemberRole(player.id, ClanRole.Member)
-        })
+        f.ask(
+          (otherOwners ? i18n.error : i18n.disabled)`Отказаться от владения`,
+          i18n`Вы уверены что хотите сбросить свою роль в клане до участника?`,
+          () => {
+            if (!otherOwners)
+              return player.fail(
+                i18n.error`Вы не можете отказаться от владения клана являясь единственным его владельцем`,
+              )
+            clan.setMemberRole(player.id, ClanRole.Member)
+          },
+        )
 
         f.button((otherOwners ? i18n.error : i18n.disabled)`Покинуть клан`, () => {
           if (!otherOwners)

@@ -121,12 +121,12 @@ onLoad(() => {
 
       world.beforeEvents.itemUse.subscribe(event => {
         if (event.source.id !== player.id) return
-        if (!cooldown.isExpired(player)) return
 
         for (const [, control, onUse] of Object.values(controls)) {
           if (control.is(event.itemStack)) {
             event.cancel = true
-            system.delay(() => onUse(player, cutscene, temporary))
+            if (!cooldown.isExpired(player)) return
+            return system.delay(() => onUse(player, cutscene, temporary))
           }
         }
       })

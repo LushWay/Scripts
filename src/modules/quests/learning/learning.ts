@@ -9,6 +9,7 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
+import { Cutscene } from 'lib/cutscene'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
@@ -42,13 +43,13 @@ class Learning {
       if (!this.learningLocation.valid || !this.craftingTableLocation.valid)
         return q.failed(noI18n`Learning is not setup properly`)
 
-      const maxReturnToAreaSteps = 4
+      const maxReturnToAreaSteps = 5
       const returnToMineArea = (step: number) => () => {
-        if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) return
-
-        // Fix to ones that joined and been AFK, newbie expired and they can't leave quest because
+        // Fix to those who had joined and been AFK, newbie expired and they can't leave quest because
         // they can only mine in newbie mode
         enterNewbieMode(player, false)
+
+        if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) return
 
         const regions = MineareaRegion.getManyAt(player)
         if (!regions.length) {
@@ -140,17 +141,16 @@ class Learning {
 
           const airdrop = firstTime ? spawnAirdrop() : getAirdrop()
 
-          ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
-            const airdropEntity = airdrop.chest
-            if (!airdropEntity) return
-            if (event.target.id !== airdropEntity.id) return
+          // ctx.world.afterEvents.playerInteractWithEntity.subscribe(event => {
+          //   const airdropEntity = airdrop.chest
+          //   if (!airdropEntity) return
+          //   if (event.target.id !== airdropEntity.id) return
 
-            if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
-          })
+          //   if (player.id === event.player.id) ctx.system.delay(() => ctx.next())
+          // })
 
-          ctx.world.afterEvents.entityDie.subscribe(event => {
-            if (event.deadEntity.id !== airdrop.chest?.id) return
-            ctx.system.delay(() => ctx.next())
+          ctx.world.afterEvents.entityRemove.subscribe(event => {
+            if (event.removedEntityId === airdrop.chest?.id) ctx.system.delay(() => ctx.next())
           })
 
           let i = 0
@@ -174,13 +174,8 @@ class Learning {
       q.dynamic(i18n`Используй монеты в инвентаре`)
         .description(i18n`Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет`)
         .activate(ctx => {
-          let money = 0
-          if (ctx.player.container) {
-            for (const [, item] of ctx.player.container.entries())
-              if (item?.typeId === Items.Money) money += item.amount
-          }
-
-          if (!money) ctx.next()
+          const money = ctx.player.container?.find(new ItemStack(Items.Money))
+          if (typeof money !== 'number') return ctx.next()
 
           ctx.world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
             if (source.id !== ctx.player.id || itemStack.typeId !== Items.Money) return
@@ -217,13 +212,11 @@ class Learning {
         .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
         .target(crafting)
 
-      q.counter(
-        i =>
-          i === 0
-            ? i18n.header`Вновь вскопайте камень в шахте ${0}/${1}`
-            : i18n.header`Добыто железной руды: ${i - 1}/${3}`,
-        3 + 1,
-      )
+      q.cutscene(this.noOresCutscene, i18n.header`На поверхности руд нет`)
+
+      q.cutscene(this.minerCutscene, i18n.header`Попробуйте копнуть поглубже`)
+
+      q.counter(i => i18n.header`Добыто железной руды: ${i}/${3}`, 3)
         .description(i18n`Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!`)
         .activate(ctx => {
           // Force iron ore generation
@@ -236,10 +229,10 @@ class Learning {
               ;(ctx.db as { iron?: number }).iron ??= 0
 
               if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
-                if (ctx.db.iron >= ctx.end - 1) return true
+                if (ctx.db.iron >= ctx.end) return true
 
                 for (const block of possibleBlocks) {
-                  if (ctx.db.iron >= ctx.end - 1) break
+                  if (ctx.db.iron >= ctx.end) break
                   if (place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
                     ctx.db.iron++
                   }
@@ -251,21 +244,15 @@ class Learning {
           )
 
           // Check if it breaks
-          ctx.world.afterEvents.playerBreakBlock.subscribe(
-            ({
-              brokenBlockPermutation: {
-                type: { id },
-              },
-              player,
-            }) => {
-              if (player.id !== player.id) return
-              if (ctx.value === 0 ? id !== b.Stone : id !== b.IronOre && id !== MinecraftItemTypes.DeepslateIronOre)
-                return
+          ctx.world.afterEvents.playerBreakBlock.subscribe(({ brokenBlockPermutation, player }) => {
+            if (player.id !== player.id) return
 
-              player.playSound(Sounds.Success)
-              ctx.add(1)
-            },
-          )
+            const id = brokenBlockPermutation.type.id
+            if (id !== b.IronOre && id !== MinecraftItemTypes.DeepslateIronOre) return
+
+            player.playSound(Sounds.Success)
+            ctx.add(1)
+          })
         })
 
       q.dialogue(VillageOfMiners.guide, i18n`Шахтер зовет вас наверх, чтобы поговорить!`)
@@ -273,6 +260,10 @@ class Learning {
   )
 
   learningLocation = location(this.quest.group.place('tp').name(noI18n`Куда игроки будут тепаться при обучении`))
+
+  noOresCutscene = new Cutscene('learningNoOres', 'noOres', { restoreCameraTime: 0 })
+
+  minerCutscene = new Cutscene('learningMiner', 'miner')
 
   craftingTableLocation = location(this.quest.group.place('crafting table').name(noI18n`Верстак`))
 

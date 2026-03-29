@@ -110,4 +110,8 @@ export class RegionStructure {
       }
     }, yieldEach)
   }
+
+  toString() {
+    return this.id
+  }
 }

@@ -4,6 +4,7 @@ import { table } from 'lib/database/abstract'
 import { InventoryStore } from 'lib/database/inventory'
 import { scoreboardObjectiveNames } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'
+import { LoreForm } from 'lib/form/lore'
 import { ModalForm } from 'lib/form/modal'
 import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
@@ -100,7 +101,9 @@ function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
   exitFromAllQuests(player)
 
   Object.assign(player.database, point.db)
+  console.log(player.scores, point.scores)
   Object.assign(player.scores, point.scores)
+  console.log(player.scores, point.scores)
 
   if (isNewbie(player)) enterNewbieMode(player, false)
 
@@ -110,6 +113,8 @@ function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
     from: wipeInventoryDatabase.get(id, { remove: false }),
   })
   player.database.restorePoint = [player.id, id]
+  Quest.restoreFromDatabase(player)
+
   player.success(i18n`Restore point ${id} loaded.`)
 }
 
@@ -125,7 +130,7 @@ new Command('wipe')
 
       f.ask(
         i18n.error`Полный сброс`,
-        i18n`Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.`,
+        i18n`Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения`,
         () => wipe(player),
       )
 
@@ -192,18 +197,27 @@ function restorePointMenu(player: Player, [ownerId, id]: RestorePointRef, restor
     f.body(id)
 
     if (isOwner) {
-      f.ask(i18n`Перезаписать`, i18n`Перезаписать точку восстановления`, () => {
-        createRestorePoint(player, restorePoint.name, id)
-      })
+      f.ask(
+        i18n`Сохранить`,
+        i18n`Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено`,
+        () => {
+          createRestorePoint(player, restorePoint.name, id)
+        },
+      )
     }
 
-    f.ask(i18n`Загрузиться`, i18n`Загрузиться`, () => {
-      loadRestorePoint(player, [ownerId, id])
-    })
+    f.ask(
+      i18n`Загрузиться`,
+      i18n`Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено`,
+      () => {
+        loadRestorePoint(player, [ownerId, id])
+      },
+    )
     if (is(player.id, 'techAdmin')) f.button('Log to the console', () => console.log(JSON.stringify(restorePoint)))
-    f.ask(i18n.error`Удалить`, i18n`удалить точку`, () => {
-      Reflect.deleteProperty(db.get(player.id).restorePoints, id)
-    })
+    if (is(player.id, 'techAdmin') || ownerId === player.id)
+      f.ask(i18n.error`Удалить`, i18n`Вы уверены что хотите удалить точку восстановления?`, () => {
+        Reflect.deleteProperty(db.get(player.id).restorePoints, id)
+      })
   })
 }
 
@@ -211,6 +225,7 @@ function wipe(player: Player) {
   player.setGameMode(GameMode.Survival)
   updateBuilderStatus(player)
 
+  LoreForm.clearAll(player.id)
   exitFromAllQuests(player)
   delete player.database.quests
   delete player.database.achivs

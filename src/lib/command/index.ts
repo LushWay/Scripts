@@ -43,6 +43,8 @@ type ArgReturn<Callback, Type, Optional> = Command<
 
 type CommandCallback = (ctx: CommandContext, ...args: any[]) => void
 
+let slashMode = false
+
 export class Command<Callback extends CommandCallback = (ctx: CommandContext) => void> {
   static loaded = false
 
@@ -127,7 +129,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   }
 
   [stringifySymbol]() {
-    return `§f/${this.getFullName()}`
+    return `§f${slashMode ? '/' : Command.prefixes[0]}${this.getFullName()}`
   }
 
   private getFullName(name = ''): string {
@@ -467,6 +469,7 @@ declare global {
 globalThis.Command = Command
 
 function register(namespace: string) {
+  slashMode = true
   system.beforeEvents.startup.subscribe(load => {
     for (const command of Command.commands) {
       if (command.sys.depth !== 0) continue

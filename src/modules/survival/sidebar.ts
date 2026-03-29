@@ -78,13 +78,12 @@ const survivalSidebar = new Sidebar(
       const stats = `${scores} ${online}${settings.mode === 'sidebar' ? '\n \n' : ''}`
 
       return {
-        format:
-          settings.mode === 'sidebar'
-            ? `${region}\n${stats}\n$${names.quest}`
-            : [stats, undefined, `$${names.quest}`, undefined, region],
+        format: settings.mode === 'sidebar' ? `${region}\n${stats}` : [stats, undefined, undefined, undefined, region],
+
+        showActionBar: Quest.showActionBar,
 
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        maxWordCount: settings.sidebarMaxWordLength ?? 20,
+        maxWordCount: settings.sidebarMaxWordLength ?? 25,
       }
     },
   },
@@ -133,7 +132,6 @@ const survivalSidebar = new Sidebar(
         return () => online.toString()
       },
     },
-    [names.quest]: Quest.sidebar,
   },
 )
 

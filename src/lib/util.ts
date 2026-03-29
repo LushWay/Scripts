@@ -261,5 +261,11 @@ export function capitalize<T extends string>(str: T) {
 }
 
 export function pick<T extends object, K extends keyof T>(object: T, keys: K[]): Pick<T, K> {
-  return Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key as K))) as Pick<T, K>
+  return keys.reduce(
+    (result, key) => {
+      result[key] = object[key]
+      return result
+    },
+    {} as Pick<T, K>,
+  )
 }

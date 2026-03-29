@@ -47,7 +47,7 @@ class Location<T extends Vector3> {
         onChange: () => location.load(true),
       }
 
-      onLoad(() => location.load())
+      Settings.worldDatabase.onLoad(() => location.load())
       location.firstLoad = true
 
       // Set floored value on reload

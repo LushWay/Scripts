@@ -21,6 +21,10 @@ export class LoreForm extends QuestForm {
     return this.list.map(e => LoreForm.db.get(`${e.id} ${playerId}`))
   }
 
+  static clearAll(playerId: string) {
+    this.list.map(e => LoreForm.db.delete(`${e.id} ${playerId}`))
+  }
+
   constructor(
     protected id: string,
     form: NewFormCreator,

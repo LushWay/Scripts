@@ -46,6 +46,7 @@ export class Sidebar<E = any> {
         e: E,
       ) => {
         format: Format
+        showActionBar: (player: Player) => void
         maxWordCount: number
       }
       getExtra: (p: Player) => E
@@ -74,14 +75,17 @@ export class Sidebar<E = any> {
   }
 
   show(player: Player) {
+    const extra = this.getExtra(player)
+    const options = this.getOptions(player, extra)
+
+    options.showActionBar(player)
+
     if (Sidebar.forceHide.has(player)) {
       this.clearSidebar(player)
       this.clearTips(player)
       return
     }
 
-    const extra = this.getExtra(player)
-    const options = this.getOptions(player, extra)
     let content = options.format
 
     for (const [key, line] of Object.entries(this.content)) {

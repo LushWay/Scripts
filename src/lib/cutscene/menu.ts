@@ -56,7 +56,7 @@ const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, par
     .button(noI18n`Воспроизвести`, () => cutscene.play(player))
 
   if (created) {
-    f.ask(noI18n.error`Удалить`, noI18n.error`Удалить`, () => {
+    f.ask(noI18n.error`Удалить`, noI18n.error`Вы уверены, что хотите удалить катсцену?`, () => {
       Cutscene.all.delete(cutscene.id)
       cutscenes.delete(cutscene.id)
       player.success()

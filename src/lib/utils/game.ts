@@ -48,6 +48,8 @@ export function isLocationError(
  * @param animTime - Time of the animation
  */
 export function restorePlayerCamera(player: Player, animTime = 1) {
+  if (animTime === 0) return player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+
   const headLocation = player.getHeadLocation()
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
     location: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 0.5)),

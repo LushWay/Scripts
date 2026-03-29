@@ -34,6 +34,8 @@ export class LoadRef<T> {
 
   private stack: string
 
+  protected loaded = false
+
   constructor(loader: () => T) {
     this.stack = stringifyError.stack.get()
     LoadRef.loaders.push(() => {
@@ -48,6 +50,7 @@ export class LoadRef<T> {
             'LoadRefWaiterError',
             this.stack,
           )
+          this.loaded = true
         },
         'LoadRefError',
         this.stack,
@@ -58,6 +61,7 @@ export class LoadRef<T> {
   protected waiters: ((value: T) => void)[] = []
 
   onLoad = (waiter: (value: T) => void) => {
+    if (this.loaded) return waiter(this.value)
     this.waiters.push(waiter)
   }
 }

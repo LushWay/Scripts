@@ -27,7 +27,6 @@ patchPackage('@minecraft/server', {
 import fs from 'fs/promises'
 import path from 'path'
 
-import { pathInfo } from 'leafy-utils'
 import { createRequire } from 'module'
 
 const noticeFirstLine = '* This file was automatically patched by'
@@ -39,22 +38,20 @@ ${noticeFirstLine}
 * src/lib/extensions/
 */`
 
-export const { relative } = pathInfo(import.meta.url)
-const require = createRequire(import.meta.url)
-export const resolve = require.resolve
-
 export async function patchPackage(
   packageName: string,
   options: {
     replaces: { find: RegExp | string; replace: string; all?: boolean; throwError?: boolean }[]
   },
 ) {
-  const packageJsonPath = path.join(packageName, 'package.json')
+  const resolve = createRequire(import.meta.url).resolve
+  const packageJsonPath = packageName + '/package.json'
+
   let packagePath
   try {
     packagePath = resolve(packageJsonPath)
-  } catch {
-    console.log('Unable to resolve', packageJsonPath)
+  } catch (e) {
+    console.log('Unable to resolve', packageJsonPath, e)
     return
   }
 
