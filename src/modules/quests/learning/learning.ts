@@ -294,7 +294,7 @@ class Learning {
     system.runInterval(() => {
       if (!this.learningLocation.valid) return
       world[this.learningLocation.dimensionType]
-        .getEntities({ location: this.learningLocation, maxDistance: 25 })
+        .getEntities({ location: this.learningLocation, maxDistance: 25, families: ['monster'] })
         .forEach(e => {
           if (!e.nameTag) e.remove()
         })
