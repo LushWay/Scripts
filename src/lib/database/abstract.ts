@@ -10,10 +10,11 @@ export interface Table<Value, Key = string> {
   delete(key: Key): boolean
   size: number
   keys(): MapIterator<Key>
-  values(): Value[]
-  valuesImmutable(): MapIterator<Immutable<Value>>
+  values(): Immutable<Value>[]
+  valuesIterator(): MapIterator<Immutable<Value>>
   entries(): [Key, Value][]
   entriesImmutable(): MapIterator<[Key, Immutable<Value>]>
+  onLoad(waiter: (value: void) => void): void
 }
 
 export function table<Value, Key extends string = string>(name: string): Table<Value | undefined, Key>
@@ -72,10 +73,22 @@ export class MemoryTable<Value, Key extends string = string> extends ProxyDataba
       this.value = new Map(Object.entries(tableData)) as Map<Key, Value>
     }
   }
+
+  protected loaded = true
+
+  onLoad(waiter: (value: void) => void): void {
+    waiter()
+  }
 }
 
 if (__TEST__) {
-  class TestDatabase<Value, Key extends string> extends ProxyDatabase<Value, Key> {}
+  class TestDatabase<Value, Key extends string> extends ProxyDatabase<Value, Key> implements Table<Value, Key> {
+    protected loaded = true
+
+    onLoad(waiter: (value: void) => void): void {
+      waiter()
+    }
+  }
 
   configureDatabase({
     tables: TestDatabase.tables,

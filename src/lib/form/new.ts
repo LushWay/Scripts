@@ -114,17 +114,21 @@ class Form {
    *   // Will show message form with `§cВы уверены, что хотите удалить письмо?` and `§cУдалить`, `Отмена` buttons
    *   §r
    *
-   * @param text - Button text. Will be also used as ask body
-   * @param yesText - Yes button text, e.g. 'Да'
+   * @param buttonText - Button text. Will be also used as ask body
+   * @param explanation - Yes button text, e.g. 'Да'
    * @param yesAction - Function that will be called when yes button was pressed
    * @param noText - Function that will be called when no button was pressed
    * @param texture - Button texture
    */
   // TODO Fix
-  ask(text: Text, yesText: Text, yesAction: VoidFunction, noText: Text = i18n`Отмена`, texture: string | null = null) {
-    return this.button(text, texture, p =>
-      ask(p, i18n.error`Вы уверены, что хотите ${text}?`, yesText, yesAction, noText, this.show),
-    )
+  ask(
+    buttonText: Text,
+    explanation: Text,
+    yesAction: VoidFunction,
+    noText: Text = i18n`Отмена`,
+    texture: string | null = null,
+  ) {
+    return this.button(buttonText, texture, p => ask(p, explanation, buttonText, yesAction, noText, this.show))
   }
 
   show = async () => {

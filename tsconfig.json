@@ -47,6 +47,6 @@
     "outDir": "scripts",
     "baseUrl": "src/"
   },
-  "include": ["src", "tools/defines.d.ts"],
+  "include": ["src", "../tools/defines.d.ts"],
   "exclude": ["node_modules", "src/chestui", "vitest/dist/**", "scripts/**"] //  "src/test/**",
 }

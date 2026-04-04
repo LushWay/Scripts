@@ -1,5 +1,5 @@
 import * as mc from '@minecraft/server'
-import '../../tools/defines.d.ts'
+import '../../../tools/defines.d.ts'
 
 declare global {
   type VoidFunction = () => void
@@ -94,15 +94,6 @@ type Narrowable = string | number | bigint | boolean
 declare module '@minecraft/server' {
   interface PlayerDatabase {
     name?: string | undefined
-    readonly role: Role
-    prevRole?: Role
-    quests?: import('./quest/quest').Quest.DB
-    achivs?: import('./achievements/achievement').Achievement.DB
-    join?: {
-      position?: number[]
-      stage?: number
-    }
-    unlockedPortals?: string[]
   }
 }
 

@@ -6,6 +6,7 @@ import { QS, QSBuilder } from './step'
 import { QSBreakCounter, QSBreakCounterBuilder } from './steps/break-counter'
 import { QSButton, QSButtonBuilder } from './steps/button'
 import { QSCounter, QSCounterBuilder } from './steps/counter'
+import { QSCutscene } from './steps/cutscene'
 import { QSDialogue } from './steps/dialogue'
 import { QSDynamic, QSDynamicBuilder } from './steps/dynamic'
 import { QSItem, QSItemBuilder } from './steps/item'
@@ -30,13 +31,6 @@ export class PlayerQuest {
 
   breakCounter = this.wrapStep(QSBreakCounterBuilder, QSBreakCounter)
 
-  failed = (reason: Text, exit = false) => {
-    return this.dynamic(reason).activate(ctx => {
-      ctx.error(reason)
-      if (exit) this.quest.exit(this.player)
-    })
-  }
-
   reachArea = QSReachArea.bind(this)
 
   reachRegion = QSReachRegion.bind(this)
@@ -44,6 +38,16 @@ export class PlayerQuest {
   dialogue = QSDialogue.bind(this)
 
   button = this.wrapStep(QSButtonBuilder, QSButton)
+
+  cutscene = QSCutscene.bind(this)
+
+  failed = (reason: Text, exit = false) => {
+    console.error(reason)
+    return this.dynamic(reason).activate(ctx => {
+      ctx.error(reason)
+      if (exit) this.quest.exit(this.player)
+    })
+  }
 
   end = (action: (ctx: PlayerQuest) => void) => {
     this.onEnd = action.bind(this, this) as VoidFunction

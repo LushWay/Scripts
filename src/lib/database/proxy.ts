@@ -8,7 +8,7 @@ const PROXY_TARGET = Symbol('proxy_target')
 type DynamicObject = Record<string | number | symbol, unknown>
 type ProxiedDynamicObject = DynamicObject & { [IS_PROXIED]?: boolean }
 
-export class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
+export abstract class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
   static tables: Record<string, UnknownTable> = {}
 
   constructor(
@@ -17,6 +17,8 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   ) {
     ProxyDatabase.tables[id] = this as UnknownTable
   }
+
+  abstract onLoad(waiter: (value: void) => void): void
 
   get size(): number {
     return this.value.size
@@ -35,6 +37,7 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   }
 
   getImmutable(key: Key): Immutable<Value> {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const value = this.value.get(key)
     if (this.defaultValue && typeof value === 'undefined') {
       this.value.set(key, this.defaultValue(key))
@@ -45,37 +48,42 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   }
 
   delete(key: Key): boolean {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const deleted = this.value.delete(key)
     if (deleted) this.needSave()
     return deleted
   }
 
   set(key: Key, value: Value): void {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     this.value.set(key, value)
     this.needSave()
   }
 
   keys(): MapIterator<Key> {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return this.value.keys()
   }
 
-  values(): Value[] {
-    const values: Value[] = []
-    for (const value of this.value.values()) values.push(value)
-    return values
+  values() {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
+    return [...this.value.values()] as Immutable<Value>[]
   }
 
-  valuesImmutable() {
+  valuesIterator() {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return this.value.values() as MapIterator<Immutable<Value>>
   }
 
   entries(): [Key, Value][] {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const entries: [Key, Value][] = []
     for (const [key, value] of this.value.entries()) entries.push([key, this.wrap(value, '') as Value])
     return entries
   }
 
   entriesImmutable(): MapIterator<[Key, Immutable<Value>]> {
+    if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     return this.value.entries() as MapIterator<[Key, Immutable<Value>]>
   }
 
@@ -139,6 +147,8 @@ export class ProxyDatabase<Value = unknown, Key extends string = string> impleme
   }
 
   protected value = new Map<Key, Value>()
+
+  protected loaded = false
 
   private proxyCache = new WeakMap<DynamicObject, DynamicObject>()
 

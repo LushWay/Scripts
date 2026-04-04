@@ -2,9 +2,10 @@ import { Player, TeleportOptions, Vector3, system, world } from '@minecraft/serv
 import { isEmpty } from 'lib/util'
 import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
-import { i18n, noI18n } from './i18n/text'
+import { noI18n } from './i18n/text'
 import { Place } from './rpg/place'
 import { Settings } from './settings'
+import { onLoad } from './utils/load-ref'
 import { VectorInDimension } from './utils/point'
 
 interface LocationCommon<T extends Vector3> {
@@ -46,7 +47,7 @@ class Location<T extends Vector3> {
         onChange: () => location.load(true),
       }
 
-      location.load()
+      Settings.worldDatabase.onLoad(() => location.load())
       location.firstLoad = true
 
       // Set floored value on reload
@@ -166,42 +167,48 @@ export const locationWithRotation = LocationWithRotation.creator<
 /** Creates reference to a location that can be changed via settings command */
 export const locationWithRadius = LocationWithRadius.creator<Vector3 & { radius: number }, typeof LocationWithRadius>()
 
-system.delay(() => {
-  for (const [k, d] of Settings.worldDatabase.entries()) {
-    if (!Object.keys(d).length) {
-      Settings.worldDatabase.delete(k)
+onLoad(() => {
+  system.delay(() => {
+    for (const [k, d] of Settings.worldDatabase.entriesImmutable()) {
+      if (!Object.keys(d).length) {
+        Settings.worldDatabase.delete(k)
+      }
     }
-  }
+  })
 })
 
 /** Migration helper */
 export function migrateLocationName(oldGroup: string, oldName: string, newGroup: string, newName: string) {
-  const group = Settings.worldDatabase.get(oldGroup)
-  const location = group[oldName]
-  if (typeof location !== 'undefined') {
-    console.debug(i18n`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
+  onLoad(() => {
+    const group = Settings.worldDatabase.get(oldGroup)
+    const location = group[oldName]
+    if (typeof location !== 'undefined') {
+      console.debug(`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
 
-    Settings.worldDatabase.get(newGroup)[newName] = location
+      Settings.worldDatabase.get(newGroup)[newName] = location
 
-    Reflect.deleteProperty(Settings.worldDatabase.get(oldGroup), oldName)
-  } else if (!Settings.worldDatabase.get(newGroup)[newName]) {
-    console.warn(
-      i18n.error`No location found at ${oldGroup}:${oldName}. Group: ${isEmpty(group) ? [...Settings.worldDatabase.keys()] : Object.keys(group)}`,
-    )
-  }
+      Reflect.deleteProperty(Settings.worldDatabase.get(oldGroup), oldName)
+    } else if (!Settings.worldDatabase.get(newGroup)[newName]) {
+      console.warn(
+        noI18n.warn`No location found at ${oldGroup}:${oldName}. Group: ${isEmpty(group) ? [...Settings.worldDatabase.keys()] : Object.keys(group)}`,
+      )
+    }
+  })
 }
 
 export function migrateLocationGroup(from: string, to: string) {
-  const group = Settings.worldDatabase.get(from)
-  if (typeof group !== 'undefined') {
-    console.debug(i18n`Migrating group ${from} to ${to}`)
+  onLoad(() => {
+    const group = Settings.worldDatabase.get(from)
+    if (typeof group !== 'undefined') {
+      console.debug(noI18n`Migrating group ${from} to ${to}`)
 
-    Settings.worldDatabase.set(to, { ...Settings.worldDatabase.get(to), ...group })
+      Settings.worldDatabase.set(to, { ...Settings.worldDatabase.get(to), ...group })
 
-    Settings.worldDatabase.delete(from)
-  } else {
-    console.warn(
-      i18n.error`No group found for migration: ${from} -> ${to}. Groups: ${[...Settings.worldDatabase.keys()]}`,
-    )
-  }
+      Settings.worldDatabase.delete(from)
+    } else {
+      console.warn(
+        noI18n.warn`No group found for migration: ${from} -> ${to}. Groups: ${[...Settings.worldDatabase.keys()]}`,
+      )
+    }
+  })
 }

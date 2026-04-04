@@ -1,6 +1,6 @@
 import { Dimension, system, world } from '@minecraft/server'
-import { i18n, noI18n } from 'lib/i18n/text'
-import { stringifyError } from 'lib/util'
+import { noI18n } from 'lib/i18n/text'
+import { stringifyError, util } from 'lib/util'
 import { AbstractPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 
@@ -18,19 +18,18 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
   static loaded = false
 
-  static asSaveableArea<T extends AreaCreator>(this: T) {
+  static asSaveableArea<T extends AreaCreator>(this: T, type: string) {
     const b = this as AreaWithType<T>
-    world.afterEvents.worldLoad.subscribe(() => {
-      b.type = new (this as unknown as AreaCreator)({}).type
+    b.type = type
+    ;(b.prototype as Area).type = type
 
-      if ((this as unknown as typeof Area).loaded) {
-        throw new Error(
-          `Registering area type ${b.type} failed. Regions are already restored from json. Registering area should occur on the import-time.`,
-        )
-      }
+    if ((this as unknown as typeof Area).loaded) {
+      throw new Error(
+        `Registering area type ${b.type} failed. Regions are already restored from json. Registering area should occur on the import-time.`,
+      )
+    }
 
-      ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
-    })
+    ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
     return b
   }
 
@@ -39,7 +38,9 @@ export abstract class Area<T extends JsonObject = JsonObject> {
 
     const area = Area.areas.find(e => e.type === a.t)
     if (!area) {
-      console.warn(i18n`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`)
+      console.warn(
+        noI18n.warn`[Area][Database] No area found for ${a.t}. Maybe you forgot to register kind or import file?`,
+      )
       return
     }
 
@@ -51,7 +52,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
     public dimensionType: DimensionType = 'overworld',
   ) {}
 
-  abstract type: string
+  type!: string
 
   /** Checks if the point is inside the area */
   isIn(point: AbstractPoint) {
@@ -103,12 +104,13 @@ export abstract class Area<T extends JsonObject = JsonObject> {
   }
 
   forEachVector(
-    callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | Promise<void> | symbol,
+    callback: (vector: Vector3, isIn: boolean, dimension: Dimension) => void | Promise<void>,
     yieldEach = 10,
   ) {
     const { edges, dimension } = this
     const isIn = (vector: Vector3) => this.isIn({ location: vector, dimensionType: this.dimensionType })
     const { max, min } = this.dimension.heightRange
+    const stack = new Error().stack
 
     return new Promise<void>((resolve, reject) => {
       system.runJob(
@@ -116,9 +118,12 @@ export abstract class Area<T extends JsonObject = JsonObject> {
           try {
             let i = 0
             for (const vector of Vec.forEach(...edges)) {
-              if (vector.y < min || vector.y > max) continue
+              if (vector.y < min || vector.y > max) {
+                yield
+                continue
+              }
 
-              callback(vector, isIn(vector), dimension)
+              util.catch(() => callback(vector, isIn(vector), dimension), 'Area.forEachVector', stack)
               i++
               if (i % yieldEach === 0) yield
             }

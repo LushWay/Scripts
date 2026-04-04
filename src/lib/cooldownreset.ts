@@ -35,7 +35,7 @@ export function registerResettableCooldown(name: string, cd: CooldownController 
   }
 }
 
-const cdsform = form(f => {
+export const cooldownResetForm = form(f => {
   f.title('Кулдауны')
   for (const cd of cds ?? []) {
     f.button(cdform(cd))
@@ -48,7 +48,7 @@ const cdform = form.params<{ cd: CooldownController; name: string }>((f, { param
   for (const [id, time] of Object.entries(list)) {
     const elapsed = time - Date.now()
     if (elapsed < 0) continue
-    f.button(i18n`${getFullname(id)}\n${i18n.hhmmss(elapsed)}`, () => {
+    f.button(i18n`${getFullname(id)}\n${i18n.time(elapsed)}`, () => {
       params.cd.reset(id)
       self()
     })
@@ -56,6 +56,6 @@ const cdform = form.params<{ cd: CooldownController; name: string }>((f, { param
 })
 
 new Command('cooldownreset')
-  .setPermissions('techAdmin')
+  .setPermissions('moderator')
   .setDescription('Сбрасывает разные кулдауны')
-  .executes(cdsform.command)
+  .executes(cooldownResetForm.command)

@@ -1,12 +1,12 @@
 import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
-import { Vec } from 'lib/vector'
 
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { noI18n } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
-import { restorePlayerCamera } from 'lib/utils/game'
+import { hexToRgb } from 'lib/util'
+import { onLoad, restorePlayerCamera } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 /**
@@ -27,8 +27,14 @@ interface Section {
 type Sections = (undefined | Section)[]
 
 /** Controller used to abort playing cutscene animation */
-interface AbortController {
+interface CutsceneAbortController {
   cancel: boolean
+}
+
+export namespace Cutscene {
+  export interface Options {
+    restoreCameraTime?: number
+  }
 }
 
 export class Cutscene {
@@ -52,7 +58,10 @@ export class Cutscene {
   private restoreCameraTime = 2
 
   /** List of players that currently see cutscene play */
-  private current = new WeakPlayerMap<{ player: Player; controller: AbortController }>({
+  private current = new WeakPlayerMap<{
+    player: Player
+    controller: CutsceneAbortController
+  }>({
     onLeave: playerId => this.exit(playerId),
   })
 
@@ -61,10 +70,17 @@ export class Cutscene {
   constructor(
     public id: string,
     public displayName: Text,
+    options?: Cutscene.Options,
   ) {
     Cutscene.all.set(id, this)
 
-    this.sections = Cutscene.db.get(this.id).slice()
+    if (options) {
+      if (typeof options.restoreCameraTime === 'number') this.restoreCameraTime = options.restoreCameraTime
+    }
+
+    onLoad(() => {
+      this.sections = Cutscene.db.get(this.id).slice()
+    })
   }
 
   private get defaultSection() {
@@ -92,6 +108,7 @@ export class Cutscene {
     Compass.forceHide.add(player)
     Sidebar.forceHide.add(player)
 
+    const switchColor = hexToRgb('#102010')
     const controller = { cancel: false }
     const promise = this.forEachPoint(
       async (point, pointNum, section, sectionNum) => {
@@ -108,24 +125,20 @@ export class Cutscene {
             easeOptions: Object.assign(this.defaultSection, section),
           })
         } else {
-          const red = 10 / 256
-          const green = 20 / 256
-          const blue = 10 / 256
-          // #102010
-
+          // Section switch
           player.camera.fade({
             fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
-            fadeColor: { red, green, blue },
+            fadeColor: switchColor,
           })
 
           await system.sleep(10)
 
           if (!(player.isValid as boolean)) return
 
-          // There is no way to set a camera without easing using pure script
-          player.runCommand(
-            `camera @s set ${MinecraftCameraPresetsTypes.Free} pos ${Vec.string(point)} rot ${point.rx} ${point.ry}`,
-          )
+          player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
+            location: point,
+            rotation: { x: point.rx, y: point.ry },
+          })
         }
       },
       { controller, exit: () => this.exit(player) },
@@ -154,7 +167,7 @@ export class Cutscene {
       sections = this.sections,
       exit,
       intervalTime = this.intervalTime,
-    }: { controller: AbortController; sections?: Sections; exit?: VoidFunction; intervalTime?: number },
+    }: { controller: CutsceneAbortController; sections?: Sections; exit?: VoidFunction; intervalTime?: number },
   ) {
     const end = new Error('End.')
     try {
@@ -176,7 +189,7 @@ export class Cutscene {
   }
 
   /** Uses bezier curves to interpolate points along a section. */
-  private *pointIterator({ step = 0.5, points }: Section) {
+  private *pointIterator({ step, points }: Section) {
     const emptyPoint: Point = { rx: 0, ry: 0, x: 0, y: 0, z: 0 }
     let index = 0
     for (let point = 0; point <= points.length; point += step) {
@@ -217,15 +230,18 @@ export class Cutscene {
     this.current.delete(playerId)
     if (player instanceof Player) {
       restorePlayerCamera(player, this.restoreCameraTime)
-      system.runTimeout(
-        () => {
-          if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
-          Compass.forceHide.delete(player)
-          Sidebar.forceHide.delete(player)
-        },
-        'restoreCutsceneHud',
-        this.restoreCameraTime * TicksPerSecond,
-      )
+
+      const reset = () => {
+        if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
+        Compass.forceHide.delete(player)
+        Sidebar.forceHide.delete(player)
+      }
+
+      if (this.restoreCameraTime) {
+        system.runTimeout(reset, 'restoreCutsceneHud', this.restoreCameraTime * TicksPerSecond)
+      } else {
+        reset()
+      }
     }
 
     return true
@@ -295,6 +311,6 @@ function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: k
 
 function getVector5(player: Player): Vector5 {
   const { x: rx, y: ry } = player.getRotation()
-  const { x, y, z } = Vec.floor(player.getHeadLocation())
+  const { x, y, z } = player.getHeadLocation()
   return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }
 }

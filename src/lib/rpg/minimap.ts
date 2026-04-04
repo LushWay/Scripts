@@ -1,5 +1,6 @@
 import { Player, world } from '@minecraft/server'
 import { playerJson, PlayerProperties } from 'lib/assets/player-json'
+import { onLoad } from 'lib/utils/load-ref'
 
 export function setMinimapEnabled(player: Player, status: boolean) {
   player.setProperty(PlayerProperties['lw:minimap'], status)
@@ -32,7 +33,9 @@ world.afterEvents.playerSpawn.subscribe(event => {
   resetAllMinimaps(event.player)
 })
 
-world.getAllPlayers().forEach(resetAllMinimaps)
+onLoad(() => {
+  world.getAllPlayers().forEach(resetAllMinimaps)
+})
 
 function resetAllMinimaps(player: Player) {
   resetMinimapNpcPosition(player, MinimapNpc.Airdrop)

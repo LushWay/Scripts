@@ -1,15 +1,13 @@
-import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
+import { ContainerSlot, ItemStack, Player, Potions } from '@minecraft/server'
 import {
   MinecraftItemTypes,
+  MinecraftPotionDeliveryTypes as PotionDelivery,
   MinecraftPotionEffectTypes as PotionEffects,
-  MinecraftPotionLiquidTypes as PotionLiquids,
-  MinecraftPotionModifierTypes as PotionModifiers,
 } from '@minecraft/vanilla-data'
 import { shopFormula } from 'lib/assets/shop'
 import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
-import { Message } from 'lib/i18n/message'
 import { i18n } from 'lib/i18n/text'
 import { Cost } from 'lib/shop/cost'
 import { isKeyof } from 'lib/util'
@@ -177,8 +175,8 @@ export class ShopForm {
     return this
   }
 
-  potion(cost: Cost, effect: PotionEffects, modifier = PotionModifiers.Normal, liquid = PotionLiquids.Regular) {
-    const item = ItemStack.createPotion({ effect, modifier, liquid })
+  potion(cost: Cost, effect: PotionEffects, delivery = PotionDelivery.Consume) {
+    const item = Potions.resolve(effect, delivery)
     this.itemStack(item, cost, getAuxTextureOrPotionAux(item))
   }
 

@@ -1,9 +1,9 @@
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
-import { generateDefine } from './tools/define'
+import { generateDefine } from '../tools/define'
 
 export default defineConfig({
-  define: generateDefine({ dev: true, test: true, world: false, port: '1000', vitest: true }),
+  define: generateDefine({ dev: true, test: true }),
   test: {
     globals: true,
 
@@ -15,6 +15,11 @@ export default defineConfig({
       reporter: process.env.CI ? ['lcov'] : ['html', 'json'],
       include: ['src/lib', 'src/modules'],
       exclude: ['src/lib/assets', 'src/lib/bds', 'src/test', '**/*.test.ts', '**/*.spec.ts'],
+    },
+    server: {
+      deps: {
+        inline: [/@formatjs/],
+      },
     },
     setupFiles: ['src/test/setup.ts'],
     globalSetup: ['src/test/global.ts'],

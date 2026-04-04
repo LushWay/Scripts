@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
-import { util, wrap } from 'lib/util'
+import { wordWrap, wrap } from 'lib/util'
 import { ActionbarPriority } from './extensions/on-screen-display'
+import { onLoad } from './utils/game'
 import { WeakPlayerSet } from './weak-player-storage'
 
 type Format =
@@ -25,7 +26,7 @@ export class Sidebar<E = any> {
 
   static forceHide = new WeakPlayerSet()
 
-  content
+  content!: SidebarVariables<E>
 
   getExtra
 
@@ -45,6 +46,7 @@ export class Sidebar<E = any> {
         e: E,
       ) => {
         format: Format
+        showActionBar: (player: Player) => void
         maxWordCount: number
       }
       getExtra: (p: Player) => E
@@ -54,7 +56,9 @@ export class Sidebar<E = any> {
     this.name = name
     this.getExtra = getExtra
     this.getOptions = getOptions
-    this.content = this.init(content)
+    onLoad(() => {
+      this.content = this.init(content)
+    })
     Sidebar.instances.push(this)
   }
 
@@ -71,14 +75,17 @@ export class Sidebar<E = any> {
   }
 
   show(player: Player) {
+    const extra = this.getExtra(player)
+    const options = this.getOptions(player, extra)
+
+    options.showActionBar(player)
+
     if (Sidebar.forceHide.has(player)) {
       this.clearSidebar(player)
       this.clearTips(player)
       return
     }
 
-    const extra = this.getExtra(player)
-    const options = this.getOptions(player, extra)
     let content = options.format
 
     for (const [key, line] of Object.entries(this.content)) {
@@ -110,7 +117,7 @@ export class Sidebar<E = any> {
   static wrap(line: string, maxWordCount: number) {
     return line
       .split('\n')
-      .map(e => wrap(e, maxWordCount))
+      .map(e => wordWrap(e, maxWordCount))
       .flat()
       .join('\n')
   }

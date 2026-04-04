@@ -3,7 +3,6 @@
 import {
   EquipmentSlot,
   ItemLockMode,
-  ItemStack,
   LocationInUnloadedChunkError,
   LocationOutOfWorldBoundariesError,
   Player,
@@ -12,15 +11,14 @@ import {
 } from '@minecraft/server'
 
 import { MinecraftEffectTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { LockAction } from 'lib/action'
+import { CustomItem } from 'lib/rpg/custom-item'
 import { util } from 'lib/util'
 import { Vec } from 'lib/vector'
-import { LockAction } from 'lib/action'
 
-const RTP_ELYTRA = new ItemStack(MinecraftItemTypes.Elytra, 1).setInfo(
-  '§6Элитра перемещения',
-  'Элитра перелета, пропадает на земле',
-)
-RTP_ELYTRA.lockMode = ItemLockMode.slot
+const RTP_ELYTRA = new CustomItem(MinecraftItemTypes.Elytra)
+  .nameTag('§6Элитра перемещения')
+  .lore('Элитра перелета, пропадает на земле')
 
 const IN_SKY = new Set<string>()
 new LockAction(player => IN_SKY.has(player.id), '§cВ начале коснитесь земли!')
@@ -158,7 +156,9 @@ function giveElytra(player: Player, c = 5) {
     }
   }
 
-  slot.setItem(RTP_ELYTRA)
+  const clone = RTP_ELYTRA.itemStack.clone()
+  clone.lockMode = ItemLockMode.slot
+  slot.setItem(clone)
   player.database.survival.rtpElytra = 1
 }
 
@@ -184,6 +184,6 @@ function clearElytra(player: Player) {
   if (!equippable) return
   const slot = equippable.getEquipmentSlot(EquipmentSlot.Chest)
   const item = slot.getItem()
-  if (item && RTP_ELYTRA.is(item)) slot.setItem(undefined)
+  if (item && RTP_ELYTRA.isItem(item)) slot.setItem(undefined)
   delete player.database.survival.rtpElytra
 }

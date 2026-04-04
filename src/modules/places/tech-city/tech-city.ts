@@ -1,5 +1,7 @@
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { CutArea } from 'lib/region/areas/cut'
+import { Loot } from 'lib/rpg/loot-table'
+import { onLoad } from 'lib/utils/load-ref'
 import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { QuartzMineRegion } from '../anarchy/quartz'
 import { BaseItem } from '../base/base'
@@ -10,12 +12,13 @@ import { Stoner } from '../lib/npc/stoner'
 import { Woodman } from '../lib/npc/woodman'
 import { Engineer } from './engineer'
 import { createBossGolem } from './golem.boss'
-import { Loot } from 'lib/rpg/loot-table'
 
 class TechCityBuilder extends City {
   constructor() {
     super('TechCity', i18nShared`Техноград`)
-    this.create()
+    onLoad(() => {
+      this.create()
+    })
   }
 
   engineer = new Engineer(this.group)
@@ -39,10 +42,10 @@ class TechCityBuilder extends City {
 
     this.createKits(
       new Loot()
-        .itemStack(CannonItem.blueprint)
+        .itemStack(() => CannonItem.blueprint)
         .weight('10%')
 
-        .itemStack(CannonShellItem.blueprint)
+        .itemStack(() => CannonShellItem.blueprint)
         .weight('10%')
 
         .item('RedTerracotta')
@@ -53,22 +56,22 @@ class TechCityBuilder extends City {
         .weight('10%').build,
 
       new Loot()
-        .itemStack(CannonShellItem.blueprint)
+        .itemStack(() => CannonShellItem.blueprint)
         .weight('3%')
 
-        .itemStack(CannonShellItem.itemStack)
+        .itemStack(CannonShellItem)
         .weight('3%')
 
-        .itemStack(CannonItem.blueprint)
+        .itemStack(() => CannonItem.blueprint)
         .weight('2%')
 
-        .itemStack(CannonItem.itemStack)
+        .itemStack(CannonItem)
         .weight('2%')
 
-        .itemStack(BaseItem.blueprint)
+        .itemStack(() => BaseItem.blueprint)
         .weight('1%')
 
-        .itemStack(BaseItem.itemStack)
+        .itemStack(BaseItem)
         .weight('1%').build,
     )
   }

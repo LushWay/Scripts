@@ -98,10 +98,10 @@ export class Region {
     if (!key) {
       // We are creating new region and should save it
       region.save()
-      region.onCreate()
+      util.catch(() => region.onCreate(), `${this.name}.onCreate`)
     } else {
       // Restoring region with existing key
-      region.onRestore()
+      util.catch(() => region.onRestore(), `${this.name}.onCreate`)
     }
 
     if (area.radius) this.chunkQuery.add(region)

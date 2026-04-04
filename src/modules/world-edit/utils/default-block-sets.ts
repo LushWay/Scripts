@@ -1,6 +1,7 @@
 import { BlockPermutation, BlockTypes, LiquidType } from '@minecraft/server'
 import { BlockStateSuperset, MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { noNullable } from 'lib/util'
+import { onLoad } from 'lib/utils/load-ref'
 import {
   BlockStateWeight,
   BlocksSets,
@@ -9,10 +10,15 @@ import {
   fromBlockStateWeightToReplaceTarget,
 } from './blocks-set'
 
-const trees: BlockStateWeight[] = BlockTypes.getAll()
-  .filter(e => e.id.endsWith('_log') || e.id.includes('leaves'))
-  .map(e => [e.id, void 0, 1])
-trees.push([MinecraftBlockTypes.MangroveRoots, void 0, 1])
+const trees = onLoad(() => {
+  const trees: BlockStateWeight[] = BlockTypes.getAll()
+    .filter(e => e.id.endsWith('_log') || e.id.includes('leaves'))
+    .map(e => [e.id, void 0, 1])
+
+  trees.push([MinecraftBlockTypes.MangroveRoots, void 0, 1])
+
+  return trees
+})
 
 export const DEFAULT_BLOCK_SETS: BlocksSets = {
   Земля: [[MinecraftBlockTypes.GrassBlock, void 0, 1]],
@@ -48,11 +54,14 @@ function isGlassPane(typeId: string) {
 }
 
 const allBlockTypes = [isSlab, isStairs, isWall, isTrapdoor, isGlass, isGlassPane]
-const air = BlockPermutation.resolve(MinecraftBlockTypes.Air)
+const air = onLoad(() => BlockPermutation.resolve(MinecraftBlockTypes.Air))
 
-export const DEFAULT_REPLACE_TARGET_SETS: Record<string, ReplaceTarget[]> = {
-  'Любое дерево': trees.map(fromBlockStateWeightToReplaceTarget).filter(noNullable),
-}
+export const DEFAULT_REPLACE_TARGET_SETS = onLoad(
+  () =>
+    ({
+      'Любое дерево': trees.value.map(fromBlockStateWeightToReplaceTarget).filter(noNullable),
+    }) as Record<string, ReplaceTarget[]>,
+)
 
 export const REPLACE_MODES: Record<string, ReplaceMode> = {
   'Не воздух': {
@@ -77,7 +86,7 @@ export const REPLACE_MODES: Record<string, ReplaceMode> = {
   'Замена соответств. блока': {
     matches: () => true,
     select(block, permutations) {
-      if (block.isAir) return air
+      if (block.isAir) return air.value
 
       let permutation: BlockPermutation | undefined
       const { typeId } = block
@@ -125,7 +134,7 @@ export function shortenBlocksSetName(name: string | undefined | null) {
 }
 
 addPostfix(DEFAULT_BLOCK_SETS)
-addPostfix(DEFAULT_REPLACE_TARGET_SETS)
+DEFAULT_REPLACE_TARGET_SETS.onLoad(v => addPostfix(v))
 
 function addPostfix(blocksSet: Record<string, unknown>) {
   Object.keys(blocksSet).forEach(e => {

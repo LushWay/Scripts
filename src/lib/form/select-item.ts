@@ -2,7 +2,7 @@ import { ContainerSlot, EntityComponentTypes, EquipmentSlot, ItemStack, Player }
 import { enchantData } from 'lib/assets/texture-data'
 import { ChestForm } from 'lib/form/chest'
 import { BUTTON } from 'lib/form/utils'
-import { langToken, translateEnchantment, translateToken } from 'lib/i18n/lang'
+import { translateEnchantment, translateToken } from 'lib/i18n/lang'
 
 export type ItemFilter = (itemStack: ItemStack) => boolean
 export type OnSelect = (itemSlot: ContainerSlot, itemStack: ItemStack) => void
@@ -69,10 +69,12 @@ function addItem(
   const nameTagPrefix = enchanted ? '§b' : ''
   const lore = [...enchantmentsToLore(item, player), ...slot.getLore(), ...addItemDurabilityToLore(item)]
 
+  // TODO Potion icons
+
   chestForm.button({
     slot: i,
     icon: typeId,
-    nameTag: nameTagPrefix + translateToken(langToken(typeId), player.lang),
+    nameTag: nameTagPrefix + translateToken(item.localizationKey, player.lang),
     amount: slot.amount,
     enchanted,
     lore,

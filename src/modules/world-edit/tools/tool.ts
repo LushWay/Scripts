@@ -5,6 +5,7 @@ import { ListSounds } from 'lib/assets/sounds'
 import { ActionForm } from 'lib/form/action'
 import { ModalForm } from 'lib/form/modal'
 import { inspect } from 'lib/utils/inspect'
+import { onLoad } from 'lib/utils/load-ref'
 import { Vec } from 'lib/vector'
 import { WorldEditTool } from '../lib/world-edit-tool'
 
@@ -113,7 +114,7 @@ class Tool extends WorldEditTool {
 
   constructor() {
     super()
-    const variables = new MolangVariableMap()
+    const variables = onLoad(() => new MolangVariableMap())
 
     system.runInterval(
       () => {
@@ -137,7 +138,7 @@ class Tool extends WorldEditTool {
             hit.block.dimension.spawnParticle(
               lore[1],
               Vec.add(hit.block.location, { x: 0.5, z: 0.5, y: 1.5 }),
-              variables,
+              variables.value,
             )
           }
 

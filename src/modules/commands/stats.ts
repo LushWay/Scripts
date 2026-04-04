@@ -37,8 +37,12 @@ function formatDate(date: number) {
   return i18n.hhmmss(date)
 }
 
-function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreName, getN: (n: Text) => string) {
-  const table: Text.Table[number][] = []
+function statsTable(
+  s: Player['scores'],
+  getKey: (k: ScoreNames.Stat) => ScoreName,
+  getN: (n: Text) => string,
+): Text.Table {
+  const table: Text.Table = []
   for (const key of scoreboardObjectiveNames.stats) {
     const k = getKey(key)
     table.push([getN(scoreboardDisplayNames[k]), s[k]])
@@ -46,5 +50,5 @@ function statsTable(s: Player['scores'], getKey: (k: ScoreNames.Stat) => ScoreNa
     if (key === 'damageGive')
       table.push([getN(i18n`Нанесено/Получено`), s[getKey('damageGive')] / s[getKey('damageRecieve')]])
   }
-  return table satisfies Text.Table
+  return table
 }

@@ -1,6 +1,7 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { noI18n } from 'lib/i18n/text'
+import { onLoad } from 'lib/utils/load-ref'
 import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 
@@ -14,16 +15,16 @@ class DynamicPropertyDB<Value = unknown, Key extends string = string> extends Pr
     super(id, defaultValue)
     if (id in DynamicPropertyDB.tables) throw new DatabaseError(`Table ${this.id} already initialized!`)
 
-    world.afterEvents.worldLoad.subscribe(() => {
-      this.init()
-    })
     DynamicPropertyDB.tables[id] = this as UnknownTable
   }
 
-  private init() {
+  onLoad = onLoad(() => this.load()).onLoad
+
+  private load() {
     // Init
     try {
       this.value = new Map(this.restore(LongDynamicProperty.get(this.id) as Record<string, unknown>))
+      this.loaded = true
     } catch (error) {
       console.error(new DatabaseError(noI18n`Failed to init table '${this.id}': ${error}`))
     }
@@ -119,7 +120,7 @@ export class LongDynamicProperty {
   }
 }
 
-if (!__VITEST__)
+if (!__TEST__)
   configureDatabase({
     createTable: (name, defaultValue?: import('./abstract').DatabaseDefaultValue<unknown>) =>
       new DynamicPropertyDB<unknown, string>(name, defaultValue),

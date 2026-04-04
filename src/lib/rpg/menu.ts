@@ -1,13 +1,13 @@
-import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, ItemTypes, Player, world } from '@minecraft/server'
+import { ContainerSlot, EquipmentSlot, ItemLockMode, ItemStack, Player, world } from '@minecraft/server'
 import { InventoryInterval } from 'lib/action'
 import { Items } from 'lib/assets/custom-items'
 import { form } from 'lib/form/new'
-import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { util } from 'lib/util'
+import { onLoad } from 'lib/utils/load-ref'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
 import { MinimapNpc, resetMinimapNpcPosition, setMinimapEnabled, setMinimapNpcPosition } from './minimap'
-import { Language } from 'lib/assets/lang'
 
 export class Menu {
   static settings: [Text, string] = [i18n`Меню\n§7Разные настройки интерфейсов и меню в игре`, 'menu']
@@ -23,9 +23,11 @@ export class Menu {
     return item.clone()
   }
 
-  static itemStack = this.createItem()
+  static itemStack = onLoad(() => this.createItem())
 
-  static item = createPublicGiveItemCommand('menu', this.itemStack, another => this.isMenu(another), i18n`меню`, false)
+  static item = onLoad(() =>
+    createPublicGiveItemCommand('menu', this.itemStack.value, another => this.isMenu(another), i18n`меню`, false),
+  )
 
   static {
     world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
@@ -45,7 +47,7 @@ export class Menu {
   }
 
   static isMenu(slot: Pick<ContainerSlot, 'typeId'>) {
-    return this.isCompass(slot) || slot.typeId === this.itemStack.typeId
+    return this.isCompass(slot) || slot.typeId === this.itemStack.value.typeId
   }
 }
 
@@ -66,9 +68,11 @@ export class Compass {
     }
   }
 
-  private static items = new Array(32).fill(null).map((_, i) => {
-    return Menu.createItem(`${Items.CompassPrefix}${i}`)
-  })
+  private static items = onLoad(() =>
+    new Array(32).fill(null).map((_, i) => {
+      return Menu.createItem(`${Items.CompassPrefix}${i}`)
+    }),
+  )
 
   /** Map of player as key and compass target as value */
   private static players = new WeakPlayerMap<Vector3>()
@@ -106,7 +110,7 @@ export class Compass {
 
     const target = this.players.get(player)
     if (!target || player.database.inv === 'spawn') {
-      if (Menu.isCompass(slot)) slot.setItem(Menu.itemStack)
+      if (Menu.isCompass(slot)) slot.setItem(Menu.itemStack.value)
       return
     }
 
@@ -129,7 +133,7 @@ export class Compass {
     const angle = Math.atan2(sin, cos)
     const i = Math.floor((16 * angle) / Math.PI + 16) || 0
 
-    if (typeof i === 'number') return this.items[i]
+    if (typeof i === 'number') return this.items.value[i]
   }
 }
 

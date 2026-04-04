@@ -1,6 +1,6 @@
 /* i18n-ignore */
 
-import { Container, ItemStack, MolangVariableMap, Player, world } from '@minecraft/server'
+import { Container, ItemStack, MolangVariableMap, Player } from '@minecraft/server'
 import { Vec } from 'lib/vector'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
@@ -9,7 +9,7 @@ import { Cooldown } from 'lib/cooldown'
 import { i18n } from 'lib/i18n/text'
 import { Temporary } from 'lib/temporary'
 import { util } from 'lib/util'
-import { isLocationError } from 'lib/utils/game'
+import { isLocationError, onLoad } from 'lib/utils/game'
 import { Cutscene } from './cutscene'
 import { cutscene as cusceneCommand } from './menu'
 
@@ -26,7 +26,7 @@ export const cutsceneEdit = {
   },
 }
 
-world.afterEvents.worldLoad.subscribe(() => {
+onLoad(() => {
   /** List of items that controls the editing process */
   const controls: Record<
     string,
@@ -52,7 +52,7 @@ world.afterEvents.worldLoad.subscribe(() => {
       ),
       (player, cutscene) => {
         cutscene.withNewSection(cutscene.sections, {})
-        player.info(`Секция добавлена. Секций всего: §f${cutscene.sections.length}`)
+        player.info(`Секция добавлена. Создайте точку внутри секции. Секций всего: §f${cutscene.sections.length}`)
       },
     ],
     cancel: [
@@ -121,12 +121,12 @@ world.afterEvents.worldLoad.subscribe(() => {
 
       world.beforeEvents.itemUse.subscribe(event => {
         if (event.source.id !== player.id) return
-        if (!cooldown.isExpired(player)) return
 
         for (const [, control, onUse] of Object.values(controls)) {
           if (control.is(event.itemStack)) {
             event.cancel = true
-            system.delay(() => onUse(player, cutscene, temporary))
+            if (!cooldown.isExpired(player)) return
+            return system.delay(() => onUse(player, cutscene, temporary))
           }
         }
       })

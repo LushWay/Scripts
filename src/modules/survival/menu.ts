@@ -3,13 +3,15 @@ import { achievementsForm, achievementsFormName } from 'lib/achievements/command
 import { clanMenu } from 'lib/clan/menu'
 import { Core } from 'lib/extensions/core'
 import { form } from 'lib/form/new'
+import { BUTTON } from 'lib/form/utils'
 import { i18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
+import { mailMenu } from 'lib/mail/command'
 import { Join } from 'lib/player-join'
 import { questsMenu } from 'lib/quest/menu'
 import { Menu } from 'lib/rpg/menu'
 import { playerSettingsMenu } from 'lib/settings'
-import { mailMenu } from 'modules/commands/mail'
+import { doNothing } from 'lib/util'
 import { statsForm } from 'modules/commands/stats'
 import { baseMenu } from 'modules/places/base/base-menu'
 import { wiki } from 'modules/wiki/wiki'
@@ -17,8 +19,6 @@ import { Anarchy } from '../places/anarchy/anarchy'
 import { Spawn } from '../places/spawn'
 import { recurForm } from './recurring-events'
 import { speedrunForm } from './speedrun/target'
-import { BUTTON } from 'lib/form/utils'
-import { doNothing } from 'lib/util'
 
 function tp(
   player: Player,
@@ -77,5 +77,5 @@ const secondPage = form(f => {
 })
 
 Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
-  if (firstJoin) Menu.item.give(player, { mode: 'ensure' })
+  if (firstJoin) Menu.item.value.give(player, { mode: 'ensure' })
 })

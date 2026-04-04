@@ -1,8 +1,8 @@
 import { i18n } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { RegionEvents } from 'lib/region/events'
-import { City } from './city'
 import { isNotPlaying } from 'lib/utils/game'
+import { City } from './city'
 
 export class CityInvestigating<T extends City> {
   static list: CityInvestigating<City>[] = []
@@ -41,10 +41,7 @@ export class CityInvestigating<T extends City> {
       (q, player) => {
         if (!this.city.safeArea) return q.failed(i18n`Город не настроен!`)
 
-        if (this.city.cutscene.sections.length)
-          q.dynamic(i18n`Обзор города`).activate(ctx => {
-            this.city.cutscene.play(ctx.player)?.finally(() => ctx.next())
-          })
+        q.cutscene(this.city.cutscene, i18n`Обзор города`)
 
         q.dialogue(this.city.guide)
 

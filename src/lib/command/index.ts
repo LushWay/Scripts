@@ -43,6 +43,8 @@ type ArgReturn<Callback, Type, Optional> = Command<
 
 type CommandCallback = (ctx: CommandContext, ...args: any[]) => void
 
+let slashMode = false
+
 export class Command<Callback extends CommandCallback = (ctx: CommandContext) => void> {
   static loaded = false
 
@@ -50,6 +52,10 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
 
   static isCommand(message: string) {
     return this.prefixes.some(prefix => message.startsWith(prefix) && message !== prefix)
+  }
+
+  static isServer(player: Player) {
+    return player.id === 'server'
   }
 
   static chatSendListener(event: ChatSendAfterEvent) {
@@ -123,7 +129,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
   }
 
   [stringifySymbol]() {
-    return `§f/${this.getFullName()}`
+    return `§f${slashMode ? '/' : Command.prefixes[0]}${this.getFullName()}`
   }
 
   private getFullName(name = ''): string {
@@ -136,7 +142,7 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
     for (const command of this.commands) {
       if (!command.sys.parent && command.sys.name === name) {
         Command.logger
-          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(2)}${command.stack ? i18n.warn`And:\n${command.stack}` : ''}`
+          .warn`Duplicate command name: ${name} at\n${stringifyError.stack.get(0)}${command.stack ? i18n.warn`And:\n${command.stack}` : ''}`
         return
       }
     }
@@ -217,8 +223,8 @@ export class Command<Callback extends CommandCallback = (ctx: CommandContext) =>
    * @param {string} name - Name of the new command
    */
   constructor(name: string, type?: IArgumentType<boolean>, depth = 0, parent: Command | null = null) {
-    this.stack = stringifyError.stack.get(2)
-    if (!parent && !__VITEST__) Command.checkIsUnique(name)
+    this.stack = stringifyError.stack.get(0)
+    if (!parent && !__TEST__) Command.checkIsUnique(name)
 
     if (Command.loaded) {
       Command.logger.warn('Commands are already loaded, tried registering ', name, new Error().stack)
@@ -463,6 +469,7 @@ declare global {
 globalThis.Command = Command
 
 function register(namespace: string) {
+  slashMode = true
   system.beforeEvents.startup.subscribe(load => {
     for (const command of Command.commands) {
       if (command.sys.depth !== 0) continue

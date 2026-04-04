@@ -1,4 +1,5 @@
 import { Player, system, world } from '@minecraft/server'
+import { onLoad } from 'lib/utils/load-ref'
 import { EventLoader, EventSignal } from '../event-signal'
 
 /** Core server features */
@@ -15,8 +16,8 @@ export const Core = {
   },
 }
 
-if (!__VITEST__) {
-  world.afterEvents.worldLoad.subscribe(() => {
+if (!__TEST__) {
+  onLoad(() => {
     system.run(function waiter() {
       const entities = world.overworld.getEntities()
       if (entities.length < 1) {

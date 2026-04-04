@@ -240,7 +240,7 @@ describe('migrate', () => {
     expect(Settings.worldDatabase.get(group.id)['newname']).toBe('1 0 1')
     expect(consoleLogSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§7Migrating location §flocations§7:§foldname§7 to §fid§7:§fnewname§7",
+        "Migrating location locations:oldname to id:newname",
       ]
     `)
   })
@@ -262,10 +262,10 @@ describe('migrate', () => {
 
     expect(consoleErrorSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "§cNo location found at §funknown group§c:§fwas never defined§c. Group: [
+        "§eNo location found at §funknown group§e:§fwas never defined§e. Group: [
         §2\`unknown group\`§r,
         §2\`id\`§r
-      ]§c",
+      ]§e",
       ]
     `)
     expect(Settings.worldDatabase.get(group.id)[point.shortId]).toBeUndefined()

@@ -4,7 +4,7 @@ import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
 import { form } from 'lib/form/new'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { is } from 'lib/roles'
 import { noNullable } from 'lib/util'
 import { Vec } from 'lib/vector'
@@ -84,46 +84,51 @@ function completeQuestsMenu(player: Player, back: VoidFunction) {
     .show(player)
 }
 
-export const manageQuestMenu = form.params<{ quest: Quest }>((f, { player, back, params: { quest } }) => {
-  const current = quest.getCurrentStep(player)
-  let currentDescription = ''
-  if (current) {
-    currentDescription =
-      i18n`Текущее действие: ${current.text()}\nОписание действия: ${current.description?.() ?? ''}\nЛокация: ${current.target ? Vec.string(current.target.location, true) : ''}`.to(
-        player.lang,
-      )
-    if (current.target?.dimensionType !== 'overworld') {
-      currentDescription += i18n`\nИзмерение: ${current.target?.dimensionType}`.to(player.lang)
+export const manageQuestMenu = form.params<{ quest: Quest; target?: Player }>(
+  (f, { player, back, params: { quest, target = player } }) => {
+    const current = quest.getCurrentStep(target)
+    const description: Text.Table = [[i18n`Описание`, quest.description]]
+    if (current) {
+      description.push([i18n`Текущее действие`, current.text()], [i18n`Описание:`, current.description?.()], '')
+
+      if (current.target) {
+        description.push([i18n`Локация`, Vec.string(current.target.location, true)])
+        if (current.target.dimensionType !== 'overworld')
+          description.push([i18n`Измерение`, current.target.dimensionType])
+      }
+    } else if (quest.isCompleted(target)) {
+      description.push(i18n.success`Задание завершено!`)
     }
-  } else if (quest.isCompleted(player)) {
-    currentDescription = i18n.success`Задание завершено!`.to(player.lang)
-  }
 
-  f.title(quest.name)
-  f.body(i18n`Описание задания: ${quest.description}\n\n${currentDescription}`)
+    f.title(quest.name)
+    f.body(textTable(description))
 
-  if (Quest.getCurrentStepOf(player) !== quest.getCurrentStep(player)) {
-    f.button(i18n`Сделать приоритетным`, () => {
-      if (!player.database.quests) return
+    if (Quest.getCurrentStepOf(target) !== current) {
+      f.button(i18n`Сделать приоритетным`, () => {
+        if (!target.database.quests) return
 
-      const active = quest.getDatabase(player)
-      if (!active) return
+        const active = quest.getDatabase(target)
+        if (!active) return
 
-      player.database.quests.active = player.database.quests.active.filter(e => e !== active)
-      player.database.quests.active.unshift(active)
-    })
-  }
+        target.database.quests.active = target.database.quests.active.filter(e => e !== active)
+        target.database.quests.active.unshift(active)
+      })
+    }
 
-  f.ask(
-    i18n.error`Отказаться от задания`,
-    i18n.error`Отказаться`,
-    () => (quest.exit(player, undefined, true), back?.(player)),
-    i18n`Назад`,
-  )
-
-  const place = current?.target
-  if (is(player.id, 'techAdmin') && place)
-    f.button('§7admin: tp to quest point', () =>
-      player.teleport(place.location, { dimension: world[place.dimensionType] }),
+    f.ask(
+      i18n.error`Отказаться`,
+      i18n.error`Отказаться от задания?`,
+      () => (quest.exit(target, undefined, true), back?.(player)),
+      i18n`Назад`,
     )
-})
+
+    if (is(player.id, 'techAdmin')) {
+      const place = current?.target
+      if (place) {
+        f.button('§7admin: tp to quest point', () =>
+          player.teleport(place.location, { dimension: world[place.dimensionType] }),
+        )
+      }
+    }
+  },
+)

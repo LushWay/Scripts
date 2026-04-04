@@ -2,23 +2,18 @@ import { createPoint } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { TEST_clearDatabase, TEST_createPlayer } from 'test/utils'
 import { SphereArea } from '../areas/sphere'
+import { RegionDatabase, registerSaveableRegion, TEST_clearSaveableRegions } from '../database'
 import { Region } from './region'
-import { registerSaveableRegion } from '../database'
-import { RegionDatabase } from '../database'
 
 describe('Region', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     Region.regions = []
     TEST_clearDatabase(RegionDatabase)
-  })
-
-  beforeEach(() => {
+    TEST_clearSaveableRegions()
     vi.useFakeTimers()
     vi.setSystemTime(new Date(0))
   })
   afterEach(() => {
-    Region.regions = []
-    TEST_clearDatabase(RegionDatabase)
     vi.useRealTimers()
   })
 
@@ -32,12 +27,12 @@ describe('Region', () => {
     registerSaveableRegion('t', T)
     const area = new SphereArea({ center: Vec.zero, radius: 0 }, 'overworld')
 
-    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00"`)
-    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-0"`)
-    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-1"`)
-    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-2"`)
-    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-3"`)
-    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01-01-1970-00:00-4"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01.01.1970-03:00"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01.01.1970-03:00-0"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01.01.1970-03:00-1"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01.01.1970-03:00-2"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01.01.1970-03:00-3"`)
+    expect(T.create(area).id).toMatchInlineSnapshot(`"t-s-0-01.01.1970-03:00-4"`)
   })
 
   it('should return owner name', () => {
@@ -51,7 +46,9 @@ describe('Region', () => {
 
   it('should return instances of right type', () => {
     class TestRegion extends Region {}
+    registerSaveableRegion('1', TestRegion)
     class AnotherTestRegion extends Region {}
+    registerSaveableRegion('1', AnotherTestRegion)
 
     expect(Region.regions.length).toBe(0)
     expect(TestRegion.regions.length).toBe(0)
@@ -80,9 +77,11 @@ describe('Region', () => {
 
   it('should store regions in different places', () => {
     class TestRegion extends Region {}
+    registerSaveableRegion('1', TestRegion)
     class TestAbcRegion extends TestRegion {}
-
+    registerSaveableRegion('2', TestAbcRegion)
     class OtherRegion extends Region {}
+    registerSaveableRegion('3', OtherRegion)
 
     const a = new SphereArea({ center: Vec.zero, radius: 0 })
 
@@ -101,10 +100,12 @@ describe('Region', () => {
     expect(TestRegion.getAll().map(e => e.creator.name)).toMatchInlineSnapshot(`
       [
         "TestRegion",
+        "TestAbcRegion",
       ]
     `)
     expect(TestAbcRegion.getAll().map(e => e.creator.name)).toMatchInlineSnapshot(`
       [
+        "TestRegion",
         "TestAbcRegion",
       ]
     `)

@@ -65,6 +65,17 @@ export async function showForm(
         if (response.cancelationReason === FormCancelationReason.UserClosed) return false
         if (response.cancelationReason === FormCancelationReason.UserBusy) {
           switch (i) {
+            case 1:
+              // First attempt failed, maybe chat closed...
+              player.closeChat()
+              continue
+
+            case 2:
+              // Second attempt, tell player to manually close chat...
+              player.info(i18n`Закрой чат!`)
+              await system.sleep(10)
+              continue
+
             default:
               await system.sleep(10)
               break

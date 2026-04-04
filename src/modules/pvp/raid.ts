@@ -6,13 +6,14 @@ import { i18n } from 'lib/i18n/text'
 import { Region } from 'lib/region'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { onLoad } from 'lib/utils/load-ref'
 import { ms } from 'lib/utils/ms'
 import { BaseRegion } from 'modules/places/base/region'
 
 const notify = new Map<string, { time: number; reason: Text }>()
 const targetLockTime = ms.from('min', 8)
 const raiderLockTime = ms.from('min', 10)
-const objective = ScoreboardDB.objective('raid')
+const objective = onLoad(() => ScoreboardDB.objective('raid'))
 
 world.beforeEvents.explosion.subscribe(event => {
   const checker = createBlockExplosionChecker()
@@ -81,11 +82,11 @@ system.runInterval(
       } else notify.set(id, { time: time - 1, reason })
     }
 
-    for (const { participant, score } of objective.getScores()) {
+    for (const { participant, score } of objective.value.getScores()) {
       if (score > 1) {
-        objective.addScore(participant, -1)
+        objective.value.addScore(participant, -1)
       } else {
-        objective.removeParticipant(participant)
+        objective.value.removeParticipant(participant)
       }
     }
   },

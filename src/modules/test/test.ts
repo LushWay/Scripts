@@ -16,6 +16,7 @@ import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CommandContext } from 'lib/command/context'
 import { parseArguments } from 'lib/command/utils'
 import { Cutscene } from 'lib/cutscene'
+import { scoreboardObjectiveNames } from 'lib/database/scoreboard'
 import { DatabaseUtils } from 'lib/database/utils'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
@@ -35,7 +36,7 @@ import { LootTable } from 'lib/rpg/loot-table'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Settings } from 'lib/settings'
-import { inspect, isKeyof, util } from 'lib/util'
+import { inspect, isKeyof, pick, util } from 'lib/util'
 import { restorePlayerCamera } from 'lib/utils/game'
 import { toPoint } from 'lib/utils/point'
 import { Rewards } from 'lib/utils/rewards'
@@ -65,6 +66,12 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  scores(ctx) {
+    console.log(
+      pick(ctx.player.scores, ['money', 'anarchyOnlineTime', ...scoreboardObjectiveNames.gameModeStats]),
+      ctx.player.scores.anarchyOnlineTime,
+    )
+  },
   loot(ctx) {
     const lootTableName = ctx.args[1] ?? ''
     const lootTable = LootTable.instances.get(lootTableName)

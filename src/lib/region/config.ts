@@ -1,6 +1,7 @@
-import { BlockTypes, Entity, world } from '@minecraft/server'
+import { BlockTypes, Entity } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { onLoad } from 'lib/utils/load-ref'
 
 /** All doors and switches in minecraft */
 export const DOORS: string[] = []
@@ -14,7 +15,7 @@ export const SWITCHES: string[] = []
 /** All gates in minecraft */
 export const GATES: string[] = []
 
-world.afterEvents.worldLoad.subscribe(() => {
+onLoad(() => {
   const blocks = BlockTypes.getAll()
 
   function fill(target: string[], filter: (params: { id: string }) => boolean) {
@@ -60,25 +61,21 @@ export const INTERACTABLE_ENTITIES: string[] = [
  * System entities like database, floating text, sit and other which are not affected by health bar display, region
  * permissions and other filterings
  */
-export const NOT_MOB_ENTITIES = [
+export const NOT_MOB_ENTITIES: string[] = [
   CustomEntityTypes.Database,
   CustomEntityTypes.FloatingText,
   CustomEntityTypes.FloatingTextNpc,
   CustomEntityTypes.Sit,
-  CustomEntityTypes.Grave,
-  CustomEntityTypes.Loot,
   MinecraftEntityTypes.Npc,
   'minecraft:item',
   'minecraft:leash_knot',
   MinecraftEntityTypes.FishingHook,
-] as string[]
+]
 
-export const PVP_ENTITIES = [
+export const PVP_ENTITIES: string[] = [
   MinecraftEntityTypes.Player,
   MinecraftEntityTypes.Arrow,
   MinecraftEntityTypes.Snowball,
-  CustomEntityTypes.Fireball,
-  CustomEntityTypes.Cannon,
 ]
 
 const ALLOW_SPAWN_PROP = 'allowSpawn'

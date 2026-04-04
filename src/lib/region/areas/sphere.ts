@@ -3,8 +3,6 @@ import { Vec } from 'lib/vector'
 import { Area } from './area'
 
 class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius: number }> {
-  type = 's'
-
   isNear(point: AbstractPoint, distance: number): boolean {
     const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
@@ -40,4 +38,4 @@ class Sphere extends Area<{ center: { x: number; z: number; y: number }; radius:
   }
 }
 
-export const SphereArea = Sphere.asSaveableArea()
+export const SphereArea = Sphere.asSaveableArea('s')

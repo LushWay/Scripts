@@ -5,13 +5,13 @@ import 'lib/load/message1'
 import 'lib/database/properties'
 
 // Database
-// export * from 'lib/database/inventory'
-// export * from 'lib/database/player'
-// export * from 'lib/database/scoreboard'
-// export * from 'lib/database/utils'
+import 'lib/database/inventory'
+import 'lib/database/player'
+import 'lib/database/scoreboard'
+import 'lib/database/utils'
 
 // // Command
-// export * from 'lib/command/index'
+import 'lib/command/index'
 
 // // Lib
 // export * from 'lib/roles'

@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server'
+import { onLoad } from 'lib/utils/load-ref'
 import { LongDynamicProperty } from './properties'
 
 export class LimitedSet<T> extends Set<T> {
@@ -18,10 +18,14 @@ export class PersistentSet<T extends Json> extends LimitedSet<T> {
     protected limit = 1_000,
   ) {
     super()
-    world.afterEvents.worldLoad.subscribe(() => {
-      this.load()
-    })
+    for (const key in LimitedSet.prototype) {
+      ;(this as Record<string, unknown>)[key] = () => {
+        throw new Error(`PersistentSet<${id}> is not yet loaded!`)
+      }
+    }
   }
+
+  onLoad = onLoad(() => this.load()).onLoad
 
   private load() {
     const id = `PersistentSet<${this.id}>:`
@@ -31,12 +35,20 @@ export class PersistentSet<T extends Json> extends LimitedSet<T> {
       if (!Array.isArray(values)) return console.warn(`${id} Dynamic property is not array, it is:`, values)
 
       values.forEach(e => this.add(e as T))
+
+      for (const [key, value] of Object.entries(LimitedSet.prototype)) (this as Record<string, unknown>)[key] = value
     } catch (error) {
       console.error(`${id} Failed to load:`, error)
+
+      for (const key in LimitedSet.prototype) {
+        ;(this as Record<string, unknown>)[key] = () => {
+          throw new Error(`PersistentSet<${id}> Failed to load: ${error}`)
+        }
+      }
     }
   }
 
-  save() {
+  protected save() {
     LongDynamicProperty.set(this.id, JSON.stringify([...this]))
     return this
   }

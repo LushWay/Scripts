@@ -12,5 +12,5 @@
     "module": "NodeNext",
     "allowImportingTsExtensions": true
   },
-  "include": [".", "./defines.d.ts"]
+  "include": [".", "../../tools/defines.d.ts"]
 }

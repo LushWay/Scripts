@@ -37,7 +37,7 @@ class VillageOfExporersBuilder extends City {
       i18n`Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ`,
     )
 
-    f.quest(techCityInvestigating.goToCityQuest, i18n`А где мне базу сделать-то?`)
+    lf.quest(techCityInvestigating.goToCityQuest, i18n`А где мне базу сделать-то?`)
   })
 }
 

@@ -13,6 +13,8 @@ export class PlaceAction {
   }
 
   static subscribe(type: PlaceType, place: Vector3, action: PlayerCallback, dimension: DimensionType = 'overworld') {
+    this.listen()
+
     const id = this.placeId(place, dimension)
 
     if (!this[type].has(id)) this[type].set(id, new Set())
@@ -50,7 +52,11 @@ export class PlaceAction {
 
   private static interactions = new Map<string, Set<PlayerCallback>>()
 
-  static {
+  private static isListening = false
+
+  private static listen() {
+    if (this.isListening) return
+    this.isListening = true
     onPlayerMove.subscribe(({ player, location, dimensionType }) =>
       this.emit('enters', location, player, dimensionType),
     )

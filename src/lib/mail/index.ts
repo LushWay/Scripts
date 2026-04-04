@@ -1,0 +1,192 @@
+import { Player } from '@minecraft/server'
+
+import { Rewards } from 'lib/utils/rewards'
+import { defaultLang } from '../assets/lang'
+import { table } from '../database/abstract'
+import { Message } from '../i18n/message'
+import { i18n, noI18n } from '../i18n/text'
+import './command'
+
+export namespace Mail {
+  export namespace Letter {
+    export interface Metadata {
+      read: boolean
+      rewardsClaimed: boolean
+    }
+
+    /** "pointer" to a global letter */
+    export type Link = Metadata & { readonly id: string }
+
+    /** A global letter is a letter sent to multiple players */
+    export interface Global {
+      readonly title: string
+      readonly content: string
+      readonly rewards: import('lib/utils/rewards').Rewards.DatabaseEntry[]
+    }
+
+    /** A local letter is a letter sent to a specific player */
+    export type Local = Global & Metadata
+  }
+}
+
+export class Mail {
+  static dbPlayers = table<(Mail.Letter.Local | Mail.Letter.Link)[]>('mailPlayers', () => [])
+
+  static dbGlobal = table<Mail.Letter.Global>('mailGlobal')
+
+  static globalNotFound: Mail.Letter.Global = { title: noI18n`Not found`, content: noI18n`404 Error`, rewards: [] }
+
+  /**
+   * Sends the mail for the player
+   *
+   * @param playerId The reciever
+   * @param title The letter title
+   * @param content The letter content
+   * @param rewards The attached rewards
+   */
+  static send(playerId: string, title: Message, content: Message, rewards = new Rewards()) {
+    Mail.inform(playerId, title)
+    this.dbPlayers
+      .get(playerId)
+      // TODO Use player offline lang once added
+
+      .push({
+        read: false,
+        title: title.to(defaultLang),
+        content: content.to(defaultLang),
+        rewards: rewards.serialize(),
+        rewardsClaimed: false,
+      })
+  }
+
+  private static inform(playerId: string, title: Message) {
+    const player = Player.getById(playerId)
+    if (player) player.info(i18n`${i18n.header`Почта`}: ${title}, просмотреть: /mail`)
+  }
+
+  /**
+   * Sends a mail to multiple players
+   *
+   * @param playerIds The recievers
+   * @param title The letter title
+   * @param content The letter content
+   * @param rewards The attached rewards
+   */
+  static sendMultiple(
+    playerIds: readonly string[],
+    title: Message,
+    content: Message,
+    rewards: Rewards = new Rewards(),
+  ) {
+    let id = new Date().toISOString()
+
+    if (this.dbGlobal.has(id)) {
+      let postfix = 0
+      while (this.dbGlobal.has(id + postfix.toString())) postfix++
+      id = id + postfix.toString()
+    }
+
+    // TODO Use player offline lang once added
+    this.dbGlobal.set(id, {
+      title: title.to(defaultLang),
+      content: content.to(defaultLang),
+      rewards: rewards.serialize(),
+    })
+
+    for (const playerId of playerIds) {
+      Mail.inform(playerId, title)
+      this.dbPlayers.get(playerId).push({ read: false, rewardsClaimed: false, id })
+    }
+  }
+
+  /**
+   * This function returns the unread messages count for a player
+   *
+   * @param playerId
+   * @returns Unread messages count
+   */
+  static getUnreadMessagesCount(playerId: string): number {
+    return this.dbPlayers.get(playerId).filter(letter => !letter.read).length
+  }
+
+  /**
+   * Converts letter pointer or local letter to the LocalLetter
+   *
+   * @param letter - Letter pointer or the local letter
+   */
+  static toLocalLetter(letter: Mail.Letter.Link | Mail.Letter.Local | undefined) {
+    if (!letter) return
+    if ('id' in letter) {
+      const global = Mail.dbGlobal.get(letter.id)
+      if (typeof global === 'undefined') return
+
+      // We cannot use spread syntax here because it will create new
+      // object, so changes will not be saved to the database
+      return Object.setPrototypeOf(letter, global) as Mail.Letter.Local
+    } else return letter
+  }
+
+  /**
+   * Returns the letters array for a player (with indexes)
+   *
+   * @param playerId The player ID
+   */
+  static getLetters(playerId: string) {
+    const letters = []
+
+    for (const [index, anyLetter] of this.dbPlayers.get(playerId).entries()) {
+      const letter = this.toLocalLetter(anyLetter)
+      if (letter) letters.push({ letter, index })
+    }
+
+    return letters
+  }
+
+  /**
+   * Claims the rewards attached to a letter
+   *
+   * @param player The player to give out the rewards to
+   * @param index The index of the message in the player's mailbox
+   */
+  static claimRewards(player: Player, index: number) {
+    const letter = this.toLocalLetter(this.dbPlayers.get(player.id)[index])
+    if (!letter || letter.rewardsClaimed) return
+
+    Rewards.restore(letter.rewards).give(player)
+    letter.rewardsClaimed = true
+  }
+
+  /**
+   * Marks the message as read
+   *
+   * @param {string} playerId The ID of the player in whose mailbox is the message that we want to mark as read
+   * @param {number} index The index of the message in the player's mailbox
+   */
+  static readMessage(playerId: string, index: number) {
+    const letter = this.dbPlayers.get(playerId)[index]
+    if (!letter || letter.read) return
+
+    letter.read = true
+  }
+
+  static readAllAndClaimRewards(player: Player) {
+    for (const { index, letter } of this.getLetters(player.id)) {
+      try {
+        this.readMessage(player.id, index)
+        this.claimRewards(player, index)
+      } catch (e) {
+        console.error('Failed to read and claim:', player.name, index, letter, e)
+      }
+    }
+  }
+
+  /**
+   * Deletes a message from a player's mailbox
+   *
+   * @param {Player} player The player in whose mailbox is the message that we want to delete
+   * @param {number} index The index of the message in the player's mailbox
+   */
+  static deleteMessage(player: Player, index: number) {
+    this.dbPlayers.get(player.id).splice(index, 1)
+  }
+}

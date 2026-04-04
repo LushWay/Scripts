@@ -41,6 +41,7 @@ export class Portal {
     }: { lockAction?: LockActionCheckOptions; fadeScreen?: boolean; title?: string } = {},
     updateHud?: VoidFunction,
   ) {
+    console.log('Portal teleport')
     if (!this.canTeleport(player, lockAction)) return
 
     if (fadeScreen) this.fadeScreen(player)

@@ -1,7 +1,7 @@
 import { BlockPermutation, ItemPotionComponent, ItemStack, Player } from '@minecraft/server'
 
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
-import { MinecraftItemTypes, MinecraftPotionLiquidTypes } from '@minecraft/vanilla-data'
+import { MinecraftItemTypes, MinecraftPotionDeliveryTypes } from '@minecraft/vanilla-data'
 import { Items, totalCustomItems } from 'lib/assets/custom-items'
 import { textureData } from 'lib/assets/texture-data'
 import { translateTypeId } from 'lib/i18n/lang'
@@ -44,8 +44,9 @@ export function getAuxTextureOrPotionAux(itemStack: ItemStack) {
   const potion = itemStack.getComponent(ItemPotionComponent.componentId)
   if (!potion) return getAuxOrTexture(MinecraftItemTypes.Potion)
 
-  const { potionEffectType: effect, potionLiquidType: liquid } = potion
-  const type = liquid.id !== MinecraftPotionLiquidTypes.Regular ? '_' + liquid.id.toLowerCase() : ''
+  // TODO ENSure it works correctly
+  const { potionEffectType: effect, potionDeliveryType: delivery } = potion
+  const type = delivery.id !== MinecraftPotionDeliveryTypes.Consume ? '_' + delivery.id.toLowerCase() : ''
   const effectId =
     (effect.id[0] ?? '').toLowerCase() +
     effect.id

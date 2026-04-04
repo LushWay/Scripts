@@ -1,4 +1,4 @@
-import { Enchantment, RawMessage, RawText } from '@minecraft/server'
+import { Enchantment, ItemStack, RawMessage, RawText, world } from '@minecraft/server'
 import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
 import { blockItemsLangJson, langs } from 'lib/assets/lang-big'
 import { addNamespace, inspect } from 'lib/util'
@@ -20,6 +20,9 @@ import { sprintf } from './sprintf'
 export function translateTypeId(typeId: string, lang: Language) {
   return translateToken(langToken(typeId), lang)
 }
+
+const langTokenCache = new Map<string, string>()
+
 /**
  * Gets localization name of the ItemStack or Block
  *
@@ -30,15 +33,30 @@ export function translateTypeId(typeId: string, lang: Language) {
  * @example
  *   langToken(MinecraftEnchantmentTypes.Sharpness) // %enchantment.sharnpess.name
  */
+export function langToken(typeId: string): string {
+  if (blockItemsLangJson[typeId]) return blockItemsLangJson[typeId]
 
-export function langToken(item: { typeId: string } | string) {
-  const typeId = typeof item === 'object' ? item.typeId : item
-  return typeId in blockItemsLangJson ? blockItemsLangJson[typeId] : typeId
+  try {
+    const item = new ItemStack(typeId)
+    langTokenCache.set(typeId, item.localizationKey)
+    return item.localizationKey
+  } catch {}
+
+  try {
+    const block = world.overworld.getBlock({ x: 0, y: world.overworld.heightRange.max - 1, z: 0 })
+    if (block) {
+      block.setType(typeId)
+      langTokenCache.set(typeId, block.localizationKey)
+      return block.localizationKey
+    }
+  } catch {}
+
+  return typeId
 }
 
 /**
- * Returns RawText representation of an Enchantment or Enchantment Type. If Enchanment is provided, also returns its as
- * another translated RawMessage
+ * Returns translated string representation of an Enchantment or Enchantment Type. If Enchanment is provided, also
+ * returns its as another translated RawMessage
  */
 export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment, language: Language): string {
   let result = translateTypeId(addNamespace(typeof e === 'string' ? e : e.type.id), language)

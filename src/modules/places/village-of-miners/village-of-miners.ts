@@ -76,7 +76,7 @@ class VillageOfMinersBuilder extends City {
       i18n`Они есть... просто они сидят дома и смотрят стрим @shp1natqp`,
     )
 
-    f.quest(
+    lf.quest(
       stoneQuarryInvestigating.goToCityQuest,
       i18n`Как мне переплавить руду?`,
       i18n`Возьми у меня задание и отправляйся в другое поселение следуя компасу.`,

@@ -19,8 +19,6 @@ class ChunkCube extends Area<ChunkCubeDatabase> {
     super(database, dimensionType)
   }
 
-  type = 'c'
-
   isNear(point: AbstractPoint, distance: number): boolean {
     const { location: vector, dimensionType } = toPoint(point)
     if (!this.isOurDimension(dimensionType)) return false
@@ -60,4 +58,4 @@ class ChunkCube extends Area<ChunkCubeDatabase> {
   }
 }
 
-export const ChunkCubeArea = ChunkCube.asSaveableArea()
+export const ChunkCubeArea = ChunkCube.asSaveableArea('c')

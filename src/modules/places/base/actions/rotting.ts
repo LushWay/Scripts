@@ -1,22 +1,22 @@
 import { Block, BlockPermutation, ContainerSlot, Player, system } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 
+import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
 import { form } from 'lib/form/new'
 import { Message } from 'lib/i18n/message'
 import { i18n } from 'lib/i18n/text'
-import { anyPlayerNearRegion } from 'lib/player-move'
-import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { itemNameXCount } from 'lib/utils/item-name-x-count'
-import { spawnParticlesInArea } from 'modules/world-edit/config'
-import { BaseRegion, RottingState } from '../region'
-import { Cooldown } from 'lib/cooldown'
 import { Mail } from 'lib/mail'
+import { anyPlayerNearRegion } from 'lib/player-move'
 import { actionGuard, ActionGuardOrder } from 'lib/region'
+import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { isEmpty } from 'lib/util'
-import { getBlockStatus, isLocationError, isNotPlaying } from 'lib/utils/game'
+import { getBlockStatus, isLocationError, isNotPlaying, onLoad } from 'lib/utils/game'
+import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
+import { spawnParticlesInArea } from 'modules/world-edit/config'
+import { BaseRegion, RottingState } from '../region'
 
 const takeMaterialsTime = __DEV__ ? ms.from('day', 1) : ms.from('day', 1)
 const blocksReviseTime = __DEV__ ? ms.from('min', 1) : ms.from('min', 2)
@@ -24,9 +24,11 @@ const materialsReviseTime = __DEV__ ? ms.from('min', 1) : ms.from('min', 1)
 
 const cooldowns = table<Record<string, unknown>>('baseCoooldowns', () => ({}))
 
-const blocksToMaterialsCooldown = new Cooldown(blocksReviseTime, false, cooldowns.get('blocksToMaterials'))
-const reviseMaterialsCooldown = new Cooldown(materialsReviseTime, false, cooldowns.get('revise'))
-const takeMaterialsCooldown = new Cooldown(takeMaterialsTime, false, cooldowns.get('takeMaterials'))
+const blocksToMaterialsCooldown = onLoad(
+  () => new Cooldown(blocksReviseTime, false, cooldowns.get('blocksToMaterials')),
+)
+const reviseMaterialsCooldown = onLoad(() => new Cooldown(materialsReviseTime, false, cooldowns.get('revise')))
+const takeMaterialsCooldown = onLoad(() => new Cooldown(takeMaterialsTime, false, cooldowns.get('takeMaterials')))
 
 system.runInterval(
   () => {
@@ -40,9 +42,9 @@ system.runInterval(
       spawnParticlesInArea(base.area.center, Vec.add(base.area.center, Vec.one))
 
       if (block.typeId === MinecraftBlockTypes.Barrel) {
-        if (blocksToMaterialsCooldown.isExpired(base.id)) blocksToMaterials(base)
-        if (reviseMaterialsCooldown.isExpired(base.id)) reviseMaterials(base, block)
-        if (takeMaterialsCooldown.isExpired(base.id)) takeMaterials(base, block)
+        if (blocksToMaterialsCooldown.value.isExpired(base.id)) blocksToMaterials(base)
+        if (reviseMaterialsCooldown.value.isExpired(base.id)) reviseMaterials(base, block)
+        if (takeMaterialsCooldown.value.isExpired(base.id)) takeMaterials(base, block)
       } else startRotting(base, RottingState.Destroyed)
     }
   },
@@ -81,7 +83,7 @@ const baseRottingMenu = form.params<{ base: BaseRegion }>((f, { params: { base }
 
   f.title(i18n`Гниение базы`)
   f.body(
-    i18n`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${i18n.hhmmss(takeMaterialsCooldown.getRemainingTime(base.id))}`,
+    i18n`Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n${materials}\nМатериалы в бочке:\n${barrelMaterials}\n${missingMaterialsText}\nДо следующего сбора ресурсов: ${i18n.hhmmss(takeMaterialsCooldown.value.getRemainingTime(base.id))}`,
   )
 })
 

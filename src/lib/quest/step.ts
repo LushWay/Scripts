@@ -219,4 +219,7 @@ export abstract class QS<DB = any> extends Temporary {
     this.cleaners.push(() => eventSignal.unsubscribe(callback))
     return callback
   }
+
+  /** The amount of ticks red dot will flicker when step changes to this */
+  public animateTicks?: number
 }

@@ -6,7 +6,6 @@ import {
   MinecraftEnchantmentTypes,
   MinecraftItemTypes,
   MinecraftPotionEffectTypes,
-  MinecraftPotionModifierTypes,
 } from '@minecraft/vanilla-data'
 
 import { Sounds } from 'lib/assets/custom-sounds'
@@ -19,8 +18,7 @@ import { Cost, MoneyCost, MultiCost } from 'lib/shop/cost'
 import { ErrorCost, FreeCost } from 'lib/shop/cost/cost'
 import { ShopFormSection } from 'lib/shop/form'
 import { ShopNpc } from 'lib/shop/npc'
-import { addNamespace } from 'lib/util'
-import { doNothing } from 'lib/util'
+import { addNamespace, doNothing } from 'lib/util'
 import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
@@ -180,10 +178,10 @@ export class Mage extends ShopNpc {
             form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Strength)
             form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Healing)
             form.potion(new MoneyCost(100), MinecraftPotionEffectTypes.Swiftness)
-            form.potion(new MoneyCost(10), MinecraftPotionEffectTypes.NightVision, MinecraftPotionModifierTypes.Long)
+            form.potion(new MoneyCost(10), MinecraftPotionEffectTypes.LongNightvision)
           })
-          .itemStack(IceBombItem, new MoneyCost(100))
-          .itemStack(FireBallItem, new MoneyCost(100))
+          .itemStack(IceBombItem.itemStack, new MoneyCost(100))
+          .itemStack(FireBallItem.itemStack, new MoneyCost(100))
           .itemStack(new ItemStack(i.TotemOfUndying), new MultiCost().money(6_000).item(i.Emerald, 1))
           .itemStack(new ItemStack(i.EnchantedGoldenApple), new MultiCost().item(i.GoldenApple).money(10_000)),
       )

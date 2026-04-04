@@ -1,5 +1,6 @@
 import { Dimension, World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
+import { onLoad } from 'lib/utils/load-ref'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -11,7 +12,7 @@ declare module '@minecraft/server' {
      * Logs given message once
      *
      * @param type Type of log
-     * @param messages Data to log
+     * @param messages Data to log using world.debug()
      */
     logOnce(type: string, ...messages: unknown[]): void
 
@@ -21,26 +22,18 @@ declare module '@minecraft/server' {
   }
 }
 
-world.afterEvents.worldLoad.subscribe(() => {
-  expand(World.prototype, {
-    overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
-    nether: world.getDimension(MinecraftDimensionTypes.Nether),
-    end: world.getDimension(MinecraftDimensionTypes.TheEnd),
-  })
-})
-
 expand(World.prototype, {
   say: world.sendMessage.bind(world),
   get overworld() {
-    // throw new Error('Dimensions are not available')
+    throw new Error('Dimensions are not available')
     return undefined as unknown as Dimension
   },
   get nether() {
-    // throw new Error('Dimensions are not available')
+    throw new Error('Dimensions are not available')
     return undefined as unknown as Dimension
   },
   get end() {
-    // throw new Error('Dimensions are not available')
+    throw new Error('Dimensions are not available')
     return undefined as unknown as Dimension
   },
   logOnce(name, ...data: unknown[]) {
@@ -48,6 +41,14 @@ expand(World.prototype, {
     console.log(name, ...data)
     logs.add(name)
   },
+})
+
+onLoad(() => {
+  expand(World.prototype, {
+    overworld: world.getDimension(MinecraftDimensionTypes.Overworld),
+    nether: world.getDimension(MinecraftDimensionTypes.Nether),
+    end: world.getDimension(MinecraftDimensionTypes.TheEnd),
+  })
 })
 
 const logs = new Set()

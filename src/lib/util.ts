@@ -8,19 +8,20 @@ export { inspect, stringify, stringifyError }
 export const util = {
   /** Runs the given callback safly. If it throws any error it will be handled */
   catch(this: void, fn: () => void | Promise<void>, subtype = 'Handled', originalStack?: string) {
-    const prefix = `§6${subtype}: `
     try {
       const promise = fn()
       if (promise instanceof Promise) {
-        promise.catch((e: unknown) => {
-          console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }))
-        })
+        promise.catch((e: unknown) => util.onError(e, subtype, originalStack))
       }
     } catch (e: unknown) {
-      console.error(
-        prefix + stringifyError(e as Error, { omitStackLines: 1 }) + (originalStack ? '\n\n' + originalStack : ''),
-      )
+      util.onError(e, subtype, originalStack)
     }
+  },
+
+  onError(e: unknown, subtype: string, originalStack?: string) {
+    const prefix = `§6${subtype}: `
+    const add = originalStack ? '\n\n' + stringifyError.stack.get(0, originalStack) : ''
+    console.error(prefix + stringifyError(e as Error, { omitStackLines: 1 }) + add)
   },
 
   benchmark: Object.assign(
@@ -77,7 +78,7 @@ export const util = {
     const r = TerminalColors.r
     if (!r) throw new TypeError('Broken terminal colors: no r')
 
-    return __SERVER__ ? text.replace(/§(.)/g, (_, a: string) => TerminalColors[a] ?? r) + r : text.replace(/§(.)/g, '')
+    return text.replace(/§(.)/g, (_, a: string) => TerminalColors[a] ?? r) + r
   },
 
   fromTerminalColorsToMinecraft(string: string) {
@@ -124,6 +125,48 @@ export function wrap(string: string, maxLength: number) {
     } else if ((char + line).replace(/§./g, '').length > maxLength) {
       // Limit exceeded, newline
       char.trim() && lines.push(char)
+    } else {
+      // No limit, add char to the line
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      lines[i] += char
+    }
+  }
+
+  return lines
+}
+
+/**
+ * Wraps the line
+ *
+ * @param string
+ * @param maxLength
+ */
+export function wordWrap(string: string, maxLength: number) {
+  /** @type {string[]} */
+  const lines: string[] = []
+  const rawlines = string.split('')
+
+  for (const char of rawlines) {
+    if (!char) continue
+
+    // Empty lines, add first char
+    if (!lines.length) {
+      lines.push(char)
+      continue
+    }
+
+    // Last element index
+    const i = lines.length - 1
+    const line = lines[i] ?? ''
+    const lastLineChar = line[line.length - 1]
+
+    if (lastLineChar === '§' || char === '§') {
+      // Ignore limit for invisible chars
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      lines[i] += char
+    } else if ((char + line).replace(/§./g, '').length > maxLength && !char.trim()) {
+      // Limit exceeded, newline
+      lines.push('')
     } else {
       // No limit, add char to the line
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
@@ -260,5 +303,11 @@ export function capitalize<T extends string>(str: T) {
 }
 
 export function pick<T extends object, K extends keyof T>(object: T, keys: K[]): Pick<T, K> {
-  return Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key as K))) as Pick<T, K>
+  return keys.reduce(
+    (result, key) => {
+      result[key] = object[key]
+      return result
+    },
+    {} as Pick<T, K>,
+  )
 }

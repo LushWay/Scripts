@@ -1,5 +1,6 @@
 import { system, System, world } from '@minecraft/server'
 import stringifyError from 'lib/utils/error'
+import { LoadRef } from 'lib/utils/load-ref'
 import { capitalize, util } from '../util'
 import { expand } from './extend'
 
@@ -64,15 +65,23 @@ expand(System.prototype, {
 
   runJob(generator, name) {
     const id = name ?? stringifyError.parent()
+    const source = new Error().stack
     return super.runJob(
       (function* runJobWrapper() {
-        let v
+        let v: IteratorResult<void> | undefined
         do {
           const end = util.benchmark(id, 'job')
-          v = generator.next()
+          util.catch(
+            () => {
+              v = generator.next()
+              return v.value
+            },
+            'runJob',
+            source,
+          )
           end()
           yield
-        } while (!v.done)
+        } while (!v?.done)
       })(),
     )
   },
@@ -93,7 +102,7 @@ expand(System.prototype, {
   },
 
   delay(fn) {
-    const origin = stringifyError.stack.get(1)
+    const origin = new Error().stack
     this.run(function delay() {
       util.catch(fn, 'system.delay', origin)
     })
@@ -156,6 +165,7 @@ function Timer(
   TIMERS_PATHES[visualId] = path
 
   function timer() {
+    if (type !== 'timeout' && !LoadRef.loadFinished) return
     util.catch(fn, capitalize(type))
   }
 

@@ -1,8 +1,8 @@
-import { Entity, EntityComponentTypes, ItemStack, Player, system, world } from '@minecraft/server'
+import { Entity, EntityComponentTypes, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 
 import { i18n } from 'lib/i18n/text'
-import { customItems } from 'lib/rpg/custom-item'
+import { CustomItem } from 'lib/rpg/custom-item'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { ms } from 'lib/utils/ms'
 import { toPoint } from 'lib/utils/point'
@@ -11,11 +11,9 @@ import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { BaseRegion } from 'modules/places/base/region'
 import { getEdgeBlocksOf } from 'modules/places/mineshaft/get-edge-blocks-of'
 
-export const IceBombItem = new ItemStack(MinecraftItemTypes.Snowball).setInfo(
-  i18n`§3Снежная бомба`,
-  i18n`Используйте, чтобы отправить все к снежной королеве подо льдину`,
-)
-customItems.push(IceBombItem)
+export const IceBombItem = new CustomItem(MinecraftItemTypes.Snowball)
+  .nameTag(i18n`§3Снежная бомба`)
+  .lore(i18n`Используйте, чтобы отправить все к снежной королеве подо льдину`)
 
 const ICE_BOMB_TRANSOFORM: Record<string, string> = {
   [MinecraftBlockTypes.Water]: MinecraftBlockTypes.FrostedIce,
@@ -28,7 +26,7 @@ const iceBombs = new Set<Entity>()
 const usedIceBombs = new WeakPlayerSet()
 
 world.afterEvents.itemUse.subscribe(event => {
-  if (!event.itemStack.is(IceBombItem)) return
+  if (!IceBombItem.isItem(event.itemStack)) return
   usedIceBombs.add(event.source)
 })
 

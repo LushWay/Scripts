@@ -82,7 +82,7 @@ export namespace createSelectPlayerMenu {
 }
 
 function getPlayersForSelectMenu(offline = true) {
-  let players = Player.database.entries()
+  let players = [...Player.database.entriesImmutable()]
   if (!offline) {
     const online = world.getAllPlayers().map(e => e.id)
     players = players.filter(([id]) => online.includes(id))
@@ -100,7 +100,7 @@ export function selectPlayer(
     const onlinePlayers = world.getAllPlayers()
     const players = []
 
-    for (const [id, db] of Player.database.entries()) {
+    for (const [id, db] of Player.database.entriesImmutable()) {
       const player = onlinePlayers.find(e => e.id === id)
 
       const name = player?.name ?? db.name ?? id

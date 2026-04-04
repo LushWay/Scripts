@@ -3,8 +3,14 @@ import { ProxyDatabase } from './proxy'
 
 describe('ProxyDatabase', () => {
   let database: Table<any, string>
+  class Database<Value = unknown, Key extends string = string> extends ProxyDatabase<Value, Key> {
+    onLoad(waiter: (value: void) => void): void {}
+
+    protected loaded = true
+  }
+
   beforeEach(() => {
-    database = new ProxyDatabase('id')
+    database = new Database('id')
   })
 
   it('should save strings', () => {
@@ -52,7 +58,7 @@ describe('ProxyDatabase', () => {
   })
 
   it('should support default value', () => {
-    const database = new ProxyDatabase<{ some: { nested: { defaultValue: boolean; assignable?: boolean } } }, string>(
+    const database = new Database<{ some: { nested: { defaultValue: boolean; assignable?: boolean } } }, string>(
       'default',
       () => ({ some: { nested: { defaultValue: true } } }),
     )

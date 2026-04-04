@@ -1,5 +1,6 @@
 import { Player, RawMessage, ScreenDisplay, system, world } from '@minecraft/server'
 import { ScreenDisplaySymbol } from 'lib/extensions/player'
+import { onLoad } from 'lib/utils/load-ref'
 import { fromMsToTicks, fromTicksToMs } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
@@ -219,7 +220,7 @@ const actionbarLock = new WeakPlayerMap<{ priority: ActionbarPriority; expires: 
 const defaultOptions = { fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 0 }
 const defaultTitleOptions = { ...defaultOptions, stayDuration: -1 }
 
-world.afterEvents.worldLoad.subscribe(run)
+onLoad(run)
 
 function run() {
   system.run(() => {

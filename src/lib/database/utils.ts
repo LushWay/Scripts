@@ -2,6 +2,7 @@
 
 import { Entity, StructureSaveMode, system, world } from '@minecraft/server'
 import { noI18n } from 'lib/i18n/text'
+import { onLoad } from 'lib/utils/load-ref'
 import { Vec } from 'lib/vector'
 
 interface TableEntity {
@@ -133,6 +134,6 @@ export class DatabaseUtils {
   }
 }
 
-world.afterEvents.worldLoad.subscribe(() => {
+onLoad(() => {
   world.overworld.runCommand('tickingarea add 0 -64 0 0 200 0 database true')
 })

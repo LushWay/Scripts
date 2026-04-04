@@ -1,3 +1,5 @@
+import './setup-early'
+
 import 'lib/load/enviroment'
 
 import 'lib/database/player'

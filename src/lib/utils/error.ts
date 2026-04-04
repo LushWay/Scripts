@@ -19,7 +19,7 @@ const stringifyError = Object.assign(
       t.name = 'StringError'
     }
 
-    __PRODUCTION__ &&
+    !__DEV__ &&
       s?.('error', {
         name: t.name ?? 'Error',
         stack: t.stack ?? '',
@@ -57,7 +57,7 @@ const stringifyError = Object.assign(
         [/(.*)\(native\)(.*)/, '§8$1(native)$2§f'],
         [s => (s.includes('lib') ? `§7${s.replace(/§./g, '')}§f` : s)],
         // [s => (s.startsWith('§7') ? s : s.replace(/:(\d+)/, ':§6$1§f'))],
-        [/__init \(index\.js:4\)/, ''],
+        [/__init \(index\.js:8\)/, ''],
       ] as [RegExp | ((s: string) => string), string?][],
 
       /** Parses stack */

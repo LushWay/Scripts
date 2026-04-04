@@ -204,7 +204,10 @@ const regionStructureForm = form.params<{ region: Region; title: Text }>((f, { p
       player.fail(i18n.error`Не удалось сохранить структуру: ${e}`)
     }
   })
-  if (exists) f.ask(noI18n`§cУдалить структуру`, noI18n`§cУдалить`, () => region.structure?.delete())
+  if (exists)
+    f.ask(noI18n.error`Удалить структуру`, noI18n.error`Удалить структуру ${region.structure}?`, () =>
+      region.structure?.delete(),
+    )
 })
 export const editRegion = form.params<{ region: Region; displayName: boolean }>(
   (f, { player, back, self, params: { region, displayName } }) => {
@@ -240,7 +243,7 @@ export const editRegion = form.params<{ region: Region; displayName: boolean }>(
       }),
     )
 
-    f.ask(noI18n.error`Удалить регион`, noI18n.error`Удалить`, () => (region.delete(), back?.(player)))
+    f.ask(noI18n.error`Удалить регион`, noI18n.error`Удалить?`, () => (region.delete(), back?.(player)))
   },
 )
 function parseLocationFromForm(ctx: FormCallback<ModalForm>, location: string, player: Player) {
@@ -366,6 +369,7 @@ export const manageRegionMembers = form.params<{
             })
         }),
       )
+
     for (const [i, memberId] of region.permissions.owners.entries()) {
       const name = Player.nameOrUnknown(memberId)
 
@@ -376,15 +380,17 @@ export const manageRegionMembers = form.params<{
           f.body(i18n`Управление участником региона`)
           if (region.getMemberRole(memberId) !== 'owner')
             f.ask(
-              isOwner ? i18n`Передать права владельца региона` : i18n`Назначить владельцем региона`,
-              i18n`Передать`,
+              i18n`Передать права`,
+              isOwner
+                ? i18n`Вы уверены что хотите передать права владельца региона игроку ${name}?`
+                : i18n`Вы уверены что хотите назначить владельцем региона игрока ${name}?`,
               () => {
                 region.permissions.owners = region.permissions.owners.sort(a => (a === memberId ? 1 : -1))
                 applyAction()
               },
             )
 
-          f.ask(i18n.error`Удалить участника`, i18n.error`Удалить`, () => {
+          f.ask(i18n.error`Удалить участника`, i18n.error`Вы уверены что хотите удалить участника из региона?`, () => {
             region.permissions.owners = region.permissions.owners.filter(e => e !== memberId)
             applyAction()
           })

@@ -1,4 +1,4 @@
-import { Player, world } from '@minecraft/server'
+import { Player } from '@minecraft/server'
 import { PersistentSet } from 'lib/database/persistent-set'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
@@ -19,7 +19,7 @@ export const cutscene = new Command('cutscene')
 
 const cutscenes = new PersistentSet<string>('cutscenesIds')
 
-world.afterEvents.worldLoad.subscribe(() => {
+cutscenes.onLoad(() => {
   for (const c of cutscenes) new Cutscene(c, c)
 })
 
@@ -56,7 +56,7 @@ const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, par
     .button(noI18n`Воспроизвести`, () => cutscene.play(player))
 
   if (created) {
-    f.ask(noI18n.error`Удалить`, noI18n.error`Удалить`, () => {
+    f.ask(noI18n.error`Удалить`, noI18n.error`Вы уверены, что хотите удалить катсцену?`, () => {
       Cutscene.all.delete(cutscene.id)
       cutscenes.delete(cutscene.id)
       player.success()

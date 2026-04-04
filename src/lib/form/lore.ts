@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { i18n } from 'lib/i18n/text'
 import { form, NewFormCallback, NewFormCreator } from './new'
+import { QuestForm } from './quest'
 
 interface LoreFormDb {
   seen: string[]
@@ -11,7 +12,7 @@ type AddFn = (f: NewFormCreator) => void
 
 export type LF = Omit<LoreForm, 'renderHistory'>
 
-export class LoreForm {
+export class LoreForm extends QuestForm {
   static db = table<LoreFormDb>('loreForm', () => ({ seen: [] }))
 
   static list: LoreForm[] = []
@@ -20,12 +21,17 @@ export class LoreForm {
     return this.list.map(e => LoreForm.db.get(`${e.id} ${playerId}`))
   }
 
+  static clearAll(playerId: string) {
+    this.list.map(e => LoreForm.db.delete(`${e.id} ${playerId}`))
+  }
+
   constructor(
     protected id: string,
-    protected form: NewFormCreator,
-    protected player: Player,
-    protected back: NewFormCallback,
+    form: NewFormCreator,
+    player: Player,
+    back: NewFormCallback,
   ) {
+    super(form, player, back)
     this.db = LoreForm.db.get(`${id} ${player.id}`)
     LoreForm.list.push(this)
   }

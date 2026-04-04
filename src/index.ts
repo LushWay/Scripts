@@ -1,8 +1,8 @@
-import { system } from '@minecraft/server'
+// Takes too much to load dynamically which results in interrupted error
+import 'lib/assets/intl-global-object'
 
-system.beforeEvents.startup.subscribe(() => {
-  system.run(() => {
-    if (__TEST__) import('./test/loader')
-    else import('./modules/loader')
-  })
+import 'lib/assets/intl'
+
+import('./modules/loader').catch((e: unknown) => {
+  console.error('Loading error', e)
 })

@@ -2,6 +2,7 @@ import { GameMode, Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
+import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Compass } from 'lib/rpg/menu'
@@ -11,6 +12,12 @@ import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { QuestButton } from './button'
 import { PlayerQuest } from './player'
 import { QS } from './step'
+
+declare module '@minecraft/server' {
+  interface PlayerDatabase {
+    quests?: Quest.DB
+  }
+}
 
 export declare namespace Quest {
   interface DB {
@@ -34,34 +41,32 @@ export class Quest {
       },
     },
   )
+  private static textCache = new WeakPlayerMap<{ step: QS; time: number }>({ removeOnLeave: true })
 
-  static sidebar: import('lib/sidebar').SidebarLineCreate<unknown> = {
-    create(sidebar) {
-      const showSidebar = sidebar.show.bind(sidebar)
-      const textCache = new WeakPlayerMap<{ step: QS; time: number }>({ removeOnLeave: true })
+  static showActionBar(this: void, player: Player) {
+    const step = Quest.getCurrentStepOf(player)
+    if (!step || player.database.inv === 'spawn' || player.getGameMode() == GameMode.Creative) return ''
 
-      return function (player: Player) {
-        const step = Quest.getCurrentStepOf(player)
-        if (!step || player.database.inv === 'spawn' || player.getGameMode() == GameMode.Creative) return ''
+    step.playerQuest.updateListeners.add(Quest.showActionBar)
 
-        step.playerQuest.updateListeners.add(showSidebar)
+    const text = `§l${step.quest.name.to(player.lang)}:§r§6 ${step.text().to(player.lang)}`
+    const cached = Quest.textCache.get(player)
 
-        const text = `§l${step.quest.name.to(player.lang)}:§r§6 ${step.text().to(player.lang)}`
-        const cached = textCache.get(player)
+    if (cached?.step !== step) {
+      Quest.textCache.set(player, { step, time: step.animateTicks ?? 10 })
+      return text
+    }
 
-        if (cached?.step !== step) {
-          textCache.set(player, { step: step, time: 10 })
-          return text
-        }
+    let toDisplay = text
 
-        if (cached.time <= 0) return text
+    if (cached.time >= 0) {
+      // Animate
+      cached.time--
+      Quest.textCache.set(player, cached)
+      toDisplay = `${cached.time % 2 !== 0 ? '§c°' : ''}${text}`
+    }
 
-        // Animate
-        cached.time--
-        textCache.set(player, cached)
-        return `${cached.time % 2 !== 0 ? '§c°' : ''}${text}`
-      }
-    },
+    player.onScreenDisplay.setActionBar(toDisplay, ActionbarPriority.Quest)
   }
 
   static quests = new Map<string, Quest>()
@@ -79,14 +84,16 @@ export class Quest {
     Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (firstJoin) return
 
-      system.delay(() => {
-        player.database.quests?.active.forEach(db => {
-          const quest = Quest.quests.get(db.id)
-          if (!quest) return
+      system.delay(() => this.restoreFromDatabase(player))
+    })
+  }
 
-          this.restore(player, quest, db)
-        })
-      })
+  static restoreFromDatabase(player: Player) {
+    player.database.quests?.active.forEach(db => {
+      const quest = Quest.quests.get(db.id)
+      if (!quest) return
+
+      this.restore(player, quest, db)
     })
   }
 
@@ -165,7 +172,11 @@ export class Quest {
   /** Moves player to the specific quest step with all the visuals etc */
   setStep(player: Player, i: number, restore = false) {
     const step = this.getCurrentStep(player, i) ?? this.createPlayerSteps(player, i)
-    if (typeof step === 'undefined') return // Index can point to unknown step, e.g quest have 4 steps but index is 10
+    // Index can point to unknown step, e.g quest have 4 steps but index is 10
+    if (typeof step === 'undefined')
+      return console.warn(
+        `Quest non existent step: ${player.name} ${this.id} ${i}/${this.players.get(player)?.steps.length}`,
+      )
 
     const db = this.getDatabase(player) ?? this.createDatabase(player, i)
 
