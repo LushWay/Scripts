@@ -2,21 +2,21 @@ import { EntityTypes, Player, StructureRotation, StructureSaveMode, system, worl
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
+import { Cooldown } from 'lib/cooldown'
 import { NewFormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNear } from 'lib/player-move'
+import { adventureModeRegions, registerRegionType, registerSaveableRegion } from 'lib/region'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
-import { createLogger } from 'lib/utils/logger'
-import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
-import { Dungeon } from './loot'
-import { Cooldown } from 'lib/cooldown'
-import { registerSaveableRegion, registerRegionType, adventureModeRegions } from 'lib/region'
 import { LootTable } from 'lib/rpg/loot-table'
 import { isKeyof } from 'lib/util'
+import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
+import { structureLikeRotate, structureLikeRotateRelative, toAbsolute, toRelative } from 'lib/utils/structure'
 import { Vec } from 'lib/vector'
+import { Dungeon } from './loot'
 
 const logger = createLogger('dungeon')
 
@@ -302,7 +302,7 @@ export class DungeonRegion extends Region {
     this.createSpawner(rotated, entities, restoreTime)
   }
 
-  protected createSpawner(location: Vector3, entities: DungeonSpawner['entities'], restoreTime = ms.from('sec', 30)) {
+  protected createSpawner(location: Vector3, entities: DungeonSpawner['entities'], restoreTime = ms.from('min', 5)) {
     this.spawners.push({
       id: Vec.string(location),
       location,
