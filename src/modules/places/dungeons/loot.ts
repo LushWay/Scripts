@@ -14,7 +14,7 @@ const defaultLoot = new Loot('dungeon_default_loot')
   .item('Apple')
   .weight('10%')
   .amount({
-    '3...8': '1%',
+    '1...2': '1%',
   })
 
   .item(Items.Money)
@@ -27,19 +27,19 @@ const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(FireBallItem)
   .weight('20%')
   .amount({
-    '10...32': '1%',
+    '3...5': '1%',
   })
 
   .itemStack(IceBombItem)
   .weight('20%')
   .amount({
-    '10...32': '1%',
+    '3...5': '1%',
   })
 
   .item('BakedPotato')
   .weight('20%')
   .amount({
-    '5...15': '1%',
+    '1...5': '1%',
   })
 
   .item('PoisonousPotato')
@@ -83,7 +83,7 @@ const powerfullLoot: Record<string, LootTable | undefined> = {
     .item('GoldenCarrot')
     .weight('10%')
     .amount({
-      '1...10': '1%',
+      '1...5': '1%',
     })
 
     .item('GoldIngot')
