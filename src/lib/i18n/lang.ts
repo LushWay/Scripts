@@ -62,8 +62,9 @@ export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment,
   let result = translateTypeId(addNamespace(typeof e === 'string' ? e : e.type.id), language)
 
   if (typeof e === 'object' && e.level > 0) {
-    const level =
-      e.level < 10 ? translateTypeId(`enchantment.level.${e.level.toString()}`, language) : e.level.toString()
+    // const level =
+    // e.level < 10 ? translateTypeId(`enchantment.level.${e.level.toString()}`, language) : e.level.toString()
+    const level = e.level.toString()
     result += ' ' + level
   }
 
