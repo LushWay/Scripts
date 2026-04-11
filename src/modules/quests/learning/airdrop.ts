@@ -19,12 +19,13 @@ export default new Loot('starter')
   .item('LeatherHelmet')
   .weight('100%')
 
-  .item('CookedBeef')
+  .item('Apple')
   .weight('100%')
-  .amount({
-    '10...20': '50%',
-    '21...32': '10%',
-  })
+  .amount({ '5': '100%' })
+
+  .item('Cookie')
+  .weight('100%')
+  .amount({ '3': '100%' })
 
   .item(Items.Money)
   .weight('100%')
