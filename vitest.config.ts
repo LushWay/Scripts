@@ -1,6 +1,6 @@
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
-import { generateDefine } from '../tools/define'
+import { generateDefine } from '../tools/define.ts'
 
 export default defineConfig({
   define: generateDefine({ dev: true, test: true }),
