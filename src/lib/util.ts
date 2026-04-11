@@ -303,11 +303,28 @@ export function capitalize<T extends string>(str: T) {
 }
 
 export function pick<T extends object, K extends keyof T>(object: T, keys: K[]): Pick<T, K> {
-  return keys.reduce(
-    (result, key) => {
-      result[key] = object[key]
-      return result
-    },
-    {} as Pick<T, K>,
-  )
+  return Object.fromEntries(Object.entries(object).filter(([key]) => keys.includes(key as K))) as Pick<T, K>
+}
+
+export class LRUSet<T> extends Set<T> {
+  constructor(private readonly limit: number) {
+    super()
+  }
+
+  get last() {
+    let last
+    for (last of this);
+    return last
+  }
+
+  add(value: T) {
+    if (this.has(value)) {
+      // Remove to re-insert at the end (newest)
+      this.delete(value)
+    } else if (this.size >= this.limit) {
+      const oldest = this.values().next().value
+      if (oldest) this.delete(oldest)
+    }
+    return super.add(value)
+  }
 }

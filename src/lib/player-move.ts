@@ -2,6 +2,7 @@ import { Player, ShortcutDimensions, system, world } from '@minecraft/server'
 import type { Region } from 'lib/region'
 import { Vec } from 'lib/vector'
 import { EventSignal } from './event-signal'
+import { LRUSet } from './util'
 import { onLoad } from './utils/game'
 import { VectorInDimension } from './utils/point'
 import { WeakPlayerMap } from './weak-player-storage'
@@ -15,6 +16,8 @@ export const onPlayerMove = new EventSignal<PlayerPosition>()
 
 /** Cache used by {@link onPlayerMove}. Updates every job run */
 export const playerPositionCache = new WeakPlayerMap<PlayerPosition>()
+
+export const playerMoveHistory = new WeakPlayerMap<LRUSet<VectorInDimension>>()
 
 export function anyPlayerNear(location: Vector3, dimensionType: ShortcutDimensions, radius: number) {
   for (const player of playerPositionCache.values()) {
@@ -49,11 +52,23 @@ function* jobPlayerPosition() {
       const { location: location, dimension } = player
       const { type: dimensionType } = dimension
 
+      const history =
+        playerMoveHistory.get(player) ??
+        (() => {
+          const history = new LRUSet<VectorInDimension>(10)
+          playerMoveHistory.set(player, history)
+          return history
+        })()
+
+      const last = history.last
+      if (last?.dimensionType !== dimensionType || !Vec.isInsideRadius(last.location, location, 10)) {
+        history.add({ location, dimensionType })
+      }
+
       const cache = playerPositionCache.get(player)
 
       if (
-        cache &&
-        cache.dimensionType === dimensionType &&
+        cache?.dimensionType === dimensionType &&
         cache.location.x === location.x &&
         cache.location.y === location.y &&
         cache.location.x === location.x

@@ -1,11 +1,16 @@
 import { EquipmentSlot, Player } from '@minecraft/server'
+import { register } from '@minecraft/server-gametest'
 import { emoji } from 'lib/assets/emoji'
+import { EventSignal } from 'lib/event-signal'
+import { regionTypes } from 'lib/region'
 import { ms } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 
 enum Level {
   None,
   Leather,
+  Stone,
+  Golden,
   Iron,
   Diamond,
   Netherite,
@@ -42,8 +47,13 @@ enum Mode {
   Every,
 }
 
+function getCompare(items: ItemsLevel, armor: ArmorLevel, mode = Mode.Half) {
+  if (mode === Mode.Every) return Math.min(items, armor)
+  return Math.max(items, armor)
+}
+
 function get(player: Player, mode = Mode.Half) {
-  return Math.max(getArmorLevel(player, mode), getItemsLevel(player, mode))
+  return getCompare(getItemsLevel(player, mode), getArmorLevel(player, mode), mode)
 }
 
 function getArmorLevel(player: Player, mode = Mode.Half) {
@@ -109,8 +119,8 @@ function checkMode<T, L extends Record<string, number | string>>(
   return minLevel
 }
 
-function is(level: Level, player: Player) {
-  return get(player) >= level
+function is(level: Level, player: Player, mode = Mode.Half) {
+  return get(player, mode) >= level
 }
 
 function isArmor(level: Level, player: Player) {
@@ -123,6 +133,8 @@ function isItems(level: Level, player: Player) {
 
 const cache = new WeakPlayerMap<{ armor: ArmorLevel; items: ItemsLevel; expires: number }>()
 
+const cacheUpdate = new EventSignal<{ player: Player; items: ItemsLevel; armor: ArmorLevel }>()
+
 function getCached(player: Player): { armor: ArmorLevel; items: ItemsLevel } {
   const cached = cache.get(player)
   if (cached && cached.expires < Date.now()) return cached
@@ -130,6 +142,7 @@ function getCached(player: Player): { armor: ArmorLevel; items: ItemsLevel } {
   const items = getItemsLevel(player)
   const armor = getArmorLevel(player)
   cache.set(player, { armor, items, expires: Date.now() + ms.from('sec', 10) })
+  EventSignal.emit(cacheUpdate, { player, armor, items })
   return { items, armor }
 }
 
@@ -152,9 +165,33 @@ const emojiArmor: Record<ArmorLevel, string> = {
   [ArmorLevel.Netherite]: emoji.custom.armor.netherite,
 }
 
+const emojiLevel: Record<Level, string> = {
+  [Level.None]: '',
+  [Level.Leather]: getEmojiText(ArmorLevel.Leather, ItemsLevel.Wooden),
+  [Level.Stone]: getEmojiText(ArmorLevel.Chainmail, ItemsLevel.Stone),
+  [Level.Golden]: getEmojiText(ArmorLevel.Golden, ItemsLevel.Golden),
+  [Level.Iron]: getEmojiText(ArmorLevel.Iron, ItemsLevel.Iron),
+  [Level.Diamond]: getEmojiText(ArmorLevel.Diamond, ItemsLevel.Diamond),
+  [Level.Netherite]: getEmojiText(ArmorLevel.Netherite, ItemsLevel.Netherite),
+}
+
 function getEmoji(player: Player) {
   const { items, armor } = getCached(player)
+  return getEmojiText(armor, items)
+}
+
+function getEmojiText(armor: ArmorLevel, items: ItemsLevel) {
   return `${emojiArmor[armor]}${emojiItems[items]}`
+}
+
+export namespace EquippmentLevel {
+  export type Global = Level
+
+  export type Armor = ArmorLevel
+
+  export type Items = ItemsLevel
+
+  export type CheckMode = Mode
 }
 
 export const EquippmentLevel = {
@@ -164,12 +201,17 @@ export const EquippmentLevel = {
   Mode,
 
   get,
+  getCompare,
   getArmorLevel,
   getItemsLevel,
   getCached,
   getEmoji,
+  getEmojiText,
 
   is,
   isArmor,
   isItems,
+
+  cacheUpdate,
+  emojiLevel,
 }

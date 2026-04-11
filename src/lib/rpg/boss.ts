@@ -1,6 +1,6 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
-import { Entity, Player, system, world } from '@minecraft/server'
+import { Entity, Player, system, WatchdogTerminateBeforeEvent, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { defaultLang } from 'lib/assets/lang'
@@ -22,6 +22,8 @@ import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { FloatingText } from './floating-text'
 import { Group, Place } from './place'
+import { EquippmentLevel } from './equipment-level'
+import { warnAboutEnteringDangerousRegion } from './equipment-level-region'
 
 interface BossDB {
   id: string
@@ -42,6 +44,7 @@ interface BossOptions {
   respawnTime: number
   allowedEntities: string[] | 'all'
   radius: number
+  equippmentLevel: EquippmentLevel.Global
 }
 
 export class Boss {
@@ -59,8 +62,19 @@ export class Boss {
           respawnTime: (respawnTime: number) => ({
             allowedEntities: (allowedEntities: string[] | 'all') => ({
               spawnEvent: (spawnEvent: BossOptions['spawnEvent']) => ({
-                radius: (radius = 40) =>
-                  new Boss({ place, typeId, loot, respawnTime, spawnEvent, allowedEntities, radius }),
+                equippmentLevel: (equippmentLevel: EquippmentLevel.Global) => ({
+                  radius: (radius = 40) =>
+                    new Boss({
+                      place,
+                      typeId,
+                      loot,
+                      respawnTime,
+                      spawnEvent,
+                      allowedEntities,
+                      radius,
+                      equippmentLevel,
+                    }),
+                }),
               }),
             }),
           }),
@@ -149,6 +163,7 @@ export class Boss {
             Boss.arenaDb.set(this.options.place.id, { area: this.region.area.toJSON(), ldb: this.region.ldb })
           }
         })
+        warnAboutEnteringDangerousRegion(this.region, options.equippmentLevel)
         EventLoaderWithArg.load(this.onRegionCreate, this.region)
       })
     })

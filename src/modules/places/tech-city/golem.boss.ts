@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server'
+import { EquipmentSlot, world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { i18nShared } from 'lib/i18n/text'
@@ -8,6 +8,7 @@ import { Vec } from 'lib/vector'
 import { ms } from 'lib/utils/ms'
 import { Loot } from 'lib/rpg/loot-table'
 import { Boss } from 'lib/rpg/boss'
+import { EquippmentLevel } from 'lib/rpg/equipment-level'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()
@@ -32,6 +33,7 @@ export function createBossGolem(group: Group) {
     .respawnTime(ms.from('min', 10))
     .allowedEntities('all')
     .spawnEvent(true)
+    .equippmentLevel(EquippmentLevel.Level.Diamond)
     .radius()
 
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource: { damagingEntity } }) => {

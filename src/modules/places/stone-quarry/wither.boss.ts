@@ -7,6 +7,7 @@ import { Loot } from 'lib/rpg/loot-table'
 import { Boss } from 'lib/rpg/boss'
 import { Group } from 'lib/rpg/place'
 import { ms } from 'lib/utils/ms'
+import { EquippmentLevel } from 'lib/rpg/equipment-level'
 
 export function createBossWither(group: Group) {
   const boss = Boss.create()
@@ -23,6 +24,7 @@ export function createBossWither(group: Group) {
       MinecraftEntityTypes.WitherSkullDangerous,
     ])
     .spawnEvent(true)
+    .equippmentLevel(EquippmentLevel.Level.Diamond)
     .radius(30)
 
   boss.onRegionCreate.subscribe(async region => {

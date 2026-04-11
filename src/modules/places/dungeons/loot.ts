@@ -6,6 +6,7 @@ import { CannonItem, CannonShellItem } from 'modules/pvp/cannon'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { BaseItem } from '../base/base'
+import { EquippmentLevel } from 'lib/rpg/equipment-level'
 
 const defaultLoot = new Loot('dungeon_default_loot')
   .itemStack(() => CannonShellItem.blueprint)
@@ -60,6 +61,10 @@ const names: Record<string, Text> = {
   [d.GasStationGarage]: i18n`Гараж`,
   [d.Avanpost]: i18n`§cАванпост`,
 } satisfies Record<StructureDungeonsId, Text>
+
+const equippmentLevel: Record<string, EquippmentLevel.Global> = {
+  [d.Avanpost]: EquippmentLevel.Level.Diamond,
+} satisfies Partial<Record<StructureDungeonsId, EquippmentLevel.Global>>
 
 const customNames: Record<string, Text> = {
   bunker: i18n`§4Бункер`,
@@ -202,4 +207,5 @@ export const Dungeon = {
   names,
   customLoot,
   customNames,
+  equippmentLevel,
 }

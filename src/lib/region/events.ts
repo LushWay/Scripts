@@ -33,6 +33,23 @@ export class RegionEvents {
     return () => this.onPlayerRegionsChange.unsubscribe(event)
   }
 
+  /**
+   * Listens for player region changes and triggers a callback when a player enters a specific region.
+   *
+   * @param region - Represents a specific Region.
+   * @param callback - Fnction that will be called when a player enters the specified region.
+   */
+  static onEnterType(region: typeof Region, callback: (player: Player, region: Region) => void) {
+    const event = this.onPlayerRegionsChange.subscribe(({ player, newest, previous }) => {
+      if (!previous.find(e => e instanceof region)) {
+        const found = newest.find(e => e instanceof region)
+        if (found) callback(player, found)
+      }
+    })
+
+    return () => this.onPlayerRegionsChange.unsubscribe(event)
+  }
+
   /** Event that triggers once all regions have loaded */
   static onLoad = new EventLoader()
 }

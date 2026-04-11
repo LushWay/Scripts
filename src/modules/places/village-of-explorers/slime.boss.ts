@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server'
+import { EquipmentSlot, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { i18nShared } from 'lib/i18n/text'
@@ -7,6 +7,7 @@ import { Group } from 'lib/rpg/place'
 import { MagicSlimeBall } from './items'
 import { ms } from 'lib/utils/ms'
 import { Loot } from 'lib/rpg/loot-table'
+import { EquippmentLevel } from 'lib/rpg/equipment-level'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()
@@ -34,6 +35,7 @@ export function createBossSlime(group: Group) {
     .respawnTime(ms.from('min', 10))
     .allowedEntities([])
     .spawnEvent(true)
+    .equippmentLevel(EquippmentLevel.Level.Iron)
     .radius(30)
     .interval(boss => {
       if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return

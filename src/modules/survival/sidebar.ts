@@ -5,6 +5,7 @@ import { i18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { Quest } from 'lib/quest/quest'
 import { Region } from 'lib/region'
+import { RegionEvents } from 'lib/region/events'
 import { Menu } from 'lib/rpg/menu'
 import { Settings } from 'lib/settings'
 import { Sidebar } from 'lib/sidebar'
@@ -88,35 +89,42 @@ const survivalSidebar = new Sidebar(
     },
   },
   {
-    [names.region]: (player, settings) => {
-      const regions = Region.getManyAt(player)
-      const region = regions[0] as Region | undefined
-      const base = '§l' + inventoryDisplay[player.database.inv].to(player.lang) + '§r§f'
-      let text = base
-      if (player.database.inv === 'anarchy') {
-        if (region instanceof BaseRegion) {
-          if (region.getMemberRole(player.id)) text = region.baseMemberText(player)
-        } else if (region) {
-          text = ''
-          const displayName = region.displayName?.to(player.lang)
-          if (displayName) {
-            switch (region.permissions.pvp) {
-              case true:
-                text = displayName
-                break
-              case 'pve':
-                text = `${emoji.shield.yellow} ${displayName}`
-                break
-              case false:
-                text = `${emoji.shield.green} ${displayName}`
+    [names.region]: {
+      create(sidebar) {
+        RegionEvents.onPlayerRegionsChange.subscribe(({ player }) => {
+          sidebar.show(player)
+        })
+        return (player, settings) => {
+          const regions = Region.getManyAt(player)
+          const region = regions[0] as Region | undefined
+          const base = '§l' + inventoryDisplay[player.database.inv].to(player.lang) + '§r§f'
+          let text = base
+          if (player.database.inv === 'anarchy') {
+            if (region instanceof BaseRegion) {
+              if (region.getMemberRole(player.id)) text = region.baseMemberText(player)
+            } else if (region) {
+              text = ''
+              const displayName = region.displayName?.to(player.lang)
+              if (displayName) {
+                switch (region.permissions.pvp) {
+                  case true:
+                    text = displayName
+                    break
+                  case 'pve':
+                    text = `${emoji.shield.yellow} ${displayName}`
+                    break
+                  case false:
+                    text = `${emoji.shield.green} ${displayName}`
+                }
+              }
             }
           }
+
+          if (settings.mode === 'sidebar') text += '\n§r§f'
+
+          return text
         }
-      }
-
-      if (settings.mode === 'sidebar') text += '\n§r§f'
-
-      return text
+      },
     },
     [names.money]: player => separateNumberWithDots(player.scores.money),
     [names.leafs]: player => separateNumberWithDots(player.scores.leafs),

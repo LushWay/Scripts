@@ -1,0 +1,66 @@
+import { Player, world } from '@minecraft/server'
+import { ask } from 'lib/form/message'
+import { i18n, textTable } from 'lib/i18n/text'
+import { playerMoveHistory } from 'lib/player-move'
+import { Region } from 'lib/region'
+import { RegionEvents } from 'lib/region/events'
+import { WeakPlayerMap } from 'lib/weak-player-storage'
+import { EquippmentLevel } from './equipment-level'
+import { isNewbie } from './newbie'
+import { doNothing } from 'lib/util'
+
+export function warnAboutEnteringDangerousRegion(region: Region, level: EquippmentLevel.Global) {
+  const cache = new WeakPlayerMap<{
+    armor: EquippmentLevel.Armor
+    items: EquippmentLevel.Items
+  }>({
+    removeOnLeave: true,
+  })
+  const addToCache = (player: Player) => cache.set(player, EquippmentLevel.getCached(player))
+
+  EquippmentLevel.cacheUpdate.subscribe(({ player, items, armor }) => {
+    const cached = cache.get(player)
+    if (!cached) return
+    if (cached.armor !== armor || cached.items !== items) cache.delete(player)
+  })
+
+  function pushAway(player: Player, region: Region) {
+    const moveTo = getFarthestPoint(player, region)
+    if (moveTo) player.teleport(moveTo.location, { dimension: world[moveTo.dimensionType] })
+  }
+
+  function getFarthestPoint(player: Player, region: Region) {
+    const moveHistory = playerMoveHistory.get(player)
+    if (!moveHistory) return
+
+    for (const position of [...moveHistory].reverse()) {
+      if (position.dimensionType === region.dimensionType && !region.area.isNear(position, 10)) return position
+    }
+  }
+
+  RegionEvents.onEnter(region, player => {
+    if (EquippmentLevel.is(level, player, EquippmentLevel.Mode.Every)) return
+    if (cache.get(player)) return
+
+    pushAway(player, region)
+
+    ask(
+      player,
+      textTable([
+        i18n`Опасно!`,
+        [i18n`Зона`, region.displayName ?? region.name],
+        '',
+        [i18n`Требуемый уровень`, EquippmentLevel.emojiLevel[level]],
+        [i18n`Ваш уровень      `, EquippmentLevel.getEmoji(player)],
+        '',
+        region.permissions.pvp === 'pve' || isNewbie(player)
+          ? i18n.success`Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.`
+          : i18n.error`Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне`,
+      ]),
+      i18n.success`Вернуться назад`,
+      doNothing,
+      i18n.error`Я готов принять риск`,
+      () => addToCache(player),
+    )
+  })
+}

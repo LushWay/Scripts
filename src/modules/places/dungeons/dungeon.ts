@@ -10,6 +10,7 @@ import { adventureModeRegions, registerRegionType, registerSaveableRegion } from
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
+import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { LootTable } from 'lib/rpg/loot-table'
 import { isKeyof } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
@@ -149,6 +150,9 @@ export class DungeonRegion extends Region {
 
       this.createSpawnerFromShulkerInventory(inv, rotated)
     }
+
+    const equippment = Dungeon.equippmentLevel[this.structureId]
+    if (equippment) warnAboutEnteringDangerousRegion(this, equippment)
   }
 
   private rotate(vectors: Vector3[]) {
