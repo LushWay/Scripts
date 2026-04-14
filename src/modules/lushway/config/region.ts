@@ -1,7 +1,14 @@
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
 import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
-import { NOT_MOB_ENTITIES, PVP_ENTITIES, regionPermissions, SafeAreaRegion } from 'lib/region'
+import {
+  actionGuard,
+  ActionGuardOrder,
+  NOT_MOB_ENTITIES,
+  PVP_ENTITIES,
+  regionPermissions,
+  SafeAreaRegion,
+} from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
 import { isNotPlaying } from 'lib/utils/game'
 
@@ -29,3 +36,8 @@ RegionEvents.onInterval.subscribe(({ player, currentRegion }) => {
 })
 
 regionPermissions.itemToProjectile.set(Items.Fireball, CustomEntityTypes.Fireball)
+
+// Allow by default
+actionGuard(ctx => {
+  return true
+}, ActionGuardOrder.Lowest)
