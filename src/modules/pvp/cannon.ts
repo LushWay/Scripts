@@ -2,15 +2,14 @@ import { EntityComponentTypes, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { Cooldown } from 'lib/cooldown'
 import { i18n } from 'lib/i18n/text'
+import { actionGuard, ActionGuardOrder } from 'lib/region'
 import { CustomItemWithBlueprint } from 'lib/rpg/custom-item'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 import { explosibleEntities, ExplosibleEntityOptions } from './explosible-entities'
 import { decreaseMainhandItemCount } from './throwable-tnt'
-import { Vec } from 'lib/vector'
-import { ActionGuardOrder } from 'lib/region'
-import { actionGuard } from 'lib/region'
-import { ms } from 'lib/utils/ms'
-import { Cooldown } from 'lib/cooldown'
 
 export const CannonItem = new CustomItemWithBlueprint('cannon')
   .typeId('lw:cannon_spawn_egg')
@@ -48,11 +47,11 @@ const cannonShellExplosion: ExplosibleEntityOptions = {
 }
 
 function fire(player: Player, fire = false) {
-  if (!CannonShellItem.isItem(player.mainhand().getItem())) return
+  if (CannonShellItem.itemStack.typeId !== player.mainhand().getItem()?.typeId) return
 
   const riding = player.getComponent(EntityComponentTypes.Riding)
   const cannon = riding?.entityRidingOn
-  if (!cannon || cannon.typeId !== CustomEntityTypes.Cannon) return guide(player)
+  if (cannon?.typeId !== CustomEntityTypes.Cannon) return guide(player)
   if (!cooldown.isExpired(player)) return false
 
   if (fire)
