@@ -2,6 +2,7 @@ import { EntityComponentTypes, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { Items } from 'lib/assets/custom-items'
 import { Cooldown } from 'lib/cooldown'
 import { i18n } from 'lib/i18n/text'
 import { actionGuard, ActionGuardOrder } from 'lib/region'
@@ -16,7 +17,7 @@ export const CannonItem = new CustomItemWithBlueprint('cannon')
   .lore(i18n`Используй этот предмет, чтобы установить пушку`)
 
 export const CannonShellItem = new CustomItemWithBlueprint('cannon shell')
-  .typeId('lw:cannon_shell')
+  .typeId(Items.CannonShell)
   .lore(i18n`Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.`)
 
 const cooldown = new Cooldown(ms.from('sec', 5))
@@ -47,7 +48,7 @@ const cannonShellExplosion: ExplosibleEntityOptions = {
 }
 
 function fire(player: Player, fire = false) {
-  if (CannonShellItem.itemStack.typeId !== player.mainhand().getItem()?.typeId) return
+  if (Items.CannonShell !== player.mainhand().getItem()?.typeId) return
 
   const riding = player.getComponent(EntityComponentTypes.Riding)
   const cannon = riding?.entityRidingOn
