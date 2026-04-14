@@ -44,6 +44,7 @@ class StoneQuarryBuilder extends City {
       MinecraftBlockTypes.Furnace,
       MinecraftBlockTypes.LitFurnace,
     ])
+    .body(i18n`У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n`)
     .onlyInStoneQuarry(true)
 
   foodOvener = Furnacer.create()
@@ -51,6 +52,7 @@ class StoneQuarryBuilder extends City {
     .id('foodOvener')
     .name(i18nShared`Баба валя`)
     .furnaceTypeIds([MinecraftBlockTypes.Smoker, MinecraftBlockTypes.LitSmoker])
+    .body(i18n`У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n`)
     .onlyInStoneQuarry(false)
 
   gunsmith = new Gunsmith(this.group)

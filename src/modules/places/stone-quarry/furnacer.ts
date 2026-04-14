@@ -1,20 +1,24 @@
 import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 
+import { InventoryInterval } from 'lib/action'
+import { Items } from 'lib/assets/custom-items'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { defaultLang } from 'lib/assets/lang'
+import { Clan } from 'lib/clan/clan'
+import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { getAuxOrTexture } from 'lib/form/chest'
 import { i18n } from 'lib/i18n/text'
 import { ActionGuardOrder, actionGuard } from 'lib/region/index'
 import { Group, Place } from 'lib/rpg/place'
 import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { StoneQuarry } from './stone-quarry'
-import { Vec } from 'lib/vector'
-import { getAuxOrTexture } from 'lib/form/chest'
-import { ms } from 'lib/utils/ms'
 
 const furnaceExpireTime = ms.from('hour', 1)
 const furnaceExpireTimeText = i18n`Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!`
@@ -23,7 +27,10 @@ export class Furnacer extends ShopNpc {
   static create() {
     return Group.placeCreator(place => ({
       furnaceTypeIds: (furnaceTypeIds: string[]) => ({
-        onlyInStoneQuarry: (onlyInStoneQuarry: boolean) => new Furnacer(place, furnaceTypeIds, onlyInStoneQuarry),
+        body: (body: Text) => ({
+          onlyInStoneQuarry: (onlyInStoneQuarry: boolean) =>
+            new Furnacer(place, furnaceTypeIds, onlyInStoneQuarry, body),
+        }),
       }),
     }))
   }
@@ -34,6 +41,14 @@ export class Furnacer extends ShopNpc {
    * @type {Furnacer[]}
    */
   static npcs: Furnacer[] = []
+
+  static findById(id: string) {
+    return this.npcs.find(e => e.id === id)
+  }
+
+  static findByFurnace(furnaceTypeId: string) {
+    return this.npcs.find(e => e.furnaceTypeIds.includes(furnaceTypeId))
+  }
 
   get id() {
     return this.place.id
@@ -51,9 +66,10 @@ export class Furnacer extends ShopNpc {
     place: Place,
     readonly furnaceTypeIds: string[],
     onlyInStoneQuarry: boolean,
+    body: Text,
   ) {
     super(place)
-    this.shop.body(() => i18n`У меня ты можешь купить ключ доступа к печкам\n\n`)
+    this.shop.body(() => body)
     Furnacer.npcs.push(this)
 
     if (onlyInStoneQuarry) {
@@ -108,7 +124,7 @@ actionGuard((player, region, ctx) => {
   if (region !== StoneQuarry.safeArea) return
 
   const furnaceTypeId = ctx.event.block.typeId
-  const furnacer = Furnacer.npcs.find(e => e.furnaceTypeIds.includes(furnaceTypeId))
+  const furnacer = Furnacer.findByFurnace(furnaceTypeId)
   if (!furnacer) return
 
   // Restrictions
@@ -128,10 +144,14 @@ actionGuard((player, region, ctx) => {
     const furnace = FurnaceKeyItem.db.get(blockId)
 
     // Furnace is already taken
-    if (furnace && furnace.code === lore.code) {
-      // Same key, acess allowed, update metadata
+    if (furnace?.code === lore.code) {
+      // Same key, access allowed, update metadata
       furnace.lastPlayerId = player.id
       return true
+    }
+
+    if (lore.status === 'used') {
+      return notAllowed(i18n`Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке`)
     }
 
     // Furnace is free, creating access key
@@ -146,6 +166,13 @@ actionGuard((player, region, ctx) => {
           )
         }
       } else {
+        const keys = [...FurnaceKeyItem.db.entriesImmutable()]
+        const personalKeys = keys.filter(e => e[1]?.lastPlayerId === player.id)
+        if (personalKeys.length >= 3) return notAllowed(i18n`Вы уже заняли ${personalKeys.length}/3 печек.`)
+
+        const clanKeys = keys.filter(e => e[1] && Clan.getPlayerClan(e[1].lastPlayerId)?.isMember(player.id))
+        if (clanKeys.length >= 3) return notAllowed(i18n`Ваш клан уже занял ${clanKeys.length}/3 печек.`)
+
         // Create new...
         system.delay(() => {
           FurnaceKeyItem.db.set(blockId, {
@@ -183,6 +210,27 @@ actionGuard((player, region, ctx) => {
   return false
 }, ActionGuardOrder.Feature)
 
+const checkCooldown = new Cooldown(ms.from('sec', 5), false, {})
+
+InventoryInterval.mainhand.subscribe(({ player, slot }) => {
+  if (slot.typeId !== Items.Key || !checkCooldown.isExpired(player)) return
+
+  const key = FurnaceKeyItem.schema.parse(player.lang, slot)
+  if (!key) {
+    // Maybe set lore to "WARNING THIS ITEM IS OLD"
+    return
+  }
+
+  if (key.status !== 'inUse') return
+
+  const furnace = [...FurnaceKeyItem.db.entriesImmutable()].find(e => e[1]?.code === key.code)
+
+  console.log({ k: key.status })
+  if (!furnace) {
+    key.status = 'used'
+  }
+})
+
 class FurnaceKeyItem {
   static db = table<{ expires: number; code: string; lastPlayerId: string; warnedAboutExpire?: 1 }>('furnaceKeys')
 
@@ -191,6 +239,7 @@ class FurnaceKeyItem {
     .lore(i18n`§7Открывает печку в каменоломне.`)
 
     .property('furnacer', String)
+    .display(i18n`Продавец`, unit => Furnacer.findById(unit)?.npc.name ?? i18n`Неизвестен`)
 
     .property('code', String)
 
@@ -201,7 +250,7 @@ class FurnaceKeyItem {
     .display(i18n`Владелец`)
 
     .property<'status', 'notUsed' | 'inUse' | 'used'>('status', 'notUsed')
-    .display('', unit => this.status[unit])
+    .display(i18n`Статус`, unit => this.status[unit])
     .build()
 
   static status = {
@@ -215,11 +264,10 @@ class FurnaceKeyItem {
       () => {
         let players
         for (const [key, furnace] of FurnaceKeyItem.db.entries()) {
-          if (typeof furnace === 'undefined') continue
-          if (furnace.warnedAboutExpire) continue
+          if (typeof furnace === 'undefined' || furnace.expires === 0) continue
 
           const untilExpire = furnace.expires - Date.now()
-          if (untilExpire < ms.from('min', 5)) {
+          if (!furnace.warnedAboutExpire && untilExpire < ms.from('min', 5)) {
             players ??= world.getAllPlayers()
 
             const player = players.find(e => e.id === furnace.lastPlayerId)
