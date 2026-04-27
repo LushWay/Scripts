@@ -4,9 +4,6 @@
 // Do not modify manually.
     
 export enum CustomEntityTypes {
-  IronGolem = 'lw:iron_golem',
-  Slime = 'lw:slime',
-  Wither = 'lw:wither',
   Cannon = 'lw:cannon',
   Database = 'rubedo:database',
   Fireball = 'lw:fireball',

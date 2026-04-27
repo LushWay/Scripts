@@ -1,9 +1,7 @@
 import { BlockTypes, EntityComponentTypes } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
-import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { MinecraftI18nMessage } from 'lib/i18n/message'
-import { noI18n } from 'lib/i18n/text'
+import { i18nShared, noI18n } from 'lib/i18n/text'
 import { BigRegionStructure } from 'lib/region/big-structure'
 import { Boss } from 'lib/rpg/boss'
 import { EquippmentLevel } from 'lib/rpg/equipment-level'
@@ -15,8 +13,8 @@ export function createBossWither(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('wither')
-    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Wither}.name`))
-    .typeId(CustomEntityTypes.Wither)
+    .name(i18nShared`§b§lКамнедробилка`)
+    .typeId(MinecraftEntityTypes.Wither)
     .loot(new Loot().item('NetherStar').build)
     .respawnTime(ms.from('hour', 1))
     .allowedEntities([
@@ -25,7 +23,7 @@ export function createBossWither(group: Group) {
       MinecraftEntityTypes.WitherSkull,
       MinecraftEntityTypes.WitherSkullDangerous,
     ])
-    .spawnEvent(false)
+    .spawnEvent(true)
     .equippmentLevel(EquippmentLevel.Level.Diamond)
     .radius(30)
 

@@ -9,6 +9,7 @@ import { Vec } from 'lib/vector'
 import { Area } from '../areas/area'
 import { Region, RegionCreationOptions, type RegionPermissions } from './region'
 import { NewFormCallback, NewFormCreator } from 'lib/form/new'
+import { RegionSave } from 'lib/region/database'
 
 interface BossArenaRegionOptions extends RegionCreationOptions {
   bossName: Text

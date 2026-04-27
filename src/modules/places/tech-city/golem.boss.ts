@@ -1,5 +1,5 @@
 import { world } from '@minecraft/server'
-import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
+import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { MinecraftI18nMessage } from 'lib/i18n/message'
@@ -10,13 +10,14 @@ import { Group } from 'lib/rpg/place'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
 import { Chip } from './engineer'
+import { i18nShared } from 'lib/i18n/text'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('golem')
-    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.IronGolem}.name`))
-    .typeId(CustomEntityTypes.IronGolem)
+    .name(i18nShared`§6§lРобот`)
+    .typeId(MinecraftEntityTypes.IronGolem)
     .loot(
       new Loot('GolemLoot')
         .itemStack(Chip)
@@ -33,7 +34,7 @@ export function createBossGolem(group: Group) {
     )
     .respawnTime(ms.from('min', 10))
     .allowedEntities('all')
-    .spawnEvent(false)
+    .spawnEvent(true)
     .equippmentLevel(EquippmentLevel.Level.Diamond)
     .radius()
 

@@ -46,6 +46,8 @@ export const rtpCommand = new Command('rtp')
       rtpComplete(ctx.player, Vec.add(location.topmost, Vec.up))
     })
   })
+
+rtpCommand
   .overload('cancel')
   .setDescription(i18n`Отменяет телепортацию`)
   .setPermissions('member')

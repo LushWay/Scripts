@@ -3,6 +3,7 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
@@ -12,6 +13,7 @@ import { Area, AreaAsJson } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
+import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
@@ -20,7 +22,6 @@ import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { EquippmentLevel } from './equipment-level'
-import { warnAboutEnteringDangerousRegion } from './equipment-level-region'
 import { FloatingText } from './floating-text'
 import { Group, Place } from './place'
 
@@ -142,22 +143,18 @@ export class Boss {
     this.location = location(options.place)
     Boss.arenaDb.onLoad(() => {
       this.location.onLoad.subscribe(center => {
-        const areadb = Boss.arenaDb.get(this.id)
+        const areadb = Boss.arenaDb.get(this.options.place.id)
 
         this.check()
         const area =
           (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??
           new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
 
-        this.region = BossArenaRegion.create(
-          area,
-          {
-            boss: this,
-            bossName: this.options.place.name,
-            permissions: { allowedEntities: this.options.allowedEntities },
-          },
-          this.id,
-        )
+        this.region = BossArenaRegion.create(area, {
+          boss: this,
+          bossName: this.options.place.name,
+          permissions: { allowedEntities: this.options.allowedEntities },
+        })
 
         if (areadb?.ldb) this.region.ldb = areadb.ldb
 
@@ -224,6 +221,16 @@ export class Boss {
     }
   }
 
+  private getName() {
+    if (typeof this.options.place.name === 'string')
+      throw new TypeError(`Boss ${this.id} name is string, expected I18nSharedMessage`)
+
+    return this.options.place.name.to(defaultLang)
+
+    // TODO add once supported
+    // return this.options.place.name.toRawText()
+  }
+
   private spawnEntity() {
     if (!this.location.valid) return
 
@@ -238,6 +245,7 @@ export class Boss {
           if (entity.id !== this.entity?.id) return
 
           system.delay(() => {
+            entity.nameTag = this.getName()
             entity.addTag(Boss.entityTag)
             EventSignal.emit(this.onBossEntitySpawn, entity)
           })
@@ -270,6 +278,7 @@ export class Boss {
       if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
+      this.entity.nameTag = this.getName()
       this.floatingText.hide()
     }
   }

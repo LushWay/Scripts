@@ -1,13 +1,13 @@
-import { Player, world } from '@minecraft/server'
+import { GameMode, Player, world } from '@minecraft/server'
 import { askNew } from 'lib/form/new'
 import { i18n, textTable } from 'lib/i18n/text'
 import { playerMoveHistory } from 'lib/player-move'
 import { Region } from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
+import { EquippmentLevel } from 'lib/rpg/equipment-level'
+import { isNewbie } from 'lib/rpg/newbie'
 import { doNothing } from 'lib/util'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { EquippmentLevel } from './equipment-level'
-import { isNewbie } from './newbie'
 
 export function warnAboutEnteringDangerousRegion(region: Region, level: EquippmentLevel.Global) {
   const cache = new WeakPlayerMap<{
@@ -34,12 +34,21 @@ export function warnAboutEnteringDangerousRegion(region: Region, level: Equippme
     if (!moveHistory) return
 
     for (const position of [...moveHistory].reverse()) {
-      if (position.dimensionType === region.dimensionType && !region.area.isNear(position, 10)) return position
+      if (
+        position.dimensionType === region.dimensionType &&
+        !region.area.isNear(position, 10) &&
+        !warnAboutEnteringDangerousRegion.shouldNotReturnToRegions.some(e => e.area.isIn(position))
+      )
+        return position
     }
   }
 
   RegionEvents.onEnter(region, player => {
-    if (EquippmentLevel.is(level, player, EquippmentLevel.Mode.Every)) return
+    if (
+      EquippmentLevel.is(level, player, EquippmentLevel.Mode.Every) ||
+      [GameMode.Spectator, GameMode.Creative].includes(player.getGameMode())
+    )
+      return
     if (cache.get(player)) return
 
     pushAway(player, region)
@@ -67,3 +76,5 @@ export function warnAboutEnteringDangerousRegion(region: Region, level: Equippme
     )
   })
 }
+
+warnAboutEnteringDangerousRegion.shouldNotReturnToRegions = [] as Region[]

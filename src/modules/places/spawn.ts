@@ -10,6 +10,7 @@ import { Portal } from 'lib/portals'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { RegionEvents } from 'lib/region/events'
 import { SafeAreaRegion } from 'lib/region/kinds/safe-area'
+import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { Menu } from 'lib/rpg/menu'
 import { Group } from 'lib/rpg/place'
 import { Settings } from 'lib/settings'
@@ -96,6 +97,8 @@ class SpawnBuilder extends AreaWithInventory {
         })
 
         this.region = SafeAreaRegion.create(new SphereArea({ center: spawnLocation, radius: 30 }, 'overworld'))
+
+        warnAboutEnteringDangerousRegion.shouldNotReturnToRegions.push(this.region)
       }
     })
   }

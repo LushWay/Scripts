@@ -2,16 +2,74 @@
   "format_version": "1.13.0",
   "minecraft:entity": {
     "description": {
-      "identifier": "lw:slime",
+      "identifier": "minecraft:slime",
       "is_spawnable": true,
       "is_summonable": true,
       "is_experimental": false
     },
     "component_groups": {
+      "lw:boss": {
+        // General boss options
+        "minecraft:experience_reward": {
+          "on_death": "100"
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/empty.json"
+        },
+        "minecraft:nameable": {
+          "allow_name_tag_renaming": true,
+          "always_show": true
+        },
+        "minecraft:boss": {
+          "should_darken_sky": false,
+          "hud_range": 40
+        },
+
+        // Entity specific options
+        "minecraft:collision_box": {
+          "width": 1.04,
+          "height": 1.04
+        },
+
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 5,
+          "reselect_targets": true,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "player"
+                  }
+                ]
+              },
+              "max_dist": 30
+            }
+          ],
+          "must_see": true
+        },
+
+        "minecraft:health": {
+          "value": 500,
+          "max": 500
+        },
+        "minecraft:attack": {
+          "damage": 8
+        },
+        "minecraft:movement": {
+          "value": 0.9
+        },
+        "minecraft:scale": {
+          "value": 6
+        }
+      },
+
       "lw:big": {
         "minecraft:collision_box": {
-          "width": 1,
-          "height": 1
+          "width": 1.04,
+          "height": 1.04
         },
         "minecraft:attack": {
           "damage": 4
@@ -23,8 +81,8 @@
 
       "lw:normal": {
         "minecraft:collision_box": {
-          "width": 0.5,
-          "height": 0.5
+          "width": 0.52,
+          "height": 0.52
         },
         "minecraft:movement": {
           "value": 0.3
@@ -34,6 +92,60 @@
         },
         "minecraft:scale": {
           "value": 2
+        }
+      },
+
+      "minecraft:slime_large": {
+        "minecraft:collision_box": {
+          "width": 2.08,
+          "height": 2.08
+        },
+        "minecraft:health": {
+          "value": 16,
+          "max": 16
+        },
+        "minecraft:movement": {
+          "value": 0.6
+        },
+        "minecraft:attack": {
+          "damage": 4
+        }
+      },
+
+      "minecraft:slime_medium": {
+        "minecraft:collision_box": {
+          "width": 1.04,
+          "height": 1.04
+        },
+        "minecraft:health": {
+          "value": 4,
+          "max": 4
+        },
+        "minecraft:movement": {
+          "value": 0.4
+        },
+        "minecraft:attack": {
+          "damage": 2
+        }
+      },
+
+      "minecraft:slime_small": {
+        "minecraft:collision_box": {
+          "width": 0.52,
+          "height": 0.52
+        },
+        "minecraft:health": {
+          "value": 1,
+          "max": 1
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:attack": {
+          "damage": 0
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/entities/slime.json"
         }
       },
 
@@ -50,59 +162,6 @@
     },
 
     "components": {
-      // General boss options
-      "minecraft:loot": {
-        "table": "loot_tables/empty.json"
-      },
-      "minecraft:nameable": {
-        "allow_name_tag_renaming": true,
-        "always_show": true
-      },
-      "minecraft:boss": {
-        "should_darken_sky": false,
-        "hud_range": 40
-      },
-
-      // Entity specific options
-      "minecraft:collision_box": {
-        "width": 1.04,
-        "height": 1.04
-      },
-
-      "minecraft:behavior.nearest_attackable_target": {
-        "priority": 5,
-        "reselect_targets": true,
-        "entity_types": [
-          {
-            "filters": {
-              "any_of": [
-                {
-                  "test": "is_family",
-                  "subject": "other",
-                  "value": "player"
-                }
-              ]
-            },
-            "max_dist": 30
-          }
-        ],
-        "must_see": true
-      },
-
-      "minecraft:health": {
-        "value": 500,
-        "max": 500
-      },
-      "minecraft:attack": {
-        "damage": 8
-      },
-      "minecraft:movement": {
-        "value": 0.9
-      },
-      "minecraft:scale": {
-        "value": 6
-      },
-
       "minecraft:experience_reward": {
         "on_death": "query.last_hit_by_player ? query.variant : 0"
       },
@@ -144,6 +203,7 @@
         "event": "minecraft:become_calm",
         "target": "self"
       },
+      "minecraft:nameable": {},
       "minecraft:behavior.slime_float": {
         "priority": 1
       },
@@ -155,6 +215,34 @@
       },
       "minecraft:behavior.slime_keep_on_jumping": {
         "priority": 5
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "snowgolem"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "irongolem"
+                }
+              ]
+            },
+            "max_dist": 16
+          }
+        ],
+        "must_see": true
       },
       "minecraft:physics": {},
       "minecraft:pushable": {
@@ -177,6 +265,11 @@
       "minecraft:become_aggressive": {
         "add": {
           "component_groups": ["minecraft:slime_aggressive"]
+        }
+      },
+      "lw:boss": {
+        "add": {
+          "component_groups": ["minecraft:slime_aggressive", "minecraft:slime_large", "lw:boss"]
         }
       },
       "lw:slime_big": {

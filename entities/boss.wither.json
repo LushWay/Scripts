@@ -2,48 +2,73 @@
   "format_version": "1.13.0",
   "minecraft:entity": {
     "description": {
-      "identifier": "lw:wither",
+      "identifier": "minecraft:wither",
       "is_spawnable": false,
       "is_summonable": true,
       "is_experimental": false
     },
 
-    "component_groups": {},
+    "component_groups": {
+      "lw:boss": {
+        // General boss options
+        "minecraft:experience_reward": {
+          "on_death": "100"
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/empty.json"
+        },
+        "minecraft:nameable": {
+          "allow_name_tag_renaming": true,
+          "always_show": true
+        },
+        "minecraft:boss": {
+          "should_darken_sky": false,
+          "hud_range": 40
+        },
+
+        // Entity specific options
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "reselect_targets": true,
+          "entity_types": [
+            {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "value": "player"
+              },
+              "max_dist": 40
+            }
+          ],
+          "must_see": true
+        }
+      }
+    },
 
     "components": {
-      // General boss options
       "minecraft:experience_reward": {
-        "on_death": "0"
+        "on_death": "50"
       },
-      "minecraft:loot": {
-        "table": "loot_tables/empty.json"
-      },
-      "minecraft:nameable": {
-        "allow_name_tag_renaming": true,
-        "always_show": true
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
       },
       "minecraft:boss": {
         "should_darken_sky": false,
-        "hud_range": 40
+        "hud_range": 55
       },
-
-      // Entity specific options
-      "minecraft:behavior.nearest_attackable_target": {
-        "priority": 3,
-        "reselect_targets": true,
-        "entity_types": [
-          {
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "on_damage": {
             "filters": {
               "test": "is_family",
               "subject": "other",
-              "value": "player"
-            },
-            "max_dist": 40
-          }
-        ],
-        "must_see": true
+              "value": "undead"
+            }
+          },
+          "deals_damage": false
+        }
       },
-
       "minecraft:health": {
         "value": 600,
         "max": 600
@@ -53,6 +78,10 @@
         "height": 3
       },
       "minecraft:fire_immune": true,
+      "minecraft:loot": {
+        "table": "loot_tables/entities/wither_boss.json"
+      },
+      "minecraft:nameable": {},
       "minecraft:movement": {
         "value": 0.25
       },
@@ -77,6 +106,39 @@
       },
       "minecraft:behavior.hurt_by_target": {
         "priority": 2
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 3,
+        "entity_types": [
+          {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "value": "player"
+            },
+            "max_dist": 70
+          },
+          {
+            "filters": {
+              "all_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "!=",
+                  "value": "undead"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "!=",
+                  "value": "inanimate"
+                }
+              ]
+            },
+            "max_dist": 70
+          }
+        ],
+        "must_see": true
       },
       "minecraft:behavior.random_stroll": {
         "priority": 5,
@@ -104,7 +166,12 @@
     },
 
     "events": {
-      "minecraft:entity_spawned": {}
+      "minecraft:entity_spawned": {},
+      "lw:boss": {
+        "add": {
+          "component_groups": ["lw:boss"]
+        }
+      }
     }
   }
 }

@@ -1,22 +1,21 @@
-import { EquipmentSlot, world } from '@minecraft/server'
+import { world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { i18nShared } from 'lib/i18n/text'
 import { Boss } from 'lib/rpg/boss'
-import { Group } from 'lib/rpg/place'
-import { MagicSlimeBall } from './items'
-import { ms } from 'lib/utils/ms'
-import { Loot } from 'lib/rpg/loot-table'
 import { EquippmentLevel } from 'lib/rpg/equipment-level'
-import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { MinecraftI18nMessage } from 'lib/i18n/message'
+import { Loot } from 'lib/rpg/loot-table'
+import { Group } from 'lib/rpg/place'
+import { ms } from 'lib/utils/ms'
+import { MagicSlimeBall } from './items'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('slime')
-    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Slime}.name`))
-    .typeId(CustomEntityTypes.Slime)
+    .name(i18nShared`§a§lМагический слайм`)
+    .typeId(MinecraftEntityTypes.Slime)
     .loot(
       new Loot('slime boss')
         .itemStack(MagicSlimeBall)
@@ -36,7 +35,7 @@ export function createBossSlime(group: Group) {
     )
     .respawnTime(ms.from('min', 10))
     .allowedEntities([])
-    .spawnEvent(false)
+    .spawnEvent(true)
     .equippmentLevel(EquippmentLevel.Level.Iron)
     .radius(30)
     .interval(boss => {
@@ -70,8 +69,11 @@ export function createBossSlime(group: Group) {
       const quarter = half / 2
       const level = hp < quarter ? 'big' : 'normal'
 
-      const spawn = () =>
-        hurtEntity.dimension.spawnEntity(`${MinecraftEntityTypes.Slime}<lw:slime_${level}>`, hurtEntity.location)
+      const spawn = () => {
+        hurtEntity.dimension.spawnEntity<CustomEntityTypes>(MinecraftEntityTypes.Slime, hurtEntity.location, {
+          spawnEvent: `lw:slime_${level}`,
+        })
+      }
 
       spawn()
       if (level === 'big') spawn()
