@@ -38,6 +38,6 @@ RegionEvents.onInterval.subscribe(({ player, currentRegion }) => {
 regionPermissions.itemToProjectile.set(Items.Fireball, CustomEntityTypes.Fireball)
 
 // Allow by default
-actionGuard(ctx => {
-  return true
+actionGuard((player, region, ctx) => {
+  if (ctx.type === 'interactWithEntity') return true
 }, ActionGuardOrder.Lowest)

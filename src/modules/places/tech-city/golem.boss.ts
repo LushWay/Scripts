@@ -9,13 +9,15 @@ import { ms } from 'lib/utils/ms'
 import { Loot } from 'lib/rpg/loot-table'
 import { Boss } from 'lib/rpg/boss'
 import { EquippmentLevel } from 'lib/rpg/equipment-level'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { MinecraftI18nMessage } from 'lib/i18n/message'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('golem')
-    .name(i18nShared`Робот`)
-    .typeId(MinecraftEntityTypes.IronGolem)
+    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Slime}.name`))
+    .typeId(CustomEntityTypes.IronGolem)
     .loot(
       new Loot('GolemLoot')
         .itemStack(Chip)
@@ -32,7 +34,7 @@ export function createBossGolem(group: Group) {
     )
     .respawnTime(ms.from('min', 10))
     .allowedEntities('all')
-    .spawnEvent(true)
+    .spawnEvent(false)
     .equippmentLevel(EquippmentLevel.Level.Diamond)
     .radius()
 

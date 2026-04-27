@@ -221,16 +221,6 @@ export class Boss {
     }
   }
 
-  private getName() {
-    if (typeof this.options.place.name === 'string')
-      throw new TypeError(`Boss ${this.id} name is string, expected I18nSharedMessage`)
-
-    return this.options.place.name.to(defaultLang)
-
-    // TODO add once supported
-    // return this.options.place.name.toRawText()
-  }
-
   private spawnEntity() {
     if (!this.location.valid) return
 
@@ -245,7 +235,6 @@ export class Boss {
           if (entity.id !== this.entity?.id) return
 
           system.delay(() => {
-            entity.nameTag = this.getName()
             entity.addTag(Boss.entityTag)
             EventSignal.emit(this.onBossEntitySpawn, entity)
           })
@@ -278,7 +267,6 @@ export class Boss {
       if (this.region && this.location.valid && !this.region.area.isIn(this.entity)) this.entity.teleport(this.location)
 
       this.onInterval?.(this)
-      this.entity.nameTag = this.getName()
       this.floatingText.hide()
     }
   }

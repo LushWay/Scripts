@@ -119,7 +119,7 @@ export class Quest {
 
   get name() {
     return this.place.group.name && this.place.name
-      ? i18nShared.join`${this.place.group.sharedName} - ${this.place.name}`
+      ? i18nShared.join`${this.place.group.name} - ${this.place.name}`
       : (this.place.sharedName ?? this.place.group.sharedName)
   }
 

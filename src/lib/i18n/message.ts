@@ -1,6 +1,7 @@
 import { RawMessage, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
 import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
+import { translateToken } from './lang'
 import { textUnitColorize } from './text'
 
 export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
@@ -159,5 +160,22 @@ export class ServerSideI18nMessage extends I18nMessage {
 
   to(language: Language): string {
     return this.generate(language)
+  }
+}
+
+export class MinecraftI18nMessage extends SharedI18nMessage {
+  constructor(
+    protected readonly token: string,
+    colors: Text.Colors = { num: '', text: '', unit: '' },
+  ) {
+    super([], [], colors)
+  }
+
+  toRawText(): RawText {
+    return { rawtext: [{ translate: this.token }] }
+  }
+
+  to(language: Language): string {
+    return translateToken(this.token, language)
   }
 }

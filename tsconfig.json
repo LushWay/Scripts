@@ -45,7 +45,9 @@
     "module": "ES2020",
     "moduleResolution": "Bundler",
     "outDir": "scripts",
-    "baseUrl": "src/"
+    "paths": {
+      "*": ["./src/*"]
+    }
   },
   "include": ["src", "../tools/defines.d.ts"],
   "exclude": ["node_modules", "src/chestui", "vitest/dist/**", "scripts/**"] //  "src/test/**",

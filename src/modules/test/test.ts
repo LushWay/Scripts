@@ -1,7 +1,18 @@
 /* i18n-ignore */
 /* eslint-disable */
 
-import { MolangVariableMap, Player, Potions, ScriptEventSource, system, world } from '@minecraft/server'
+import {
+  Entity,
+  EntityEquippableComponent,
+  EquipmentSlot,
+  ItemStack,
+  MolangVariableMap,
+  Player,
+  Potions,
+  ScriptEventSource,
+  system,
+  world,
+} from '@minecraft/server'
 import {
   MinecraftBlockTypes,
   MinecraftCameraPresetsTypes,
@@ -66,6 +77,58 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  armor(ctx) {
+    const location = ctx.player.location
+    const dimension = ctx.player.dimension
+    const entity = dimension.spawnEntity('minecraft:armor_stand', location)
+    const equippable = entity.getComponent(EntityEquippableComponent.componentId)
+    equippable?.setEquipment(EquipmentSlot.Head, new ItemStack('minecraft:player_head'))
+    equippable?.setEquipment(EquipmentSlot.Chest, new ItemStack('minecraft:iron_chestplate'))
+    equippable?.setEquipment(EquipmentSlot.Legs, new ItemStack('minecraft:iron_leggins'))
+    equippable?.setEquipment(EquipmentSlot.Feet, new ItemStack('minecraft:iron_boots'))
+    equippable?.setEquipment(EquipmentSlot.Mainhand, new ItemStack('minecraft:apple'))
+  },
+
+  door(ctx) {
+    const knocker = ctx.player as Entity
+
+    knocker.dimension.spawnParticle('effectname', Vec.add(knocker.location, Vec.up))
+    knocker.getHeadLocation()
+    const options = {
+      includeLiquidBlocks: false,
+      includePassableBlocks: false,
+      maxDistance: 10,
+    }
+    const hit = knocker.getBlockFromViewDirection(options)
+    const hit2 = knocker.dimension.getBlockFromRay(knocker.location, knocker.getViewDirection(), options)
+    const head = knocker.dimension.getBlock(knocker.getHeadLocation())
+    const on = knocker.dimension.getBlock(knocker.location)
+    const below = knocker.getBlockStandingOn({ ignoreThinBlocks: true })
+
+    const blocks = [hit?.block, hit2?.block, head, on, below]
+
+    for (let block of blocks) {
+      if (block?.typeId.includes('door') || block?.typeId.includes('lever')) {
+        if (block.permutation.getState('upper_block_bit')) {
+          block = block.below()
+          if (!block) return
+        }
+        const permutation = block.permutation.withState('open_bit', !block.permutation.getState('open_bit'))
+        block.setPermutation(permutation)
+        return
+      }
+    }
+  },
+
+  att(ctx) {
+    const m = new MolangVariableMap()
+
+    m.setFloat('radius', 10)
+    m.setFloat('time', 5)
+
+    ctx.player.dimension.spawnParticle('lw:attack_area', ctx.player.location, m)
+  },
+
   scores(ctx) {
     console.log(
       pick(ctx.player.scores, ['money', 'anarchyOnlineTime', ...scoreboardObjectiveNames.gameModeStats]),

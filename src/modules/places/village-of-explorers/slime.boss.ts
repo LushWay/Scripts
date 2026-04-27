@@ -8,13 +8,15 @@ import { MagicSlimeBall } from './items'
 import { ms } from 'lib/utils/ms'
 import { Loot } from 'lib/rpg/loot-table'
 import { EquippmentLevel } from 'lib/rpg/equipment-level'
+import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
+import { MinecraftI18nMessage } from 'lib/i18n/message'
 
 export function createBossSlime(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('slime')
-    .name(i18nShared`Магический Слайм`)
-    .typeId(MinecraftEntityTypes.Slime)
+    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Slime}.name`))
+    .typeId(CustomEntityTypes.Slime)
     .loot(
       new Loot('slime boss')
         .itemStack(MagicSlimeBall)
@@ -34,7 +36,7 @@ export function createBossSlime(group: Group) {
     )
     .respawnTime(ms.from('min', 10))
     .allowedEntities([])
-    .spawnEvent(true)
+    .spawnEvent(false)
     .equippmentLevel(EquippmentLevel.Level.Iron)
     .radius(30)
     .interval(boss => {

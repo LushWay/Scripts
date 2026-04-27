@@ -20,7 +20,7 @@ export class Crate {
 
   static getName(id: string, crate = Crate.crates.get(id)) {
     if (crate) {
-      return i18nShared.join`${crate.place.group.sharedName} - ${crate.place.name}`
+      return i18nShared.join`${crate.place.group.name} - ${crate.place.name}`
     } else return noI18n`Unknown`
   }
 
