@@ -1,10 +1,11 @@
-import { Player } from '@minecraft/server'
+import { Player, system } from '@minecraft/server'
 import { PersistentSet } from 'lib/database/persistent-set'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { createLogger } from 'lib/utils/logger'
 import { Cutscene } from './cutscene'
 import { cutsceneEdit } from './edit'
 
@@ -62,4 +63,48 @@ const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, par
       player.success()
     })
   }
+
+  f.button('Export to console', () => {
+    console.log(
+      `scriptevent lushway_cutscene:import ${JSON.stringify({ id: cutscene.id, sections: cutscene.sections })}`,
+    )
+  })
 })
+
+const logger = createLogger('cutscene import')
+
+system.afterEvents.scriptEventReceive.subscribe(
+  ({ id, message, initiator }) => {
+    if (id === 'lushway_cutscene:import') {
+      const data = JSON.parse(message) as { id: string; sections: Cutscene['sections'] }
+
+      const cutscene = Cutscene.all.get(data.id)
+
+      if (!cutscene) {
+        if (initiator instanceof Player) initiator.fail(data.id + ' not found')
+        logger.error(data.id + ' not found')
+        return
+      }
+
+      cutscene.sections = data.sections
+      cutscene.save()
+      if (initiator instanceof Player) initiator.success(data.id + ' success')
+      logger.info(data.id + 'success')
+    } else if (id === 'lushway_cutscene:export') {
+      const cutscene = Cutscene.all.get(message)
+
+      if (!cutscene) {
+        if (initiator instanceof Player) initiator.fail(message + ' not found')
+        logger.error(message + ' not found')
+        return
+      }
+
+      exportCutscene(cutscene)
+    }
+  },
+  { namespaces: ['lushway_cuctscene'] },
+)
+
+function exportCutscene(cutscene: Cutscene) {
+  logger.info(`scriptevent lushway_cutscene:import ${JSON.stringify({ id: cutscene.id, sections: cutscene.sections })}`)
+}
