@@ -1,11 +1,16 @@
 import { world } from '@minecraft/server'
-import { form } from 'lib/form/new'
+import { ArrayForm } from 'lib/form/array'
+import { form, NewFormCallback } from 'lib/form/new'
 import { debounceMenu } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
 import { i18n, i18nPlural, noI18n } from 'lib/i18n/text'
+import { Region } from 'lib/region'
+import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { isNotPlaying } from 'lib/utils/game'
 import { VectorInDimension } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
+import { CustomDungeonRegion } from 'modules/places/dungeons/custom-dungeon'
+import { DungeonRegion } from 'modules/places/dungeons/dungeon'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 import { StoneQuarry } from 'modules/places/stone-quarry/stone-quarry'
@@ -33,6 +38,8 @@ const tpMenu = form((f, { player }) => {
         dimensionType: player.dimension.type,
       }) satisfies VectorInDimension,
   )
+
+  f.button(tpMenuPoints)
 
   const locations: Record<string, ReturnType<typeof location>> = {
     [VillageOfMiners.name.to(player.lang)]: location(VillageOfMiners, '136 71 13457 140 -10', players),
@@ -81,6 +88,32 @@ function location(
   }
 
   return { location: fallback, players: playersC }
+}
+
+const tpMenuPoints = form(f => {
+  f.title('Точки притяжения')
+
+  f.button('Боссы', createMenuForRegionType(BossArenaRegion))
+
+  f.button(
+    'Повторяющиеся структуры',
+    createMenuForRegionType(DungeonRegion, r => !(r instanceof CustomDungeonRegion)),
+  )
+  f.button('Уникальные структуры', createMenuForRegionType(CustomDungeonRegion))
+})
+
+function createMenuForRegionType(region: typeof Region, filter: (r: Region) => boolean = () => true): NewFormCallback {
+  return (player, back) => {
+    new ArrayForm(region.name, region.getAll().filter(filter))
+      .back(back)
+      .button(region => {
+        return [
+          noI18n`${region.displayName}\n${region.name}`,
+          () => player.teleport(region.area.center, { dimension: region.dimension }),
+        ]
+      })
+      .show(player)
+  }
 }
 
 export const tpMenuOnce = debounceMenu(tpMenu.show)

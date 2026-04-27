@@ -218,3 +218,39 @@ export class ShowForm<T extends FormParams = undefined> {
     return (ctx: import('lib/command/context').CommandContext) => this.show(ctx.player)
   }
 }
+
+/** Shows MessageForm to the player */
+export function askNew(
+  player: Player,
+  messageFormBody: Text,
+  yesText: Text,
+  yesAction?: VoidFunction,
+  noText: Text = i18n`Отмена`,
+  noAction?: VoidFunction,
+): Promise<boolean> {
+  const hook = Promise.withResolvers<boolean>()
+
+  askForm({ hook, messageFormBody, yesText, yesAction, noText, noAction }).show(player)
+
+  return hook.promise
+}
+
+const askForm = form.params<{
+  messageFormBody: Text
+  yesText: Text
+  yesAction?: VoidFunction
+  noText: Text
+  noAction?: VoidFunction
+  hook: PromiseWithResolvers<boolean>
+}>((f, { params }) => {
+  f.title('Вы уверены?')
+  f.body(params.messageFormBody)
+  f.button(params.yesText, () => {
+    params.yesAction?.()
+    params.hook.resolve(true)
+  })
+  f.button(params.noText, () => {
+    params.noAction?.()
+    params.hook.resolve(false)
+  })
+})

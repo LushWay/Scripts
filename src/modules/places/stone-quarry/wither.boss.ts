@@ -15,7 +15,7 @@ export function createBossWither(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('wither')
-    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Slime}.name`))
+    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Wither}.name`))
     .typeId(CustomEntityTypes.Wither)
     .loot(new Loot().item('NetherStar').build)
     .respawnTime(ms.from('hour', 1))

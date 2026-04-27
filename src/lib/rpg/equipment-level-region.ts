@@ -1,13 +1,13 @@
 import { Player, world } from '@minecraft/server'
-import { ask } from 'lib/form/message'
+import { askNew } from 'lib/form/new'
 import { i18n, textTable } from 'lib/i18n/text'
 import { playerMoveHistory } from 'lib/player-move'
 import { Region } from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
+import { doNothing } from 'lib/util'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { EquippmentLevel } from './equipment-level'
 import { isNewbie } from './newbie'
-import { doNothing } from 'lib/util'
 
 export function warnAboutEnteringDangerousRegion(region: Region, level: EquippmentLevel.Global) {
   const cache = new WeakPlayerMap<{
@@ -44,19 +44,22 @@ export function warnAboutEnteringDangerousRegion(region: Region, level: Equippme
 
     pushAway(player, region)
 
-    ask(
+    askNew(
       player,
-      textTable([
-        i18n`Опасно!`,
-        [i18n`Зона`, region.displayName ?? region.name],
-        '',
-        [i18n`Требуемый уровень`, EquippmentLevel.emojiLevel[level]],
-        [i18n`Ваш уровень      `, EquippmentLevel.getEmoji(player)],
-        '',
-        region.permissions.pvp === 'pve' || isNewbie(player)
-          ? i18n.success`Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.`
-          : i18n.error`Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне`,
-      ]),
+      textTable(
+        [
+          i18n`Опасно!`,
+          [i18n`Зона`, region.displayName ?? region.name],
+          '',
+          [i18n`Требуемый уровень`, EquippmentLevel.emojiLevel[level]],
+          [i18n`Ваш уровень`, EquippmentLevel.getEmoji(player) || 'у вас вообще экипировки нет'],
+          '',
+          region.permissions.pvp === 'pve' || isNewbie(player)
+            ? i18n.success`Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.`
+            : i18n.error`Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне`,
+        ],
+        false,
+      ),
       i18n.success`Вернуться назад`,
       doNothing,
       i18n.error`Я готов принять риск`,

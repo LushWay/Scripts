@@ -1,9 +1,8 @@
 /** To add boss "minecraft:boss": { "should_darken_sky": false, "hud_range": 25 } */
 
-import { Entity, Player, system, WatchdogTerminateBeforeEvent, world } from '@minecraft/server'
+import { Entity, Player, system, world } from '@minecraft/server'
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { defaultLang } from 'lib/assets/lang'
 import { table } from 'lib/database/abstract'
 import { EventLoaderWithArg, EventSignal } from 'lib/event-signal'
 import { Core } from 'lib/extensions/core'
@@ -16,14 +15,14 @@ import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
 import { Temporary } from 'lib/temporary'
-import { getBlockStatus, onLoad } from 'lib/utils/game'
+import { getBlockStatus } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-import { FloatingText } from './floating-text'
-import { Group, Place } from './place'
 import { EquippmentLevel } from './equipment-level'
 import { warnAboutEnteringDangerousRegion } from './equipment-level-region'
+import { FloatingText } from './floating-text'
+import { Group, Place } from './place'
 
 interface BossDB {
   id: string
@@ -143,18 +142,22 @@ export class Boss {
     this.location = location(options.place)
     Boss.arenaDb.onLoad(() => {
       this.location.onLoad.subscribe(center => {
-        const areadb = Boss.arenaDb.get(this.options.place.id)
+        const areadb = Boss.arenaDb.get(this.id)
 
         this.check()
         const area =
           (areadb?.area ? Area.fromJson(areadb.area) : undefined) ??
           new SphereArea({ center, radius: this.options.radius }, this.options.place.group.dimensionType)
 
-        this.region = BossArenaRegion.create(area, {
-          boss: this,
-          bossName: this.options.place.name,
-          permissions: { allowedEntities: this.options.allowedEntities },
-        })
+        this.region = BossArenaRegion.create(
+          area,
+          {
+            boss: this,
+            bossName: this.options.place.name,
+            permissions: { allowedEntities: this.options.allowedEntities },
+          },
+          this.id,
+        )
 
         if (areadb?.ldb) this.region.ldb = areadb.ldb
 

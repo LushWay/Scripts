@@ -86,16 +86,15 @@ declare global {
   }
 }
 
-export function textTable(table: Text.Table): Message {
+export function textTable(table: Text.Table, colored = table.length > 5): Message {
   return new ServerSideI18nMessage(defaultColors(), lang => {
-    const long = table.length > 5
     return table
       .map((v, i) => {
         if (typeof v === 'string') return v
         if (v instanceof Message) return v.to(lang)
 
         const [key, value] = v
-        return `${i % 2 === 0 && long ? '§f' : '§7'}${key.to(lang)}: ${textUnitColorize(value, undefined, lang)}`
+        return `${i % 2 === 0 && colored ? '§f' : '§7'}${key.to(lang)}: ${textUnitColorize(value, undefined, lang)}`
       })
       .join('\n')
   })

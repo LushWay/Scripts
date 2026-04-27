@@ -1,22 +1,21 @@
-import { EquipmentSlot, world } from '@minecraft/server'
-import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { world } from '@minecraft/server'
+import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 
-import { i18nShared } from 'lib/i18n/text'
-import { Group } from 'lib/rpg/place'
-import { Chip } from './engineer'
-import { Vec } from 'lib/vector'
-import { ms } from 'lib/utils/ms'
-import { Loot } from 'lib/rpg/loot-table'
-import { Boss } from 'lib/rpg/boss'
-import { EquippmentLevel } from 'lib/rpg/equipment-level'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { MinecraftI18nMessage } from 'lib/i18n/message'
+import { Boss } from 'lib/rpg/boss'
+import { EquippmentLevel } from 'lib/rpg/equipment-level'
+import { Loot } from 'lib/rpg/loot-table'
+import { Group } from 'lib/rpg/place'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
+import { Chip } from './engineer'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()
     .group(group)
     .id('golem')
-    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.Slime}.name`))
+    .name(new MinecraftI18nMessage(`entity.${CustomEntityTypes.IronGolem}.name`))
     .typeId(CustomEntityTypes.IronGolem)
     .loot(
       new Loot('GolemLoot')

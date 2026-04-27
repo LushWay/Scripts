@@ -176,6 +176,8 @@ export class MinecraftI18nMessage extends SharedI18nMessage {
   }
 
   to(language: Language): string {
-    return translateToken(this.token, language)
+    const text = translateToken(this.token, language)
+    if (text.includes('§')) return '§r' + text + '§r'
+    return text
   }
 }
