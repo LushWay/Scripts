@@ -1,14 +1,14 @@
 import { Player } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
 import { i18n } from 'lib/i18n/text'
-import { form, NewFormCallback, NewFormCreator } from './new'
+import { form, FormCreator, NewFormCallback } from './new'
 import { QuestForm } from './quest'
 
 interface LoreFormDb {
   seen: string[]
 }
 
-type AddFn = (f: NewFormCreator) => void
+type AddFn = (f: FormCreator) => void
 
 export type LF = Omit<LoreForm, 'renderHistory'>
 
@@ -27,7 +27,7 @@ export class LoreForm extends QuestForm {
 
   constructor(
     protected id: string,
-    form: NewFormCreator,
+    form: FormCreator,
     player: Player,
     back: NewFormCallback,
   ) {

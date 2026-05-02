@@ -2,7 +2,6 @@ import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { defaultLang } from 'lib/assets/lang'
 import { ActionForm } from 'lib/form/action'
-import { ArrayFormBuilder, ShowArrayForm } from 'lib/form/array-new'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
@@ -18,9 +17,9 @@ export interface FormContext<T extends FormParams> {
 }
 
 export type FormParams = Record<string, unknown> | undefined
-export type NewFormCreator = Omit<Form, 'show' | 'currentTitle'>
+export type FormCreator = Omit<Form, 'show' | 'currentTitle'>
 
-type CreateForm<P extends FormParams = undefined> = (form: NewFormCreator, ctx: FormContext<P>) => void
+type FormCreateFn<P extends FormParams = undefined> = (form: FormCreator, ctx: FormContext<P>) => void
 
 class Form {
   constructor(private player: Player) {
@@ -34,12 +33,12 @@ class Form {
   title(title: Text, prefix = '§c§o§m§m§o§n§r§f') {
     this.currentTitle = title
     this.form.title(`${prefix}${title.to(this.player.lang)}`)
-    return this as NewFormCreator
+    return this as FormCreator
   }
 
   body(body: Text) {
     this.form.body(body.to(this.player.lang))
-    return this as NewFormCreator
+    return this as FormCreator
   }
 
   private buttons: NewFormCallback[] = []
@@ -52,10 +51,10 @@ class Form {
    * @param text - Text to show on this button
    * @param callback - What happens when this button is clicked
    */
-  button(text: Text, callback: NewFormCallback | ShowForm): NewFormCreator
+  button(text: Text, callback: NewFormCallback | ShowForm): FormCreator
 
   /** Adds a button to this form */
-  button(link: ShowForm, icon?: string | null): NewFormCreator
+  button(link: ShowForm, icon?: string | null): FormCreator
 
   /**
    * Adds a button to this form
@@ -64,7 +63,7 @@ class Form {
    * @param iconPath - Textures/ui/plus
    * @param callback - What happens when this button is clicked
    */
-  button(text: Text, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): NewFormCreator
+  button(text: Text, iconPath: string | null | undefined, callback: NewFormCallback | ShowForm): FormCreator
 
   /**
    * Adds a button to this form
@@ -77,7 +76,7 @@ class Form {
     textOrForm: Text | ShowForm,
     callbackOrIcon: string | null | undefined | NewFormCallback | ShowForm,
     callbackOrUndefined?: NewFormCallback | ShowForm,
-  ): NewFormCreator {
+  ): FormCreator {
     let text, icon, callback
 
     if (textOrForm instanceof ShowForm) {
@@ -161,25 +160,9 @@ class Form {
   }
 }
 
-export function form(create: CreateForm) {
-  return new ShowForm(create, undefined)
-}
-
-form.params = <P extends FormParams>(create: CreateForm<P>) => {
-  return (params: P) => new ShowForm<P>(create, params) as unknown as ShowForm
-}
-
-type CreateArrayForm<P extends FormParams = undefined> = (f: ArrayFormBuilder.Creator, ctx: FormContext<P>) => void
-
-form.array = (create: CreateArrayForm) => new ShowArrayForm(create, undefined)
-
-form.arrayParams = <P extends FormParams>(create: CreateArrayForm<P>) => {
-  return (params: P) => new ShowArrayForm(create, params)
-}
-
 export class ShowForm<T extends FormParams = undefined> {
   constructor(
-    private create: CreateForm<T>,
+    private create: FormCreateFn<T>,
     protected params: T,
   ) {}
 
@@ -223,6 +206,14 @@ export class ShowForm<T extends FormParams = undefined> {
   get command() {
     return (ctx: import('lib/command/context').CommandContext) => this.show(ctx.player)
   }
+}
+
+export function form(create: FormCreateFn) {
+  return new ShowForm(create, undefined)
+}
+
+form.params = <P extends FormParams>(create: FormCreateFn<P>) => {
+  return (params: P) => new ShowForm<P>(create, params) as unknown as ShowForm
 }
 
 /** Shows MessageForm to the player */

@@ -14,7 +14,7 @@ import { doNothing, util } from '../util'
 import { stringSimilarity } from '../utils/search'
 import { ActionForm } from './action'
 import { ModalForm } from './modal'
-import { FormContext, FormParams, NewFormCallback, ShowForm } from './new'
+import { form, FormContext, FormParams, NewFormCallback, ShowForm } from './new'
 import { BUTTON } from './utils'
 
 export declare namespace ArrayFormBuilder {
@@ -334,4 +334,12 @@ export class ArrayFormBuilder<
       }
     }
   }
+}
+
+type CreateArrayForm<P extends FormParams = undefined> = (f: ArrayFormBuilder.Creator, ctx: FormContext<P>) => void
+
+export const formArray = (create: CreateArrayForm) => new ShowArrayForm(create, undefined)
+
+formArray.params = <P extends FormParams>(create: CreateArrayForm<P>) => {
+  return (params: P) => new ShowArrayForm(create, params)
 }

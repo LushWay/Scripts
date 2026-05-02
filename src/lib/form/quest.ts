@@ -1,10 +1,10 @@
-import { Quest } from 'lib/quest'
-import { FormContext, NewFormCallback, NewFormCreator } from './new'
 import { Player } from '@minecraft/server'
+import { Quest } from 'lib/quest'
+import { FormCreator, NewFormCallback } from './new'
 
 export class QuestForm {
   constructor(
-    protected form: NewFormCreator,
+    protected form: FormCreator,
     protected player: Player,
     protected back: NewFormCallback,
   ) {}

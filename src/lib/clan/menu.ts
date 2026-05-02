@@ -2,7 +2,7 @@ import { Player } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { ask, MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
-import { form, FormContext, NewFormCreator } from 'lib/form/new'
+import { form, FormContext, FormCreator } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
@@ -27,7 +27,7 @@ export function clanMenu(player: Player, back?: VoidFunction) {
 }
 
 interface ClanButtonContext {
-  f: NewFormCreator
+  f: FormCreator
   clan: Clan
   formContext: FormContext<{ clan: Clan }>
   isOwner: boolean

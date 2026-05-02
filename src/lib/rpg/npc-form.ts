@@ -1,11 +1,11 @@
 import { Player } from '@minecraft/server'
 import { LF, LoreForm } from 'lib/form/lore'
-import { form, FormContext, NewFormCreator } from 'lib/form/new'
+import { form, FormContext, FormCreator } from 'lib/form/new'
 import { Npc } from './npc'
 import { Place } from './place'
 
 export type NpcFormCreator = (
-  form: NewFormCreator,
+  form: FormCreator,
   ctx: {
     npc: Npc
     lf: LF

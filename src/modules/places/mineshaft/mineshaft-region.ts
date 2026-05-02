@@ -1,15 +1,15 @@
 import { LocationOutOfWorldBoundariesError, Player, PlayerBreakBlockBeforeEvent, system } from '@minecraft/server'
 
-import { NewFormCreator } from 'lib/form/new'
+import { FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { registerRegionType } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 import { MineareaRegion } from '../../../lib/region/kinds/minearea'
 import { ores, placeOre } from './algo'
-import { registerRegionType } from 'lib/region'
-import { Vec } from 'lib/vector'
-import { ms } from 'lib/utils/ms'
 
 const logger = createLogger('Shaft')
 
@@ -65,7 +65,7 @@ export class MineshaftRegion extends MineareaRegion {
     return i18n.nocolor`§7Шахта`
   }
 
-  customFormButtons(form: NewFormCreator, player: Player): void {
+  customFormButtons(form: FormCreator, player: Player): void {
     form.button(noI18n`Убрать все руды и сохранить структуру`, () => {
       player.info('Start')
       this.removeAllOresAndResaveStructure()

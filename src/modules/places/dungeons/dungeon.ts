@@ -3,7 +3,7 @@ import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-da
 
 import { StructureDungeonsId, StructureFile, structureFiles } from 'lib/assets/structures'
 import { Cooldown } from 'lib/cooldown'
-import { NewFormCreator } from 'lib/form/new'
+import { FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNear } from 'lib/player-move'
 import { adventureModeRegions, registerRegionType, registerSaveableRegion } from 'lib/region'
@@ -198,7 +198,7 @@ export class DungeonRegion extends Region {
     return true
   }
 
-  customFormButtons(form: NewFormCreator, player: Player): void {
+  customFormButtons(form: FormCreator, player: Player): void {
     form.button(noI18n`Снова установить структуру`, () => {
       this.placeStructure()
     })

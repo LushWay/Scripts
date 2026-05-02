@@ -1,7 +1,7 @@
 import { Player, world } from '@minecraft/server'
 import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
 import { removeDefaults, setDefaults } from 'lib/database/defaults'
-import { NewFormCreator } from 'lib/form/new'
+import { FormCreator } from 'lib/form/new'
 import { noI18n, noI18nShared } from 'lib/i18n/text'
 import { noGroup, Place } from 'lib/rpg/place'
 import { util } from 'lib/util'
@@ -328,7 +328,7 @@ export class Region {
   }
 
   /** Can be overriden to add custom buttons to the .region edit form */
-  customFormButtons(form: NewFormCreator, player: Player) {
+  customFormButtons(form: FormCreator, player: Player) {
     // Can be overriden to add custom buttons
   }
 

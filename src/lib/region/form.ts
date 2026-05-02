@@ -2,7 +2,7 @@ import { Player, world } from '@minecraft/server'
 import { parseArguments, parseLocationArguments } from 'lib/command/utils'
 import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
-import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
+import { form, FormCreator, NewFormCallback } from 'lib/form/new'
 import { BUTTON, FormCallback } from 'lib/form/utils'
 import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { inspect } from 'lib/utils/inspect'
@@ -23,7 +23,7 @@ export const regionForm = form((f, { player, self }) => {
   const currentRegions = Region.getManyAt(player)
   const currentRegion = currentRegions[0]
 
-  function addRegionButton(currentRegion: Region, form: NewFormCreator) {
+  function addRegionButton(currentRegion: Region, form: FormCreator) {
     form.button(
       noI18n`${currentRegion.displayName ?? noI18n`Без имени`} (${currentRegion.area.toString()})\n${currentRegion.name}`,
       editRegion({ region: currentRegion, displayName: false }),

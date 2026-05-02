@@ -7,6 +7,7 @@ import { i18n, noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 import { Cutscene } from './cutscene'
 import { cutsceneEdit } from './edit'
+import { formArray } from 'lib/form/array-new'
 
 export const cutscene = new Command('cutscene')
   .setDescription(i18n`Катсцена`)
@@ -19,7 +20,7 @@ cutscenes.onLoad(() => {
   for (const c of cutscenes) new Cutscene(c, c)
 })
 
-const selectCutsceneMenu = form.array((f, { player }) => {
+const selectCutsceneMenu = formArray((f, { player }) => {
   f.title(noI18n`Катсцены`)
   f.body(noI18n`Список доступных для редактирования катсцен:`)
 

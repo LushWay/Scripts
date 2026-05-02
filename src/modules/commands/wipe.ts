@@ -6,7 +6,7 @@ import { scoreboardObjectiveNames } from 'lib/database/scoreboard'
 import { ArrayForm } from 'lib/form/array'
 import { LoreForm } from 'lib/form/lore'
 import { ModalForm } from 'lib/form/modal'
-import { form, NewFormCallback, NewFormCreator } from 'lib/form/new'
+import { form, FormCreator, NewFormCallback } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
@@ -179,7 +179,7 @@ function otherPlayerRestorePoints(player: Player, back?: NewFormCallback) {
     .show(player)
 }
 
-function renderList(f: NewFormCreator, source: DB, sourceOwnerId: string, player: Player) {
+function renderList(f: FormCreator, source: DB, sourceOwnerId: string, player: Player) {
   for (const [id, restorePoint] of Object.entries(source.restorePoints)) {
     const logs = source.loads.filter(e => e.pointId === id)
 

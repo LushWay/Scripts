@@ -1,5 +1,5 @@
 import { ItemStack, Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
-import { NewFormCreator } from 'lib/form/new'
+import { FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
@@ -191,7 +191,7 @@ export class MineareaRegion extends RegionWithStructure {
     }
   }
 
-  customFormButtons(form: NewFormCreator, player: Player): void {
+  customFormButtons(form: FormCreator, player: Player): void {
     form.button('Индексировать для вики', () => {
       player.info('Start')
       this.indexResources()
