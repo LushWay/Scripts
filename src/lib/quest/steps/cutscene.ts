@@ -1,7 +1,10 @@
 import { Cutscene } from 'lib/cutscene'
 import { PlayerQuest } from '../player'
 
-export function QSCutscene(this: PlayerQuest, cutscene: Cutscene, text: Text) {
+export function QSCutscene(this: PlayerQuest, id: string, text: Text, options: Cutscene.Options = {}) {
+  const fullId = this.quest.id + ' ' + id
+  const cutscene = Cutscene.all.get(fullId) ?? new Cutscene(fullId, text, options)
+
   return this.dynamic(text).activate(ctx => {
     ctx.animateTicks = 0
 
@@ -14,7 +17,7 @@ export function QSCutscene(this: PlayerQuest, cutscene: Cutscene, text: Text) {
 
     play
       .catch((e: unknown) => {
-        console.error('Cutscene error in quest', this.quest.id, ctx.player.name, e)
+        console.error('Cutscene error in quest', fullId, ctx.player.name, e)
       })
       .finally(() => {
         ctx.next()

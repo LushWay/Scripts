@@ -6,40 +6,40 @@ import { noI18n } from 'lib/i18n/text'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
 import { hexToRgb } from 'lib/util'
-import { onLoad, restorePlayerCamera } from 'lib/utils/game'
+import { restorePlayerCamera } from 'lib/utils/game'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
-
-/**
- * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
- * rotation y)
- */
-type Point = Vector5
-
-/** Single cutscene section that contains points and information about easing/animation time */
-interface Section {
-  points: Point[]
-  step: number
-  easeType?: EasingType
-  easeTime?: number
-}
-
-/** Section list */
-type Sections = (undefined | Section)[]
-
-/** Controller used to abort playing cutscene animation */
-interface CutsceneAbortController {
-  cancel: boolean
-}
 
 export namespace Cutscene {
   export interface Options {
+    instantEnter?: boolean
     restoreCameraTime?: number
   }
+
+  /** Controller used to abort playing cutscene animation */
+  export interface AbortController {
+    cancel: boolean
+  }
+
+  /**
+   * Represents single cutscene point. It has Vector3 properties and rotation properties (rx for rotation x, and ry for
+   * rotation y)
+   */
+  export type Point = Vector5
+
+  /** Single cutscene section that contains points and information about easing/animation time */
+  export interface Section {
+    points: Point[]
+    step: number
+    easeType?: EasingType
+    easeTime?: number
+  }
+
+  export type Sections = (undefined | Section)[]
 }
 
 export class Cutscene {
   /** Database containing Cutscene trail points */
-  static db = table<Sections>('cutscene', () => [])
+  static db = table<Cutscene.Sections>('cutscene', () => [])
 
   /** List of all cutscenes */
   static all = new Map<string, Cutscene>()
@@ -50,25 +50,33 @@ export class Cutscene {
     }
   }
 
+  static getVector5(player: Player): Vector5 {
+    const { x: rx, y: ry } = player.getRotation()
+    const { x, y, z } = player.getHeadLocation()
+    return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }
+  }
+
   /** List of cutscene sections */
-  sections: Sections = []
+  sections: Cutscene.Sections = []
 
   private intervalTime = 5
 
   private restoreCameraTime = 2
 
+  private instantEnter = false
+
   /** List of players that currently see cutscene play */
   private current = new WeakPlayerMap<{
     player: Player
-    controller: CutsceneAbortController
+    controller: Cutscene.AbortController
   }>({
     onLeave: playerId => this.exit(playerId),
   })
 
   /** Creates a new Cutscene. */
-
   constructor(
     public id: string,
+    /** Internal use only */
     public displayName: Text,
     options?: Cutscene.Options,
   ) {
@@ -76,9 +84,10 @@ export class Cutscene {
 
     if (options) {
       if (typeof options.restoreCameraTime === 'number') this.restoreCameraTime = options.restoreCameraTime
+      if (typeof options.instantEnter === 'boolean') this.instantEnter = options.instantEnter
     }
 
-    onLoad(() => {
+    Cutscene.db.onLoad(() => {
       this.sections = Cutscene.db.get(this.id).slice()
     })
   }
@@ -97,8 +106,8 @@ export class Cutscene {
    * @param player - Player to play cutscene for
    */
 
-  play(player: Player) {
-    if (!this.sections[0]?.points[0]) {
+  play(player: Player, sections = this.sections) {
+    if (!sections[0]?.points[0]) {
       console.error(`${this.id}: cutscene is not ready.`)
       player.fail(noI18n`${this.displayName}: cutscene is not ready.`)
       return
@@ -108,7 +117,6 @@ export class Cutscene {
     Compass.forceHide.add(player)
     Sidebar.forceHide.add(player)
 
-    const switchColor = hexToRgb('#102010')
     const controller = { cancel: false }
     const promise = this.forEachPoint(
       async (point, pointNum, section, sectionNum) => {
@@ -117,7 +125,9 @@ export class Cutscene {
           return
         }
 
-        const sectionSwitch = pointNum === 0 && sectionNum !== 0
+        const firstPoint = pointNum === 0
+        const firstSection = sectionNum === 0
+        const sectionSwitch = this.instantEnter ? firstPoint : firstPoint && !firstSection
         if (!sectionSwitch) {
           player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
             location: point,
@@ -126,10 +136,7 @@ export class Cutscene {
           })
         } else {
           // Section switch
-          player.camera.fade({
-            fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
-            fadeColor: switchColor,
-          })
+          this.darkScreen(player)
 
           await system.sleep(10)
 
@@ -141,12 +148,21 @@ export class Cutscene {
           })
         }
       },
-      { controller, exit: () => this.exit(player) },
+      { controller, sections, exit: () => this.exit(player) },
     )
 
     this.current.set(player.id, { player, controller })
 
     return promise
+  }
+
+  private switchColor = hexToRgb('#102010')
+
+  private darkScreen(player: Player) {
+    player.camera.fade({
+      fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
+      fadeColor: this.switchColor,
+    })
   }
 
   /**
@@ -161,13 +177,23 @@ export class Cutscene {
    */
 
   async forEachPoint(
-    callback: (point: Point, pointIndex: number, section: Section, sectionIndex: number) => void | Promise<void>,
+    callback: (
+      point: Cutscene.Point,
+      pointIndex: number,
+      section: Cutscene.Section,
+      sectionIndex: number,
+    ) => void | Promise<void>,
     {
       controller,
-      sections = this.sections,
+      sections,
       exit,
       intervalTime = this.intervalTime,
-    }: { controller: CutsceneAbortController; sections?: Sections; exit?: VoidFunction; intervalTime?: number },
+    }: {
+      controller: Cutscene.AbortController
+      sections: Cutscene.Sections
+      exit?: VoidFunction
+      intervalTime?: number
+    },
   ) {
     const end = new Error('End.')
     try {
@@ -189,28 +215,74 @@ export class Cutscene {
   }
 
   /** Uses bezier curves to interpolate points along a section. */
-  private *pointIterator({ step, points }: Section) {
-    const emptyPoint: Point = { rx: 0, ry: 0, x: 0, y: 0, z: 0 }
+  private *pointIterator({ step, points }: Cutscene.Section) {
+    const emptyPoint: Cutscene.Point = { rx: 0, ry: 0, x: 0, y: 0, z: 0 }
+
+    // Fixes issues with camera doing 360 spin
+    // this happens because angles like -10 and 350 are pretty close
+    // but bezier does not take that into consideration
+    const unwrapped = points.map(p => ({ ...p }))
+    for (let i = 1; i < unwrapped.length; i++) {
+      const prev = unwrapped[i - 1] ?? emptyPoint
+      const curr = unwrapped[i] ?? emptyPoint
+      const drx = this.wrapDelta(curr.rx - prev.rx)
+      const dry = this.wrapDelta(curr.ry - prev.ry)
+      curr.rx = prev.rx + drx
+      curr.ry = prev.ry + dry
+    }
+
     let index = 0
-    for (let point = 0; point <= points.length; point += step) {
-      if (!points[0]) yield { x: 0, y: 0, z: 0, rx: 0, ry: 0, index }
+    for (let point = 0; point <= unwrapped.length; point += step) {
+      if (!unwrapped[0]) yield { ...emptyPoint, index }
       const i = Math.floor(point)
       const t = point - i
-      const v0 = points[i - 1] ?? points[0] ?? emptyPoint
-      const v1 = points[i] ?? points[0] ?? emptyPoint
-      const v2 = points[i + 1] ?? v1
-      const v3 = points[i + 2] ?? v2
+      const v0 = unwrapped[i - 1] ?? unwrapped[0] ?? emptyPoint
+      const v1 = unwrapped[i] ?? unwrapped[0] ?? emptyPoint
+      const v2 = unwrapped[i + 1] ?? v1
+      const v3 = unwrapped[i + 2] ?? v2
 
-      const x = bezier([v0, v1, v2, v3], 'x', t)
-      const y = bezier([v0, v1, v2, v3], 'y', t)
-      const z = bezier([v0, v1, v2, v3], 'z', t)
+      const x = this.bezier([v0, v1, v2, v3], 'x', t)
+      const y = this.bezier([v0, v1, v2, v3], 'y', t)
+      const z = this.bezier([v0, v1, v2, v3], 'z', t)
 
-      const rx = bezier([v0, v1, v2, v3], 'rx', t)
-      const ry = bezier([v0, v1, v2, v3], 'ry', t)
+      const rx = this.bezier([v0, v1, v2, v3], 'rx', t)
+      const ry = this.bezier([v0, v1, v2, v3], 'ry', t)
 
       yield { x, y, z, rx, ry, index }
       index++
     }
+  }
+
+  // function to wrap a delta into [-180, 180]
+  private wrapDelta(delta: number) {
+    if (delta > 180) return delta - 360 * Math.ceil((delta - 180) / 360)
+    if (delta < -180) return delta + 360 * Math.ceil((-delta - 180) / 360)
+    return delta
+  }
+
+  /**
+   * Calculates the value of a point on a cubic Bezier curve.
+   *
+   * @template T - Vector type
+   * @param vectors - Array of four control points that define a cubic Bezier curve. Each control point is a Record that
+   *   have the provided axis
+   * @param axis - Axis along which the Bezier curve is being calculated. It specifies whether the calculation is for
+   *   the x-axis, y-axis, or z-axis of the provided vectors.
+   * @param t - Interpolation value between two points on a Bezier curve. It is typically a value between 0 and 1, where
+   *   0 corresponds to the starting point of the curve and 1 corresponds to the ending point of the curve.
+   */
+  private bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: keyof T, t: number) {
+    const [v0, v1, v2, v3] = vectors
+    const t2 = t * t
+    const t3 = t2 * t
+    const vv1 = v1[axis] ?? 0
+    const vv0 = v0[axis] ?? 0
+    const vv2 = v2[axis] ?? 0
+    const vv3 = v3[axis] ?? 0
+    return (
+      0.5 *
+      (2 * vv1 + (-vv0 + vv2) * t + (2 * vv0 - 5 * vv1 + 4 * vv2 - vv3) * t2 + (-vv0 + 3 * vv1 - 3 * vv2 + vv3) * t3)
+    )
   }
 
   /**
@@ -229,19 +301,24 @@ export class Cutscene {
     // Cleanup and restore to the previous state
     this.current.delete(playerId)
     if (player instanceof Player) {
-      restorePlayerCamera(player, this.restoreCameraTime)
-
-      const reset = () => {
-        if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
-        Compass.forceHide.delete(player)
-        Sidebar.forceHide.delete(player)
-      }
-
       if (this.restoreCameraTime) {
-        system.runTimeout(reset, 'restoreCutsceneHud', this.restoreCameraTime * TicksPerSecond)
+        restorePlayerCamera(player, this.restoreCameraTime)
       } else {
-        reset()
+        this.darkScreen(player)
       }
+
+      system.runTimeout(
+        () => {
+          if (!Cutscene.getCurrent(player)) {
+            if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
+            Compass.forceHide.delete(player)
+            Sidebar.forceHide.delete(player)
+            if (!this.restoreCameraTime) restorePlayerCamera(player, 0)
+          }
+        },
+        'restoreCutsceneHud',
+        2 * TicksPerSecond,
+      )
     }
 
     return true
@@ -253,12 +330,12 @@ export class Cutscene {
       sections = this.sections.slice(),
       sectionIndex = sections.length - 1,
       warn = false,
-    }: { sections?: Sections; sectionIndex?: number; warn?: boolean } = {},
+    }: { sections?: Cutscene.Sections; sectionIndex?: number; warn?: boolean } = {},
   ) {
     const section = sections[sectionIndex]
 
     if (section) {
-      section.points.push(getVector5(source))
+      section.points.push(Cutscene.getVector5(source))
     } else {
       if (warn) {
         source.warn(
@@ -272,7 +349,7 @@ export class Cutscene {
     return sections
   }
 
-  withNewSection(sections: Sections = this.sections.slice(), section: Partial<Section>) {
+  withNewSection(sections: Cutscene.Sections = this.sections.slice(), section: Partial<Cutscene.Section>) {
     sections.push(Object.assign(section, this.defaultSection))
 
     return sections
@@ -282,35 +359,4 @@ export class Cutscene {
   save() {
     Cutscene.db.set(this.id, this.sections)
   }
-}
-
-/**
- * Calculates the value of a point on a cubic Bezier curve.
- *
- * @template T - Vector type
- * @param vectors - Array of four control points that define a cubic Bezier curve. Each control point is a Record that
- *   have the provided axis
- * @param axis - Axis along which the Bezier curve is being calculated. It specifies whether the calculation is for the
- *   x-axis, y-axis, or z-axis of the provided vectors.
- * @param t - Interpolation value between two points on a Bezier curve. It is typically a value between 0 and 1, where 0
- *   corresponds to the starting point of the curve and 1 corresponds to the ending point of the curve.
- */
-function bezier<T extends Record<string, number>>(vectors: [T, T, T, T], axis: keyof T, t: number) {
-  const [v0, v1, v2, v3] = vectors
-  const t2 = t * t
-  const t3 = t2 * t
-  const vv1 = v1[axis] ?? 0
-  const vv0 = v0[axis] ?? 0
-  const vv2 = v2[axis] ?? 0
-  const vv3 = v3[axis] ?? 0
-  return (
-    0.5 *
-    (2 * vv1 + (-vv0 + vv2) * t + (2 * vv0 - 5 * vv1 + 4 * vv2 - vv3) * t2 + (-vv0 + 3 * vv1 - 3 * vv2 + vv3) * t3)
-  )
-}
-
-function getVector5(player: Player): Vector5 {
-  const { x: rx, y: ry } = player.getRotation()
-  const { x, y, z } = player.getHeadLocation()
-  return { x, y, z, rx: Math.floor(rx), ry: Math.floor(ry) }
 }

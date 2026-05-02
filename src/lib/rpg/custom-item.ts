@@ -69,7 +69,7 @@ export class CustomItemWithBlueprint extends CustomItem {
 
   get blueprint() {
     return new ItemStack(Items.Blueprint).setInfo(
-      i18n`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, defaultLang) : this._bprintName)}`.to(
+      i18n`§fЧертеж предмета ${this._nameTag ?? (this._typeId ? translateTypeId(this._typeId, defaultLang).replace(/~LINEBREAK~.+/, '') : this._bprintName)}`.to(
         defaultLang,
       ),
       i18n`С помощью него вы можете сделать предмет у инженера`.to(defaultLang),

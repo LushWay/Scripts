@@ -21,11 +21,7 @@ export function QSReachArea(
       ),
     )
 
-    const min = Vec.min(from, to)
-    const max = Vec.max(from, to)
-    const size = Vec.subtract(max, min)
-    const edge = Vec.multiply(size, 0.5)
-    ctx.target = { location: Vec.add(Vec.add(min, edge), { x: 1, y: 1, z: 1 }), dimensionType }
+    ctx.target = { location: Vec.center(from, to), dimensionType }
 
     return { cleanup: () => actions.forEach(a => a.unsubscribe()) }
   })

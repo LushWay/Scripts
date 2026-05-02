@@ -26,7 +26,6 @@ import {
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CommandContext } from 'lib/command/context'
 import { parseArguments } from 'lib/command/utils'
-import { Cutscene } from 'lib/cutscene'
 import { scoreboardObjectiveNames } from 'lib/database/scoreboard'
 import { DatabaseUtils } from 'lib/database/utils'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
@@ -635,10 +634,6 @@ const publicTests: Record<string, (ctx: CommandContext) => void | Promise<void>>
 }
 
 const c = new Command('test').setDescription('Разные тесты')
-
-new Cutscene('animation1', 'Animation1')
-new Cutscene('animation2', 'Animation2')
-new Cutscene('animation3', 'Animation3')
 
 c.string('id', true).executes(async (ctx, id) => {
   const source = is(ctx.player.id, 'techAdmin') ? { ...publicTests, ...tests } : tests

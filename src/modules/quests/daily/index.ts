@@ -82,7 +82,10 @@ function hasAccessToDaily(player: Player, tell = true, fn = (t: Text) => player.
   const completed = CityInvestigating.list.filter(e => e.quest.hadEntered(player))
   if (completed.length !== CityInvestigating.list.length) {
     if (tell) {
-      const notVisited = CityInvestigating.list.filter(e => !completed.includes(e)).map(e => e.city.group.sharedName)
+      const notVisited = CityInvestigating.list
+        .filter(e => !completed.includes(e))
+        .map(e => e.city.group.name)
+        .filter(noNullable)
       fn(
         i18n.error`Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ${intlListFormat(i18n.error.style, player.lang, 'and', notVisited)}`,
       )

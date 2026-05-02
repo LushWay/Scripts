@@ -185,7 +185,7 @@ function countItems(player: Player, type: string) {
   let count = 0
   if (!player.container) return 0
   for (const [, item] of player.container.entries()) {
-    if (!item || item.typeId !== type) continue
+    if (item?.typeId !== type) continue
 
     count += item.amount
   }

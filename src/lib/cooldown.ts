@@ -34,12 +34,12 @@ export class Cooldown {
 
   private getElapsed(key: string) {
     const timestamp = this.db[key]
-    if (typeof timestamp !== 'number') return 0
+    if (typeof timestamp !== 'number') return -1
 
     const elapsed = Date.now() - timestamp
     if (elapsed <= this.time) return elapsed
 
-    return 0
+    return -1
   }
 
   getRemainingTime(player: Player | string) {
@@ -57,17 +57,17 @@ export class Cooldown {
   isExpired(player: Player | string, updateTimestamp = true) {
     const id = player instanceof Player ? player.id : player
     const elapsed = this.getElapsed(id)
-    if (elapsed) {
+    if (elapsed === -1) {
+      if (updateTimestamp) this.db[id] = Date.now()
+
+      return true
+    } else {
       if (this.tell && player instanceof Player) {
         const after = this.time - elapsed
         player.fail(i18n.error`Не так быстро! Попробуй через ${i18n.time(after)}`)
       }
 
       return false
-    } else {
-      if (updateTimestamp) this.db[id] = Date.now()
-
-      return true
     }
   }
 }

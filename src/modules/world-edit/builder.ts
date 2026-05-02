@@ -1,4 +1,4 @@
-import { Player, system } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { InventoryStore } from 'lib/database/inventory'
 import { Join } from 'lib/player-join'
 import { CURRENT_BUILDERS, isNotPlaying } from 'lib/utils/game'
@@ -11,6 +11,10 @@ Join.onMoveAfterJoin.subscribe(({ player }) => {
 })
 
 system.runPlayerInterval(updateBuilderStatus, 'builder list update', 10)
+
+world.afterEvents.playerGameModeChange.subscribe(event => {
+  updateBuilderStatus(event.player)
+})
 
 // Insert role value right after name
 // PlayerNameTagModifiers.push(p => isBuilding(p) && `\n${getFullname(p.id, { name: false })}`)

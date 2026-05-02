@@ -1,14 +1,13 @@
 import { Crate } from 'lib/crates/crate'
-import { Cutscene } from 'lib/cutscene'
 import { i18n, i18nShared } from 'lib/i18n/text'
+import { location } from 'lib/location'
 import { DailyQuest } from 'lib/quest/quest'
 import { FloatingText } from 'lib/rpg/floating-text'
+import { LootTable } from 'lib/rpg/loot-table'
 import { Npc } from 'lib/rpg/npc'
 import { Jeweler } from 'modules/places/lib/npc/jeweler'
 import { Scavenger } from './npc/scavenger'
 import { SafePlace } from './safe-place'
-import { location } from 'lib/location'
-import { LootTable } from 'lib/rpg/loot-table'
 
 export abstract class City extends SafePlace {
   protected createKits(normalLoot: LootTable, donutLoot: LootTable) {
@@ -30,8 +29,6 @@ export abstract class City extends SafePlace {
   normalCrate?: Crate
 
   donutCrate?: Crate
-
-  cutscene = new Cutscene(this.group.id, i18n`Исследование ${this.name}`)
 
   jeweler = new Jeweler(this.group)
 

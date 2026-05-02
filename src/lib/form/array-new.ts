@@ -10,14 +10,14 @@ import {
   type SettingsConfigParsed,
   type SettingsDatabase,
 } from 'lib/settings'
-import { util } from '../util'
+import { doNothing, util } from '../util'
 import { stringSimilarity } from '../utils/search'
 import { ActionForm } from './action'
 import { ModalForm } from './modal'
-import { NewFormCallback } from './new'
+import { FormContext, FormParams, NewFormCallback, ShowForm } from './new'
 import { BUTTON } from './utils'
 
-export declare namespace ArrayForm {
+export declare namespace ArrayFormBuilder {
   type Button<T, F> = (
     item: T,
     filters: F,
@@ -35,58 +35,142 @@ export declare namespace ArrayForm {
     addCustomButtonBeforeArray?: AddCustomButtons<this, F>
     itemsPerPage?: number
     minItemsForFilters?: number
-    back?: NewFormCallback
+  }
+
+  type Creator = ArrayFormCreator
+}
+
+interface ShowArrayCreatorProvider {
+  form?: ArrayFormBuilder
+  onTitle?: (title: Text) => void
+}
+
+/** Top level for builder */
+export class ArrayFormCreator {
+  protected currentTitle?: Text
+
+  title(title: Text) {
+    this.provider.onTitle?.(title)
+    this.currentTitle = title
+    return this
+  }
+
+  protected currentBody?: Text
+
+  body(text: Text) {
+    this.currentBody = text
+    return this
+  }
+
+  constructor(protected provider: ShowArrayCreatorProvider) {}
+
+  array<T>(items: readonly T[]) {
+    this.provider.form = new ArrayFormBuilder(this.currentTitle ?? noI18n`Array form`, items).configure({
+      description: this.currentBody,
+    })
+    return this.provider.form as ArrayFormBuilder<T>
   }
 }
 
-export class ArrayForm<
-  const T,
+export class ShowArrayForm<P extends FormParams = undefined> extends ShowForm<P> {
+  constructor(
+    private arrayCreator: (f: ArrayFormCreator, ctx: FormContext<P>) => void,
+    params: P,
+  ) {
+    super(doNothing, params)
+  }
+
+  show: NewFormCallback = (player, back?) => {
+    const ctx: FormContext<P> = {
+      player,
+      back,
+      params: this.params,
+      self: () => this.show(player, back),
+    }
+
+    const provider: ShowArrayCreatorProvider = {}
+    const builder = new ArrayFormCreator(provider)
+
+    this.arrayCreator(builder, ctx)
+
+    if (!provider.form) {
+      player.fail(noI18n.error`No form was created`)
+      console.error('No form was created', this.arrayCreator)
+      return
+    }
+
+    return ArrayFormBuilder.getShow(provider.form)(player, back)
+  }
+
+  /** Used to extract the title when this form is passed as a button. Mimics ShowForm.title: runs the creator briefly. */
+  title(player: Player): Text {
+    const error = new Error('STOP FORM CREATION WE GOT TITLE')
+    let title: undefined | Text
+
+    try {
+      this.arrayCreator(
+        new ArrayFormCreator({
+          onTitle(v) {
+            title = v
+            throw error
+          },
+        }),
+        {
+          player,
+          back: doNothing,
+          params: this.params,
+          self: doNothing,
+        },
+      )
+    } catch (e) {
+      if (e !== error) throw e
+    }
+    return title ?? 'No title'
+  }
+}
+
+export class ArrayFormBuilder<
+  const T = any,
   C extends SettingsConfig = SettingsConfig,
   F extends SettingsConfigParsed<C> = SettingsConfigParsed<C>,
 > {
-  private config: ArrayForm.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: noI18n`Empty filters` } as C }
+  static getShow(form: ArrayFormBuilder) {
+    return form.show.bind(form)
+  }
+
+  private config: ArrayFormBuilder.Config<T, C, F> = { filters: { [SETTINGS_GROUP_NAME]: noI18n`Empty filters` } as C }
 
   constructor(
     private title: Text,
     private array: readonly T[],
   ) {}
 
-  description(text?: Text) {
-    this.config.description = text
-    return this
-  }
-
-  button(button: ArrayForm.Button<T, F>) {
+  button(button: ArrayFormBuilder.Button<T, F>) {
     this.config.button = button
     return this
   }
 
   filters<const V extends SettingsConfig>(filters: V) {
     this.config.filters = { [SETTINGS_GROUP_NAME]: i18n`Фильтры`, ...(filters as unknown as C) }
-    return this as unknown as ArrayForm<T, V>
+    return this as unknown as ArrayFormBuilder<T, V>
   }
 
-  sort(sort: ArrayForm.Sort<T, F>) {
+  sort(sort: ArrayFormBuilder.Sort<T, F>) {
     this.config.sort = sort
     return this
   }
 
-  addCustomButtonBeforeArray(callback: ArrayForm.AddCustomButtons<ArrayForm.Config<T, C, F>, F>) {
+  addCustomButtonBeforeArray(callback: ArrayFormBuilder.AddCustomButtons<ArrayFormBuilder.Config<T, C, F>, F>) {
     this.config.addCustomButtonBeforeArray = callback
     return this
   }
 
-  back(back?: NewFormCallback) {
-    this.config.back = back
-    return this
-  }
-
-  configure(config: Omit<ArrayForm.Config<T, C, F>, keyof this>) {
+  configure(config: Omit<ArrayFormBuilder.Config<T, C, F>, keyof this>) {
     Object.assign(this.config, config)
     return this
   }
 
-  show(
+  protected show(
     player: Player,
     back?: NewFormCallback,
     fromPage = 1,
@@ -142,7 +226,7 @@ export class ArrayForm<
       this.title.to(player.lang).replace('$page', fromPage.toString()).replace('$max', maxPages.toString()),
       this.config.description?.to(player.lang),
     )
-    if (back || this.config.back) form.addButtonBack(back ?? this.config.back, player.lang)
+    if (back) form.addButtonBack(back, player.lang)
 
     return form
   }

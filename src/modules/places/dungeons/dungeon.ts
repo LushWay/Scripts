@@ -12,6 +12,7 @@ import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
 import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { LootTable } from 'lib/rpg/loot-table'
+import { ResourceLocationRegion } from 'lib/rpg/resource-source'
 import { isKeyof } from 'lib/util'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
@@ -55,6 +56,10 @@ export class DungeonRegion extends Region {
   static dungeons: DungeonRegion[] = []
 
   static oldChestLogPositions = new Set<string>()
+
+  static getChests(region: DungeonRegion): Immutable<DungeonChest[]> {
+    return region.chests as Immutable<DungeonChest[]>
+  }
 
   static {
     system.runInterval(
@@ -175,6 +180,7 @@ export class DungeonRegion extends Region {
     DungeonRegion.dungeons.push(this)
     this.configureSize()
     this.configureDungeon()
+    this.configureItemsSource()
   }
 
   configureSize() {
@@ -374,9 +380,20 @@ export class DungeonRegion extends Region {
     })
   }
 
+  public tryUpdateChestAt(location: Vector3) {
+    const chest = this.chests.find(e => Vec.equals(e.location, location))
+    if (!chest) return false
+
+    try {
+      return this.updateChest(chest)
+    } catch (e) {
+      console.error('FAiled to update chest at', location, this.structureId, e)
+    }
+  }
+
   private updateChest(chest: DungeonChest) {
     const block = this.dimension.getBlock(chest.location)
-    if (!block?.isValid) return
+    if (!block?.isValid) return false
 
     this.ldb.chests[chest.id] = Date.now()
     this.save()
@@ -387,6 +404,7 @@ export class DungeonRegion extends Region {
     if (!container) throw new ReferenceError('No container in chest!')
 
     chest.loot.fillContainer(container)
+    return true
   }
 
   delete(): void {
@@ -407,8 +425,16 @@ export class DungeonRegion extends Region {
     })
   }
 
-  get displayName(): Text | undefined {
+  get displayName(): Text {
     return Dungeon.names[this.structureId] ?? i18n`Данж`
+  }
+
+  private configureItemsSource() {
+    const place = DungeonRegion.getOrCreatePlace(this, this.structureId)
+    const location = new ResourceLocationRegion(place, this)
+    for (const chest of this.chests) {
+      chest.loot.resources.addLocation(location)
+    }
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion)

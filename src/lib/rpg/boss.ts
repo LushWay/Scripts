@@ -16,6 +16,7 @@ import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
+import { ResourceLocationRegion } from 'lib/rpg/resource-source'
 import { Temporary } from 'lib/temporary'
 import { getBlockStatus } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
@@ -163,7 +164,11 @@ export class Boss {
             Boss.arenaDb.set(this.options.place.id, { area: this.region.area.toJSON(), ldb: this.region.ldb })
           }
         })
+
         warnAboutEnteringDangerousRegion(this.region, options.equippmentLevel)
+
+        this.options.loot.resources.addLocation(new ResourceLocationRegion(this.options.place, this.region))
+
         EventLoaderWithArg.load(this.onRegionCreate, this.region)
       })
     })

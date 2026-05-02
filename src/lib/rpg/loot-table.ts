@@ -3,10 +3,12 @@ import { MinecraftEnchantmentTypes, MinecraftEnchantmentTypesUnion, MinecraftIte
 import { Items } from 'lib/assets/custom-items'
 import { Enchantments } from 'lib/enchantments'
 import { EventSignal } from 'lib/event-signal'
+import { i18n } from 'lib/i18n/text'
+import { ItemResource, ResourcesSource } from 'lib/rpg/resource-source'
 import { inspect, isKeyof, pick } from 'lib/util'
-import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
-import { selectByChance } from './random'
+import { copyAllItemPropertiesExceptEnchants, onLoad } from 'lib/utils/game'
 import { CustomItem } from './custom-item'
+import { selectByChance } from './random'
 
 type RandomCostMap = Record<`${number}...${number}` | number, Percent>
 type Percent = `${number}%`
@@ -195,6 +197,8 @@ export class LootTable {
 
   static onNew = new EventSignal<LootTable>()
 
+  resources = new ResourcesSource()
+
   constructor(
     readonly items: StoredItem[],
     public id?: string,
@@ -205,6 +209,18 @@ export class LootTable {
 
       LootTable.instances.set(id, this)
       EventSignal.emit(LootTable.onNew, this)
+
+      onLoad(() => {
+        const totalWeight = selectByChance.getTotalChance(this.items)
+        for (const item of this.items) {
+          for (const i of this.generateItems(item)) {
+            const resource = new ItemResource(i.item).setDescription(
+              i18n`Шанс: ${i.weight / totalWeight}%%, Кол-во: ${item.amount[0]}...${item.amount.at(-1)}`,
+            )
+            this.resources.add(resource)
+          }
+        }
+      })
     }
 
     LootTable.all.push(this)
@@ -226,7 +242,6 @@ export class LootTable {
       item: undefined | ItemStack
       weight: number
     }[]
-    if (length === 1) return items.map(e => e.item)
 
     // Separate items by chance
     let explictItems = items.filter(e => e.weight === 100)

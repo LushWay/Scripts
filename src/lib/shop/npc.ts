@@ -4,6 +4,7 @@ import { Cooldown } from 'lib/cooldown'
 import { ConfigurableLocation, location } from 'lib/location'
 import { Npc } from 'lib/rpg/npc'
 import { Place } from 'lib/rpg/place'
+import { ResourceLocationVectorInDimension } from 'lib/rpg/resource-source'
 import { Shop } from './shop'
 
 export interface ShopNpcOptions {
@@ -28,6 +29,11 @@ export class ShopNpc {
       this.shop.open(event.player)
       return true
     })
+    this.npc.location.onLoad.subscribe(location => {
+      this.shop.resources.addLocation(
+        new ResourceLocationVectorInDimension(place, { location: location, dimensionType: location.dimensionType }),
+      )
+    })
   }
 }
 
@@ -51,6 +57,10 @@ export class ShopBlock {
           return true
         },
         place.group.dimensionType,
+      )
+
+      this.shop.resources.addLocation(
+        new ResourceLocationVectorInDimension(place, { location: location, dimensionType: location.dimensionType }),
       )
     })
   }

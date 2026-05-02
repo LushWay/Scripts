@@ -4,14 +4,14 @@ import { Npc } from 'lib/rpg/npc'
 import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'
 
-export function QSDialogue(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Вас ждет §f${npc.name}`) {
+export function QSDialogue(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Вас ждет §f${npc.name}`, cancel = false) {
   return this.dynamic(text)
     .target(npc.location.toPoint())
     .activate(ctx => {
       const interaction: Npc.OnInteract = event => {
         if (event.player.id !== this.player.id) return false
         ctx.next()
-        return false
+        return cancel
       }
 
       npc.questInteractions.add(interaction)

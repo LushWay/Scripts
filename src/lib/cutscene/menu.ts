@@ -1,22 +1,17 @@
 import { Player, system } from '@minecraft/server'
 import { PersistentSet } from 'lib/database/persistent-set'
-import { ActionForm } from 'lib/form/action'
-import { ArrayForm } from 'lib/form/array'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
+import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 import { Cutscene } from './cutscene'
 import { cutsceneEdit } from './edit'
 
-new Cutscene('test', 'Test')
-
 export const cutscene = new Command('cutscene')
   .setDescription(i18n`Катсцена`)
   .setPermissions('helper')
-  .executes(ctx => {
-    selectCutsceneMenu(ctx.player)
-  })
+  .executes(ctx => selectCutsceneMenu.command(ctx))
 
 const cutscenes = new PersistentSet<string>('cutscenesIds')
 
@@ -24,15 +19,18 @@ cutscenes.onLoad(() => {
   for (const c of cutscenes) new Cutscene(c, c)
 })
 
-function selectCutsceneMenu(player: Player) {
-  new ArrayForm(noI18n`Катсцены`, [...Cutscene.all.values()])
+const selectCutsceneMenu = form.array((f, { player }) => {
+  f.title(noI18n`Катсцены`)
+  f.body(noI18n`Список доступных для редактирования катсцен:`)
+
+  f.array([...Cutscene.all.values()])
     .addCustomButtonBeforeArray(f => {
       const cutscene = Cutscene.getCurrent(player)
       if (cutscene) {
         f.button('Выйти из текущей сцены', () => cutscene.exit(player))
       }
 
-      f.button('Добавить', () => {
+      f.button('Добавить', BUTTON['+'], () => {
         new ModalForm('Добавить катсцену').addTextField('Название', '').show(player, (ctx, id) => {
           if (cutscenes.has(id)) ctx.error('Имя занято')
           cutscenes.add(id)
@@ -41,10 +39,8 @@ function selectCutsceneMenu(player: Player) {
         })
       })
     })
-    .description(noI18n`Список доступных для редактирования катсцен:`)
-    .button(cutscene => [cutscene.id, manageCutsceneMenu({ cutscene }).show])
-    .show(player)
-}
+    .button(cutscene => [noI18n`${cutscene.id}\n${cutscene.displayName}`, manageCutsceneMenu({ cutscene }).show])
+})
 
 const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, params: { cutscene } }) => {
   const dots = cutscene.sections.reduce((count, section) => (section ? count + section.points.length : count), 0)
@@ -52,7 +48,6 @@ const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, par
 
   f.title(cutscene.id)
     .body(noI18n`Секций: ${cutscene.sections.length}\nТочек: ${dots}`)
-    .button(ActionForm.backText, () => selectCutsceneMenu(player))
     .button(noI18n`Редактировать`, () => cutsceneEdit.editCatcutscene(player, cutscene))
     .button(noI18n`Воспроизвести`, () => cutscene.play(player))
 
@@ -89,7 +84,7 @@ system.afterEvents.scriptEventReceive.subscribe(
       cutscene.sections = data.sections
       cutscene.save()
       if (initiator instanceof Player) initiator.success(data.id + ' success')
-      logger.info(data.id + 'success')
+      logger.info(data.id + ' success')
     } else if (id === 'lushway_cutscene:export') {
       const cutscene = Cutscene.all.get(message)
 
@@ -102,7 +97,7 @@ system.afterEvents.scriptEventReceive.subscribe(
       exportCutscene(cutscene)
     }
   },
-  { namespaces: ['lushway_cuctscene'] },
+  { namespaces: ['lushway_cutscene'] },
 )
 
 function exportCutscene(cutscene: Cutscene) {

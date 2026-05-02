@@ -13,6 +13,7 @@ import {
   ServerSideI18nMessage,
   SharedI18nMessage,
   SharedI18nMessageJoin,
+  SharedNoI18nMessage,
 } from './message'
 export type MaybeRawText = string | RawText
 
@@ -114,12 +115,14 @@ const styles = {
   disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
 }
 
+/** Used for text only developers or testers will see. */
 export const noI18n = createStatic(undefined, undefined, colors => {
   return function simpleStr(template, ...args) {
     return Message.concatTemplateStringsArray(defaultLang, template, args, colors)
   } as Text.Chained<Text.Fn<string, unknown>>
 })
 
+/** Used for any regular text on the screen */
 export const i18n = createStatic(undefined, undefined, colors => {
   const i18n = ((template, ...args) => new I18nMessage(template, args, colors)) as Text.FnWithJoin<I18nMessage, unknown>
 
@@ -128,6 +131,11 @@ export const i18n = createStatic(undefined, undefined, colors => {
   return i18n as Text.Chained<Text.FnWithJoin<I18nMessage, unknown>>
 })
 
+/**
+ * Used for places that only accept RawText and require .lang tokens to be present on client side (entity names). This
+ * is mostly for future and those places where you can't conditionally check for player language and need to provide
+ * same value for every player, thus requiring translation on client side
+ */
 export const i18nShared = createStatic(undefined, undefined, colors => {
   const i18n = ((template, ...args) => new SharedI18nMessage(template, args, colors)) as Text.FnWithJoin<
     SharedI18nMessage,
@@ -137,6 +145,18 @@ export const i18nShared = createStatic(undefined, undefined, colors => {
   i18n.join = (template, ...args) => new SharedI18nMessageJoin(template, args, colors)
 
   return i18n as Text.Chained<Text.FnWithJoin<SharedI18nMessage, RawTextArg>>
+})
+
+/** Used for points names that only developers will see. */
+export const noI18nShared = createStatic(undefined, undefined, colors => {
+  const i18n = ((template, ...args) => new SharedNoI18nMessage(template, args, colors)) as Text.FnWithJoin<
+    SharedNoI18nMessage,
+    RawTextArg
+  > as Text.FnWithJoin<SharedI18nMessage, unknown>
+
+  i18n.join = (template, ...args) => new SharedI18nMessageJoin(template, args, colors)
+
+  return i18n as Text.Chained<Text.FnWithJoin<SharedI18nMessage, unknown>>
 })
 
 export const i18nPlural = createStatic(undefined, undefined, colors => {

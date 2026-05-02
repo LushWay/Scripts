@@ -1,4 +1,4 @@
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18nShared } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { RegionEvents } from 'lib/region/events'
 import { isNotPlaying } from 'lib/utils/game'
@@ -10,10 +10,10 @@ export class CityInvestigating<T extends City> {
   quest: Quest
 
   goToCityQuest = new Quest(
-    this.city.group.place('goTo').name(''),
+    this.city.group.place('goTo').name(noI18nShared``),
     i18n`Доберитесь до указанного города или деревни`,
     q => {
-      if (!this.city.safeArea) return q.failed(i18n`Город не настроен!`)
+      if (!this.city.safeArea) return q.failed(i18n`${this.city.name}: задание исследования не настроено!`)
 
       q.reachRegion(this.city.safeArea, i18n`Доберитесь до города!`)
     },
@@ -36,14 +36,12 @@ export class CityInvestigating<T extends City> {
     })
 
     this.quest = new Quest(
-      this.city.group.place('investigating').name(''),
+      this.city.group.place('investigating').name(noI18nShared``),
       i18n`Исследуйте новый город!`,
       (q, player) => {
-        if (!this.city.safeArea) return q.failed(i18n`Город не настроен!`)
+        if (!this.city.safeArea) return q.failed(i18n`${this.city.name}: задание исследования не настроено!`)
 
-        q.cutscene(this.city.cutscene, i18n`Обзор города`)
-
-        q.dialogue(this.city.guide)
+        q.dialogue(this.city.guide, undefined, true)
 
         this.q(this.city, q, player)
       },

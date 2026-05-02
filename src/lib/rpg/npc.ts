@@ -15,6 +15,7 @@ import { Core } from 'lib/extensions/core'
 import { i18n } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
 import { anyPlayerNear } from 'lib/player-move'
+import { actionGuard, ActionGuardOrder } from 'lib/region'
 import { Temporary } from 'lib/temporary'
 import { createLogger } from 'lib/utils/logger'
 import { Place } from './place'
@@ -36,7 +37,7 @@ export class Npc {
 
   private readonly id: string
 
-  readonly dimensionId: DimensionType
+  readonly dimensionType: DimensionType
 
   /** Creates new dynamically loadable npc */
   constructor(
@@ -44,7 +45,7 @@ export class Npc {
     private onInteract: Npc.OnInteract,
   ) {
     this.id = point.id
-    this.dimensionId = point.group.dimensionType
+    this.dimensionType = point.group.dimensionType
     this.location = location(point)
     this.location.onLoad.subscribe(location => {
       if (this.entity) this.entity.teleport(location)
@@ -74,7 +75,7 @@ export class Npc {
     }
 
     try {
-      this.entity = world[this.dimensionId].spawnEntity(Npc.type, this.location)
+      this.entity = world[this.dimensionType].spawnEntity(Npc.type, this.location)
 
       new Temporary(({ world, cleanup }) => {
         world.afterEvents.entitySpawn.subscribe(({ entity }) => {
@@ -109,7 +110,10 @@ export class Npc {
   static logger = createLogger('Npc')
 
   static {
-    world.beforeEvents.playerInteractWithEntity.subscribe(event => {
+    actionGuard((__, _, ctx) => {
+      if (ctx.type !== 'interactWithEntity') return
+      const { event } = ctx
+
       if (event.target.typeId !== MinecraftEntityTypes.Npc) return
       if (event.player.getGameMode() === GameMode.Creative && event.player.isSneaking) return
 
@@ -140,16 +144,16 @@ export class Npc {
           this.logger.error(e)
         }
       })
-    })
+    }, ActionGuardOrder.EntityAction)
 
     Core.afterEvents.worldLoad.subscribe(() => {
       system.runInterval(
         () => {
           this.npcs.forEach(npc => {
             if (npc.entity || !npc.location.valid) return // Entity already loaded
-            if (!anyPlayerNear(npc.location, npc.dimensionId, 10)) return
+            if (!anyPlayerNear(npc.location, npc.dimensionType, 10)) return
 
-            const npcs = world[npc.dimensionId].getEntities({ type: Npc.type }).map(e => ({
+            const npcs = world[npc.dimensionType].getEntities({ type: Npc.type }).map(e => ({
               entity: e,
               npc: e.getDynamicProperty(Npc.dynamicPropertyName),
             }))

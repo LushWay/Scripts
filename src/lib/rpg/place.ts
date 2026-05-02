@@ -1,9 +1,10 @@
-import { SharedI18nMessage } from 'lib/i18n/message'
 import { i18nShared } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 
 export class Group {
   static groups = new Map<string, Group>()
+
+  static readonly defaultName = i18nShared`Внешнее пространство`
 
   static placeCreator<T>(onCreate: (place: Place) => T) {
     return {
@@ -28,18 +29,16 @@ export class Group {
              * @param name - Name of the point that will be displayed to the users
              * @returns - PointOfMatter
              */
-            name: (name: SharedText | string) => onCreate(new Place(group, id, name)),
+            name: (name: SharedText) => onCreate(new Place(group, id, name)),
           }
         },
       }),
     }
   }
 
-  sharedName: SharedText = i18nShared`Внешнее пространство`
-
   constructor(
     readonly id: string,
-    readonly name?: string | SharedText,
+    readonly name?: SharedText,
   ) {
     const existing = Group.groups.get(id)
     if (existing) return existing
@@ -49,7 +48,6 @@ export class Group {
     if (name) {
       // Define settings group name
       Settings.world(name, id, {})
-      if (name instanceof SharedI18nMessage) this.sharedName = name
     }
   }
 
@@ -80,21 +78,20 @@ export class Group {
 }
 
 export class Place {
+  static readonly defaultName = i18nShared`Пусто`
+
   /** Example: StoneQuarry foodOvener */
   readonly id: string
-
-  readonly sharedName?: SharedText
 
   constructor(
     readonly group: Group,
     /** Example: 'foodOvener' */
     readonly shortId: string,
-    /** Example: 'Печкин' */
-    readonly name: SharedText | string,
+    /** Example: 'куда-то тепает' for location, 'Печкин' for npc */
+    readonly name: SharedText,
   ) {
     // Trim start needed for empty point
     this.id = `${group.id} ${this.shortId}`.trimStart()
-    if (typeof name !== 'string') this.sharedName = name
   }
 }
 

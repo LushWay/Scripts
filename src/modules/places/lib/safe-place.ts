@@ -6,7 +6,7 @@ import { emoji } from 'lib/assets/emoji'
 import { ArrayForm } from 'lib/form/array'
 import { debounceMenu } from 'lib/form/utils'
 import { SharedI18nMessage } from 'lib/i18n/message'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { i18n, noI18nShared } from 'lib/i18n/text'
 import { location, locationWithRadius, locationWithRotation, Vector3Radius } from 'lib/location'
 import { Portal } from 'lib/portals'
 import { actionGuard, ActionGuardOrder, SafeAreaRegion } from 'lib/region'
@@ -31,15 +31,15 @@ export class SafePlace {
 
   readonly group = new Group(this.groupId, this.name)
 
-  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name(noI18n`мирная зона`))
+  private safeAreaLocation = locationWithRadius(this.group.place('safearea').name(noI18nShared`мирная зона`))
 
   portalTeleportsTo = locationWithRotation(
-    this.group.place('portal teleports to').name(noI18n`портал телепортирует на`),
+    this.group.place('portal teleports to').name(noI18nShared`портал телепортирует на`),
   )
 
-  private portalFrom = location(this.group.place('portal from').name(noI18n`портал от`), undefined, true)
+  private portalFrom = location(this.group.place('portal from').name(noI18nShared`портал от`), undefined, true)
 
-  private portalTo = location(this.group.place('portal to').name(noI18n`портал до`), undefined, true)
+  private portalTo = location(this.group.place('portal to').name(noI18nShared`портал до`), undefined, true)
 
   safeArea?: SafeAreaRegion
 

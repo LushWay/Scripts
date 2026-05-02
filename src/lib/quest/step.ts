@@ -26,7 +26,10 @@ export abstract class QSBuilder<S extends QS> {
   constructor(protected readonly step: S) {}
 
   create(args: [text: QS.TextT, ...args: any[]]) {
-    this.step.text = this.toFn(args[0])
+    const stepName = args[0]
+    if (stepName instanceof Message) stepName.color(i18n.header, false)
+
+    this.step.text = this.toFn(stepName)
   }
 
   /**

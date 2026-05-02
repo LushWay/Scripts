@@ -65,7 +65,7 @@ export class PlaceAction {
       // Allow using any block specified by interaction
       if (
         ctx.type === 'interactWithBlock' &&
-        (!ctx.event.itemStack || ctx.event.itemStack.typeId !== Items.WeDebugstick) &&
+        ctx.event.itemStack?.typeId !== Items.WeDebugstick &&
         this.emit('interactions', ctx.event.block, ctx.event.player, ctx.event.player.dimension.type)
       ) {
         return false

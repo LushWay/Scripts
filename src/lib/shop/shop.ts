@@ -1,7 +1,9 @@
 import { Player } from '@minecraft/server'
 import { i18n, noI18n, textTable } from 'lib/i18n/text'
+import { ResourcesSource } from 'lib/rpg/resource-source'
 import { Settings } from 'lib/settings'
 import { LeafyCost, MoneyCost } from 'lib/shop/cost'
+import { onLoad } from 'lib/utils/load-ref'
 import { ShopForm, ShopMenuCreate } from './form'
 
 export class Shop {
@@ -82,8 +84,15 @@ export class Shop {
    */
   menu(generate: ShopMenuCreate) {
     this.onOpen = generate
+
+    onLoad(() => {
+      ShopForm.createForItemsSource(this, generate)
+    })
+
     return this
   }
+
+  readonly resources = new ResourcesSource()
 
   /**
    * Opens menu for the specified player

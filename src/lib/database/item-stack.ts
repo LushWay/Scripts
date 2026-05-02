@@ -115,7 +115,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema = EmptyObject> {
     return { item, storage }
   }
 
-  parse(lang: Language, itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}, prepare = true) {
+  parse(lang: Language, itemStack: Item, defaultConfig: Partial<ParsedSchema<T>> = {}, updateItemLoreAndName = true) {
     try {
       if (itemStack.isStackable) return
     } catch (e) {
@@ -155,7 +155,7 @@ export class ItemLoreSchemaCompiled<T extends TypeSchema = EmptyObject> {
       })
     }
 
-    if (prepare) this.prepareItem(lang, itemStack, storage)
+    if (updateItemLoreAndName) this.prepareItem(lang, itemStack, storage)
 
     return storage
   }

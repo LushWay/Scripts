@@ -1,18 +1,28 @@
-import { ContainerSlot } from '@minecraft/server'
-import { InventoryInterval } from 'lib/action'
+import { ItemStack } from '@minecraft/server'
+import { Temporary } from 'lib/temporary'
 import { QS, QSBuilder } from '../step'
 
 /** Waits for item in the inventory */
 export class QSItem extends QS {
-  isItem: (item: ContainerSlot) => boolean = () => false
+  isItem: (item: ItemStack) => boolean = () => false
 
   protected activate() {
-    const action = InventoryInterval.slots.subscribe(({ player, slot }) => {
-      if (player.id !== this.player.id) return
-      if (this.isItem(slot)) this.next()
+    const hasItem = this.player.container?.slotEntries().some(e => {
+      const item = e[1].getItem()
+      if (item) return this.isItem(item)
     })
 
-    return { cleanup: () => InventoryInterval.slots.unsubscribe(action) }
+    if (hasItem) return this.next()
+
+    return new Temporary(({ world }) => {
+      world.afterEvents.playerInventoryItemChange.subscribe(
+        event => {
+          if (event.player.id !== this.player.id) return
+          if (event.itemStack && this.isItem(event.itemStack)) return this.next()
+        },
+        { ignoreQuantityChange: true },
+      )
+    })
   }
 }
 

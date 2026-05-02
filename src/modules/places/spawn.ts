@@ -3,7 +3,7 @@ import { GameMode, Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 
 import { InventoryStore } from 'lib/database/inventory'
-import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n, noI18nShared } from 'lib/i18n/text'
 import { locationWithRotation } from 'lib/location'
 import { Join } from 'lib/player-join'
 import { Portal } from 'lib/portals'
@@ -34,7 +34,7 @@ class SpawnBuilder extends AreaWithInventory {
   inventoryName: InventoryTypeName = 'spawn'
 
   location = locationWithRotation(
-    this.group.place('spawn').name(noI18n`Спавн`),
+    this.group.place('spawn').name(noI18nShared`Спавн`),
     { x: 0, y: 200, z: 0, xRot: 0, yRot: 0 },
     true,
   )

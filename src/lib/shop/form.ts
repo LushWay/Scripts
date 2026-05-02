@@ -9,8 +9,10 @@ import { table } from 'lib/database/abstract'
 import { ActionForm } from 'lib/form/action'
 import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
 import { i18n } from 'lib/i18n/text'
+import { ItemResource } from 'lib/rpg/resource-source'
 import { Cost } from 'lib/shop/cost'
 import { isKeyof } from 'lib/util'
+import { setupUsingStubPlayer } from 'lib/utils/game'
 import { itemNameXCount } from '../utils/item-name-x-count'
 import { createItemModifier, createItemModifierSection, ShopMenuWithSlotCreate } from './buttons/item-modifier'
 import { createSellableItem } from './buttons/sellable-item'
@@ -140,6 +142,10 @@ export class ShopForm {
         }, new Map<string, number>())
       : new Map<string, number>()
 
+    this.shop.resources.add(
+      new ItemResource(new ItemStack(typeId)).setDescription(i18n`Цена динамическая`).setCategory(i18n`Магазин`, -2),
+    )
+
     createSellableItem({
       player: this.player,
       form: this,
@@ -158,6 +164,10 @@ export class ShopForm {
     texture = item.typeId.includes('potion') ? getAuxTextureOrPotionAux(item) : getAuxOrTexture(item.typeId),
     name = itemNameXCount(item, '', undefined, this.player),
   ) {
+    this.shop.resources.add(
+      new ItemResource(item).setDescription(player => cost.toString(player)).setCategory(i18n`Магазин`),
+    )
+
     const space = getFreeSpaceForItemInInventory(this.player, item)
     const canAdd = space >= item.amount
     this.product()
@@ -177,7 +187,25 @@ export class ShopForm {
 
   potion(cost: Cost, effect: PotionEffects, delivery = PotionDelivery.Consume) {
     const item = Potions.resolve(effect, delivery)
-    this.itemStack(item, cost, getAuxTextureOrPotionAux(item))
+    this.itemStack(item, cost)
+  }
+
+  static createForItemsSource(shop: Shop, onOpen: ShopMenuCreate) {
+    setupUsingStubPlayer(
+      player => {
+        const form = new ShopForm(
+          () => '',
+          () => '',
+          shop,
+          onOpen,
+          player,
+        )
+
+        onOpen(form as unknown as ShopFormSection, player)
+      },
+      undefined,
+      [shop.id],
+    )
   }
 
   /**

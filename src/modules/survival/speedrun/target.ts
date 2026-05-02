@@ -1,5 +1,4 @@
-import { Player } from '@minecraft/server'
-import { InventoryInterval } from 'lib/action'
+import { Player, world } from '@minecraft/server'
 
 import { defaultLang } from 'lib/assets/lang'
 import { ScoreboardDB } from 'lib/database/scoreboard'
@@ -66,17 +65,18 @@ declare module '@minecraft/server' {
   }
 }
 
-InventoryInterval.slots.subscribe(({ player, slot }) => {
-  if (!isSpeedRunningFor(player, SpeedRunTarget.GetBaseItem)) return
-  if (slot.isValid && BaseItem.isItem(slot.getItem())) {
-    finishSpeedRun(player, SpeedRunTarget.GetBaseItem)
-  }
-})
+world.afterEvents.playerInventoryItemChange.subscribe(
+  event => {
+    if (!isSpeedRunningFor(event.player, SpeedRunTarget.GetBaseItem)) return
+    if (event.itemStack && BaseItem.isItem(event.itemStack)) finishSpeedRun(event.player, SpeedRunTarget.GetBaseItem)
+  },
+  { ignoreQuantityChange: true },
+)
 
 export const speedrunForm = form((f, { player }) => {
   f.title('Speedrun')
   f.body(
-    i18n`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн время не считается. Ваше время на анархии сейчас: ${i18n.hhmmss(player.scores.anarchyOnlineTime * 2.5)}`,
+    i18n`Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ${i18n.hhmmss(player.scores.anarchyOnlineTime * 2.5)}`,
   )
   for (const [target, name] of Object.entries(speedRunNames)) {
     const selected = player.database.speedrunTarget?.target === target

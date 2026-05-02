@@ -1,12 +1,13 @@
 import { Player } from '@minecraft/server'
 import 'lib/database/scoreboard'
+import { noI18nShared } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
 import { Group } from './rpg/place'
 import { Settings } from './settings'
 
 const group = new Group('id')
-const point = group.place('id').name('name')
+const point = group.place('id').name(noI18nShared`name`)
 
 beforeEach(() => {
   Settings.worldConfigs = {}

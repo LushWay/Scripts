@@ -1,17 +1,18 @@
 import { Entity, Player, system, world } from '@minecraft/server'
 
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { EventSignal } from 'lib/event-signal'
 import { Cooldown } from 'lib/cooldown'
+import { EventSignal } from 'lib/event-signal'
 import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
+import { PlayerQuestStub } from 'lib/quest/player'
 import { Quest } from 'lib/quest/quest'
 import { actionGuard, ActionGuardOrder, forceAllowSpawnInRegion, Region } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { inventoryIsEmpty } from 'lib/rpg/airdrop'
 import { noGroup } from 'lib/rpg/place'
 import { Settings } from 'lib/settings'
-import { Vec } from 'lib/vector'
 import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 import { SafePlace } from 'modules/places/lib/safe-place'
 import { Spawn } from 'modules/places/spawn'
 
@@ -173,6 +174,8 @@ const quest = new Quest(
   noGroup.place('restoreInventory').name(i18nShared`Вернуть вещи`),
   i18n`Верните вещи после смерти!`,
   (q, player) => {
+    if (q instanceof PlayerQuestStub) return // No cutscenes in this quest
+
     const { deadAt2, gravestoneId } = player.database.survival
     if (!gravestoneId) return q.failed(i18n.error`Могила была удалена очисткой мусора.`, true)
     if (!deadAt2) return q.failed(i18n.error`Ваше место смерти потерялось!`, true)

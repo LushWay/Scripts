@@ -40,7 +40,7 @@ class Location<T extends Vector3> {
 
       const config = (Settings.worldConfigs[place.group.id] ??= {})
       config[place.shortId] = {
-        name: place.name,
+        name: place.name === Place.defaultName ? place.name : place.name,
         description: location.format,
         value: fallback ? Location.toString(fallback) : '',
         required: true,

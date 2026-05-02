@@ -1,5 +1,6 @@
 import { MinecraftBlockTypes as b } from '@minecraft/vanilla-data'
 import { i18n, i18nShared } from 'lib/i18n/text'
+import { PlayerQuestStub } from 'lib/quest/player'
 import { DailyQuest } from 'lib/quest/quest'
 import { Rewards } from 'lib/utils/rewards'
 import { City } from 'modules/places/lib/city'
@@ -11,6 +12,8 @@ export function createMineQuests(city: City) {
       city.group.place(id).name(text),
       i18n`Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!`,
       (q, player) => {
+        if (q instanceof PlayerQuestStub) return // No cutscenes in this quest
+
         const ore = itemTypes[0] && ores.getOre(itemTypes[0])
         if (!ore) return q.failed('No ore found', true)
 

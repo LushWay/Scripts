@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { defaultLang } from 'lib/assets/lang'
 import { ActionForm } from 'lib/form/action'
+import { ArrayFormBuilder, ShowArrayForm } from 'lib/form/array-new'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
@@ -16,10 +17,10 @@ export interface FormContext<T extends FormParams> {
   params: T
 }
 
-type FormParams = Record<string, unknown> | undefined
+export type FormParams = Record<string, unknown> | undefined
 export type NewFormCreator = Omit<Form, 'show' | 'currentTitle'>
 
-type CreateForm<T extends FormParams = undefined> = (form: NewFormCreator, ctx: FormContext<T>) => void
+type CreateForm<P extends FormParams = undefined> = (form: NewFormCreator, ctx: FormContext<P>) => void
 
 class Form {
   constructor(private player: Player) {
@@ -164,17 +165,22 @@ export function form(create: CreateForm) {
   return new ShowForm(create, undefined)
 }
 
-form.params = <T extends FormParams>(create: CreateForm<T>) => {
-  return (params: T) => new ShowForm<T>(create, params) as unknown as ShowForm
+form.params = <P extends FormParams>(create: CreateForm<P>) => {
+  return (params: P) => new ShowForm<P>(create, params) as unknown as ShowForm
 }
 
-// TODO
-form.array = doNothing
+type CreateArrayForm<P extends FormParams = undefined> = (f: ArrayFormBuilder.Creator, ctx: FormContext<P>) => void
+
+form.array = (create: CreateArrayForm) => new ShowArrayForm(create, undefined)
+
+form.arrayParams = <P extends FormParams>(create: CreateArrayForm<P>) => {
+  return (params: P) => new ShowArrayForm(create, params)
+}
 
 export class ShowForm<T extends FormParams = undefined> {
   constructor(
     private create: CreateForm<T>,
-    private params: T,
+    protected params: T,
   ) {}
 
   show: NewFormCallback = async (player, back) => {

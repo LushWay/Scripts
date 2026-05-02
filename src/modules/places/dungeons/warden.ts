@@ -1,28 +1,35 @@
-import { system } from '@minecraft/server'
-import { MinecraftBlockTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
+import { ItemStack, system } from '@minecraft/server'
+import { MinecraftBlockTypes, MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 
 import { form } from 'lib/form/new'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
 import { anyPlayerNearRegion } from 'lib/player-move'
-import { rollChance } from 'lib/rpg/random'
-import { createLogger } from 'lib/utils/logger'
-import { BaseItem } from '../base/base'
 import {
-  Region,
-  RegionPermissions,
-  PVP_ENTITIES,
-  registerSaveableRegion,
-  registerRegionType,
-  disableAdventureNear,
   actionGuard,
   ActionGuardOrder,
+  disableAdventureNear,
+  PVP_ENTITIES,
+  Region,
+  RegionPermissions,
+  registerRegionType,
+  registerSaveableRegion,
 } from 'lib/region'
+import { noGroup } from 'lib/rpg/place'
+import { rollChance } from 'lib/rpg/random'
+import { ItemResource, ResourceLocationRegion, ResourcesSource } from 'lib/rpg/resource-source'
+import { onLoad } from 'lib/utils/load-ref'
+import { createLogger } from 'lib/utils/logger'
 import { fromMsToTicks, ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
+import { BaseItem } from '../base/base'
 
 const logger = createLogger('warden')
 
 class WardenDungeonRegion extends Region {
+  static resources = new ResourcesSource()
+
+  static place = noGroup.place('warden').name(i18nShared.nocolor`§5Варден`)
+
   protected priority = 3
 
   protected defaultPermissions: RegionPermissions = {
@@ -39,12 +46,31 @@ class WardenDungeonRegion extends Region {
     openContainers: false,
   }
 
-  get displayName(): Text | undefined {
-    return i18n.nocolor`§5Варден`
+  protected onCreate(): void {
+    this.onRestore()
+  }
+
+  protected onRestore(): void {
+    WardenDungeonRegion.resources.addLocation(new ResourceLocationRegion(WardenDungeonRegion.place, this))
+  }
+
+  get displayName(): Text {
+    return WardenDungeonRegion.place.name
   }
 }
 registerSaveableRegion('wardenDungeon', WardenDungeonRegion)
 registerRegionType(noI18n`Данж вардена`, WardenDungeonRegion)
+
+onLoad(() => {
+  WardenDungeonRegion.resources.add(
+    new ItemResource(new ItemStack(MinecraftItemTypes.AncientDebris)).setDescription(
+      i18n`Лежит группами по 5-10 блоков рядом с сундуками`,
+    ),
+  )
+  WardenDungeonRegion.resources.add(
+    new ItemResource(BaseItem.blueprint).setDescription(i18n`Может появиться в сундуке внутри кучи древних обломков`),
+  )
+})
 
 interface LinkedDatabase extends JsonObject {
   selected: boolean

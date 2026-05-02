@@ -42,9 +42,17 @@ export class Message {
     this.id = Message.templateToId(template)
   }
 
-  color(c: Text.Colors | Pick<Text.Static<never>, 'style'>) {
+  color(c: Text.Colors | Pick<Text.Static<never>, 'style'>, children = true) {
+    const were = this.colors
+
     this.colors = 'style' in c ? c.style : c
-    for (const arg of this.args) if (arg instanceof Message) arg.color(c)
+    for (const arg of this.args) {
+      if (arg instanceof Message) {
+        // Recolor children only if they had the same colors parent had
+        // Or if force recoloring is enabled
+        if (arg.colors === were || children) arg.color(c)
+      }
+    }
     return this
   }
 
@@ -147,6 +155,16 @@ export class SharedI18nMessageJoin extends SharedI18nMessage {
       if (args[i]) rawtext.push(args[i])
     }
     return { rawtext }
+  }
+}
+
+export class SharedNoI18nMessage extends SharedI18nMessage {
+  toRawText(): RawText {
+    return { rawtext: [{ text: this.to(defaultLang) }] }
+  }
+
+  protected argsToRawText() {
+    return []
   }
 }
 

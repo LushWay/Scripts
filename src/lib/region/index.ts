@@ -21,7 +21,6 @@ import {
   BLOCK_CONTAINERS,
   DOORS,
   GATES,
-  INTERACTABLE_ENTITIES,
   isForceSpawnInRegionAllowed,
   NOT_MOB_ENTITIES,
   SWITCHES,
@@ -56,14 +55,25 @@ export function actionGuard(fn: InteractionAllowed, position: ActionGuardOrder) 
   ACTION_GUARD.subscribe(fn, position)
 }
 
+export const NEXT = undefined
+export const ALLOW = true
+export const CANCEL = false
+
 export enum ActionGuardOrder {
-  ProjectileUsePrevent = 12,
-  // Place action. Interacting with block
+  // Cutscene editing ignores everything
+  EditMode = 14,
+  // To stop player from spawning harmful projectiles
+  ProjectileUsePrevent = 13,
+  // Npc interaction should happen even if player has not permissions in region
+  EntityAction = 12,
+  // Place action. Interacting with block should happen even if player has not permissions in region
   BlockAction = 11,
+
   // Region member permissions
   RegionMember = 10,
+
   Anticheat = 9,
-  // Vanilla features override (base placing etc)
+  // Vanilla features override (base placing etc). They should not work if player is not permitted to interact
   Feature = 8,
   // Limits
   Permission = 7,
@@ -73,16 +83,16 @@ export enum ActionGuardOrder {
 export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []
 
 actionGuard((player, region, ctx) => {
-  if (region && regionTypesThatIgnoreIsBuildingGuard.some(e => region instanceof e)) return
+  if (region && regionTypesThatIgnoreIsBuildingGuard.some(e => region instanceof e)) return NEXT
 
-  if (isNotPlaying(player)) return true
+  if (isNotPlaying(player)) return ALLOW
 
-  if (region?.getMemberRole(player.id)) return true
+  if (region?.getMemberRole(player.id)) return ALLOW
 }, ActionGuardOrder.RegionMember)
 
 actionGuard((player, region, ctx) => {
-  if (ctx.type === 'interactWithEntity' && ctx.event.target.hasTag('no_interact')) return false
-  if (ctx.type !== 'interactWithBlock' || !region) return
+  if (ctx.type === 'interactWithEntity' && ctx.event.target.hasTag('no_interact')) return CANCEL
+  if (ctx.type !== 'interactWithBlock' || !region) return NEXT
   const { typeId } = ctx.event.block
 
   if (TRAPDOORS.includes(typeId)) return region.permissions.trapdoors // allow
@@ -143,7 +153,6 @@ function getRegions(point: AbstractPoint) {
   return { region, regions }
 }
 
-/** Permissions for region */
 world.beforeEvents.playerInteractWithBlock.subscribe(event => {
   const { regions, region } = getRegions(event.block)
   if (allowed(event.player, region, { type: 'interactWithBlock', event }, regions)) return
@@ -151,18 +160,13 @@ world.beforeEvents.playerInteractWithBlock.subscribe(event => {
   event.cancel = true
 })
 
-/** Permissions for region */
 world.beforeEvents.playerInteractWithEntity.subscribe(event => {
   const { regions, region } = getRegions(event.target)
   if (allowed(event.player, region, { type: 'interactWithEntity', event }, regions)) return
 
-  // Allow interacting with any interactable entity by default
-  if (INTERACTABLE_ENTITIES.includes(event.target.typeId) && !region?.permissions.pvp) return
-
   event.cancel = true
 })
 
-/** Permissions for region */
 world.beforeEvents.playerPlaceBlock.subscribe(event => {
   const { regions, region } = getRegions(event.block)
   if (allowed(event.player, region, { type: 'place', event }, regions)) return
@@ -170,7 +174,6 @@ world.beforeEvents.playerPlaceBlock.subscribe(event => {
   event.cancel = true
 })
 
-/** Permissions for region */
 world.beforeEvents.playerBreakBlock.subscribe(event => {
   const { regions, region } = getRegions(event.block)
   if (allowed(event.player, region, { type: 'break', event }, regions)) return

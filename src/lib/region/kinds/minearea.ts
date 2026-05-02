@@ -1,4 +1,5 @@
-import { Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
+import { ItemStack, Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
+import { NewFormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
@@ -11,6 +12,7 @@ import {
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { isNewbie } from 'lib/rpg/newbie'
+import { ItemResource, ResourceLocationRegion, ResourcesSource } from 'lib/rpg/resource-source'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
@@ -19,6 +21,10 @@ import { Vec } from 'lib/vector'
 import { Area } from '../areas/area'
 
 const logger = createLogger('Minearea')
+
+interface MineareaRegionLDB extends JsonObject {
+  resources: { typeId: string; amount: number }[]
+}
 
 export class MineareaRegion extends RegionWithStructure {
   /** MineArea is more prior then other regions */
@@ -34,6 +40,10 @@ export class MineareaRegion extends RegionWithStructure {
     openContainers: true,
     allowedAllItem: true,
     owners: [],
+  }
+
+  ldb: MineareaRegionLDB = {
+    resources: [],
   }
 
   async restoreAndResaveStructure(eachVectorCallback?: (vector: Vector3) => void) {
@@ -60,17 +70,26 @@ export class MineareaRegion extends RegionWithStructure {
 
   private restoringStructurePromise: Promise<MineareaRegion[]> | undefined
 
-  async restoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
+  restoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined): Promise<MineareaRegion[]> {
     if (this.restoringStructurePromise) return this.restoringStructurePromise
 
-    this.restoringStructurePromise = this.internalRestoreStructure(eachVectorCallback)
-    this.restoringStructurePromise.catch((e: unknown) => console.error('MineareaRegion.restoreStructure', e))
-    const result = await this.restoringStructurePromise
-    delete this.restoringStructurePromise
-    return result
+    const { promise, resolve, reject } = Promise.withResolvers<MineareaRegion[]>()
+    this.restoringStructurePromise = promise
+
+    this.restoreStructureImpl(eachVectorCallback)
+      .then(resolve)
+      .catch((err: unknown) => {
+        logger.error('MineareaRegion.restoreStructure', err)
+        reject(err)
+      })
+      .finally(() => {
+        this.restoringStructurePromise = undefined
+      })
+
+    return promise
   }
 
-  private async internalRestoreStructure(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
+  private async restoreStructureImpl(eachVectorCallback: ((vector: Vector3) => void) | undefined) {
     const restoredRegions: MineareaRegion[] = []
     try {
       await this.area.forEachVector(async (vector, isIn) => {
@@ -137,7 +156,51 @@ export class MineareaRegion extends RegionWithStructure {
       ['Restoring structure', this.restoringStructureProgress],
       ['Scheduled to place blocks', this.scheduledToPlaceBlocks.length],
       ['Newbie', this.newbie],
+      ['Resource types', this.ldb.resources.length],
     ]
+  }
+
+  resources = new ResourcesSource()
+
+  async indexResources() {
+    const blockTypeToItem = new Map<string, string>()
+    const amounts = new Map<string, number>()
+
+    await this.structure.forEachBlock((_, block) => {
+      if (!block) return
+
+      const key = blockTypeToItem.getOrInsertComputed(block.type.id, () => block.getItemStack()?.typeId ?? '')
+      amounts.set(key, amounts.getOrInsert(key, 0) + 1)
+    })
+
+    this.ldb.resources = [...amounts].map(([typeId, amount]) => ({ typeId, amount }))
+    this.save()
+  }
+
+  addResourcesFromIndex() {
+    this.resources.delete()
+    this.resources = new ResourcesSource()
+
+    const place = Region.getOrCreatePlace(this, 'minearea')
+    const location = new ResourceLocationRegion(place, this)
+    this.resources.addLocation(location)
+    for (const resource of this.ldb.resources) {
+      this.resources.add(
+        new ItemResource(new ItemStack(resource.typeId)).setDescription(i18n`Макс кол-во: ${resource.amount}`),
+      )
+    }
+  }
+
+  customFormButtons(form: NewFormCreator, player: Player): void {
+    form.button('Индексировать для вики', () => {
+      player.info('Start')
+      this.indexResources()
+        .then(() => player.success())
+        .catch((error: unknown) => {
+          player.fail(`Indexing failed: ${error}`)
+          logger.error('Indexing failed', error)
+        })
+    })
   }
 }
 
@@ -198,7 +261,7 @@ export function onFullRegionTypeRestore<T extends typeof Region>(
   callback: (region: InstanceType<T>) => void,
 ) {
   if (typeof regionType === 'undefined') {
-    console.warn(new Error('Undefined regionType'))
+    logger.warn(new Error('Undefined regionType'))
     return
   }
   const hadSchedules = new Set<InstanceType<T>>()
@@ -225,7 +288,7 @@ export function onFullRegionTypeRestore<T extends typeof Region>(
             }
           }
         } catch (e) {
-          console.error(e)
+          logger.error(e)
         } finally {
           timeout()
         }

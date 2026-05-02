@@ -1,10 +1,15 @@
 import { GameMode, Player } from '@minecraft/server'
 
 import { consoleLang } from 'lib/assets/lang'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { InventoryStore } from 'lib/database/inventory'
+import { EventSignal } from 'lib/event-signal'
+import { i18n, noI18n, noI18nShared } from 'lib/i18n/text'
+import { location, ValidLocation } from 'lib/location'
+import { Portal } from 'lib/portals'
 import { isNotPlaying } from 'lib/utils/game'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { createLogger } from 'lib/utils/logger'
+import { Vec } from 'lib/vector'
 import { WeakPlayerSet } from 'lib/weak-player-storage'
 import { rtpCommand } from 'modules/commands/rtp'
 import { tpMenuOnce } from 'modules/commands/tp'
@@ -12,12 +17,6 @@ import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from '../lib/area-with-inventory'
 import { RadioactiveZone } from './radioactive-zone'
-import { EventSignal } from 'lib/event-signal'
-import { Vec } from 'lib/vector'
-import { ValidLocation } from 'lib/location'
-import { InventoryStore } from 'lib/database/inventory'
-import { location } from 'lib/location'
-import { Portal } from 'lib/portals'
 import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {
@@ -32,9 +31,9 @@ class AnarchyBuilder extends AreaWithInventory {
 
   inventoryName: InventoryTypeName = 'anarchy'
 
-  centerLocation = location(Spawn.group.place('anarchy center').name(noI18n`центр анархии`))
+  centerLocation = location(Spawn.group.place('anarchy center').name(noI18nShared`центр анархии`))
 
-  portalLocation = location(Spawn.group.place('anarchy portal').name(noI18n`портал на анархию`))
+  portalLocation = location(Spawn.group.place('anarchy portal').name(noI18nShared`портал на анархию`))
 
   inventoryStore = new InventoryStore('anarchy')
 

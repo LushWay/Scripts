@@ -2,7 +2,8 @@ import { Player, world } from '@minecraft/server'
 import { ChunkArea, ChunkQuery } from 'lib/chunk-query'
 import { removeDefaults, setDefaults } from 'lib/database/defaults'
 import { NewFormCreator } from 'lib/form/new'
-import { noI18n } from 'lib/i18n/text'
+import { noI18n, noI18nShared } from 'lib/i18n/text'
+import { noGroup, Place } from 'lib/rpg/place'
 import { util } from 'lib/util'
 import { AbstractPoint, toPoint } from 'lib/utils/point'
 import { Area } from '../areas/area'
@@ -43,8 +44,10 @@ export interface RegionCreationOptions {
   ldb?: JsonObject
 }
 
-interface RegionConstructor<I extends Region>
-  extends Pick<typeof Region, 'regions' | 'getAll' | 'getAt' | 'getManyAt' | 'chunkQuery'> {
+interface RegionConstructor<I extends Region> extends Pick<
+  typeof Region,
+  'regions' | 'getAll' | 'getAt' | 'getManyAt' | 'chunkQuery'
+> {
   new (...args: any[]): I
 }
 
@@ -181,6 +184,12 @@ export class Region {
     return (this.regions as I[]).filter(region => region.area.isIn(point)).sort((a, b) => b.priority - a.priority)
   }
 
+  static places = new Map<string, Place>()
+
+  static getOrCreatePlace(region: Region, placeId: string) {
+    return this.places.getOrInsertComputed(placeId, k => noGroup.place(k).name(noI18nShared`${region.displayName}`))
+  }
+
   /** Region priority. Used in {@link Region.getAt} */
   protected readonly priority: number = 0
 
@@ -245,7 +254,7 @@ export class Region {
     return Player.name(this.permissions.owners[0])
   }
 
-  /** Name of the region that should always be */
+  /** OwnerName ?? id */
   get name(): Text {
     return this.ownerName ?? this.id
   }

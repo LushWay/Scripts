@@ -13,10 +13,12 @@ import {
 } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { dedupe } from 'lib/dedupe'
+import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
 import { PersistentSet } from '../database/persistent-set'
 import { getRole } from '../roles'
 import { VectorInDimension } from './point'
+import { defaultLang } from 'lib/assets/lang'
 
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
 export function getBlockStatus({ location, dimensionType }: VectorInDimension) {
@@ -163,3 +165,27 @@ export function copyAllItemPropertiesExceptEnchants(item: ItemStack, newitem: It
   newitem.lockMode = item.lockMode
   for (const prop of item.getDynamicPropertyIds()) newitem.setDynamicProperty(prop, item.getDynamicProperty(prop))
 }
+
+/**
+ * Used for initializing data that requires player. For example quest steps for cutscenes or shop buttons for item
+ * sources
+ */
+export function setupUsingStubPlayer(
+  setup: (stubPlayer: Player) => void,
+  logger = setupUsingStubPlayer.logger,
+  details: unknown[] = [],
+) {
+  try {
+    const player = {
+      getComponent() {
+        return
+      },
+      lang: defaultLang,
+    } satisfies Partial<Player> as unknown as Player
+    setup(player)
+  } catch (e) {
+    logger.error('Stub loading error', ...details, e)
+  }
+}
+
+setupUsingStubPlayer.logger = createLogger('StubPlayer')

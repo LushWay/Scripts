@@ -1,16 +1,18 @@
-import { GameMode, Player, system, world } from '@minecraft/server'
+import { Player, system, world } from '@minecraft/server'
 import { Sounds } from 'lib/assets/custom-sounds'
 import { EventLoader, EventSignal } from 'lib/event-signal'
-import { Core } from 'lib/extensions/core'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { i18n, i18nShared, noI18n } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18nShared } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
+import { RegionEvents } from 'lib/region/events'
 import { Compass } from 'lib/rpg/menu'
 import { Group, Place } from 'lib/rpg/place'
 import { Settings } from 'lib/settings'
+import { isNotPlaying, setupUsingStubPlayer } from 'lib/utils/game'
+import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { QuestButton } from './button'
-import { PlayerQuest } from './player'
+import { PlayerQuest, PlayerQuestStub } from './player'
 import { QS } from './step'
 
 declare module '@minecraft/server' {
@@ -27,7 +29,7 @@ export declare namespace Quest {
 }
 
 export class Quest {
-  static error = class QuestError extends Error {}
+  static logger = createLogger('Quest')
 
   static playerSettings = Settings.player(
     i18n`Задания
@@ -45,7 +47,7 @@ export class Quest {
 
   static showActionBar(this: void, player: Player) {
     const step = Quest.getCurrentStepOf(player)
-    if (!step || player.database.inv === 'spawn' || player.getGameMode() == GameMode.Creative) return ''
+    if (!step || player.database.inv === 'spawn' || isNotPlaying(player)) return ''
 
     step.playerQuest.updateListeners.add(Quest.showActionBar)
 
@@ -98,7 +100,7 @@ export class Quest {
   }
 
   static {
-    Core.afterEvents.worldLoad.subscribe(() => {
+    RegionEvents.onLoad.subscribe(() => {
       system.delay(() => {
         EventLoader.load(this.onQuestLoad)
 
@@ -118,9 +120,9 @@ export class Quest {
   }
 
   get name() {
-    return this.place.group.name && this.place.name
-      ? i18nShared.join`${this.place.group.name} - ${this.place.name}`
-      : (this.place.sharedName ?? this.place.group.sharedName)
+    // Some quests like learning and getting items back after death
+    // use default global group without name, thus we need to display only quest name
+    return this.place.group.name ? i18nShared.join`${this.place.group.name} - ${this.place.name}` : this.place.name
   }
 
   /**
@@ -141,7 +143,9 @@ export class Quest {
     Quest.quests.set(this.id, this)
     Quest.onQuestLoad.subscribe(() => {
       world.getAllPlayers().forEach(e => Quest.restore(e, this))
+      setupUsingStubPlayer(player => create(new PlayerQuestStub(this, player), player), Quest.logger, [this.id])
     })
+
     this.onCreate()
   }
 
@@ -174,7 +178,7 @@ export class Quest {
     const step = this.getCurrentStep(player, i) ?? this.createPlayerSteps(player, i)
     // Index can point to unknown step, e.g quest have 4 steps but index is 10
     if (typeof step === 'undefined')
-      return console.warn(
+      return Quest.logger.warn(
         `Quest non existent step: ${player.name} ${this.id} ${i}/${this.players.get(player)?.steps.length}`,
       )
 
@@ -260,7 +264,7 @@ export class Quest {
   }
 
   get group() {
-    return new Group(`quest: ${this.id}`, noI18n`Задание: ${this.name}\n§7${this.description}`)
+    return new Group(`quest: ${this.id}`, noI18nShared`Задание: ${this.name}\n§7${this.description}`)
   }
 
   button = new QuestButton(this)

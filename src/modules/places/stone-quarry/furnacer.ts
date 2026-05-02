@@ -1,4 +1,4 @@
-import { ContainerSlot, Player, TicksPerSecond, system, world } from '@minecraft/server'
+import { ContainerSlot, ItemStack, Player, TicksPerSecond, system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 
 import { InventoryInterval } from 'lib/action'
@@ -103,6 +103,10 @@ export class Furnacer extends ShopNpc {
         },
       )
     })
+  }
+
+  isKey(itemStack: ItemStack): boolean {
+    return FurnaceKeyItem.schema.parse(defaultLang, itemStack, {}, false)?.furnacer === this.id
   }
 
   createItemKey(player?: Player) {

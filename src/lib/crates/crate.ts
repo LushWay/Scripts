@@ -1,7 +1,7 @@
 import { LocationInUnloadedChunkError, Player, system, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { defaultLang } from 'lib/assets/lang'
 import { form } from 'lib/form/new'
-import { SharedI18nMessage } from 'lib/i18n/message'
 import { is } from 'lib/roles'
 import { customItems } from 'lib/rpg/custom-item'
 import { FloatingText } from 'lib/rpg/floating-text'
@@ -13,7 +13,6 @@ import { ItemLoreSchema } from '../database/item-stack'
 import { i18n, i18nShared, noI18n } from '../i18n/text'
 import { ConfigurableLocation, ValidLocation, location } from '../location'
 import CrateLootAnimation from './animation'
-import { defaultLang } from 'lib/assets/lang'
 
 export class Crate {
   static crates = new Map<string, Crate>()

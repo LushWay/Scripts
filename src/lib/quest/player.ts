@@ -41,8 +41,15 @@ export class PlayerQuest {
 
   cutscene = QSCutscene.bind(this)
 
+  nextQuest(quest: Quest) {
+    this.dynamic(quest.id).activate(ctx => {
+      ctx.next()
+      quest.enter(this.player)
+    })
+  }
+
   failed = (reason: Text, exit = false) => {
-    console.error(reason)
+    Quest.logger.error(this.quest.id, reason)
     return this.dynamic(reason).activate(ctx => {
       ctx.error(reason)
       if (exit) this.quest.exit(this.player)
@@ -86,3 +93,6 @@ export class PlayerQuest {
     }
   }
 }
+
+/** Used during initizalization to load cutscenes defined in quest steps */
+export class PlayerQuestStub extends PlayerQuest {}

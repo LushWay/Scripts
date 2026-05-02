@@ -15,7 +15,7 @@ export function selectByChance<T>(items: ChanceItem<T>[]) {
   return { index: 0, item: items[0]?.item as T }
 }
 
-selectByChance.getTotalChance = <T>(items: ChanceItem<T>[]) => {
+selectByChance.getTotalChance = (items: { weight: number }[]) => {
   return items.reduce((sum, { weight: chance }) => sum + chance, 0)
 }
 

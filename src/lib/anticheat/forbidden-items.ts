@@ -1,10 +1,9 @@
 import { system, world } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 
+import { actionGuard, ActionGuardOrder } from 'lib/region'
+import { isNotPlaying, onLoad } from 'lib/utils/game'
 import { antiCheatLogger } from './log-provider'
-import { ActionGuardOrder } from 'lib/region'
-import { actionGuard } from 'lib/region'
-import { isNotPlaying } from 'lib/utils/game'
 
 const forbiddenItems: string[] = [
   MinecraftItemTypes.Barrier,
@@ -56,4 +55,6 @@ actionGuard((player, _, ctx) => {
   }
 }, ActionGuardOrder.Anticheat)
 
-system.delay(interval)
+onLoad(() => {
+  system.delay(interval)
+})
