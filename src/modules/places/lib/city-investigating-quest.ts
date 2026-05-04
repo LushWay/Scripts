@@ -26,15 +26,6 @@ export class CityInvestigating<T extends City> {
   ) {
     CityInvestigating.list.push(this as unknown as CityInvestigating<City>)
 
-    Quest.onLoad.subscribe(() => {
-      if (this.city.safeArea) {
-        RegionEvents.onEnter(this.city.safeArea, player => {
-          if (isNotPlaying(player)) return
-          if (!this.quest.hadEntered(player)) this.quest.enter(player)
-        })
-      }
-    })
-
     this.quest = new Quest(
       this.city.group.place('investigating').name(noI18nShared``),
       i18n`Исследуйте новый город!`,

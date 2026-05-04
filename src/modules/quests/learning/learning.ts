@@ -218,7 +218,7 @@ class Learning {
       assertLoaded(VillageOfExplorers.safeArea, 'VillageOfExplorers.safeArea')
       assertLoaded(this.closestGasStation, 'closest gas station')
 
-      const maxReturnToAreaSteps = 5
+      const maxReturnToAreaSteps = 4
       const limitMovementToMineArea = (step: number) => () => {
         // Fix to those who had joined and been AFK, newbie expired and they can't leave quest because
         // they can only mine in newbie mode
@@ -349,6 +349,8 @@ class Learning {
       q.dynamic(i18n`Используй монеты в инвентаре`)
         .description(i18n`Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет`)
         .activate(ctx => {
+          ctx.onInterval(limitMovementToMineArea(4))
+
           const money = ctx.player.container?.find(new ItemStack(Items.Money))
           if (typeof money !== 'number') return ctx.next()
 
@@ -413,7 +415,7 @@ class Learning {
                   const isFirst = ctx.db.iron < alwaysIron
 
                   // The more iron they have, the lower is the chance (100 to 46 with step of 2)
-                  const isRandom = rollChance(100 - ctx.db.iron * 2)
+                  const isRandom = rollChance(100 - ctx.db.iron * 3)
                   if ((isFirst || isRandom) && place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
                     ctx.db.iron++
                     placed = true
@@ -461,6 +463,8 @@ class Learning {
       const chest = DungeonRegion.getChests(this.closestGasStation.region)[0]?.location
       q.dynamic(i18n`Откройте сундук в разрушенном магазине`)
         .activate(ctx => {
+          // fix timeout
+          // fix food delay
           ctx.world.afterEvents.playerInteractWithBlock.subscribe(event => {
             if (event.player.id !== ctx.player.id) return
             if (event.block.typeId !== MinecraftBlockTypes.Chest) return

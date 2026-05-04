@@ -6,6 +6,7 @@ import { form } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
+import { Vec } from 'lib/vector'
 import { Cutscene } from './cutscene'
 import { cutsceneEdit } from './edit'
 
@@ -111,15 +112,9 @@ system.afterEvents.scriptEventReceive.subscribe(
         return
       }
 
-      // Build an object mapping id -> full cutscene data
-      const exportData: Record<string, { sections: Cutscene['sections'] }> = {}
       for (const cs of allCutscenes) {
-        exportData[cs.id] = { sections: cs.sections }
+        exportCutscene(cs)
       }
-
-      const jsonString = JSON.stringify(exportData)
-      // Log the full data so the admin can copy it from console
-      logger.info(`[EXPORT_ALL] ${jsonString}`)
 
       if (initiator instanceof Player) {
         initiator.success(`Exported ${allCutscenes.length} cutscene(s). Check console logs.`)
@@ -169,5 +164,8 @@ system.afterEvents.scriptEventReceive.subscribe(
 )
 
 function exportCutscene(cutscene: Cutscene) {
-  logger.info(`scriptevent lushway_cutscene:import ${JSON.stringify({ id: cutscene.id, sections: cutscene.sections })}`)
+  if (cutscene.sections[0]?.points.length)
+    logger.info(
+      `scriptevent lushway_cutscene:import ${JSON.stringify({ id: cutscene.id, sections: cutscene.sections.map(e => ({ points: e?.points.map(e => ({ ...e, ...Vec.divide(Vec.multiply(e, 1).floor(), 1) })) })) })}`,
+    )
 }

@@ -200,8 +200,7 @@ export class Quest {
     this.players.set(player, playerQuest)
 
     try {
-      const result = this.create(playerQuest, player)
-      if (result instanceof Promise) throw new Error(this.id + ' is not fully loaded!!!')
+      this.create(playerQuest, player)
     } catch (e) {
       Quest.logger.player(player).error('Initialize failed', this.name, this.id, e)
       if (e instanceof Error) playerQuest.failed(e.message)
