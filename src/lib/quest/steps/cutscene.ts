@@ -1,26 +1,46 @@
 import { Cutscene } from 'lib/cutscene'
-import { PlayerQuest } from '../player'
 
-export function QSCutscene(this: PlayerQuest, id: string, text: Text, options: Cutscene.Options = {}) {
-  const fullId = this.quest.id + ' ' + id
-  const cutscene = Cutscene.all.get(fullId) ?? new Cutscene(fullId, text, options)
+import { QS, QSBuilder } from '../step'
 
-  return this.dynamic(text).activate(ctx => {
-    ctx.animateTicks = 0
+export class QSCutscene extends QS {
+  cutscene!: Cutscene
 
-    const play = cutscene.play(ctx.player)
+  fullId!: string
+
+  protected activate() {
+    this.animateTicks = 0
+
+    const play = this.cutscene.play(this.player)
 
     if (!play) {
       // Cutscene is not configured, skip
-      return ctx.next()
+      return this.next()
     }
 
     play
       .catch((e: unknown) => {
-        console.error('Cutscene error in quest', fullId, ctx.player.name, e)
+        console.error('Cutscene error in quest', this.fullId, this.player.name, e)
       })
       .finally(() => {
-        ctx.next()
+        this.next()
       })
-  })
+  }
+}
+
+export class QSCutsceneBuilder extends QSBuilder<QSCutscene> {
+  create([id, text]: [id: string, text: Text]) {
+    super.create([text])
+
+    const fullId = this.step.quest.id + ' ' + id
+
+    const options: Cutscene.Options = {}
+
+    const prev = this.step.playerQuest.steps.at(-2) // -1 is this.step, -2 is step before
+    if (prev instanceof QSCutscene) {
+      prev.cutscene.options.restoreCameraTime = 0
+      options.instantEnter = true
+    }
+
+    this.step.cutscene = Cutscene.all.get(fullId) ?? new Cutscene(fullId, text, options)
+  }
 }

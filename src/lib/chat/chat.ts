@@ -4,7 +4,6 @@ import { table } from 'lib/database/abstract'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { Settings } from 'lib/settings'
 import { onLoad } from 'lib/utils/load-ref'
-import { msold } from 'lib/utils/ms-old'
 import { Singleton } from 'lib/utils/singleton'
 
 export declare namespace Chat {
@@ -62,11 +61,9 @@ export abstract class Chat extends Singleton {
   }
 
   informAboutMute(player: Player, mute: Chat.MuteInfo): void {
-    const timeText = msold.remaining(mute.mutedUntil - Date.now())
+    const timeText = i18n.time(mute.mutedUntil - Date.now())
 
-    return player.fail(
-      noI18n.error`Вы замьючены в чате на ${timeText.value} ${timeText.type} по причине: ${mute.reason}`,
-    )
+    return player.fail(noI18n.error`Вы замьючены в чате на ${timeText} по причине: ${mute.reason}`)
   }
 
   registerChatListener() {

@@ -2,6 +2,7 @@ import { RGB } from '@minecraft/server'
 import { TerminalColors } from './assets/terminal-colors'
 import stringifyError from './utils/error'
 import { inspect, stringify } from './utils/inspect'
+import { InvalidLocation, ValidLocation } from 'lib/location'
 
 export { inspect, stringify, stringifyError }
 
@@ -328,3 +329,9 @@ export class LRUSet<T> extends Set<T> {
     return super.add(value)
   }
 }
+
+export function assertLoaded<T>(value: T | undefined, name: string): asserts value is T {
+  if (typeof value === 'undefined') throw new assertLoaded.Error(`${name} is not yet loaded`)
+}
+
+assertLoaded.Error = class LoadError extends Error {}

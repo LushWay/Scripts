@@ -61,10 +61,6 @@ export class Cutscene {
 
   private intervalTime = 5
 
-  private restoreCameraTime = 2
-
-  private instantEnter = false
-
   /** List of players that currently see cutscene play */
   private current = new WeakPlayerMap<{
     player: Player
@@ -78,17 +74,14 @@ export class Cutscene {
     public id: string,
     /** Internal use only */
     public displayName: Text,
-    options?: Cutscene.Options,
+    readonly options: Cutscene.Options = {},
   ) {
     Cutscene.all.set(id, this)
 
-    if (options) {
-      if (typeof options.restoreCameraTime === 'number') this.restoreCameraTime = options.restoreCameraTime
-      if (typeof options.instantEnter === 'boolean') this.instantEnter = options.instantEnter
-    }
-
     Cutscene.db.onLoad(() => {
       this.sections = Cutscene.db.get(this.id).slice()
+      this.sections = this.sections.filter(e => e?.points.length)
+      this.save()
     })
   }
 
@@ -108,7 +101,7 @@ export class Cutscene {
 
   play(player: Player, sections = this.sections) {
     if (!sections[0]?.points[0]) {
-      console.error(`${this.id}: cutscene is not ready.`)
+      console.error(`${this.id}: cutscene is not ready.`, sections)
       player.fail(noI18n`${this.displayName}: cutscene is not ready.`)
       return
     }
@@ -127,7 +120,7 @@ export class Cutscene {
 
         const firstPoint = pointNum === 0
         const firstSection = sectionNum === 0
-        const sectionSwitch = this.instantEnter ? firstPoint : firstPoint && !firstSection
+        const sectionSwitch = this.options.instantEnter ? firstPoint : firstPoint && !firstSection
         if (!sectionSwitch) {
           player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
             location: point,
@@ -195,20 +188,17 @@ export class Cutscene {
       intervalTime?: number
     },
   ) {
-    const end = new Error('End.')
     try {
       for (const [sectionIndex, section] of sections.entries()) {
-        if (!section) throw end
+        if (!section) return
 
         for (const { index: pointIndex, ...point } of this.pointIterator(section)) {
-          if (controller.cancel) throw end
+          if (controller.cancel) return
 
           await callback(point, pointIndex, section, sectionIndex)
           await system.sleep(intervalTime)
         }
       }
-    } catch (error) {
-      if (error !== end) console.error(error)
     } finally {
       exit?.()
     }
@@ -301,24 +291,26 @@ export class Cutscene {
     // Cleanup and restore to the previous state
     this.current.delete(playerId)
     if (player instanceof Player) {
-      if (this.restoreCameraTime) {
-        restorePlayerCamera(player, this.restoreCameraTime)
+      const restoreCameraTime = this.options.restoreCameraTime ?? 1
+      if (restoreCameraTime) {
+        restorePlayerCamera(player, restoreCameraTime)
       } else {
         this.darkScreen(player)
-      }
 
-      system.runTimeout(
-        () => {
-          if (!Cutscene.getCurrent(player)) {
-            if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
-            Compass.forceHide.delete(player)
-            Sidebar.forceHide.delete(player)
-            if (!this.restoreCameraTime) restorePlayerCamera(player, 0)
-          }
-        },
-        'restoreCutsceneHud',
-        2 * TicksPerSecond,
-      )
+        // When configuring cutscene and using play button
+        // cutscene that has second cutscene after it and does not
+        // restore camera will make player stuck in the state
+        // without controls and stuck camera. So we run a timeout
+        // that checks if other cutscene is being run and if not resets
+        // the camera and controls
+        system.runTimeout(
+          () => {
+            if (!Cutscene.getCurrent(player)) restorePlayerCamera(player, 0)
+          },
+          'restoreCutsceneHud',
+          1 * TicksPerSecond,
+        )
+      }
     }
 
     return true

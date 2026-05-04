@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { BlockVolume, LocationInUnloadedChunkError, world } from '@minecraft/server'
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 

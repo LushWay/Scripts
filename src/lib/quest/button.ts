@@ -20,7 +20,7 @@ export class QuestButton {
     const step = this.quest.getCurrentStep(player)
     if (!step)
       return [
-        this.quest.name,
+        i18n`Задание\n${this.quest.name}`,
         undefined,
         form(f => {
           f.title(this.quest.name)

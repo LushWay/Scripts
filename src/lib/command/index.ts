@@ -521,17 +521,17 @@ function register(namespace: string) {
             optionalParameters,
           },
           (ctx, ...args) => {
-            if (!callback) {
-              return {
-                status: CustomCommandStatus.Failure,
-                message: 'Команда не готова',
-              }
-            }
-
             const isServer = !(ctx.sourceEntity instanceof Player)
             const output: CommandOutputBuffer = { output: '', isSync: isServer }
             const player: Player =
               ctx.sourceEntity instanceof Player ? ctx.sourceEntity : createPlayerProxy(ctx, command, output)
+
+            if (!callback) {
+              return {
+                status: CustomCommandStatus.Failure,
+                message: i18n`Команда не готова`.to(player.lang),
+              }
+            }
 
             const allowed = command.sys.requires(player)
             if (!allowed) {
@@ -607,6 +607,7 @@ function createPlayerProxy(
       warn: sendMessage,
       sendMessage: sendMessage,
       tell: sendMessage,
+      lang: consoleLang,
       playSound: () => void 0,
       id: 'server',
       name: 'server',
@@ -644,6 +645,6 @@ function execCmd(
     }
   } catch (e) {
     Command.logger.player(player).error(command.sys.name, ...args, e)
-    player.fail('Ошибка в команде ' + String(e))
+    player.fail(noI18n`Command error ${String(e)}`)
   }
 }

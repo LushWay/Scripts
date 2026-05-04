@@ -22,7 +22,7 @@ export class CityInvestigating<T extends City> {
 
   constructor(
     readonly city: T,
-    private q: (city: T, ...params: Parameters<Quest['create']>) => void,
+    private q: (city: T, ...params: Parameters<Quest.Create>) => ReturnType<Quest.Create>,
   ) {
     CityInvestigating.list.push(this as unknown as CityInvestigating<City>)
 
@@ -43,7 +43,7 @@ export class CityInvestigating<T extends City> {
 
         q.dialogue(this.city.guide, undefined, true)
 
-        this.q(this.city, q, player)
+        return this.q(this.city, q, player)
       },
       true,
     )

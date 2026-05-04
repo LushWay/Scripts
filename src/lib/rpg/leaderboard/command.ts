@@ -132,7 +132,7 @@ function editLeaderboard(player: Player, lb?: Leaderboard, data: Partial<Leaderb
       data.dimension = player.dimension.type
       update()
     })
-    form.ask('§cУдалить таблицу лидеров', '§cУдалить', () => lb && lb.remove(), 'Отмена')
+    form.ask('§cУдалить таблицу лидеров', '§cУдалить', () => lb?.remove(), 'Отмена')
   }
 
   form.show(player)

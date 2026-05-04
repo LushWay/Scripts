@@ -9,6 +9,7 @@ import { Clan } from 'lib/clan/clan'
 import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
 import { ItemLoreSchema } from 'lib/database/item-stack'
+import { EventSignal } from 'lib/event-signal'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { i18n } from 'lib/i18n/text'
 import { ActionGuardOrder, actionGuard } from 'lib/region/index'
@@ -53,6 +54,9 @@ export class Furnacer extends ShopNpc {
   get id() {
     return this.place.id
   }
+
+  // Used for learning
+  public readonly onFurnaceLock = new EventSignal<{ player: Player }>()
 
   /**
    * Creates new Furnaceer npc store
@@ -190,6 +194,8 @@ actionGuard((player, region, ctx) => {
           lore.player = player.name
 
           player.success(furnaceExpireTimeText)
+
+          EventSignal.emit(furnacer.onFurnaceLock, { player })
         })
 
         // Prevent from opening furnace dialog

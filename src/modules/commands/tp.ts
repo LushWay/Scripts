@@ -1,3 +1,5 @@
+/* i18n-ignore */
+
 import { world } from '@minecraft/server'
 import { ArrayForm } from 'lib/form/array'
 import { form, NewFormCallback } from 'lib/form/new'

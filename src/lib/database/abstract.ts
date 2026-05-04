@@ -15,6 +15,7 @@ export interface Table<Value, Key = string> {
   entries(): [Key, Value][]
   entriesImmutable(): MapIterator<[Key, Immutable<Value>]>
   onLoad(waiter: (value: void) => void): void
+  loaded: boolean
 }
 
 export function table<Value, Key extends string = string>(name: string): Table<Value | undefined, Key>
@@ -74,7 +75,7 @@ export class MemoryTable<Value, Key extends string = string> extends ProxyDataba
     }
   }
 
-  protected loaded = true
+  loaded = true
 
   onLoad(waiter: (value: void) => void): void {
     waiter()
@@ -83,7 +84,7 @@ export class MemoryTable<Value, Key extends string = string> extends ProxyDataba
 
 if (__TEST__) {
   class TestDatabase<Value, Key extends string> extends ProxyDatabase<Value, Key> implements Table<Value, Key> {
-    protected loaded = true
+    loaded = true
 
     onLoad(waiter: (value: void) => void): void {
       waiter()

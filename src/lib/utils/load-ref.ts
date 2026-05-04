@@ -11,15 +11,19 @@ export class LoadRef<T> {
     return v instanceof LoadRef ? v.value : v
   }
 
-  protected static loaders: (() => void)[] = []
+  protected static loaders: LoadRef<any>[] = []
 
   static {
     world.afterEvents.worldLoad.subscribe(() => {
       LoadRef.loadStarted = true
       system.runJob(
         (function* loadRefJob() {
-          for (const loader of LoadRef.loaders) {
-            loader()
+          for (const ref of LoadRef.loaders.sort((a, b) => a.priority - b.priority)) {
+            // const start = Date.now()
+            // const name = ref.loader.toString().replaceAll('\n', '').replaceAll(/\s\s+/g, ' ').slice(0, 100)
+            // console.log('LOADING', OnLoadPriority[ref.priority], name)
+            ref.loaderWithCatch()
+            // console.log('LOADED', Date.now() - start, name)
             yield
           }
           LoadRef.loadFinished = true
@@ -36,9 +40,14 @@ export class LoadRef<T> {
 
   protected loaded = false
 
-  constructor(loader: () => T) {
-    this.stack = stringifyError.stack.get()
-    LoadRef.loaders.push(() => {
+  protected loaderWithCatch: VoidFunction
+
+  constructor(
+    protected loader: () => T,
+    protected priority: OnLoadPriority,
+  ) {
+    this.stack = stringifyError.stack.get(2)
+    this.loaderWithCatch = () => {
       util.catch(
         () => {
           const value = loader()
@@ -55,7 +64,9 @@ export class LoadRef<T> {
         'LoadRefError',
         this.stack,
       )
-    })
+    }
+
+    LoadRef.loaders.push(this)
   }
 
   protected waiters: ((value: T) => void)[] = []
@@ -68,7 +79,14 @@ export class LoadRef<T> {
 
 export type MaybeRef<T> = T | LoadRef<T>
 
-export function onLoad<T>(loader: () => T) {
+export enum OnLoadPriority {
+  Enviroment = 1,
+  Database = 2,
+  Important = 3,
+  NonImportant = 4,
+}
+
+export function onLoad<T>(loader: () => T, priority = OnLoadPriority.NonImportant) {
   if (LoadRef.loadStarted) {
     // console.log('LOADING', new Error())
     return {
@@ -79,5 +97,5 @@ export function onLoad<T>(loader: () => T) {
     }
   }
 
-  return new LoadRef(loader)
+  return new LoadRef(loader, priority)
 }

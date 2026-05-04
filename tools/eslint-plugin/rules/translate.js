@@ -4,7 +4,7 @@ import { sourceCodeLang } from '../asset-lang.js'
 import { addTranslation, messagesJson, readMessages, writeMessages } from '../lang.js'
 import { createRule, toRelative } from '../utils.js'
 
-/** @import {TSESTree} from '@typescript-eslint/utils' */
+/** @import {TSESTree} from "@typescript-eslint/utils" */
 let text = ''
 let i = 0
 
@@ -17,7 +17,7 @@ const translateRule = createRule({
     },
     schema: [],
     messages: {
-      dontUseLiterals: "Don't use literals. Use t instead",
+      dontUseLiterals: "Don't use literals. Use i18n, noI18n or other subtypes instead",
     },
     fixable: 'code',
   },
@@ -39,20 +39,25 @@ const translateRule = createRule({
         }
       },
       TemplateLiteral(node) {
-        const template = node.quasis.map(e => e.value.raw)
-        const id = template.join('\x00')
+        const templateStrings = node.quasis.map(e => e.value.raw)
+        const id = templateStrings.join('\x00')
 
         if (/[а-яА-Я]/.test(id)) {
-          if (node.parent.type === 'TaggedTemplateExpression') {
+          const template = node.parent
+          if (template.type === 'TaggedTemplateExpression') {
             const tag =
-              node.parent.tag.type === 'Identifier'
-                ? node.parent.tag
-                : node.parent.tag.type === 'MemberExpression' && node.parent.tag.object.type === 'Identifier'
-                  ? node.parent.tag.object
+              template.tag.type === 'Identifier'
+                ? { name: template.tag.name }
+                : template.tag.type === 'MemberExpression' && template.tag.object.type === 'Identifier'
+                  ? { name: template.tag.object.name, property: template.tag.property }
                   : undefined
 
-            const name = tag ? tag.name : undefined
-            if (name === 'noI18n' || name === 'i18nJoin') return
+            const name = tag?.name
+            const subname = tag?.property?.type === 'Identifier' ? tag.property.name : undefined
+
+            if (name === 'noI18n' || name == 'noI18nShared') return
+
+            if (subname === 'join') return
 
             const filelink = `file:///./${file}`.replaceAll(path.sep, '/')
             if (!text.includes(filelink)) text += '\n\n' + filelink + '\n'
@@ -62,7 +67,7 @@ const translateRule = createRule({
             const shared = name === 'i18nShared'
             const plural = name === 'i18nPlural'
 
-            addTranslation(id, template, shared, plural)
+            addTranslation(id, templateStrings, shared, plural)
           } else if (!isInsideWorldSettings(node)) {
             context.report({
               node,

@@ -102,13 +102,13 @@ export const inClanMenu = form.params<{ clan: Clan }>((f, formContext) => {
   }
 
   f.button(i18n`Другие кланы\n§7Посмотреть`, () => {
-    new ArrayForm('Кланы', [...Clan.getAll()].reverse())
+    new ArrayForm(i18n`Кланы`, [...Clan.getAll()].reverse())
       .button((clan, _, __) => {
         return [
           getClanButtonName(clan),
           form((f, { self }) => {
             f.title(clan.name)
-            f.body(`Короткое имя: ${clan.shortname}`)
+            f.body(i18n`Короткое имя: ${clan.shortname}`)
 
             for (const o of clan.members) {
               f.button(i18n`${getFullname(o.id)}\n${Clan.roleToString(o.role)}`, self)

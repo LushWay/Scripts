@@ -6,8 +6,8 @@ import { form, NewFormCallback } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
+import { i18n } from 'lib/i18n/text'
 import { ms, Time } from 'lib/utils/ms'
-import { msold } from 'lib/utils/ms-old'
 import { Chat } from './chat'
 
 function mute(type: Time, time: number, reason = 'за поведение', id: string, muter: Player) {
@@ -17,8 +17,8 @@ function mute(type: Time, time: number, reason = 'за поведение', id: 
   const player = Player.getById(id)
   if (player) Chat.getInstance().informAboutMute(player, muteInfo)
 
-  const timeText = msold.remaining(actualTime)
-  const muteText = `Игрок ${player ? getFullname(player) : Player.nameOrUnknown(id)} был замьючен на ${timeText.value} ${timeText.type} по причине: ${reason}`
+  const timeText = i18n.time(actualTime)
+  const muteText = i18n`Игрок ${player ? getFullname(player) : Player.nameOrUnknown(id)} был замьючен на ${timeText} по причине: ${reason}`
   muter.success(muteText)
   // if (!Command.isServer(muter)) adminNotify(`${getFullname(muter)}: ${muteText}`)
 }
@@ -29,11 +29,11 @@ function unmute(id: string, muter: Player) {
 
   const onlinePlayer = Player.getById(id)
   const fullname = onlinePlayer ? getFullname(onlinePlayer) : Player.nameOrUnknown(id)
-  const timeText = msold.remaining(info.mutedUntil - Date.now())
+  const timeText = i18n.time(info.mutedUntil - Date.now())
 
   Chat.getInstance().muteDb.delete(id)
 
-  const muteText = `Размьючен игрок ${fullname} который был замьючен по причине ${info.reason}, до конца оставалось ${timeText.value} ${timeText.type}`
+  const muteText = i18n`Размьючен игрок ${fullname} который был замьючен по причине ${info.reason}, до конца оставалось ${timeText}`
   muter.success(muteText)
   // if (!Command.isServer(muter)) adminNotify(`${getFullname(muter)}: ${muteText}`)
 }

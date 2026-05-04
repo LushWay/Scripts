@@ -13,13 +13,15 @@ import { Cutscene } from 'lib/cutscene'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { ActionForm } from 'lib/form/action'
 import { i18n, i18nShared, noI18n, noI18nShared } from 'lib/i18n/text'
-import { location } from 'lib/location'
+import { assertLocationIsValid, location } from 'lib/location'
 import { actionGuard, ActionGuardOrder, Region, RoadRegion } from 'lib/region'
 import { RegionEvents } from 'lib/region/events'
 import { MineareaRegion } from 'lib/region/kinds/minearea'
 import { enterNewbieMode } from 'lib/rpg/newbie'
 import { noGroup } from 'lib/rpg/place'
+import { rollChance } from 'lib/rpg/random'
 import { Temporary } from 'lib/temporary'
+import { assertLoaded } from 'lib/util'
 import { onLoad } from 'lib/utils/load-ref'
 import { createLogger } from 'lib/utils/logger'
 import { createPointVec } from 'lib/utils/point'
@@ -70,14 +72,14 @@ class Learning {
         }
       })
 
-      const { safeArea } = VillageOfMiners
+      const { safeArea } = VillageOfExplorers
       if (!safeArea) logger.warn('Village of miners safe area is not loaded, aborting...')
       else {
         function findClosestRegion<T extends Region>(regions: T[], to: Region): T | undefined {
           return regions
             .filter(e => e.dimensionType === to.dimensionType)
             .map(region => ({ region, distance: Vec.distance(to.area.center, region.area.center) }))
-            .sort((a, b) => b.distance - a.distance)[0]?.region
+            .sort((a, b) => a.distance - b.distance)[0]?.region
         }
 
         const gasStations = DungeonRegion.getAll().filter(e => e.structureId.includes('gas_station'))
@@ -95,6 +97,7 @@ class Learning {
               region: gasStation,
               closestRoad,
             }
+            console.log(Vec.string(gasStation.area.center), Vec.string(closestRoad.area.center))
           }
         }
       }
@@ -208,13 +211,12 @@ class Learning {
     noGroup.place('learning').name(i18nShared`Обучение`),
     i18n`Обучение базовым механикам сервера`,
     (q, player) => {
-      if (!this.learningLocation.valid) return q.failed(noI18n`Learning location is not yet loaded`)
-      if (!this.craftingTableLocation.valid) return q.failed(noI18n`Learning craftingTableLocation is not yet loaded`)
+      assertLocationIsValid(this.learningLocation)
+      assertLocationIsValid(this.craftingTableLocation)
 
-      if (!StoneQuarry.safeArea) return q.failed(noI18n`Stone quarry safe area is not yet loaded`)
-      if (!VillageOfExplorers.safeArea) return q.failed(noI18n`VE safe area is not yet loaded`)
-
-      if (!this.closestGasStation) return q.failed(noI18n`Failed to find gas station for learning`)
+      assertLoaded(StoneQuarry.safeArea, 'StoneQuarry.safeArea')
+      assertLoaded(VillageOfExplorers.safeArea, 'VillageOfExplorers.safeArea')
+      assertLoaded(this.closestGasStation, 'closest gas station')
 
       const maxReturnToAreaSteps = 5
       const limitMovementToMineArea = (step: number) => () => {
@@ -385,11 +387,10 @@ class Learning {
         .isItem(item => item.typeId === MinecraftItemTypes.StonePickaxe)
         .target(crafting)
 
-      q.cutscene('noOres', i18n`На поверхности руд нет`, { restoreCameraTime: 0 })
+      q.cutscene('noOres', i18n`На поверхности руд нет`)
+      q.cutscene('miner', i18n`Попробуйте копнуть поглубже`)
 
-      q.cutscene('miner', i18n`Попробуйте копнуть поглубже`, { instantEnter: true })
-
-      q.counter(i => i18n`Добыто железной руды: ${i}/${10}`, 10)
+      q.counter((i, end) => i18n`Добыто железной руды: ${i}/${end}`, 29)
         .description(i18n`Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!`)
         .activate(ctx => {
           const alwaysIron = 3
@@ -407,16 +408,21 @@ class Learning {
               ;(ctx.db as { iron?: number }).iron ??= 0
 
               if ('iron' in ctx.db && typeof ctx.db.iron === 'number') {
-                if (ctx.db.iron >= alwaysIron) return delegateToNaturalGeneration
-
+                let placed = false
                 for (const block of possibleBlocks) {
-                  if (ctx.db.iron >= alwaysIron) break
-                  if (place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
+                  const isFirst = ctx.db.iron < alwaysIron
+
+                  // The more iron they have, the lower is the chance (100 to 46 with step of 2)
+                  const isRandom = rollChance(100 - ctx.db.iron * 2)
+                  if ((isFirst || isRandom) && place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
                     ctx.db.iron++
+                    placed = true
                   }
                 }
-                return ignoreNaturalGeneration
-              } else return delegateToNaturalGeneration
+                if (placed) return ignoreNaturalGeneration
+              }
+
+              return delegateToNaturalGeneration
             },
             // Priority
             10,
@@ -436,22 +442,16 @@ class Learning {
 
       q.dialogue(VillageOfMiners.guide, i18n`Шахтер зовет вас наверх, чтобы поговорить!`, true)
 
-      q.cutscene('vmShowcase', i18n`Это деревня шахтеров`, { restoreCameraTime: 0 })
-      q.cutscene('vmShowcase2', i18n`Здесь нет печей для переплавки руды`, {
-        restoreCameraTime: 0,
-        instantEnter: true,
-      })
-      q.cutscene('vmShowcase3', i18n`Отправляйтесь за ними в ${i18n.accent`Каменоломню`}`, {
-        restoreCameraTime: 0,
-        instantEnter: true,
-      })
+      q.cutscene('vmShowcase', i18n`Это деревня шахтеров`)
+      q.cutscene('vmShowcase2', i18n`Здесь нет печей для переплавки руды`)
+      q.cutscene('vmShowcase3', i18n`Отправляйтесь за ними в ${i18n.accent`Каменоломню`}`)
 
       const goToStoneQuarryText = i18n`Идите в ${i18n.accent`Каменоломню`} по дороге`
 
       q.reachRegion(VillageOfExplorers.safeArea, goToStoneQuarryText)
 
-      q.cutscene('veShowcase4', i18n`Это деревня исследователей`, { restoreCameraTime: 0 })
-      q.cutscene('veShowcase5', i18n`Это место вам понадобится позже`, { instantEnter: true })
+      q.cutscene('veShowcase4', i18n`Это деревня исследователей`)
+      q.cutscene('veShowcase5', i18n`Это место вам понадобится позже`)
 
       // Gas station guide
       q.reachRegion(this.closestGasStation.closestRoad, goToStoneQuarryText)

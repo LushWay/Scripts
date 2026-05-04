@@ -13,7 +13,7 @@ import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { QuestButton } from './button'
 import { PlayerQuest, PlayerQuestStub } from './player'
-import { QS } from './step'
+import { QS, QSBuilder } from './step'
 
 declare module '@minecraft/server' {
   interface PlayerDatabase {
@@ -26,6 +26,11 @@ export declare namespace Quest {
     active: { id: string; i: number; db?: unknown }[]
     completed: string[]
   }
+
+  type Create = (
+    q: Omit<PlayerQuest, 'list' | 'updateListeners' | 'update' | 'player' | 'quest'>,
+    p: Player,
+  ) => MaybePromise<QSBuilder<QS> | void>
 }
 
 export class Quest {
@@ -78,10 +83,6 @@ export class Quest {
     return db && this.quests.get(db.id)?.getCurrentStep(player, db.i)
   }
 
-  private static restore(player: Player, quest: Quest, db = quest.getDatabase(player)) {
-    if (db) quest.setStep(player, db.i, true)
-  }
-
   static {
     Join.onMoveAfterJoin.subscribe(({ player, firstJoin }) => {
       if (firstJoin) return
@@ -95,7 +96,7 @@ export class Quest {
       const quest = Quest.quests.get(db.id)
       if (!quest) return
 
-      this.restore(player, quest, db)
+      quest.restoreFromDatabase(player, db)
     })
   }
 
@@ -120,6 +121,9 @@ export class Quest {
   }
 
   get name() {
+    // Quests like city investigating omit place name
+    if (!this.place.name.id) return this.place.group.name ?? this.place.name
+
     // Some quests like learning and getting items back after death
     // use default global group without name, thus we need to display only quest name
     return this.place.group.name ? i18nShared.join`${this.place.group.name} - ${this.place.name}` : this.place.name
@@ -134,19 +138,20 @@ export class Quest {
   constructor(
     public readonly place: Place,
     public readonly description: Text,
-    private create: (
-      q: Omit<PlayerQuest, 'list' | 'updateListeners' | 'update' | 'player' | 'quest'>,
-      p: Player,
-    ) => void,
+    private create: Quest.Create,
     public readonly guideIgnore = false,
   ) {
     Quest.quests.set(this.id, this)
-    Quest.onQuestLoad.subscribe(() => {
-      world.getAllPlayers().forEach(e => Quest.restore(e, this))
-      setupUsingStubPlayer(player => create(new PlayerQuestStub(this, player), player), Quest.logger, [this.id])
+    Quest.onQuestLoad.subscribe(async () => {
+      await setupUsingStubPlayer(player => create(new PlayerQuestStub(this, player), player), Quest.logger, [this.id])
+      world.getAllPlayers().forEach(player => this.restoreFromDatabase(player))
     })
 
     this.onCreate()
+  }
+
+  restoreFromDatabase(player: Player, db = this.getDatabase(player)) {
+    if (db) this.setStep(player, db.i, true)
   }
 
   protected onCreate() {
@@ -193,7 +198,15 @@ export class Quest {
   private createPlayerSteps(player: Player, index: number) {
     const playerQuest = new PlayerQuest(this, player)
     this.players.set(player, playerQuest)
-    this.create(playerQuest, player)
+
+    try {
+      const result = this.create(playerQuest, player)
+      if (result instanceof Promise) throw new Error(this.id + ' is not fully loaded!!!')
+    } catch (e) {
+      Quest.logger.player(player).error('Initialize failed', this.name, this.id, e)
+      if (e instanceof Error) playerQuest.failed(e.message)
+      else playerQuest.failed(String(e))
+    }
 
     return playerQuest.steps[index]
   }

@@ -1,12 +1,15 @@
-import { Player } from '@minecraft/server'
+import { Player, system, TicksPerSecond } from '@minecraft/server'
 import { isNotPlaying } from 'lib/utils/game'
 import { Quest } from './quest'
 import { QS, QSBuilder } from './step'
 
+import { EventLoader, EventLoaderWithArg } from 'lib/event-signal'
+import { i18n } from 'lib/i18n/text'
+import { VectorInDimension } from 'lib/utils/point'
 import { QSBreakCounter, QSBreakCounterBuilder } from './steps/break-counter'
 import { QSButton, QSButtonBuilder } from './steps/button'
 import { QSCounter, QSCounterBuilder } from './steps/counter'
-import { QSCutscene } from './steps/cutscene'
+import { QSCutscene, QSCutsceneBuilder } from './steps/cutscene'
 import { QSDialogue } from './steps/dialogue'
 import { QSDynamic, QSDynamicBuilder } from './steps/dynamic'
 import { QSItem, QSItemBuilder } from './steps/item'
@@ -39,7 +42,7 @@ export class PlayerQuest {
 
   button = this.wrapStep(QSButtonBuilder, QSButton)
 
-  cutscene = QSCutscene.bind(this)
+  cutscene = this.wrapStep(QSCutsceneBuilder, QSCutscene)
 
   nextQuest(quest: Quest) {
     this.dynamic(quest.id).activate(ctx => {
@@ -48,11 +51,53 @@ export class PlayerQuest {
     })
   }
 
+  subQuest(target: Quest, goGetQuestText = i18n`Возьмите задание ${target.name}`, goGetLocation?: VectorInDimension) {
+    return this.dynamic(() =>
+      target.isCompleted(this.player)
+        ? target.id
+        : !target.hadEntered(this.player)
+          ? goGetQuestText
+          : i18n`Завершите задание ${target.name}`,
+    ).activate(ctx => {
+      if (target.isCompleted(this.player)) {
+        // Completed, skip
+        ctx.next()
+      } else if (!target.hadEntered(this.player)) {
+        // Not yet entered, point to a location
+        if (goGetLocation) ctx.target = goGetLocation
+      } else {
+        // Wait for completion
+        ctx.subscribe(Quest.onEnd, ({ quest, player }) => {
+          if (quest !== target || player !== this.player) return
+
+          // To not spam with quests
+          system.delay(() => ctx.next())
+        })
+      }
+    })
+  }
+
   failed = (reason: Text, exit = false) => {
     Quest.logger.error(this.quest.id, reason)
     return this.dynamic(reason).activate(ctx => {
       ctx.error(reason)
       if (exit) this.quest.exit(this.player)
+    })
+  }
+
+  waitForLoad(loader: { onLoad(v: VoidFunction): void } | EventLoader | EventLoaderWithArg<any>) {
+    return new Promise<void>((resolve, reject) => {
+      if (loader instanceof EventLoaderWithArg || loader instanceof EventLoader) {
+        loader.subscribe(resolve)
+      } else {
+        loader.onLoad(resolve)
+      }
+
+      system.runTimeout(
+        () => reject(new Error('Quest.waitForLoad timeout: ' + this.quest.id)),
+        'Quest.waitForLoad timeout',
+        TicksPerSecond * 5,
+      )
     })
   }
 

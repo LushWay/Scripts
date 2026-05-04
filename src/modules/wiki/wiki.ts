@@ -1,13 +1,17 @@
-import { Player } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
-import { ArrayForm } from 'lib/form/array'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { formArray } from 'lib/form/array-new'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
-import { langToken } from 'lib/i18n/lang'
-import { i18n, textTable } from 'lib/i18n/text'
+import { QuestForm } from 'lib/form/quest'
+import { BUTTON } from 'lib/form/utils'
+import { langToken, translateTypeId } from 'lib/i18n/lang'
+import { i18n, i18nShared, textTable } from 'lib/i18n/text'
+import { Quest } from 'lib/quest'
+import { PlayerQuestStub } from 'lib/quest/player'
+import { noGroup, Place } from 'lib/rpg/place'
 import { selectByChance } from 'lib/rpg/random'
 import { ItemResource, Resource, ResourceDescripton, ResourceLocation, ResourcesSource } from 'lib/rpg/resource-source'
-import { doNothing } from 'lib/util'
+import { noBoolean } from 'lib/util'
 import { ores } from 'modules/places/mineshaft/algo'
 import { OreEntry } from 'modules/places/mineshaft/ore-collector'
 
@@ -20,25 +24,36 @@ new Command('wiki')
 export const wiki = form(f => {
   f.title(i18n`Википедия`, '§c§u§s§r')
   f.button(i18n`Руды`, 'textures/blocks/diamond_ore', wikiOres)
-  f.button(i18n`Ресурсы`, 'textures/blocks/diamond', wikiItems)
-  f.button(i18n`Ресурсы по локациям`, 'textures/blocks/dirt', wikiLocations)
+  f.button(i18n`Ресурсы`, getAuxOrTexture(MinecraftItemTypes.Diamond), wikiItems)
+  f.button(i18n`Ресурсы по локациям`, BUTTON.search, wikiLocations)
 })
 
-function wikiLocations(player: Player, back?: PlayerCallback) {
-  new ArrayForm(
-    i18n`Ресурсы по локациям`,
+const wikiLocations = formArray(f => {
+  f.title(i18n`Ресурсы по локациям`)
+  f.array(
     ResourcesSource.sources.flatMap(source =>
       source.locations.map(location => ({ location, resources: source.resources })),
     ),
-  )
-    .button(({ location, resources }) => [location.place.name, () => {}])
-    .back(back)
-    .show(player)
+  ).button(({ location, resources }) => {
+    return [getNameFromPlace(location.place), wikiLocationItems({ location, resources }).show]
+  })
+})
+
+const wikiLocationItems = formArray.params<{ location: ResourceLocation; resources: Resource[] }>(
+  (f, { params: { location, resources } }) => {
+    f.title(getNameFromPlace(location.place))
+    f.array(resources).button(resource => [
+      resource.displayName,
+      wikiItemLocation({ resource, location: { location } }).show,
+    ])
+  },
+)
+
+function getNameFromPlace(place: Place) {
+  return i18n.join` ${place.group.name ? i18n.join`${place.group.name} ` : ''}${place.name}`
 }
 
-function wikiItems(player: Player, back?: PlayerCallback) {
-  const self = () => wikiItems(player, back)
-
+const wikiItems = formArray((f, { player }) => {
   const items = ResourcesSource.getMap().reduce<
     { resource: Resource; locations: { location: ResourceLocation; description?: ResourceDescripton }[] }[]
   >((acc, [items, source]) => {
@@ -58,11 +73,13 @@ function wikiItems(player: Player, back?: PlayerCallback) {
     }
     return acc
   }, [])
-  new ArrayForm(i18n`Ресурсы`, items)
+
+  f.title(i18n`Ресурсы`)
+
+  f.array(items)
     .filters({
       food: { name: 'Еда', value: false },
     })
-    .back(back)
     .sort((arr, filters) => {
       if (filters.food) arr = arr.filter(e => e.resource instanceof ItemResource && e.resource.itemStack.food)
 
@@ -72,30 +89,59 @@ function wikiItems(player: Player, back?: PlayerCallback) {
       ({ resource, locations }) =>
         [
           i18n.join`${resource.displayName}\n${locations.map(e => e.location.place.name.to(player.lang)).join(', ')}`,
-          () => wikiItemLocations(player, self, resource, locations),
+          wikiItemLocations({ resource, locations }).show,
           resource.icon,
         ] as const,
     )
-    .show(player)
+})
+
+interface RL {
+  location: ResourceLocation
+  description?: ResourceDescripton
 }
 
-function wikiItemLocations(
-  player: Player,
-  back: PlayerCallback,
-  resource: Resource,
-  locations: { location: ResourceLocation; description?: ResourceDescripton }[],
-) {
-  new ArrayForm(resource.displayName, locations)
-    .button(item => {
-      const place = item.location.place
-      return [
-        i18n.join` ${place.group.name ? i18n.join`${place.group.name} ` : ''}${place.name}\n${Resource.toText(item.description, player)}`,
-        doNothing,
-      ]
-    })
-    .back(back)
-    .show(player)
-}
+const wikiItemLocations = formArray.params<{
+  resource: Resource
+  locations: RL[]
+}>((f, { player, params: { locations, resource } }) => {
+  f.title(resource.displayName)
+  f.array(locations).button(item => {
+    return [
+      i18n.join`${getNameFromPlace(item.location.place)}\n${Resource.toText(item.description, player)}`,
+      wikiItemLocation({ resource, location: item }).show,
+    ]
+  })
+})
+
+const wikiItemLocation = form.params<{ resource: Resource; location: RL }>(
+  (
+    f,
+    {
+      player,
+      self,
+      params: {
+        resource,
+        location: { location, description },
+      },
+    },
+  ) => {
+    f.title(resource.displayName)
+    const resDesc = Resource.toText(description, player)
+    f.body(
+      textTable([
+        [i18n`Описание`, resDesc],
+        [i18n`Локация`, location.place.name],
+        location.place.group.name ? [i18n`Группа`, location.place.group.name] : '',
+      ]),
+    )
+
+    new QuestForm(f, player, self).quest(
+      location.reachQuest,
+      undefined,
+      i18n`Вы можете взять это задание чтобы отслеживать направления источника ресурса (${resource.displayName}) с помощью компаса`,
+    )
+  },
+)
 
 export const wikiOres = form((f, { player }) => {
   f.title(i18n`Руды`)
@@ -115,20 +161,63 @@ export const wikiOres = form((f, { player }) => {
     f.button(i18n`На этой высоте руд нет`, wikiOres)
   }
 
-  for (const { item, weight: chance } of ores.getAll()) {
+  for (const { item: ore, weight: chance } of ores.getAll()) {
     f.button(
-      i18n`${oreName(item, getChance(chance, totalChance))}, ${`§7${item.below}...${item.above}`}, Группа: ${item.groupChance}%%`,
-      getOreTexture(item),
-      wikiOre({ item, weight: chance / totalChance }),
+      i18n`${oreName(ore, getChance(chance, totalChance))}, ${`§7${ore.below}...${ore.above}`}, Группа: ${ore.groupChance}%%`,
+      getOreTexture(ore),
+      wikiOre({ ore: ore }),
     )
   }
 })
+
+const amount = 10
+export const mineQuests = ores
+  .getAll()
+  .map(({ item: ore }) => {
+    const itemType = ore.types[0]
+    if (!itemType) return false
+
+    return {
+      ore,
+      quest: new Quest(
+        noGroup
+          .place(itemType + '-wiki-mine')
+          .name(i18nShared`Добыть: ${{ rawtext: [{ translate: langToken(itemType) }] }}`),
+
+        i18n`Спуститесь в шахту и вскопайте указанный ресурс!`,
+        (q, player) => {
+          if (q instanceof PlayerQuestStub) return // No cutscenes in this quest
+
+          let y = ~~player.location.y
+
+          const { below, above } = ore
+          const inRange = () => y < below && y > above
+
+          q.breakCounter(
+            (c, end) =>
+              inRange()
+                ? `${c}/${end} y=${above}..${y}..${below}`
+                : i18n.error`Копать нужно на высоте ${above}..${below}. Ваш y = ${y}`,
+            amount,
+          )
+            .filter(({ type: { id } }) => ore.types.includes(id))
+            .activate(ctx => {
+              ctx.onInterval(() => {
+                y = ~~player.location.y
+                ctx.update()
+              })
+            })
+        },
+      ),
+    }
+  })
+  .filter(noBoolean)
 
 const wikiOresAtY = (ores: { text: Text; entry: OreEntry; chance: number }[], y: number) =>
   form(f => {
     f.title(i18n`Руды на ${y}`)
     for (const ore of ores.slice().sort((a, b) => b.chance - a.chance))
-      f.button(ore.text, getOreTexture(ore.entry.item), wikiOre(ore.entry))
+      f.button(ore.text, getOreTexture(ore.entry.item), wikiOre({ ore: ore.entry.item }))
   })
 
 function getChance(chance: number, totalChance: number) {
@@ -143,13 +232,18 @@ function oreName(item: OreEntry['item'], chance: number, separator = '\n') {
   return i18n`${`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`}${separator}${chance}%%`
 }
 
-const wikiOre = ({ item }: OreEntry) =>
-  form(f => {
-    f.title(i18n`%${langToken(item.types[0] ?? MinecraftBlockTypes.Stone)}`)
-    f.body(
-      textTable([
-        [i18n`Под`, item.below],
-        [i18n`Над`, item.above],
-      ]),
-    )
-  })
+const wikiOre = form.params<{ ore: OreEntry['item'] }>((f, { player, self, params: { ore } }) => {
+  f.title(translateTypeId(ore.types[0] ?? MinecraftBlockTypes.Stone, player.lang))
+  f.body(
+    textTable([
+      [i18n`Под`, ore.below],
+      [i18n`Над`, ore.above],
+      [i18n`Типы`, ore.types.map(e => translateTypeId(e, player.lang)).join(', ')],
+    ]),
+  )
+
+  const quest = mineQuests.find(e => e.ore === ore)
+  if (quest) {
+    new QuestForm(f, player, self).quest(quest.quest)
+  }
+})

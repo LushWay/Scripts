@@ -26,5 +26,8 @@ selectByChance.getTotalChance = (items: { weight: number }[]) => {
  * @param chance
  */
 export function rollChance(chance: number) {
+  chance = Math.min(Math.max(0, chance), 100)
+  if (chance === 0) return false
+  if (chance === 100) return true
   return Math.random() * 100 <= chance
 }

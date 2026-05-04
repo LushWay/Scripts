@@ -3,6 +3,7 @@ import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
+import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { is } from 'lib/roles'
@@ -125,10 +126,22 @@ export const manageQuestMenu = form.params<{ quest: Quest; target?: Player }>(
     if (is(player.id, 'techAdmin')) {
       const place = current?.target
       if (place) {
-        f.button('§7admin: tp to quest point', () =>
+        f.button(noI18n.accent`admin: tp to quest point`, () =>
           player.teleport(place.location, { dimension: world[place.dimensionType] }),
         )
       }
+      f.button(noI18n.accent`admin: move steps`, () => {
+        new ModalForm('steps').addTextField('steps, -1 - back, 1 - forward', '1', '1').show(player, (ctx, v) => {
+          if (isNaN(parseInt(v))) return ctx.error('Not a number')
+          const i = quest.getDatabase(player)?.i
+          if (typeof i === 'undefined') return ctx.error('Not in quest')
+
+          player.success(
+            noI18n`Quest move: ${i} -> ${i + parseInt(v)}/${quest.getCurrentStep(player)?.playerQuest.steps.length}`,
+          )
+          quest.setStep(player, i + parseInt(v))
+        })
+      })
     }
   },
 )

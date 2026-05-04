@@ -8,6 +8,7 @@ import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
 import { lootTablePreview } from 'lib/rpg/loot-table-preview'
 import { Place } from 'lib/rpg/place'
+import { ResourceLocationVectorInDimension } from 'lib/rpg/resource-source'
 import { PlaceAction } from '../action'
 import { ItemLoreSchema } from '../database/item-stack'
 import { i18n, i18nShared, noI18n } from '../i18n/text'
@@ -64,6 +65,8 @@ export class Crate {
       if (e instanceof LocationInUnloadedChunkError) return
       throw e
     }
+
+    this.lootTable.resources.addLocation(new ResourceLocationVectorInDimension(this.place, location.toPoint()))
   }
 
   private get name() {

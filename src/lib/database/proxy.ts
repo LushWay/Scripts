@@ -148,7 +148,7 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
 
   protected value = new Map<Key, Value>()
 
-  protected loaded = false
+  loaded = false
 
   private proxyCache = new WeakMap<DynamicObject, DynamicObject>()
 

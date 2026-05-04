@@ -1,6 +1,6 @@
 import { Dimension, World, world } from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
-import { onLoad } from 'lib/utils/load-ref'
+import { onLoad, OnLoadPriority } from 'lib/utils/load-ref'
 import { expand } from './extend'
 
 declare module '@minecraft/server' {
@@ -49,6 +49,6 @@ onLoad(() => {
     nether: world.getDimension(MinecraftDimensionTypes.Nether),
     end: world.getDimension(MinecraftDimensionTypes.TheEnd),
   })
-})
+}, OnLoadPriority.Enviroment)
 
 const logs = new Set()

@@ -23,7 +23,7 @@ function load() {
     const block = dimension.getBlock(location)
     const chest = block?.getComponent('inventory')
 
-    if (!block || block.typeId !== MinecraftBlockTypes.Chest || !chest?.container)
+    if (block?.typeId !== MinecraftBlockTypes.Chest || !chest?.container)
       return console.warn(
         `Unable to load ${structure}, block is`,
         block?.typeId,

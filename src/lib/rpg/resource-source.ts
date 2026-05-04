@@ -4,7 +4,7 @@ import { Items } from 'lib/assets/custom-items'
 import { getAuxOrTexture, getAuxTextureOrPotionAux } from 'lib/form/chest'
 import { translateToken } from 'lib/i18n/lang'
 import { ServerSideI18nMessage } from 'lib/i18n/message'
-import { i18n } from 'lib/i18n/text'
+import { i18n, i18nShared } from 'lib/i18n/text'
 import { Quest } from 'lib/quest'
 import { Region } from 'lib/region'
 import { Place } from 'lib/rpg/place'
@@ -95,6 +95,14 @@ export class ItemResource extends Resource {
 }
 
 export abstract class ResourceLocation {
+  static places = new Map<string, Place>()
+
+  protected getOrCreatePlace() {
+    return ResourceLocation.places.getOrInsertComputed(`${this.place.shortId} resource`, id =>
+      this.place.group.place(id).name(i18nShared`Доберитесь до: ${this.place.name}`),
+    )
+  }
+
   constructor(
     readonly place: Place,
     readonly key: string,
@@ -118,8 +126,8 @@ export class ResourceLocationRegion extends ResourceLocation {
     super(place, `region-${region.id}`)
   }
 
-  reachQuest = new Quest(this.place, this.description, q => {
-    q.reachRegion(this.region, i18n`Доберитесь до зоны`)
+  reachQuest = new Quest(this.getOrCreatePlace(), this.description, q => {
+    q.reachRegion(this.region, i18n`Следуйте компасу`)
   })
 }
 
@@ -131,7 +139,7 @@ export class ResourceLocationVectorInDimension extends ResourceLocation {
     super(place, `vector-${JSON.stringify(vector)}`)
   }
 
-  reachQuest = new Quest(this.place, this.description, q => {
+  reachQuest = new Quest(this.getOrCreatePlace(), this.description, q => {
     q.reachArea(
       Vec.subtract(this.vector.location, Vec.one.multiply(2)),
       Vec.add(this.vector.location, Vec.one.multiply(2)),
@@ -142,12 +150,14 @@ export class ResourceLocationVectorInDimension extends ResourceLocation {
 }
 
 export class ResourcesSource {
-  static readonly resource: Resource
-
   static sources: ResourcesSource[] = []
 
   static getMap() {
     return this.sources.map(e => [e.resources, e] as const)
+  }
+
+  static getLocationsByResource(filter: (r: Resource) => boolean): ResourceLocation[] {
+    return this.sources.flatMap(e => (e.resources.some(r => filter(r)) ? e.locations : []))
   }
 
   constructor() {
@@ -159,12 +169,14 @@ export class ResourcesSource {
   addLocation(location: ResourceLocation) {
     if (this.locations.some(e => e.place === location.place)) return
     this.locations.push(location)
+    return this
   }
 
   readonly resources: Resource[] = []
 
   add(resource: Resource) {
     this.resources.push(resource)
+    return this
   }
 
   delete() {

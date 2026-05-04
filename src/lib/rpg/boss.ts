@@ -16,7 +16,7 @@ import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { LootTable } from 'lib/rpg/loot-table'
 import { givePlayerMoneyAndXp } from 'lib/rpg/money'
-import { ResourceLocationRegion } from 'lib/rpg/resource-source'
+import { ExperienceLevelResource, ResourceLocationRegion, ResourcesSource } from 'lib/rpg/resource-source'
 import { Temporary } from 'lib/temporary'
 import { getBlockStatus } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
@@ -127,6 +127,12 @@ export class Boss {
     return this.options.place.id
   }
 
+  get place() {
+    return this.options.place
+  }
+
+  resources = new ResourcesSource().add(new ExperienceLevelResource().setAmount(0, 100))
+
   /**
    * Creates a new boss
    *
@@ -167,7 +173,9 @@ export class Boss {
 
         warnAboutEnteringDangerousRegion(this.region, options.equippmentLevel)
 
-        this.options.loot.resources.addLocation(new ResourceLocationRegion(this.options.place, this.region))
+        const location = new ResourceLocationRegion(this.options.place, this.region)
+        this.options.loot.resources.addLocation(location)
+        this.resources.addLocation(location)
 
         EventLoaderWithArg.load(this.onRegionCreate, this.region)
       })

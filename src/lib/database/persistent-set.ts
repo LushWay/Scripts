@@ -1,4 +1,4 @@
-import { onLoad } from 'lib/utils/load-ref'
+import { onLoad, OnLoadPriority } from 'lib/utils/load-ref'
 import { LongDynamicProperty } from './properties'
 
 export class LimitedSet<T> extends Set<T> {
@@ -25,7 +25,7 @@ export class PersistentSet<T extends Json> extends LimitedSet<T> {
     }
   }
 
-  onLoad = onLoad(() => this.load()).onLoad
+  onLoad = onLoad(() => this.load(), OnLoadPriority.Database).onLoad
 
   private load() {
     const id = `PersistentSet<${this.id}>:`

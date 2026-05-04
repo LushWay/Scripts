@@ -4,7 +4,12 @@ import { Npc } from 'lib/rpg/npc'
 import { PlayerQuest } from '../player'
 import { QSDynamic } from './dynamic'
 
-export function QSDialogue(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Вас ждет §f${npc.name}`, cancel = false) {
+export function QSDialogue(
+  this: PlayerQuest,
+  npc: Npc,
+  text = i18n`Вас ждет ${i18n.accent`${npc.name}`}`,
+  cancel = false,
+) {
   return this.dynamic(text)
     .target(npc.location.toPoint())
     .activate(ctx => {
@@ -19,7 +24,7 @@ export function QSDialogue(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Ва
     })
 }
 
-export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = i18n.nocolor`Вас ждет §f${npc.name}`) {
+export function QSDialogueOverride(this: PlayerQuest, npc: Npc, text = i18n`Вас ждет ${i18n.accent`${npc.name}`}`) {
   return {
     body: (body: string) => ({
       buttons: (...buttons: [string, (ctx: QSDynamic, back: VoidFunction) => void][]) => {

@@ -1,7 +1,7 @@
 import { world } from '@minecraft/server'
 import { ProxyDatabase } from 'lib/database/proxy'
 import { noI18n } from 'lib/i18n/text'
-import { onLoad } from 'lib/utils/load-ref'
+import { onLoad, OnLoadPriority } from 'lib/utils/load-ref'
 import { DatabaseDefaultValue, DatabaseError, UnknownTable, configureDatabase } from './abstract'
 import { DatabaseUtils } from './utils'
 
@@ -18,7 +18,7 @@ class DynamicPropertyDB<Value = unknown, Key extends string = string> extends Pr
     DynamicPropertyDB.tables[id] = this as UnknownTable
   }
 
-  onLoad = onLoad(() => this.load()).onLoad
+  onLoad = onLoad(() => this.load(), OnLoadPriority.Database).onLoad
 
   private load() {
     // Init

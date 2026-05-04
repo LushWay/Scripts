@@ -240,7 +240,7 @@ const askForm = form.params<{
   noAction?: VoidFunction
   hook: PromiseWithResolvers<boolean>
 }>((f, { params }) => {
-  f.title('Вы уверены?')
+  f.title(i18n`Вы уверены?`)
   f.body(params.messageFormBody)
   f.button(params.yesText, () => {
     params.yesAction?.()

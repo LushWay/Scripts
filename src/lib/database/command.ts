@@ -53,7 +53,6 @@ function showTable(player: Player, tableId: string, table: UnknownTable) {
 }
 
 function tableProperty(key: string, table: UnknownTable, player: Player, back: VoidFunction) {
-  key = key + ''
   let value: unknown
   let failedToLoad = false
 

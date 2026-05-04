@@ -129,7 +129,7 @@ export abstract class QS<DB = any> extends Temporary {
    * @param text - Text to print
    */
   error(text: Text) {
-    this.player.fail(i18n.error`Задание сломалось: ${text}`.to(this.player.lang))
+    this.player.fail(i18n.error`Задание ${this.quest.name} сломалось: ${text}`.to(this.player.lang))
     return this
   }
 

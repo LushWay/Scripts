@@ -1,6 +1,7 @@
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 
-import { i18n, i18nShared } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18nShared } from 'lib/i18n/text'
+import { Loot } from 'lib/rpg/loot-table'
 import { AuntZina } from 'modules/places/stone-quarry/aunt-zina'
 import { Barman } from 'modules/places/stone-quarry/barman'
 import { Horseman } from 'modules/places/stone-quarry/horseman'
@@ -12,7 +13,7 @@ import { Woodman } from '../lib/npc/woodman'
 import { Furnacer } from './furnacer'
 import { Gunsmith } from './gunsmith'
 import { createBossWither } from './wither.boss'
-import { Loot } from 'lib/rpg/loot-table'
+import { location } from 'lib/location'
 
 class StoneQuarryBuilder extends City {
   constructor() {
@@ -50,7 +51,7 @@ class StoneQuarryBuilder extends City {
   foodOvener = Furnacer.create()
     .group(this.group)
     .id('foodOvener')
-    .name(i18nShared`Баба валя`)
+    .name(i18nShared`Баба Валя`)
     .furnaceTypeIds([MinecraftBlockTypes.Smoker, MinecraftBlockTypes.LitSmoker])
     .body(i18n`У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n`)
     .onlyInStoneQuarry(false)
@@ -60,6 +61,8 @@ class StoneQuarryBuilder extends City {
   guide = new GuideNpc(this.group, i18nShared`Ломщик`, (f, { lf }) => {
     lf.question('wtfCity', i18n`А что за город`, i18n`Ну типа крутой камни ломаем вот да`)
   })
+
+  craftingTable = location(this.group.place('crafting table').name(noI18nShared`Верстак`))
 
   private create() {
     this.createKits(

@@ -19,6 +19,8 @@ import { PersistentSet } from '../database/persistent-set'
 import { getRole } from '../roles'
 import { VectorInDimension } from './point'
 import { defaultLang } from 'lib/assets/lang'
+import { Sidebar } from 'lib/sidebar'
+import { Compass } from 'lib/rpg/menu'
 
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
 export function getBlockStatus({ location, dimensionType }: VectorInDimension) {
@@ -50,12 +52,12 @@ export function isLocationError(
  * @param animTime - Time of the animation
  */
 export function restorePlayerCamera(player: Player, animTime = 1) {
-  if (animTime === 0) return player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+  if (animTime === 0) return resetCamera(player)
 
   const headLocation = player.getHeadLocation()
   player.camera.setCamera(MinecraftCameraPresetsTypes.Free, {
     location: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 0.5)),
-    facingLocation: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 10)),
+    facingLocation: Vec.add(headLocation, Vec.multiply(player.getViewDirection(), 100)),
     easeOptions: {
       easeTime: animTime,
       // easeType: EasingType.OutCubic,
@@ -67,11 +69,21 @@ export function restorePlayerCamera(player: Player, animTime = 1) {
       if (Vec.distance(player.getHeadLocation(), headLocation) > 0.3) {
         // Apply animation again because player had moved
         restorePlayerCamera(player, animTime * 0.5)
-      } else player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+      } else {
+        resetCamera(player)
+      }
     },
     restorePlayerCamera.name,
     animTime * TicksPerSecond,
   )
+}
+
+function resetCamera(player: Player) {
+  player.camera.setCamera(MinecraftCameraPresetsTypes.FirstPerson)
+
+  if (player.isValid) player.onScreenDisplay.resetHudElementsVisibility()
+  Compass.forceHide.delete(player)
+  Sidebar.forceHide.delete(player)
 }
 
 export const CURRENT_BUILDERS = new PersistentSet<string>('onlineBuilderList')
@@ -170,11 +182,11 @@ export function copyAllItemPropertiesExceptEnchants(item: ItemStack, newitem: It
  * Used for initializing data that requires player. For example quest steps for cutscenes or shop buttons for item
  * sources
  */
-export function setupUsingStubPlayer(
-  setup: (stubPlayer: Player) => void,
+export function setupUsingStubPlayer<T>(
+  setup: (stubPlayer: Player) => T,
   logger = setupUsingStubPlayer.logger,
   details: unknown[] = [],
-) {
+): T | undefined {
   try {
     const player = {
       getComponent() {
@@ -182,7 +194,7 @@ export function setupUsingStubPlayer(
       },
       lang: defaultLang,
     } satisfies Partial<Player> as unknown as Player
-    setup(player)
+    return setup(player)
   } catch (e) {
     logger.error('Stub loading error', ...details, e)
   }

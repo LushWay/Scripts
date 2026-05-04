@@ -167,7 +167,7 @@ export class InventoryStore {
       const raw = item.getLore().join('')
 
       // Finding manifest
-      if (raw && raw.at(0) === '{' && raw.at(-1) === '}') {
+      if (raw.at(0) === '{' && raw.at(-1) === '}') {
         let manifest
         try {
           manifest = JSON.parse(raw) as StoreManifest

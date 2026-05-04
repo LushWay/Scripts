@@ -7,7 +7,7 @@ export class QSDynamic extends QS {
 }
 
 export class QSDynamicBuilder extends QSBuilder<QSDynamic> {
-  create(args: [text: Text]) {
+  create(args: [text: QS.TextT]) {
     super.create(args)
   }
 }

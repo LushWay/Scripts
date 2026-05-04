@@ -9,7 +9,7 @@ import { Cooldown } from 'lib/cooldown'
 import { table } from 'lib/database/abstract'
 import { deepClone } from 'lib/database/defaults'
 import { InventoryStore } from 'lib/database/inventory'
-import { form } from 'lib/form/new'
+import { askNew, form } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { actionGuard, ActionGuardOrder, CANCEL, NEXT } from 'lib/region'
 import { Temporary } from 'lib/temporary'
@@ -374,9 +374,10 @@ const inventoryDb = new InventoryStore('cutsceneEdit')
 
 const pointEditMenu = form.params<{ cutscene: Cutscene; edit: EditingCutscenePlayer; point: Cutscene.Point }>(
   (f, { player, self, params: { edit, point, cutscene } }) => {
-    const section = edit.sections.find(e => e?.points.includes(point))
+    const sectionIndex = edit.sections.findIndex(e => e?.points.includes(point))
+    const section = edit.sections[sectionIndex]
     const index = section?.points.findIndex(e => e === point)
-    if (!section || typeof index === 'undefined') return f.title('ОШибка точки нет')
+    if (!section || typeof index === 'undefined' || index === -1) return f.title('ОШибка точки нет')
 
     const playerPoint = Cutscene.getVector5(player)
     f.title('Точка')
@@ -412,8 +413,13 @@ const pointEditMenu = form.params<{ cutscene: Cutscene; edit: EditingCutscenePla
         teleportToPoint(player, next)
         pointEditMenu({ point: next, edit, cutscene }).show(player)
       })
-      .button('§cУдалить', () => {
+      .button(noI18n.error`Удалить`, () => {
         section.points.splice(index, 1)
+        if (section.points.length === 0) {
+          askNew(player, 'Удалить пустую секцию вместе с точкой?', noI18n.error`Удалить`, () => {
+            edit.sections.splice(sectionIndex, 1)
+          })
+        }
       })
   },
 )

@@ -1,7 +1,7 @@
 import { Cooldown } from 'lib/cooldown'
 import { form } from 'lib/form/new'
 import { getFullname } from 'lib/get-fullname'
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 
 interface CooldownController {
   list(): Record<string, number>
@@ -36,7 +36,7 @@ export function registerResettableCooldown(name: string, cd: CooldownController 
 }
 
 export const cooldownResetForm = form(f => {
-  f.title('Кулдауны')
+  f.title(noI18n`Cooldowns`)
   for (const cd of cds ?? []) {
     f.button(cdform(cd))
   }
@@ -57,5 +57,5 @@ const cdform = form.params<{ cd: CooldownController; name: string }>((f, { param
 
 new Command('cooldownreset')
   .setPermissions('moderator')
-  .setDescription('Сбрасывает разные кулдауны')
+  .setDescription(noI18n`Resets some cooldowns`)
   .executes(cooldownResetForm.command)

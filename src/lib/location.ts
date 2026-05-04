@@ -1,5 +1,5 @@
 import { Player, TeleportOptions, Vector3, system, world } from '@minecraft/server'
-import { isEmpty } from 'lib/util'
+import { assertLoaded, isEmpty } from 'lib/util'
 import { Vec, VecSymbol } from 'lib/vector'
 import { EventLoaderWithArg } from './event-signal'
 import { noI18n } from './i18n/text'
@@ -136,6 +136,19 @@ class Location<T extends Vector3> {
 
   teleport(player: Player) {
     player.teleport(Vec.add(this.location, { x: 0.5, y: 0, z: 0.5 }), this.teleportOptions)
+  }
+}
+
+export function assertLocationIsValid<T extends Vector3>(
+  value: ValidLocation<T> | InvalidLocation<T>,
+): asserts value is ValidLocation<T> {
+  if (!value.valid) {
+    if (value instanceof Location) {
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      throw new assertLoaded.Error(`Location is not yet loaded: ${value['group']} ${value['name']}`)
+    } else {
+      throw new assertLoaded.Error(`Location is not yet loaded`)
+    }
   }
 }
 

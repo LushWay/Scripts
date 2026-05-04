@@ -3,7 +3,7 @@ import { defaultLang } from 'lib/assets/lang'
 import { expand } from 'lib/extensions/extend'
 import { i18nShared } from 'lib/i18n/text'
 import { capitalize } from 'lib/util'
-import { onLoad } from 'lib/utils/load-ref'
+import { onLoad, OnLoadPriority } from 'lib/utils/load-ref'
 
 declare module '@minecraft/server' {
   namespace ScoreNames {
@@ -174,7 +174,7 @@ export class ScoreboardDB {
   ) {
     onLoad(() => {
       this.scoreboard = ScoreboardDB.objective(id, displayName)
-    })
+    }, OnLoadPriority.Database)
   }
 
   set(id: Entity | string, value: number) {

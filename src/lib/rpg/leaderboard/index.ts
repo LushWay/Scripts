@@ -53,13 +53,7 @@ export class Leaderboard {
 
   static all = new Map<string, Leaderboard>()
 
-  static createLeaderboard({
-    objective,
-    location,
-    dimension = 'overworld',
-    style = 'green',
-    displayName = objective,
-  }: LeaderboardInfo) {
+  static createLeaderboard({ objective, location, dimension, style, displayName }: LeaderboardInfo) {
     const entity = world[dimension].spawnEntity<CustomEntityTypes>(Leaderboard.entityId, Vec.floor(location))
     entity.nameTag = 'updating...'
     entity.addTag(Leaderboard.tag)
@@ -109,14 +103,14 @@ export class Leaderboard {
     const id = this.objective?.id
     if (!id) return 'noname'
     if (isKeyof(id, scoreboardDisplayNames)) return scoreboardDisplayNames[id].to(defaultLang)
-    return this.scoreboard.displayName.toString()
+    return (this.scoreboard.displayName as string | { toString(): string }).toString()
   }
 
   get nameRawText(): RawText | RawMessage {
     const id = this.objective?.id
     if (!id) return { text: 'noname' }
     if (isKeyof(id, scoreboardDisplayNames)) return scoreboardDisplayNames[id].toRawText()
-    return { text: this.scoreboard.displayName.toString() }
+    return { text: (this.scoreboard.displayName as string | { toString(): string }).toString() }
   }
 
   updateLeaderboard() {

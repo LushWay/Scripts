@@ -1,5 +1,6 @@
 import { Player, system } from '@minecraft/server'
 import { PersistentSet } from 'lib/database/persistent-set'
+import { formArray } from 'lib/form/array-new'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
@@ -7,7 +8,6 @@ import { i18n, noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
 import { Cutscene } from './cutscene'
 import { cutsceneEdit } from './edit'
-import { formArray } from 'lib/form/array-new'
 
 export const cutscene = new Command('cutscene')
   .setDescription(i18n`Катсцена`)
@@ -28,19 +28,25 @@ const selectCutsceneMenu = formArray((f, { player }) => {
     .addCustomButtonBeforeArray(f => {
       const cutscene = Cutscene.getCurrent(player)
       if (cutscene) {
-        f.button('Выйти из текущей сцены', () => cutscene.exit(player))
+        f.button(noI18n`Выйти из текущей сцены`, () => cutscene.exit(player))
       }
 
-      f.button('Добавить', BUTTON['+'], () => {
-        new ModalForm('Добавить катсцену').addTextField('Название', '').show(player, (ctx, id) => {
-          if (cutscenes.has(id)) ctx.error('Имя занято')
+      f.button(noI18n`Добавить`, BUTTON['+'], () => {
+        new ModalForm(noI18n`Добавить катсцену`).addTextField(noI18n`Название`, '').show(player, (ctx, id) => {
+          if (cutscenes.has(id)) ctx.error(noI18n`Имя занято`)
           cutscenes.add(id)
           const cutscene = new Cutscene(id, id)
           manageCutsceneMenu({ cutscene }).show(player)
         })
       })
     })
-    .button(cutscene => [noI18n`${cutscene.id}\n${cutscene.displayName}`, manageCutsceneMenu({ cutscene }).show])
+    .button(
+      cutscene =>
+        [
+          noI18n`${cutscene.id} ${cutscene.sections.length}/${cutscene.sections.reduce((acc, v) => acc + (v?.points.length ?? 0), 0)}\n${cutscene.displayName}`,
+          manageCutsceneMenu({ cutscene }).show,
+        ] as const,
+    )
 })
 
 const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, params: { cutscene } }) => {
@@ -96,6 +102,67 @@ system.afterEvents.scriptEventReceive.subscribe(
       }
 
       exportCutscene(cutscene)
+    } else if (id === 'lushway_cutscene:export_all') {
+      const allCutscenes = Array.from(Cutscene.all.values())
+      if (allCutscenes.length === 0) {
+        const msg = 'No cutscenes found to export'
+        if (initiator instanceof Player) initiator.fail(msg)
+        logger.error(msg)
+        return
+      }
+
+      // Build an object mapping id -> full cutscene data
+      const exportData: Record<string, { sections: Cutscene['sections'] }> = {}
+      for (const cs of allCutscenes) {
+        exportData[cs.id] = { sections: cs.sections }
+      }
+
+      const jsonString = JSON.stringify(exportData)
+      // Log the full data so the admin can copy it from console
+      logger.info(`[EXPORT_ALL] ${jsonString}`)
+
+      if (initiator instanceof Player) {
+        initiator.success(`Exported ${allCutscenes.length} cutscene(s). Check console logs.`)
+      }
+    } else if (id === 'lushway_cutscene:import_all') {
+      let data
+      try {
+        data = JSON.parse(message) as Record<string, { sections: Cutscene['sections'] }>
+      } catch (e) {
+        const errMsg = 'Invalid JSON for import_all'
+        if (initiator instanceof Player) initiator.fail(errMsg)
+        logger.error(errMsg)
+        return
+      }
+
+      let successCount = 0
+      let failCount = 0
+
+      for (const [csId, csData] of Object.entries(data)) {
+        // Validate required fields
+        if (!csId || !Array.isArray(csData.sections)) {
+          logger.warn(`Skipping invalid entry for id "${csId}" – missing sections`)
+          failCount++
+          continue
+        }
+
+        const cutscene = Cutscene.all.get(csId)
+        if (!cutscene) {
+          logger.warn('No cutscene', csId)
+          failCount++
+        } else {
+          cutscene.sections = csData.sections
+          cutscene.save()
+          successCount++
+        }
+      }
+
+      const summary = `Import complete: ${successCount} succeeded, ${failCount} failed`
+      if (initiator instanceof Player) {
+        if (failCount === 0) initiator.success(summary)
+        else initiator.fail(summary)
+      }
+      logger.info(summary)
     }
   },
   { namespaces: ['lushway_cutscene'] },

@@ -10,6 +10,7 @@ import {
 
 import { Sounds } from 'lib/assets/custom-sounds'
 import { Enchantments } from 'lib/enchantments'
+import { EventSignal } from 'lib/event-signal'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { translateEnchantment, translateTypeId } from 'lib/i18n/lang'
 import { i18n, i18nShared } from 'lib/i18n/text'
@@ -27,6 +28,9 @@ import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
 import { enchantmentPrice } from './price'
 
 export class Mage extends ShopNpc {
+  // Used for learning quest
+  onBuy = new EventSignal<{ player: Player }>()
+
   constructor(group: Group) {
     super(group.place('mage').name(i18nShared`Маг`))
 
@@ -245,6 +249,7 @@ export class Mage extends ShopNpc {
         .onBuy(player => {
           this.updateEnchatnment(slot, type, up)
           player.playSound(Sounds.LevelUp)
+          EventSignal.emit(this.onBuy, { player })
         })
     }
   }

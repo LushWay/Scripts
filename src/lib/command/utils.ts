@@ -26,7 +26,7 @@ export function parseArguments(message: string): string[] {
     .trim()
     .replace(/([~^][^~^\s]*)/g, '$1 ')
     .match(/"[^"]+"|[^\s]+/g)
-  if (augments) return augments.map(e => e.replace(/"(.+)"/, '$1').toString())
+  if (augments) return augments.map(e => e.replace(/"(.+)"/, '$1'))
   return []
 }
 
