@@ -117,9 +117,7 @@ system.runInterval(
         if (!ownerId) return
 
         const player = Player.database.getImmutable(ownerId)
-        if (player.survival.gravestoneId !== entity.id) return
-
-        EventSignal.emit(onGravestoneRemove, { ownerId, reason })
+        if (player.survival.gravestoneId === entity.id) EventSignal.emit(onGravestoneRemove, { ownerId, reason })
         entity.remove()
       }
 

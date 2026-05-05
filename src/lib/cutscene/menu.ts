@@ -159,7 +159,7 @@ system.afterEvents.scriptEventReceive.subscribe(
       const fullJson = JSON.stringify(exportData)
       const sessionId = `export_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`
 
-      const chunkSize = 1900
+      const chunkSize = 1500
       let offset = 0
       let chunkIndex = 0
       while (offset < fullJson.length) {
