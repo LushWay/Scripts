@@ -476,12 +476,10 @@ class Learning {
       const chest = DungeonRegion.getChests(this.closestGasStation.region)[0]?.location
       q.dynamic(i18n`Откройте сундук в разрушенном магазине`)
         .activate(ctx => {
-          const cooldown = new Cooldown(ms.from('sec', 1), false)
-
           ctx.world.afterEvents.playerInteractWithBlock.subscribe(event => {
             if (event.player.id !== ctx.player.id) return
             if (event.block.typeId !== MinecraftBlockTypes.Chest) return
-            if (!cooldown.isExpired(player)) return
+            if (!event.isFirstEvent) return
 
             this.closestGasStation?.region.tryUpdateChestAt(event.block)
 

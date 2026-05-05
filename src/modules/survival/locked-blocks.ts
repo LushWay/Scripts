@@ -1,7 +1,6 @@
 import { intlListFormat } from 'lib/i18n/intl'
 import { i18n } from 'lib/i18n/text'
-import { ActionGuardOrder } from 'lib/region'
-import { actionGuard } from 'lib/region'
+import { actionGuard, ActionGuardOrder } from 'lib/region'
 
 const blocked: Record<string, Text[]> = {}
 
@@ -17,7 +16,7 @@ actionGuard((player, region, ctx) => {
   if (!npcs) return
 
   player.fail(
-    i18n.error`Я не знаю что мне делать с этим, стоит спросить ${intlListFormat(i18n.error.style, player.lang, 'or', npcs)}`,
+    i18n.error`Не умею этим пользоваться, но знаю кто точно поможет: ${intlListFormat(i18n.error.style, player.lang, 'or', npcs)}`,
   )
   return false
 }, ActionGuardOrder.Permission)

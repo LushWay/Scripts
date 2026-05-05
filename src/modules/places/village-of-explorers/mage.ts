@@ -24,7 +24,7 @@ import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
 import { FireBallItem } from 'modules/pvp/fireball'
 import { IceBombItem } from 'modules/pvp/ice-bomb'
 import { ItemAbility } from 'modules/pvp/item-ability'
-import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
+import { lockBlockPriorToNpc } from 'modules/survival/locked-blocks'
 import { enchantmentPrice } from './price'
 
 export class Mage extends ShopNpc {
@@ -38,6 +38,7 @@ export class Mage extends ShopNpc {
     lockBlockPriorToNpc(MinecraftBlockTypes.Anvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.ChippedAnvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.DamagedAnvil, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.Grindstone, this.place.name)
 
     this.shop.body(() => i18n`Чего пожелаешь?`)
     this.shop.menu((form, player) => {

@@ -9,7 +9,7 @@ import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { copyAllItemPropertiesExceptEnchants } from 'lib/utils/game'
-import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
+import { lockBlockPriorToNpc } from 'modules/survival/locked-blocks'
 
 export class Gunsmith extends ShopNpc {
   constructor(group: Group) {
@@ -20,6 +20,7 @@ export class Gunsmith extends ShopNpc {
     lockBlockPriorToNpc(MinecraftBlockTypes.ChippedAnvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.DamagedAnvil, this.place.name)
     lockBlockPriorToNpc(MinecraftBlockTypes.EnchantingTable, this.place.name)
+    lockBlockPriorToNpc(MinecraftBlockTypes.Grindstone, this.place.name)
 
     this.shop.menu((form, player) => {
       form

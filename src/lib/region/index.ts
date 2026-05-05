@@ -131,11 +131,11 @@ const permdebugLogger = createLogger('region-perm')
 
 const allowed: InteractionAllowed = (player, region, context, regions) => {
   //
-  for (const [fn] of EventSignal.sortSubscribers(ACTION_GUARD)) {
+  for (const [fn, order] of EventSignal.sortSubscribers(ACTION_GUARD)) {
     const result = fn(player, region, context, regions)
     if (Region.permissionDebug) {
       if (is(player.id, 'techAdmin')) {
-        let msg = noI18n`§5${fn.toString().slice(0, 100).replaceAll('\n', ' ')} -> ${typeof result === 'undefined' ? '§bSKIP' : result}`
+        let msg = noI18n`${`§5${ActionGuardOrder[order]}`} ${fn.toString().replaceAll(/\s\s+/g, ' ').slice(0, 100).replaceAll('\n', ' ')} -> ${typeof result === 'undefined' ? '§bSKIP' : result}`
         if (typeof result === 'boolean') msg += noI18n`\n§fResult: ${result}`
         permdebugLogger.info(msg)
         player.tell(msg)

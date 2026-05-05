@@ -18,7 +18,7 @@ import { FreeCost, MoneyCost } from 'lib/shop/cost'
 import { ShopNpc } from 'lib/shop/npc'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
-import { lockBlockPriorToNpc } from 'modules/survival/locked-features'
+import { lockBlockPriorToNpc } from 'modules/survival/locked-blocks'
 import { StoneQuarry } from './stone-quarry'
 
 const furnaceExpireTime = ms.from('hour', 1)
