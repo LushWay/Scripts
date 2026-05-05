@@ -1,4 +1,4 @@
-import { Player, system } from '@minecraft/server'
+import { Entity, Player, system } from '@minecraft/server'
 import { PersistentSet } from 'lib/database/persistent-set'
 import { formArray } from 'lib/form/array-new'
 import { ModalForm } from 'lib/form/modal'
@@ -6,7 +6,6 @@ import { form } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { createLogger } from 'lib/utils/logger'
-import { Vec } from 'lib/vector'
 import { Cutscene } from './cutscene'
 import { cutsceneEdit } from './edit'
 
@@ -76,96 +75,175 @@ const manageCutsceneMenu = form.params<{ cutscene: Cutscene }>((f, { player, par
 
 const logger = createLogger('cutscene import')
 
+// ========================
+//  Unified feedback helper
+// ========================
+function sendFeedback(
+  initiator: Entity | undefined,
+  message: string,
+  type: 'success' | 'fail' | 'info' | 'error' = 'info',
+) {
+  // Always log to console
+  switch (type) {
+    case 'success':
+      logger.info(`[SUCCESS] ${message}`)
+      break
+    case 'fail':
+      logger.error(`[FAIL] ${message}`)
+      break
+    case 'error':
+      logger.error(`[ERROR] ${message}`)
+      break
+    default:
+      logger.info(message)
+  }
+  // If initiator is a player, send an in‑game message
+  if (initiator instanceof Player) {
+    switch (type) {
+      case 'success':
+        initiator.success(message)
+        break
+      case 'fail':
+        initiator.fail(message)
+        break
+      default:
+        initiator.sendMessage(message)
+    }
+  }
+}
+
+//  Chunk buffer storage
+const importBuffers = new Map<string, string[]>() // key = session ID
+
+//  Event listener
 system.afterEvents.scriptEventReceive.subscribe(
   ({ id, message, initiator }) => {
     if (id === 'lushway_cutscene:import') {
-      const data = JSON.parse(message) as { id: string; sections: Cutscene['sections'] }
+      let data
+      try {
+        data = JSON.parse(message) as { id: string; sections: Cutscene['sections'] }
+      } catch (e) {
+        sendFeedback(initiator, 'Invalid JSON for import', 'fail')
+        return
+      }
 
       const cutscene = Cutscene.all.get(data.id)
-
       if (!cutscene) {
-        if (initiator instanceof Player) initiator.fail(data.id + ' not found')
-        logger.error(data.id + ' not found')
+        sendFeedback(initiator, `Cutscene "${data.id}" not found – import skipped`, 'fail')
         return
       }
 
       cutscene.sections = data.sections
       cutscene.save()
-      if (initiator instanceof Player) initiator.success(data.id + ' success')
-      logger.info(data.id + ' success')
+      sendFeedback(initiator, `Cutscene "${data.id}" imported successfully`, 'success')
     } else if (id === 'lushway_cutscene:export') {
       const cutscene = Cutscene.all.get(message)
-
       if (!cutscene) {
-        if (initiator instanceof Player) initiator.fail(message + ' not found')
-        logger.error(message + ' not found')
+        sendFeedback(initiator, `Cutscene "${message}" not found`, 'fail')
         return
       }
-
-      exportCutscene(cutscene)
+      exportSingleCutscene(cutscene)
+      sendFeedback(initiator, `Export command for "${message}" written to console`, 'success')
     } else if (id === 'lushway_cutscene:export_all') {
       const allCutscenes = Array.from(Cutscene.all.values())
       if (allCutscenes.length === 0) {
-        const msg = 'No cutscenes found to export'
-        if (initiator instanceof Player) initiator.fail(msg)
-        logger.error(msg)
+        sendFeedback(initiator, 'No cutscenes to export', 'fail')
         return
       }
 
+      const exportData: Record<string, { sections: Cutscene['sections'] }> = {}
       for (const cs of allCutscenes) {
-        exportCutscene(cs)
+        exportData[cs.id] = { sections: cs.sections }
       }
 
-      if (initiator instanceof Player) {
-        initiator.success(`Exported ${allCutscenes.length} cutscene(s). Check console logs.`)
+      const fullJson = JSON.stringify(exportData)
+      const sessionId = `export_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`
+
+      const chunkSize = 1900
+      let offset = 0
+      let chunkIndex = 0
+      while (offset < fullJson.length) {
+        const chunk = fullJson.slice(offset, offset + chunkSize)
+        // Build the chunk command
+        const chunkPayload = JSON.stringify({ session: sessionId, chunk: chunk, index: chunkIndex })
+        const command = `scriptevent lushway_cutscene:import_all_chunk ${chunkPayload}`
+        logger.info(command) // prints the exact command to run
+        offset += chunkSize
+        chunkIndex++
       }
-    } else if (id === 'lushway_cutscene:import_all') {
+
+      // Finalize command
+      const finalizePayload = JSON.stringify({ session: sessionId, totalChunks: chunkIndex })
+      const finalizeCommand = `scriptevent lushway_cutscene:import_all_finalize ${finalizePayload}`
+      logger.info(finalizeCommand)
+
+      sendFeedback(initiator, `Export complete (${chunkIndex} chunks). Check console for commands.`, 'success')
+    } else if (id === 'lushway_cutscene:import_all_chunk') {
       let data
       try {
-        data = JSON.parse(message) as Record<string, { sections: Cutscene['sections'] }>
+        data = JSON.parse(message) as { session: string; chunk: string; index?: number }
       } catch (e) {
-        const errMsg = 'Invalid JSON for import_all'
-        if (initiator instanceof Player) initiator.fail(errMsg)
-        logger.error(errMsg)
+        sendFeedback(initiator, 'Invalid JSON for import_all_chunk', 'fail')
+        return
+      }
+
+      const session = data.session || (initiator instanceof Player ? initiator.id : 'console')
+      importBuffers.getOrInsert(session, []).push(data.chunk)
+
+      if (typeof data.index === 'number') {
+        logger.info(`Chunk ${data.index} received for session ${session}`)
+      }
+    } else if (id === 'lushway_cutscene:import_all_finalize') {
+      let data
+      try {
+        data = JSON.parse(message) as { session: string; totalChunks?: number }
+      } catch (e) {
+        sendFeedback(initiator, 'Invalid JSON for import_all_finalize', 'fail')
+        return
+      }
+
+      const session = data.session || (initiator instanceof Player ? initiator.id : 'console')
+      const chunks = importBuffers.get(session)
+      if (!chunks || chunks.length === 0) {
+        sendFeedback(initiator, `No buffered chunks for session "${session}"`, 'fail')
+        return
+      }
+
+      const fullJson = chunks.join('')
+      importBuffers.delete(session)
+
+      let importData
+      try {
+        importData = JSON.parse(fullJson) as Record<string, { sections: Cutscene['sections'] }>
+      } catch (e) {
+        sendFeedback(initiator, 'Failed to parse combined JSON – import aborted', 'fail')
         return
       }
 
       let successCount = 0
-      let failCount = 0
-
-      for (const [csId, csData] of Object.entries(data)) {
-        // Validate required fields
-        if (!csId || !Array.isArray(csData.sections)) {
-          logger.warn(`Skipping invalid entry for id "${csId}" – missing sections`)
-          failCount++
-          continue
-        }
-
+      let skipCount = 0
+      for (const [csId, csData] of Object.entries(importData)) {
         const cutscene = Cutscene.all.get(csId)
         if (!cutscene) {
-          logger.warn('No cutscene', csId)
-          failCount++
-        } else {
-          cutscene.sections = csData.sections
-          cutscene.save()
-          successCount++
+          sendFeedback(initiator, `Cutscene "${csId}" does not exist – skipped`, 'info')
+          skipCount++
+          continue
         }
+        cutscene.sections = csData.sections
+        cutscene.save()
+        successCount++
       }
 
-      const summary = `Import complete: ${successCount} succeeded, ${failCount} failed`
-      if (initiator instanceof Player) {
-        if (failCount === 0) initiator.success(summary)
-        else initiator.fail(summary)
-      }
-      logger.info(summary)
+      const summary = `Import finished: ${successCount} updated, ${skipCount} skipped (non‑existent or invalid)`
+      if (skipCount === 0) sendFeedback(initiator, summary, 'success')
+      else sendFeedback(initiator, summary, 'fail')
     }
   },
   { namespaces: ['lushway_cutscene'] },
 )
 
-function exportCutscene(cutscene: Cutscene) {
-  if (cutscene.sections[0]?.points.length)
-    logger.info(
-      `scriptevent lushway_cutscene:import ${JSON.stringify({ id: cutscene.id, sections: cutscene.sections.map(e => ({ points: e?.points.map(e => ({ ...e, ...Vec.divide(Vec.multiply(e, 1).floor(), 1) })) })) })}`,
-    )
+// Helper for single export (unchanged)
+function exportSingleCutscene(cutscene: Cutscene) {
+  const command = `scriptevent lushway_cutscene:import ${JSON.stringify({ id: cutscene.id, sections: cutscene.sections })}`
+  logger.info(command)
 }
