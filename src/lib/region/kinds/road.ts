@@ -1,6 +1,7 @@
-import { Player, system } from '@minecraft/server'
-import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
+import { Player, system, world } from '@minecraft/server'
+import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { onLoad } from 'lib/utils/load-ref'
 import { RegionEvents } from '../events'
 import { registerRegionType, registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
@@ -45,6 +46,21 @@ system.runPlayerInterval(
   'road skin region',
   20,
 )
+
+const rideable = [MinecraftEntityTypes.Horse, MinecraftEntityTypes.Mule, MinecraftEntityTypes.Donkey]
+
+onLoad(() => {
+  system.runJobInterval(function* roadRegionHorseSpeed() {
+    for (const horse of world.overworld
+      .getEntities({ excludeFamilies: ['monster'] })
+      .filter(e => rideable.includes(e.typeId as MinecraftEntityTypes))) {
+      if (Region.getManyAt(horse).some(e => e instanceof RoadRegion)) {
+        horse.addEffect(MinecraftEffectTypes.Speed, 40, { showParticles: false, amplifier: 2 })
+      }
+      yield
+    }
+  }, 20)
+})
 
 function speed(player: Player, regions: Region[]) {
   if (regions.some(e => e instanceof RoadRegion)) {

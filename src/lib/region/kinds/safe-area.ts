@@ -18,6 +18,7 @@ export class SafeAreaRegion extends Region {
       MinecraftEntityTypes.Player,
       MinecraftEntityTypes.ArmorStand,
       MinecraftEntityTypes.Chicken,
+      MinecraftEntityTypes.Horse,
       'minecraft:painting',
       'minecraft:leash_knot',
     ],
