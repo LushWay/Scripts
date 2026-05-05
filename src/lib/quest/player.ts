@@ -54,7 +54,7 @@ export class PlayerQuest {
   subQuest(target: Quest, goGetQuestText = i18n`Возьмите задание ${target.name}`, goGetLocation?: VectorInDimension) {
     return this.dynamic(() =>
       target.isCompleted(this.player)
-        ? target.id
+        ? 'ERROR quest is completed: ' + target.id
         : !target.hadEntered(this.player)
           ? goGetQuestText
           : i18n`Завершите задание ${target.name}`,
@@ -68,7 +68,8 @@ export class PlayerQuest {
       } else {
         // Wait for completion
         ctx.subscribe(Quest.onEnd, ({ quest, player }) => {
-          if (quest !== target || player !== this.player) return
+          console.log('ABC', quest.id, target.id)
+          if (quest !== target || player.id !== this.player.id) return
 
           // To not spam with quests
           system.delay(() => ctx.next())

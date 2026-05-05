@@ -55,9 +55,9 @@ class SpawnBuilder extends AreaWithInventory {
         const spawnLocation = this.location
         world.setDefaultSpawnLocation(spawnLocation)
 
-        this.portal = new Portal('spawn', null, null, player => {
+        this.portal = new Portal('spawn', null, null, (player, fadeScreen) => {
           if (!Portal.canTeleport(player)) return
-          Portal.fadeScreen(player)
+          if (fadeScreen) Portal.fadeScreen(player)
 
           this.switchInventory(player)
           spawnLocation.teleport(player)

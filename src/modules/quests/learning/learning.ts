@@ -9,9 +9,10 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
+import { Cooldown } from 'lib/cooldown'
 import { Cutscene } from 'lib/cutscene'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { ActionForm } from 'lib/form/action'
+import { form } from 'lib/form/new'
 import { i18n, i18nShared, noI18n, noI18nShared } from 'lib/i18n/text'
 import { assertLocationIsValid, location } from 'lib/location'
 import { actionGuard, ActionGuardOrder, Region, RoadRegion } from 'lib/region'
@@ -24,6 +25,7 @@ import { Temporary } from 'lib/temporary'
 import { assertLoaded } from 'lib/util'
 import { onLoad } from 'lib/utils/load-ref'
 import { createLogger } from 'lib/utils/logger'
+import { ms } from 'lib/utils/ms'
 import { createPointVec } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
@@ -97,7 +99,6 @@ class Learning {
               region: gasStation,
               closestRoad,
             }
-            console.log(Vec.string(gasStation.area.center), Vec.string(closestRoad.area.center))
           }
         }
       }
@@ -153,53 +154,65 @@ class Learning {
 
     const sent = new WeakPlayerSet()
 
-    Anarchy.enterLearning = async player => {
-      if (sent.has(player)) return false
+    Anarchy.enterLearning = (player, switchInventoryAndHud) => {
+      if (sent.has(player)) return
 
-      const toSpawn = () => (temp.cleanup(), Spawn.portal?.teleport(player))
-      if (!this.learningLocation.valid)
-        return (toSpawn(), player.fail(noI18n.error`Learning is not setup properly (1)`), false)
+      const toSpawn = () => {
+        temp.cleanup()
+        Spawn.portal?.teleport(player, false)
+      }
+
+      if (!this.learningLocation.valid) {
+        toSpawn()
+        player.fail(noI18n.error`Learning is not setup properly (1)`)
+        return
+      }
 
       const temp = new Temporary(ctx => {
+        sent.add(player)
+
         const fadeCamera = () => {
-          player.camera.fade({
-            fadeColor: { blue: 0, green: 0, red: 0 },
-            fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
-          })
+          if (player.isValid) {
+            player.camera.fade({
+              fadeColor: { blue: 0, green: 0, red: 0 },
+              fadeTime: { fadeInTime: 0.5, holdTime: 0.5, fadeOutTime: 1 },
+            })
+          }
         }
 
         fadeCamera()
 
         ctx.system.runInterval(fadeCamera, 'anarchy learning screen fade', 10)
+
+        return {
+          cleanup: () => {
+            sent.delete(player)
+          },
+        }
       })
 
       logger.player(player).info`Open rebith form`
 
-      return new Promise<boolean>(resolve => {
-        sent.add(player)
-        new ActionForm(
-          i18n`Режим Перерождение`.to(player.lang),
-          i18n`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`.to(
-            player.lang,
-          ),
+      form(f => {
+        f.title(i18n`Режим Перерождение`)
+        f.body(
+          i18n`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`,
         )
-          .button(i18n`Вперед!`.to(player.lang), () => {
-            if (!this.learningLocation.valid) return
+        f.button(i18n`Вперед!`, () => {
+          if (!this.learningLocation.valid) return
 
-            logger.player(player).info`Teleporting to ${this.learningLocation}`
-            resolve(true)
-            system.delay(() => {
-              if (!this.learningLocation.valid) return
-              player.teleport(this.learningLocation)
-              temp.cleanup()
-              this.quest.enter(player)
-            })
+          logger.player(player).info`Teleporting to ${this.learningLocation}`
+
+          switchInventoryAndHud()
+          system.delay(() => {
+            if (!this.learningLocation.valid) return
+            player.teleport(this.learningLocation)
+            temp.cleanup()
+            this.quest.enter(player)
           })
-          .addButtonBack(toSpawn, player.lang)
-          .show(player)
-          .then(shown => (shown && toSpawn(), false))
-          .finally(() => sent.delete(player))
-      })
+        })
+        f.close(() => toSpawn())
+      }).show(player, () => toSpawn())
     }
   }
 
@@ -377,7 +390,7 @@ class Learning {
         .isItem(item => item.typeId === MinecraftItemTypes.WoodenPickaxe)
         .target(crafting)
 
-      q.breakCounter((i, end) => i18n`Спуститесь в шахту и добудьте камня: ${i}/${end}`, 10)
+      q.breakCounter((i, end) => i18n`Спуститесь в шахту и добудьте камня: ${i}/${end}`, 3)
         .description(i18n`Отправляйтесь в шахту, найдите и накопайте камня.`)
         .filter(broken => broken.type.id === b.Stone)
         .activate(ctx => {
@@ -415,7 +428,7 @@ class Learning {
                   const isFirst = ctx.db.iron < alwaysIron
 
                   // The more iron they have, the lower is the chance (100 to 46 with step of 2)
-                  const isRandom = rollChance(100 - ctx.db.iron * 3)
+                  const isRandom = rollChance(Math.max(100 - ctx.db.iron * 5, 10))
                   if ((isFirst || isRandom) && place(block, isDeepslate ? b.DeepslateIronOre : b.IronOre)) {
                     ctx.db.iron++
                     placed = true
@@ -463,17 +476,21 @@ class Learning {
       const chest = DungeonRegion.getChests(this.closestGasStation.region)[0]?.location
       q.dynamic(i18n`Откройте сундук в разрушенном магазине`)
         .activate(ctx => {
-          // fix timeout
-          // fix food delay
+          const cooldown = new Cooldown(ms.from('sec', 1), false)
+
           ctx.world.afterEvents.playerInteractWithBlock.subscribe(event => {
             if (event.player.id !== ctx.player.id) return
             if (event.block.typeId !== MinecraftBlockTypes.Chest) return
+            if (!cooldown.isExpired(player)) return
 
             this.closestGasStation?.region.tryUpdateChestAt(event.block)
-            const container = event.block.getComponent(BlockInventoryComponent.componentId)?.container
-            const hasFood = container?.slotEntries().some(e => !!e[1].getItem()?.food)
-            if (!hasFood)
-              ctx.player.warn(i18n`В этот раз еды не оказалось, однако в следующий раз может повезти больше.`)
+
+            system.delay(() => {
+              const container = event.block.getComponent(BlockInventoryComponent.componentId)?.container
+              const hasFood = container?.slotEntries().some(e => !!e[1].getItem()?.food)
+              if (!hasFood)
+                ctx.player.warn(i18n`В этот раз еды не оказалось, однако в следующий раз может повезти больше.`)
+            })
             ctx.next()
           })
         })

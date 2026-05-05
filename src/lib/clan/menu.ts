@@ -142,7 +142,7 @@ function clanJoinRequests(player: Player, clan: Clan, back?: VoidFunction) {
           new MessageForm(i18n`Выбор`.to(player.lang), i18n`Принять игрока '${name}' в клан?`.to(player.lang))
             .setButton1(i18n`Принять!`.to(player.lang), () => {
               const message = i18n.nocolor`Вы приняты в клан ${clan.name}`
-              Mail.send(id, message, i18n`Откройте меню клана с помощью /clan`)
+              Mail.send(id, message, i18n`Откройте меню клана с помощью .clan`)
               clan.addMember(id)
               self()
             })

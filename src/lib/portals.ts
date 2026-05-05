@@ -59,7 +59,7 @@ export class Portal {
     readonly id: string,
     private from: Vector3 | null,
     private to: Vector3 | null,
-    private place: Vector3 | PlayerCallback,
+    private place: Vector3 | ((player: Player, fadeScreen: boolean) => void),
   ) {
     const previous = Portal.portals.get(this.id)
     if (previous) {
@@ -90,8 +90,8 @@ export class Portal {
     return new Command(this.id).setGroup('public').executes(ctx => this.teleport(ctx.player))
   }
 
-  teleport(player: Player) {
-    if (typeof this.place === 'function') this.place(player)
-    else Portal.teleport(player, this.place)
+  teleport(player: Player, fadeScreen = true) {
+    if (typeof this.place === 'function') this.place(player, fadeScreen)
+    else Portal.teleport(player, this.place, { fadeScreen })
   }
 }

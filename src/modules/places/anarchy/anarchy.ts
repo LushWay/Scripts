@@ -24,9 +24,8 @@ class AnarchyBuilder extends AreaWithInventory {
 
   zone: RadioactiveZone | undefined
 
-  // Hook function
-  async enterLearning(player: Player): Promise<boolean> {
-    return Promise.resolve(true)
+  enterLearning(player: Player, switchInventoryAndHud: VoidFunction) {
+    // Hook function
   }
 
   inventoryName: InventoryTypeName = 'anarchy'
@@ -65,8 +64,7 @@ class AnarchyBuilder extends AreaWithInventory {
       if (!Portal.canTeleport(player)) return
 
       if (!player.database.survival.anarchy) {
-        this.enterLearning(player).then(r => {
-          if (!r) return
+        this.enterLearning(player, () => {
           this.switchInventory(player)
           showSurvivalHud(player)
         })

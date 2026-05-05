@@ -1,6 +1,7 @@
 import { Player } from '@minecraft/server'
 import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
 import { defaultLang } from 'lib/assets/lang'
+import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
 import { ask } from 'lib/form/message'
 import { showForm } from 'lib/form/utils'
@@ -131,12 +132,21 @@ class Form {
     return this.button(buttonText, texture, p => ask(p, explanation, buttonText, yesAction, noText, this.show))
   }
 
+  protected onClose = new EventSignal()
+
+  /** Adds listener to the onClose event when player closes form */
+  close(listener: VoidFunction) {
+    this.onClose.subscribe(listener)
+  }
+
   show = async () => {
     if (!this.buttons.length) this.button(noI18n`Empty`, undefined, this.show)
 
     const response = await showForm(this.form, this.player)
-    if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined')
+    if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined') {
+      EventSignal.emit(this.onClose, undefined)
       return
+    }
 
     const callback = this.buttons[response.selection]
     if (typeof callback === 'undefined')
@@ -155,6 +165,7 @@ class Form {
         this.player.fail(
           noI18n.error`Button error: ${this.buttonText[response.selection]}, erorr: ${e}. Сообщите администрации.`,
         )
+        EventSignal.emit(this.onClose, undefined)
       }
     }
   }

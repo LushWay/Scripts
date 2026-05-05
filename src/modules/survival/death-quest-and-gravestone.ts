@@ -21,17 +21,18 @@ const gravestoneDiedAtPve = 'gravestoneDiedAtPve'
 export const gravestoneEntityTypeId = CustomEntityTypes.Grave
 const gravestoneTag = 'gravestone'
 const gravestoneSpawnedAt = 'gravestoneAt'
-const gravestoneCleanupAfter = ms.from('sec', 5)
+const gravestoneWaitForItems = ms.from('sec', 5)
+const gravestoneCleanupAfter = ms.from('min', 30)
 
 world.afterEvents.entityDie.subscribe(event => {
   if (event.deadEntity instanceof Player) {
-    const settings = getSettings(event.deadEntity)
-    const playerContainer = event.deadEntity.container
+    // const settings = getSettings(event.deadEntity)
+    // const playerContainer = event.deadEntity.container
 
-    if (playerContainer?.emptySlotsCount === playerContainer?.size && settings.noInvMessage) {
-      event.deadEntity.warn(i18n`Вы умерли без вещей!`)
-      if (event.deadEntity.isSimulated()) return
-    }
+    // if (playerContainer?.emptySlotsCount === playerContainer?.size && settings.noInvMessage) {
+    // event.deadEntity.warn(i18n`Вы умерли без вещей!`)
+    // if (event.deadEntity.isSimulated()) return
+    // }
 
     const { dimension, id: playerId, location, name } = event.deadEntity
     event.deadEntity.database.survival.deadAt2 = { location: Vec.floor(location), dimensionType: dimension.type }
@@ -65,11 +66,6 @@ const getSettings = Settings.player(...Quest.playerSettings.extend, {
   restoreInvQuest: {
     name: i18n`Задание "Вернуть вещи"`,
     description: i18n`Включать ли задание по восстановлению инвентаря после смерти`,
-    value: true,
-  },
-  noInvMessage: {
-    name: i18n`Сообщение при смерти с пустым инвентарём`,
-    description: i18n`Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов`,
     value: true,
   },
 })
@@ -107,18 +103,37 @@ world.afterEvents.playerSpawn.subscribe(({ initialSpawn, player }) => {
   }
 })
 
+enum GravestonCleanupReason {
+  Error,
+  Empty,
+  Timeout,
+}
+
 system.runInterval(
   () => {
     for (const entity of world.overworld.getEntities({ type: gravestoneEntityTypeId, tags: [gravestoneTag] })) {
+      const remove = (reason: GravestonCleanupReason) => {
+        const ownerId = gravestoneGetOwner(entity)
+        if (!ownerId) return
+
+        const player = Player.database.getImmutable(ownerId)
+        if (player.survival.gravestoneId !== entity.id) return
+
+        EventSignal.emit(onGravestoneRemove, { ownerId, reason })
+        entity.remove()
+      }
+
       const at = entity.getDynamicProperty(gravestoneSpawnedAt)
       if (typeof at !== 'number') {
-        entity.remove()
+        remove(GravestonCleanupReason.Error)
         continue
       }
 
-      if (Cooldown.isExpired(at, gravestoneCleanupAfter)) {
-        if (inventoryIsEmpty(entity)) entity.remove()
+      if (Cooldown.isExpired(at, gravestoneWaitForItems)) {
+        if (inventoryIsEmpty(entity)) remove(GravestonCleanupReason.Empty)
       }
+
+      if (Cooldown.isExpired(at, gravestoneCleanupAfter)) remove(GravestonCleanupReason.Timeout)
     }
   },
   'gravestones cleanup',
@@ -150,17 +165,7 @@ actionGuard((player, _, ctx) => {
   return true
 }, ActionGuardOrder.Feature)
 
-world.beforeEvents.entityRemove.subscribe(({ removedEntity }) => {
-  const ownerId = gravestoneGetOwner(removedEntity)
-  if (!ownerId) return
-
-  const player = Player.database.getImmutable(ownerId)
-  if (player.survival.gravestoneId !== removedEntity.id) return
-
-  system.delay(() => EventSignal.emit(onGravestoneRemove, { ownerId }))
-})
-
-const onGravestoneRemove = new EventSignal<{ ownerId: string }>()
+const onGravestoneRemove = new EventSignal<{ ownerId: string; reason: GravestonCleanupReason }>()
 
 onGravestoneRemove.subscribe(({ ownerId }) => {
   const onlinePlayer = world.getAllPlayers().find(e => e.id === ownerId)
@@ -178,7 +183,7 @@ const quest = new Quest(
 
     const { deadAt2, gravestoneId } = player.database.survival
     if (!gravestoneId) return q.failed(i18n.error`Могила была удалена очисткой мусора.`, true)
-    if (!deadAt2) return q.failed(i18n.error`Ваше место смерти потерялось!`, true)
+    if (!deadAt2) return q.failed(i18n.error`Ваше место смерти не сохранилось!`, true)
 
     q.dynamic(Vec.string(deadAt2.location, true))
       .description(
@@ -194,10 +199,16 @@ const quest = new Quest(
 
           ctx.next()
         })
-        ctx.subscribe(onGravestoneRemove, ({ ownerId }) => {
+        ctx.subscribe(onGravestoneRemove, ({ ownerId, reason }) => {
           if (ownerId !== player.id) return
 
-          player.fail(i18n.error`Могила исчезла...`)
+          if (reason === GravestonCleanupReason.Empty) {
+            player.warn(i18n.warn`Могила оказалась пустой и была удалена`)
+          } else if (reason === GravestonCleanupReason.Timeout) {
+            player.warn(i18n.error`Могила была удалена очисткой мусора.`)
+          } else {
+            player.fail(noI18n.error`Gravestone was invalid`)
+          }
           ctx.next()
         })
       })

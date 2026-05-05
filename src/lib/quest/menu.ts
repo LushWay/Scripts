@@ -130,18 +130,24 @@ export const manageQuestMenu = form.params<{ quest: Quest; target?: Player }>(
           player.teleport(place.location, { dimension: world[place.dimensionType] }),
         )
       }
-      f.button(noI18n.accent`admin: move steps`, () => {
-        new ModalForm('steps').addTextField('steps, -1 - back, 1 - forward', '1', '1').show(player, (ctx, v) => {
-          if (isNaN(parseInt(v))) return ctx.error('Not a number')
-          const i = quest.getDatabase(player)?.i
-          if (typeof i === 'undefined') return ctx.error('Not in quest')
+      if (current) {
+        f.button(noI18n.accent`admin: move steps`, () => {
+          new ModalForm('steps').addTextField('steps, -1 - back, 1 - forward', '1', '1').show(player, (ctx, v) => {
+            if (isNaN(parseInt(v))) return ctx.error('Not a number')
+            const i = quest.getDatabase(player)?.i
+            if (typeof i === 'undefined') return ctx.error('Not in quest')
 
-          player.success(
-            noI18n`Quest move: ${i} -> ${i + parseInt(v)}/${quest.getCurrentStep(player)?.playerQuest.steps.length}`,
-          )
-          quest.setStep(player, i + parseInt(v))
+            player.success(
+              noI18n`Quest move: ${i} -> ${i + parseInt(v)}/${quest.getCurrentStep(player)?.playerQuest.steps.length}`,
+            )
+            quest.setStep(player, i + parseInt(v))
+          })
         })
-      })
+      } else {
+        f.button(noI18n.accent`admin: enter`, () => {
+          quest.enter(player)
+        })
+      }
     }
   },
 )
