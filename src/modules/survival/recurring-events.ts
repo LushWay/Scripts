@@ -12,7 +12,6 @@ import { ms } from 'lib/utils/ms'
 // TODO Add command to show menu to view events
 // TODO Add a way to trigger event right now in the menu by using leafs (should be separated from the regular ones and with the bigger amplifier, and regular ones should not intersect with custom ones)
 // TODO Add menu to the survival menu
-// TODO Add chat notification
 
 class RecurringEffect {
   static all: RecurringEffect[] = []
