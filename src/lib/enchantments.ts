@@ -57,6 +57,7 @@ function load() {
       }
 
       ;((Enchantments.custom[addNamespace(ench.type.id)] ??= {})[ench.level] ??= {})[item.typeId] = item
+      ;((Enchantments.custom[ench.type.id] ??= {})[ench.level] ??= {})[item.typeId] = item
       expecting--
     }
   }

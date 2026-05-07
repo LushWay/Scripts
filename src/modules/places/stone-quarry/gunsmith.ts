@@ -1,6 +1,7 @@
 import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes as i, MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { translateTypeId } from 'lib/i18n/lang'
+import { Enchantments } from 'lib/enchantments'
+import { translateEnchantment } from 'lib/i18n/lang'
 
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { Group } from 'lib/rpg/place'
@@ -38,7 +39,7 @@ export class Gunsmith extends ShopNpc {
                 i.DiamondSword,
               ] as string[]
             ).includes(item.typeId),
-          i18n`Алмазный предмет`,
+          i18n`Алмазный меч/инструмент/броня`,
           (form, slot) => {
             form
               .product()
@@ -89,8 +90,7 @@ export class Gunsmith extends ShopNpc {
                 if (item.durability) item.durability.damage = 0
                 const olditem = item.clone()
                 item.enchantable?.removeAllEnchantments()
-                this.copyEnchantments(item, olditem, player)
-                slot.setItem(item)
+                slot.setItem(this.copyEnchantments(item, olditem, player))
               })
           },
         )
@@ -103,28 +103,50 @@ export class Gunsmith extends ShopNpc {
 
     const newitem = new ItemStack(item.typeId.replace('diamond', 'netherite'))
     copyAllItemPropertiesExceptEnchants(newitem, item)
-    this.copyEnchantments(newitem, item, player)
-
-    slot.setItem(newitem)
+    slot.setItem(this.copyEnchantments(newitem, item, player))
   }
 
-  private copyEnchantments(newitem: ItemStack, item: ItemStack, player: Player) {
-    // TODO Enchants above max level won't work here
+  private copyEnchantments(item: ItemStack, olditem: ItemStack, player: Player) {
     let lost = false
-    if (newitem.enchantable && item.enchantable) {
-      for (const ench of item.enchantable.getEnchantments()) {
+    if (item.enchantable && olditem.enchantable) {
+      // Custom enchantment levels, replace with item from storage
+      const aboveMaxLevel = olditem.enchantable.getEnchantments().find(e => e.level > e.type.maxLevel)
+
+      if (aboveMaxLevel) {
+        const itemWithCustomEnchantment =
+          Enchantments.custom[aboveMaxLevel.type.id]?.[aboveMaxLevel.level]?.[item.typeId]
+
+        if (itemWithCustomEnchantment?.enchantable) {
+          copyAllItemPropertiesExceptEnchants(item, itemWithCustomEnchantment)
+          item = itemWithCustomEnchantment
+        } else {
+          console.error(
+            player.name,
+            aboveMaxLevel.type.id,
+            aboveMaxLevel.level,
+            item.typeId,
+            Enchantments.custom[aboveMaxLevel.type.id],
+            Enchantments.custom[aboveMaxLevel.type.id]?.[aboveMaxLevel.level],
+            Enchantments.custom[aboveMaxLevel.type.id]?.[aboveMaxLevel.level]?.[item.typeId],
+          )
+          player.warn(i18n.warn`Зачарование ${translateEnchantment(aboveMaxLevel, player.lang)} не удалось перенести.`)
+        }
+      }
+
+      for (const ench of olditem.enchantable.getEnchantments()) {
+        if (ench.type.id === aboveMaxLevel?.type.id) continue
         if (!lost && rollChance(3)) {
           lost = true
           player.warn(
-            i18n.warn`Онет, кажется, зачарование ${translateTypeId(ench.type.id, player.lang)} уровнем ${ench.level.toString()} потерялось...`.to(
-              player.lang,
-            ),
+            i18n.warn`Онет, кажется, зачарование ${translateEnchantment(ench, player.lang)} уровнем ${ench.level.toString()} потерялось...`,
           )
           continue
         } else {
-          newitem.enchantable.addEnchantment(ench)
+          item.enchantable?.addEnchantment(ench)
         }
       }
     }
+
+    return item
   }
 }
