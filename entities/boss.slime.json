@@ -52,11 +52,11 @@
         },
 
         "minecraft:health": {
-          "value": 500,
-          "max": 500
+          "value": 250,
+          "max": 250
         },
         "minecraft:attack": {
-          "damage": 8
+          "damage": 4
         },
         "minecraft:movement": {
           "value": 0.9
