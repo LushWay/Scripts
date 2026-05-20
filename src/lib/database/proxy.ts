@@ -1,6 +1,6 @@
 import { system } from '@minecraft/server'
 import type { DatabaseDefaultValue, Table, UnknownTable } from './abstract'
-import { removeDefaults, setDefaults } from './defaults'
+import { deepClone, removeDefaults, setDefaults } from './defaults'
 
 const IS_PROXIED = Symbol('is_proxied')
 const PROXY_TARGET = Symbol('proxy_target')
@@ -56,7 +56,7 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
 
   set(key: Key, value: Value): void {
     if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
-    this.value.set(key, value)
+    this.value.set(key, deepClone(value))
     this.needSave()
   }
 

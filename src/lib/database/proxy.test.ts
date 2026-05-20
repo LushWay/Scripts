@@ -40,6 +40,17 @@ describe('ProxyDatabase', () => {
     `)
   })
 
+  it('should delink objects', () => {
+    const value = { a: 1 }
+    database.set('key', value)
+    value.a = 2
+    expect(database.get('key')).toMatchInlineSnapshot(`
+      {
+        "a": 1,
+      }
+    `)
+  })
+
   it('should save arrays', () => {
     database.set('array', [1, 2, 4, 5])
     expect(database.get('array')).toMatchInlineSnapshot(`
