@@ -196,7 +196,9 @@ class Learning {
         f.body(
           i18n`Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.`,
         )
+        let buttonPressed = false
         f.button(i18n`Вперед!`, () => {
+          buttonPressed = true
           if (!this.learningLocation.valid) return
 
           logger.player(player).info`Teleporting to ${this.learningLocation}`
@@ -209,7 +211,7 @@ class Learning {
             this.quest.enter(player)
           })
         })
-        f.close(() => toSpawn())
+        f.close(() => !buttonPressed && toSpawn())
       }).show(player, () => toSpawn())
     }
   }

@@ -1,7 +1,7 @@
 import { RawMessage, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
 import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
-import { translateToken } from './lang'
+import { rawTextToString, translateToken } from './lang'
 import { textUnitColorize } from './text'
 
 export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
@@ -139,6 +139,16 @@ export class SharedI18nMessage extends I18nMessage {
       argsRawtext.push({ rawtext: messages })
     }
     return argsRawtext
+  }
+
+  to(language: Language) {
+    return Message.concatTemplateStringsArray(
+      language,
+      this.template,
+      this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
+      this.colors,
+      this.postfixes,
+    )
   }
 }
 

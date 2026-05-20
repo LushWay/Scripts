@@ -17,7 +17,7 @@ export const villageOfExplorersInvestigating = new CityInvestigating(VillageOfEx
 
   assertLoaded(slimeResourceLocation, 'Slime resource location')
 
-  const lapisQuest = mineQuests.find(e => e.ore.types.includes(MinecraftBlockTypes.LapisOre))?.quest
+  const lapisQuest = mineQuests.value.find(e => e.ore.types.includes(MinecraftBlockTypes.LapisOre))?.quest
 
   assertLoaded(lapisQuest, 'Lapis quest')
   assertLoaded(TechCity.safeArea, 'TechCity.safeArea')

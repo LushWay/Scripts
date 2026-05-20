@@ -48,8 +48,12 @@ export function langToken(typeId: string): string {
       block.setType(typeId)
       langTokenCache.set(typeId, block.localizationKey)
       return block.localizationKey
+    } else {
+      console.log('no block')
     }
-  } catch {}
+  } catch (e) {
+    console.error(e)
+  }
 
   return typeId
 }

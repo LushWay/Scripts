@@ -1,4 +1,4 @@
-import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { formArray } from 'lib/form/array-new'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
@@ -12,6 +12,7 @@ import { noGroup, Place } from 'lib/rpg/place'
 import { selectByChance } from 'lib/rpg/random'
 import { ItemResource, Resource, ResourceDescripton, ResourceLocation, ResourcesSource } from 'lib/rpg/resource-source'
 import { noBoolean } from 'lib/util'
+import { onLoad } from 'lib/utils/load-ref'
 import { ores } from 'modules/places/mineshaft/algo'
 import { OreEntry } from 'modules/places/mineshaft/ore-collector'
 
@@ -24,7 +25,7 @@ new Command('wiki')
 export const wiki = form(f => {
   f.title(i18n`Википедия`, '§c§u§s§r')
   f.button(i18n`Руды`, 'textures/blocks/diamond_ore', wikiOres)
-  f.button(i18n`Ресурсы`, getAuxOrTexture(MinecraftItemTypes.Diamond), wikiItems)
+  f.button(i18n`Ресурсы`, 'textures/items/diamond', wikiItems)
   f.button(i18n`Ресурсы по локациям`, BUTTON.search, wikiLocations)
 })
 
@@ -171,47 +172,49 @@ export const wikiOres = form((f, { player }) => {
 })
 
 const amount = 10
-export const mineQuests = ores
-  .getAll()
-  .map(({ item: ore }) => {
-    const itemType = ore.types[0]
-    if (!itemType) return false
+export const mineQuests = onLoad(() =>
+  ores
+    .getAll()
+    .map(({ item: ore }) => {
+      const itemType = ore.types[0]
+      if (!itemType) return false
 
-    return {
-      ore,
-      quest: new Quest(
-        noGroup
-          .place(itemType + '-wiki-mine')
-          .name(i18nShared`Добыть: ${{ rawtext: [{ translate: langToken(itemType) }] }}`),
+      return {
+        ore,
+        quest: new Quest(
+          noGroup
+            .place(itemType + '-wiki-mine')
+            .name(i18nShared`Добыть: ${{ rawtext: [{ translate: langToken(itemType) }] }}`),
 
-        i18n`Спуститесь в шахту и вскопайте указанный ресурс!`,
-        (q, player) => {
-          if (q instanceof PlayerQuestStub) return // No cutscenes in this quest
+          i18n`Спуститесь в шахту и вскопайте указанный ресурс!`,
+          (q, player) => {
+            if (q instanceof PlayerQuestStub) return // No cutscenes in this quest
 
-          let y = ~~player.location.y
+            let y = ~~player.location.y
 
-          const { below, above } = ore
-          const inRange = () => y < below && y > above
+            const { below, above } = ore
+            const inRange = () => y < below && y > above
 
-          q.breakCounter(
-            (c, end) =>
-              inRange()
-                ? `${c}/${end} y=${above}..${y}..${below}`
-                : i18n.error`Копать нужно на высоте ${above}..${below}. Ваш y = ${y}`,
-            amount,
-          )
-            .filter(({ type: { id } }) => ore.types.includes(id))
-            .activate(ctx => {
-              ctx.onInterval(() => {
-                y = ~~player.location.y
-                ctx.update()
+            q.breakCounter(
+              (c, end) =>
+                inRange()
+                  ? `${c}/${end} y=${above}..${y}..${below}`
+                  : i18n.error`Копать нужно на высоте ${above}..${below}. Ваш y = ${y}`,
+              amount,
+            )
+              .filter(({ type: { id } }) => ore.types.includes(id))
+              .activate(ctx => {
+                ctx.onInterval(() => {
+                  y = ~~player.location.y
+                  ctx.update()
+                })
               })
-            })
-        },
-      ),
-    }
-  })
-  .filter(noBoolean)
+          },
+        ),
+      }
+    })
+    .filter(noBoolean),
+)
 
 const wikiOresAtY = (ores: { text: Text; entry: OreEntry; chance: number }[], y: number) =>
   form(f => {
@@ -225,7 +228,9 @@ function getChance(chance: number, totalChance: number) {
 }
 
 function getOreTexture(item: OreEntry['item']) {
-  return getAuxOrTexture(item.types[0] ?? MinecraftBlockTypes.Stone)
+  const newLocal = getAuxOrTexture(item.types[0] ?? MinecraftBlockTypes.Stone)
+  console.log({ newLocal, a: item.types[0] })
+  return newLocal
 }
 
 function oreName(item: OreEntry['item'], chance: number, separator = '\n') {
@@ -242,7 +247,7 @@ const wikiOre = form.params<{ ore: OreEntry['item'] }>((f, { player, self, param
     ]),
   )
 
-  const quest = mineQuests.find(e => e.ore === ore)
+  const quest = mineQuests.value.find(e => e.ore === ore)
   if (quest) {
     new QuestForm(f, player, self).quest(quest.quest)
   }

@@ -17,6 +17,7 @@ import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from '../lib/area-with-inventory'
 import { RadioactiveZone } from './radioactive-zone'
+import { stringifyError } from 'lib/util'
 import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {
