@@ -9,7 +9,6 @@ import { Airdrop } from 'lib/rpg/airdrop'
 import { createPublicGiveItemCommand, Menu } from 'lib/rpg/menu'
 
 import { Items } from 'lib/assets/custom-items'
-import { Cooldown } from 'lib/cooldown'
 import { Cutscene } from 'lib/cutscene'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { form } from 'lib/form/new'
@@ -25,7 +24,6 @@ import { Temporary } from 'lib/temporary'
 import { assertLoaded } from 'lib/util'
 import { onLoad } from 'lib/utils/load-ref'
 import { createLogger } from 'lib/utils/logger'
-import { ms } from 'lib/utils/ms'
 import { createPointVec } from 'lib/utils/point'
 import { Vec } from 'lib/vector'
 import { WeakPlayerMap, WeakPlayerSet } from 'lib/weak-player-storage'
@@ -223,7 +221,9 @@ class Learning {
   quest = new Quest(
     noGroup.place('learning').name(i18nShared`Обучение`),
     i18n`Обучение базовым механикам сервера`,
-    (q, player) => {
+    async (q, player) => {
+      await q.waitForLoad(Airdrop.db)
+
       assertLocationIsValid(this.learningLocation)
       assertLocationIsValid(this.craftingTableLocation)
 

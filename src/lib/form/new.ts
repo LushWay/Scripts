@@ -1,5 +1,5 @@
 import { Player } from '@minecraft/server'
-import { ActionFormData, ActionFormResponse } from '@minecraft/server-ui'
+import { ActionFormData, ActionFormResponse, CustomForm } from '@minecraft/server-ui'
 import { defaultLang } from 'lib/assets/lang'
 import { EventSignal } from 'lib/event-signal'
 import { ActionForm } from 'lib/form/action'
@@ -29,16 +29,26 @@ class Form {
 
   private form = new ActionFormData()
 
+  private customForm?: CustomForm
+
   currentTitle?: Text
 
   title(title: Text, prefix = '§c§o§m§m§o§n§r§f') {
     this.currentTitle = title
-    this.form.title(`${prefix}${title.to(this.player.lang)}`)
+    //if (prefix === '§c§o§m§m§o§n§r§f') {
+    //  this.customForm = CustomForm.create(this.player, title.to(this.player.lang))
+    //} else {
+      this.form.title(`${prefix}${title.to(this.player.lang)}`)
+    //}
     return this as FormCreator
   }
 
   body(body: Text) {
-    this.form.body(body.to(this.player.lang))
+    if (this.customForm) {
+      this.customForm.label(body.to(this.player.lang))
+    } else {
+      this.form.body(body.to(this.player.lang))
+    }
     return this as FormCreator
   }
 
@@ -99,7 +109,14 @@ class Form {
     const finalCallback = callback instanceof ShowForm ? callback.show : callback
     if (!finalCallback) throw new TypeError(`No callback`)
 
-    this.form.button(text.to(this.player.lang), icon ?? undefined)
+    if (this.customForm) {
+      this.customForm.button(text.to(this.player.lang), () => {
+        this.executeCallback(finalCallback, text.to(defaultLang))
+        this.customForm?.close()
+      })
+    } else {
+      this.form.button(text.to(this.player.lang), icon ?? undefined)
+    }
     this.buttons.push(finalCallback)
     this.buttonText.push(text.to(defaultLang))
     return this
@@ -142,18 +159,34 @@ class Form {
   show = async () => {
     if (!this.buttons.length) this.button(noI18n`Empty`, undefined, this.show)
 
-    const response = await showForm(this.form, this.player)
-    if (response === false || !(response instanceof ActionFormResponse) || typeof response.selection === 'undefined') {
-      EventSignal.emit(this.onClose, undefined)
-      return
+    if (this.customForm) {
+      await this.customForm.closeButton().show()
+    } else {
+      const response = await showForm(this.form, this.player)
+      if (
+        response === false ||
+        !(response instanceof ActionFormResponse) ||
+        typeof response.selection === 'undefined'
+      ) {
+        EventSignal.emit(this.onClose, undefined)
+        return
+      }
+
+      const callback = this.buttons[response.selection]
+      if (typeof callback === 'undefined')
+        throw new TypeError(
+          `Callback for ${response.selection} does not exists, only ${this.buttons.length} callbacks are available`,
+        )
+
+      const buttonText = this.buttonText[response.selection]
+
+      await this.executeCallback(callback, buttonText)
     }
 
-    const callback = this.buttons[response.selection]
-    if (typeof callback === 'undefined')
-      throw new TypeError(
-        `Callback for ${response.selection} does not exists, only ${this.buttons.length} callbacks are available`,
-      )
+    EventSignal.emit(this.onClose, undefined)
+  }
 
+  private async executeCallback(callback: NewFormCallback, buttonText: string | undefined) {
     if (__TEST__) {
       await callback(this.player, this.show)
     } else {
@@ -161,10 +194,8 @@ class Form {
         if (typeof callback !== 'function') throw new Error('Callback is undefined')
         await callback(this.player, this.show)
       } catch (e) {
-        console.error('FORM BUTTON ERROR', this.player.name, this.buttonText[response.selection], callback, e)
-        this.player.fail(
-          noI18n.error`Button error: ${this.buttonText[response.selection]}, erorr: ${e}. Сообщите администрации.`,
-        )
+        console.error('FORM BUTTON ERROR', this.player.name, buttonText, callback, e)
+        this.player.fail(noI18n.error`Button error: ${buttonText}, erorr: ${e}. Сообщите администрации.`)
         EventSignal.emit(this.onClose, undefined)
       }
     }

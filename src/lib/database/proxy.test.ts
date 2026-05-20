@@ -6,7 +6,7 @@ describe('ProxyDatabase', () => {
   class Database<Value = unknown, Key extends string = string> extends ProxyDatabase<Value, Key> {
     onLoad(waiter: (value: void) => void): void {}
 
-    protected loaded = true
+    loaded = true
   }
 
   beforeEach(() => {

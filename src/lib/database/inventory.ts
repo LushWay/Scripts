@@ -54,7 +54,7 @@ export class InventoryStore {
     to.addExperience(from.xp)
 
     const health = to.getComponent('health')
-    if (health) health.setCurrentValue(from.health)
+    if (health) health.setCurrentValue(Math.min(from.health, 20))
 
     const { container } = to
     if (!container) return

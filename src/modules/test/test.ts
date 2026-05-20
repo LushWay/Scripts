@@ -3,6 +3,7 @@
 
 import {
   Entity,
+  EntityEnderInventoryComponent,
   EntityEquippableComponent,
   EquipmentSlot,
   ItemStack,
@@ -23,6 +24,7 @@ import {
   MinecraftPotionEffectTypes,
 } from '@minecraft/vanilla-data'
 
+import * as d from '@minecraft/debug-utilities'
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { CommandContext } from 'lib/command/context'
 import { parseArguments } from 'lib/command/utils'
@@ -46,7 +48,7 @@ import { LootTable } from 'lib/rpg/loot-table'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Settings } from 'lib/settings'
-import { inspect, isKeyof, pick, util } from 'lib/util'
+import { hexToRgb, hexToRgba, inspect, isKeyof, pick, util } from 'lib/util'
 import { restorePlayerCamera } from 'lib/utils/game'
 import { toPoint } from 'lib/utils/point'
 import { Rewards } from 'lib/utils/rewards'
@@ -76,6 +78,45 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  a(ctx) {
+    const line = new d.DebugLine(ctx.player.location, Vec.add(ctx.player.location, Vec.down.multiply(4)))
+    line.color = hexToRgba('#F9B1B1FF')
+    line.scale = 5
+    d.debugDrawer.addShape(line, ctx.player.dimension)
+  },
+  ba(ctx) {
+    const line = new d.DebugBox(ctx.player.location)
+    line.color = hexToRgba('#F9B1B1CA')
+    line.scale = 5
+    d.debugDrawer.addShape(line, ctx.player.dimension)
+  },
+  dd(ctx) {
+    const arow = new d.DebugArrow(
+      Vec.add(ctx.player.location, Vec.one.multiply(5)),
+      Vec.add(ctx.player.location, Vec.one.multiply(5)).add(Vec.down.multiply(4)),
+    )
+    arow.color = { red: 1, green: 1, blue: 1, alpha: 1 }
+    arow.headRadius = 0.1
+    arow.headLength = 2
+    d.debugDrawer.addShape(arow, ctx.player.dimension)
+
+    const text = new d.DebugText(ctx.player.getHeadLocation(), 'Some text teesting')
+    text.useRotation = true
+    let i = 0
+    system.runInterval(
+      () => {
+        i++
+        text.setText(`Some text: ${i}`)
+      },
+      'aaa',
+      20,
+    )
+    d.debugDrawer.addShape(text)
+  },
+  ec(ctx) {
+    const a = ctx.player.getComponent(EntityEnderInventoryComponent.componentId)
+    a?.container
+  },
   armor(ctx) {
     const location = ctx.player.location
     const dimension = ctx.player.dimension

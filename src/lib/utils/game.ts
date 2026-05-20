@@ -12,15 +12,15 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
+import { defaultLang } from 'lib/assets/lang'
 import { dedupe } from 'lib/dedupe'
+import { Compass } from 'lib/rpg/menu'
+import { Sidebar } from 'lib/sidebar'
 import { createLogger } from 'lib/utils/logger'
 import { Vec } from 'lib/vector'
 import { PersistentSet } from '../database/persistent-set'
 import { getRole } from '../roles'
 import { VectorInDimension } from './point'
-import { defaultLang } from 'lib/assets/lang'
-import { Sidebar } from 'lib/sidebar'
-import { Compass } from 'lib/rpg/menu'
 
 /** Checks if block on specified location is loaded (e.g. we can operate with blocks/entities on it) and returns it */
 export function getBlockStatus({ location, dimensionType }: VectorInDimension) {
@@ -190,7 +190,7 @@ export function setupUsingStubPlayer<T>(
   try {
     const player = {
       getComponent() {
-        return
+        return undefined
       },
       lang: defaultLang,
     } satisfies Partial<Player> as unknown as Player

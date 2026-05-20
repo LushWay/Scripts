@@ -212,6 +212,10 @@ onPlayerMove.subscribe(({ player, location, dimensionType }) => {
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
 })
 
+// world.beforeEvents.entityHurt.subscribe(event => {
+//   event.cancel = true
+// })
+
 // TODO Migrate to entityHurtBeforeEvent
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
   if (!damagingEntity?.isValid || !hurtEntity.isValid) return

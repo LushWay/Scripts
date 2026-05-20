@@ -1,8 +1,7 @@
-import { RGB } from '@minecraft/server'
+import { RGB, RGBA } from '@minecraft/server'
 import { TerminalColors } from './assets/terminal-colors'
 import stringifyError from './utils/error'
 import { inspect, stringify } from './utils/inspect'
-import { InvalidLocation, ValidLocation } from 'lib/location'
 
 export { inspect, stringify, stringifyError }
 
@@ -265,6 +264,20 @@ export function hexToRgb(hex: `#${string}`): RGB {
   const [red, green, blue] = rgb as [number, number, number]
 
   return { red, green, blue }
+}
+
+export function hexToRgba(hex: `#${string}`): RGBA {
+  const rgb = hex
+    .padEnd(8, 'F')
+    // Normalize hex
+    .replace(/^#?([a-f\d]{8})$/i, (_, r: string) => r)
+    .match(/.{2}/g)
+    ?.map(x => parseInt(x, 16) / 256)
+
+  if (!rgb) throw new TypeError(`HEX ${hex} is invalid. Expected #[a-f\\d][a-f\\d][a-f\\d][a-f\\d]`)
+  const [red, green, blue, alpha] = rgb as [number, number, number, number]
+
+  return { red, green, blue, alpha }
 }
 
 /** Returns the size of an object or array by checking its length or number of keys. */

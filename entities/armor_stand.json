@@ -35,7 +35,8 @@
         "minecraft:nameable": { "allow_name_tag_renaming": true, "always_show": true },
         "minecraft:knockback_resistance": { "value": 100, "max": 100 },
         "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": false },
-        "minecraft:navigation.walk": { "can_sink": false }
+        "minecraft:navigation.walk": { "can_sink": false },
+        "minecraft:collision_box": { "width": 0, "height": 0 }
       },
       "kill": { "minecraft:instant_despawn": {} }
     },
