@@ -8,11 +8,12 @@ import { RegionEvents } from 'lib/region/events'
 import { Compass } from 'lib/rpg/menu'
 import { Group, Place } from 'lib/rpg/place'
 import { Settings } from 'lib/settings'
-import { isNotPlaying, setupUsingStubPlayer } from 'lib/utils/game'
+import { stringifyError } from 'lib/util'
+import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { QuestButton } from './button'
-import { PlayerQuest, PlayerQuestStub } from './player'
+import { PlayerQuest } from './player'
 import { QS, QSBuilder } from './step'
 
 declare module '@minecraft/server' {
@@ -142,8 +143,7 @@ export class Quest {
     public readonly guideIgnore = false,
   ) {
     Quest.quests.set(this.id, this)
-    Quest.onQuestLoad.subscribe(async () => {
-      await setupUsingStubPlayer(player => create(new PlayerQuestStub(this, player), player), Quest.logger, [this.id])
+    Quest.onQuestLoad.subscribe(() => {
       world.getAllPlayers().forEach(player => this.restoreFromDatabase(player))
     })
 
@@ -179,12 +179,12 @@ export class Quest {
   }
 
   /** Moves player to the specific quest step with all the visuals etc */
-  setStep(player: Player, i: number, restore = false) {
-    const step = this.getCurrentStep(player, i) ?? this.createPlayerSteps(player, i)
+  async setStep(player: Player, i: number, restore = false) {
+    const step = this.getCurrentStep(player, i) ?? (await this.createPlayerSteps(player, i))
     // Index can point to unknown step, e.g quest have 4 steps but index is 10
     if (typeof step === 'undefined')
       return Quest.logger.warn(
-        `Quest non existent step: ${player.name} ${this.id} ${i}/${this.players.get(player)?.steps.length}`,
+        `Quest non existent step: ${player.name} ${this.id} ${i}/${this.players.get(player)?.steps.length} ${stringifyError.stack.get()}`,
       )
 
     const db = this.getDatabase(player) ?? this.createDatabase(player, i)
@@ -195,12 +195,12 @@ export class Quest {
     step.enter(!restore)
   }
 
-  private createPlayerSteps(player: Player, index: number) {
+  private async createPlayerSteps(player: Player, index: number) {
     const playerQuest = new PlayerQuest(this, player)
     this.players.set(player, playerQuest)
 
     try {
-      this.create(playerQuest, player)
+      await this.create(playerQuest, player)
     } catch (e) {
       Quest.logger.player(player).error('Initialize failed', this.name, this.id, e)
       if (e instanceof Error) playerQuest.failed(e.message)

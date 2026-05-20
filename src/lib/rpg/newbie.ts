@@ -1,4 +1,4 @@
-import { EntityDamageCause, Player, system, world } from '@minecraft/server'
+import { EntityDamageCause, Player, world } from '@minecraft/server'
 import { PlayerProperties } from 'lib/assets/player-json'
 import { Cooldown } from 'lib/cooldown'
 import { ask } from 'lib/form/message'
@@ -6,8 +6,6 @@ import { i18n } from 'lib/i18n/text'
 import { Join } from 'lib/player-join'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
-
-const newbieTime = ms.from('hour', 2)
 
 const property = PlayerProperties['lw:newbie']
 
@@ -107,7 +105,9 @@ new Command('newbie')
     ctx.player.success()
   })
 
-system.runPlayerInterval(player => {
-  if (isNewbie(player) && player.scores.anarchyOnlineTime * 2.5 > newbieTime)
-    exitNewbieMode(player, i18n.warn`провели на анархии больше 2 часов`)
-}, 'newbie mode exit')
+// const newbieTime = ms.from('hour', 2)
+
+// system.runPlayerInterval(player => {
+//   if (isNewbie(player) && player.scores.anarchyOnlineTime * 2.5 > newbieTime)
+//     exitNewbieMode(player, i18n.warn`провели на анархии больше 2 часов`)
+// }, 'newbie mode exit')
