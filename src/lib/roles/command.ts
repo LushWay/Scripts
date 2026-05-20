@@ -14,7 +14,7 @@ function canChange(who: Role, target: Role, allowSame = false) {
   return FULL_HIERARCHY.indexOf(who) < FULL_HIERARCHY.indexOf(target)
 }
 
-const command = new Command('role')
+new Command('role')
   .setDescription(i18n`Показывает вашу роль`)
   .setPermissions('everybody')
   .executes(ctx => roleMenu(ctx.player))

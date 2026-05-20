@@ -58,7 +58,7 @@ const PERMISSIONS: Record<Role, Role[]> = {
  *
  * Also known as role hierarchy
  */
-export const WHO_CAN_CHANGE: Role[] = ['creator', 'techAdmin', 'admin', 'moderator', 'helper']
+export const WHO_CAN_CHANGE: Role[] = ['creator', 'curator', 'techAdmin', 'admin', 'moderator', 'helper']
 
 /**
  * Checks if player has permissions for performing role actions. (e.g. if player role is above or equal)
