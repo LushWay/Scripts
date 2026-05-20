@@ -199,7 +199,7 @@ export const mineQuests = onLoad(() =>
               (c, end) =>
                 inRange()
                   ? `${c}/${end} y=${above}..${y}..${below}`
-                  : i18n.error`Копать нужно на высоте ${above}..${below}. Ваш y = ${y}`,
+                  : i18n.error`Копать нужно на высоте от ${above} до ${below}. Ваш y = ${y}`,
               amount,
             )
               .filter(({ type: { id } }) => ore.types.includes(id))

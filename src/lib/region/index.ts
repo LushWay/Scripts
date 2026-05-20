@@ -77,7 +77,8 @@ export enum ActionGuardOrder {
   Feature = 8,
   // Limits
   Permission = 7,
-  Lowest = 6,
+  Low = 6,
+  Lowest = 5,
 }
 
 export const regionTypesThatIgnoreIsBuildingGuard: (typeof Region)[] = []

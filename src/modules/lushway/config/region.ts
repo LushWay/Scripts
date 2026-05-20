@@ -108,4 +108,4 @@ actionGuard((player, region, ctx) => {
 actionGuard((player, region, ctx) => {
   if (ctx.type === 'interactWithEntity') return true
   if (ctx.type === 'interactWithBlock') return false
-}, ActionGuardOrder.Lowest)
+}, ActionGuardOrder.Low)
