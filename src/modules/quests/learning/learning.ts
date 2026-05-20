@@ -235,9 +235,9 @@ class Learning {
 
       const maxReturnToAreaSteps = 4
       const limitMovementToMineArea = (step: number) => () => {
-        // Fix to those who had joined and been AFK, newbie expired and they can't leave quest because
+        // Fix to those who had joined and been AFK, newbie status may lost and they can't leave quest because
         // they can only mine in newbie mode
-        enterNewbieMode(player, false)
+        enterNewbieMode(player)
 
         if (player.database.inv !== 'anarchy' || Spawn.region?.area.isIn(player)) return
 

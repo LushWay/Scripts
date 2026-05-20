@@ -101,8 +101,6 @@ function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
   Object.assign(player.scores, point.scores)
   console.log(player.scores, point.scores)
 
-  if (isNewbie(player)) enterNewbieMode(player, false)
-
   player.teleport(point.location, { dimension: world[point.dimensionType] })
   InventoryStore.load({ from: wipeInventoryDatabase.getOrThrow(id), to: player })
   player.database.restorePoint = [player.id, id]

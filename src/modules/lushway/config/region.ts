@@ -33,18 +33,13 @@ PVP_ENTITIES.push(CustomEntityTypes.Fireball, CustomEntityTypes.Cannon)
 RegionEvents.onInterval.subscribe(({ player, currentRegion }) => {
   const isPlaying = !isNotPlaying(player)
 
-  const resetNewbie = () => player.setProperty(PlayerProperties['lw:newbie'], !!player.database.survival.newbie)
-
   if (typeof currentRegion !== 'undefined' && isPlaying) {
     if (currentRegion.permissions.pvp === false) {
       player.triggerEvent(
         player.database.inv === 'spawn' ? PlayerEvents['player:spawn'] : PlayerEvents['player:safezone'],
       )
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else if (currentRegion.permissions.pvp === 'pve') {
-      player.setProperty(PlayerProperties['lw:newbie'], true)
-    } else resetNewbie()
-  } else resetNewbie()
+    }
+  }
 })
 
 regionPermissions.itemToProjectile.set(Items.Fireball, CustomEntityTypes.Fireball)
