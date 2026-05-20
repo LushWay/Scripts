@@ -1,7 +1,9 @@
+import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 import { Crate } from 'lib/crates/crate'
 import { i18n, i18nShared } from 'lib/i18n/text'
 import { location } from 'lib/location'
 import { DailyQuest } from 'lib/quest/quest'
+import { actionGuard, ActionGuardOrder } from 'lib/region'
 import { FloatingText } from 'lib/rpg/floating-text'
 import { LootTable } from 'lib/rpg/loot-table'
 import { Npc } from 'lib/rpg/npc'
@@ -45,3 +47,7 @@ export abstract class City extends SafePlace {
     true,
   )
 }
+
+actionGuard((_, __, ctx) => {
+  if (ctx.type === 'interactWithBlock' && ctx.event.block.typeId === MinecraftBlockTypes.EnderChest) return true
+}, ActionGuardOrder.Feature)

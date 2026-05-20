@@ -17,9 +17,13 @@ import { Cooldown } from 'lib/cooldown'
 
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
 import { i18n } from 'lib/i18n/text'
+import { askForExitingNewbieMode, isNewbie } from 'lib/rpg/newbie'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
+import { doNothing } from 'lib/util'
 import { ms } from 'lib/utils/ms'
 import { BaseRegion } from 'modules/places/base/region'
+
+import 'lib/clan/disable-clan-pvp'
 
 SafeAreaRegion.enableGamemodeChange()
 
@@ -84,7 +88,7 @@ actionGuard((player, region, ctx) => {
       const scheduled = !!ScheduleBlockPlace.has(event.block, event.block.dimension.type)
 
       if (scheduled) return true
-      else return
+      else return !!event.itemStack
     }
   }
 }, ActionGuardOrder.Permission)
@@ -108,4 +112,24 @@ actionGuard((player, region, ctx) => {
 actionGuard((player, region, ctx) => {
   if (ctx.type === 'interactWithEntity') return true
   if (ctx.type === 'interactWithBlock') return false
-}, ActionGuardOrder.Low)
+}, ActionGuardOrder.Lowest)
+
+const dontKillNewbiewsTimeout = new Cooldown(ms.from('sec', 3))
+
+regionPermissions.isPvPallowed.push((attacker, reciever) => {
+  if (isNewbie(reciever)) {
+    system.delay(() => {
+      if (dontKillNewbiewsTimeout.isExpired(attacker)) attacker.fail(i18n.error`Нельзя сражаться с новичками!`)
+    })
+    return false
+  }
+
+  if (isNewbie(attacker)) {
+    system.delay(() => {
+      if (dontKillNewbiewsTimeout.isExpired(attacker)) {
+        askForExitingNewbieMode(attacker, i18n`вы атаковали игрока`, doNothing)
+      }
+    })
+    return false
+  }
+})

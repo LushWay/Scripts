@@ -78,11 +78,7 @@ function createRestorePoint(player: Player, name: string, id = generateId(name))
       scores: pick(player.scores, ['money', 'anarchyOnlineTime', ...scoreboardObjectiveNames.gameModeStats]),
       db: pick(player.database, ['inv', 'survival', 'unlockedPortals', 'quests', 'achivs']),
     }
-    wipeInventoryDatabase.saveFrom(player, {
-      rewrite: true,
-      key: id,
-      keepInventory: true,
-    })
+    wipeInventoryDatabase.set(id, InventoryStore.getFrom(player, { enderChest: true }))
     player.success(i18n`Restore point ${id} created`)
   } catch (e) {
     player.fail(i18n.error`Creating restore point failed.`)
@@ -108,10 +104,7 @@ function loadRestorePoint(player: Player, [ownerId, id]: RestorePointRef) {
   if (isNewbie(player)) enterNewbieMode(player, false)
 
   player.teleport(point.location, { dimension: world[point.dimensionType] })
-  InventoryStore.load({
-    to: player,
-    from: wipeInventoryDatabase.get(id, { remove: false }),
-  })
+  InventoryStore.load({ from: wipeInventoryDatabase.getOrThrow(id), to: player })
   player.database.restorePoint = [player.id, id]
   Quest.restoreFromDatabase(player)
 
@@ -245,7 +238,7 @@ function wipe(player: Player) {
   delete player.database.survival.newbie
   delete player.database.survival.rtpElytra
 
-  Anarchy.inventoryStore.remove(player.id)
+  Anarchy.inventoryStore.delete(player.id)
   Spawn.loadInventory(player)
   Spawn.portal?.teleport(player)
 

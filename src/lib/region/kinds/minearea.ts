@@ -252,7 +252,7 @@ actionGuard((player, region, ctx) => {
       } else return notifyBuilder(player, region)
     }
   }
-}, ActionGuardOrder.Lowest)
+}, ActionGuardOrder.Low)
 
 disableAdventureNear.push(MineareaRegion)
 

@@ -3,7 +3,7 @@ import { GameMode, Player, system, world } from '@minecraft/server'
 import { MinecraftEffectTypes } from '@minecraft/vanilla-data'
 
 import { InventoryStore } from 'lib/database/inventory'
-import { i18n, i18nShared, noI18n, noI18nShared } from 'lib/i18n/text'
+import { i18n, i18nShared, noI18nShared } from 'lib/i18n/text'
 import { locationWithRotation } from 'lib/location'
 import { Join } from 'lib/player-join'
 import { Portal } from 'lib/portals'
@@ -105,14 +105,13 @@ class SpawnBuilder extends AreaWithInventory {
 
   loadInventory(player: Player): void {
     InventoryStore.load({
-      to: player,
       from: {
         xp: 0,
         health: 20,
         equipment: {},
         slots: { 0: Menu.itemStack.value },
       },
-      clearAll: true,
+      to: player,
     })
     player.database.inv = 'spawn'
   }

@@ -1,4 +1,4 @@
-import { Entity, EquipmentSlot, ItemStack, Player, system } from '@minecraft/server'
+import { Entity, EntityEnderInventoryComponent, EquipmentSlot, ItemStack, Player, system } from '@minecraft/server'
 
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Core } from 'lib/extensions/core'
@@ -13,6 +13,7 @@ type Equipment = Exclude<keyof typeof EquipmentSlot, 'mainhand'>
 
 export interface Inventory {
   slots: Record<string, ItemStack>
+  enderChestSlots?: Record<string, ItemStack>
   equipment: Partial<Record<Equipment, ItemStack>>
   xp: number
   health: number
@@ -20,9 +21,13 @@ export interface Inventory {
 
 interface StoreManifest {
   owner: string
-  slots: (number | Equipment)[]
+  slots: (number | Equipment | `ender${number}`)[]
   xp: number
   health: number
+}
+
+interface InventoryOptions {
+  enderChest?: boolean
 }
 
 export class InventoryStore {
@@ -39,9 +44,8 @@ export class InventoryStore {
    * @param o - Load options
    * @param o.to - The entity that is receiving the equipment and inventory items being loaded.
    * @param o.from - The object from which the equipment and inventory items are being loaded.
-   * @param o.clearAll - Boolean that determines clear entity inventory before loading or not
    */
-  static load({ to, from, clearAll = true }: { to: Player; from: Inventory; clearAll?: boolean }) {
+  static load({ to, from, enderChest = false }: { to: Player; from: Inventory } & InventoryOptions) {
     const equipment = to.getComponent('equippable')
     if (!equipment) return
     equipment.setEquipment(EquipmentSlot.Offhand, from.equipment.Offhand)
@@ -56,9 +60,27 @@ export class InventoryStore {
     const health = to.getComponent('health')
     if (health) health.setCurrentValue(Math.min(from.health, health.effectiveMax))
 
+    const enderComponent = to.getComponent(EntityEnderInventoryComponent.componentId)
+    if (enderComponent && from.enderChestSlots && enderChest) {
+      enderComponent.container.clearAll()
+      for (const [i, item] of Object.entries(from.enderChestSlots)) {
+        try {
+          if (typeof item !== 'undefined') enderComponent.container.setItem(Number(i), item)
+        } catch (e) {
+          to.fail(noI18n`Failed to load item to ender chest slot ${i}.`)
+          console.error(
+            `§cFailed to load ender chest slot §f${i}§c for player §f${to.name}§r§c, item: `,
+            item,
+            '§r§cerror:',
+            e,
+          )
+        }
+      }
+    }
+
     const { container } = to
     if (!container) return
-    if (clearAll) container.clearAll()
+    container.clearAll()
     for (const [i, item] of Object.entries(from.slots)) {
       try {
         if (typeof item !== 'undefined') container.setItem(Number(i), item)
@@ -77,10 +99,10 @@ export class InventoryStore {
   /**
    * Returns an object containing the equipment and inventory slots of a player.
    *
-   * @param {Player} from - The entity from which we are retrieving the equipment and inventory information. It is used
-   *   to access the "equippable" and "inventory" components of the entity.
+   * @param from - The entity from which we are retrieving the equipment and inventory information. It is used to access
+   *   the "equippable" and "inventory" components of the entity.
    */
-  static get(from: Player): Inventory {
+  static getFrom(from: Player, { enderChest = false }: InventoryOptions = {}): Inventory {
     const equipment = from.getComponent('equippable')
     if (!equipment) throw new ReferenceError('Equippable component does not exists')
 
@@ -89,22 +111,16 @@ export class InventoryStore {
 
     const xp = from.getTotalXp()
 
-    const healthComponent = from.getComponent('health')
-    if (!healthComponent) throw new ReferenceError('Health component does not exists')
+    const health = from.getComponent('health')?.currentValue
+    if (typeof health === 'undefined') throw new ReferenceError('Health component does not exists')
 
-    const health = healthComponent.currentValue
-
-    /** @type {Inventory['slots']} */
     const slots: Inventory['slots'] = {}
 
-    for (let i = 0; i < container.size; i++) {
-      const item = container.getItem(i)
-      if (!item) continue
-
-      slots[i] = item
+    for (const [i, item] of container.entries()) {
+      if (item) slots[i] = item
     }
 
-    return {
+    const inventory: Inventory = {
       xp,
       health,
       slots,
@@ -116,6 +132,18 @@ export class InventoryStore {
         Feet: equipment.getEquipment(EquipmentSlot.Feet),
       },
     }
+
+    if (enderChest) {
+      const ender = from.getComponent(EntityEnderInventoryComponent.componentId)
+      if (!ender) throw new ReferenceError('Ender inventory component does not exists')
+
+      inventory.enderChestSlots = {}
+      for (const [i, item] of ender.container.entries()) {
+        if (item) inventory.enderChestSlots[i] = item
+      }
+    }
+
+    return inventory
   }
 
   /** List of all loaded table entities */
@@ -159,7 +187,7 @@ export class InventoryStore {
       equipment: {},
       slots: {},
     }
-    let slots: Record<number, { type: 'equipment' | 'slots'; index: Equipment | number }> = []
+    let slots: Record<number, { type: 'equipment' | 'slots' | 'enderChestSlots'; index: Equipment | number }> = []
     let step = 0
     let owner = ''
 
@@ -191,10 +219,19 @@ export class InventoryStore {
         step = 0
         store.health = manifest.health
         store.xp = manifest.xp
-        slots = manifest.slots.map(e => ({
-          type: typeof e === 'string' ? 'equipment' : 'slots',
-          index: e,
-        }))
+        slots = manifest.slots.map(e => {
+          if (typeof e === 'string') {
+            if (e.startsWith('ender')) {
+              return { type: 'enderChestSlots', index: Number(e.slice('ender'.length)) }
+            } else {
+              return { type: 'equipment', index: e as Equipment }
+            }
+          }
+          return {
+            type: 'slots',
+            index: e,
+          }
+        })
         continue
       }
 
@@ -205,6 +242,8 @@ export class InventoryStore {
       const slot = slots[step]
       if (typeof slot !== 'undefined') {
         const { type, index } = slot
+        store[type] ??= {}
+
         // @ts-expect-error AAAAAAAAAAAAAAAA
         store[type][index] = item
       }
@@ -236,7 +275,7 @@ export class InventoryStore {
     const items: ItemStack[] = []
 
     for (const [owner, store] of this.inventories) {
-      const storeIndex = items.length
+      const storeDataStartIndex = items.length
       const manifest: StoreManifest = {
         health: store.health,
         xp: store.xp,
@@ -245,26 +284,33 @@ export class InventoryStore {
       }
 
       for (const key of Object.keys(store.equipment)) {
-        if (!store.equipment[key]) continue
-        const move = manifest.slots.push(key)
         const eq = store.equipment[key]
-        if (typeof eq === 'undefined') throw new DatabaseError(noI18n.error`Failed to get equipment with key ${key}`)
+        if (!eq) continue
 
-        items[storeIndex + move] = eq
+        const offset = manifest.slots.push(key)
+        items[storeDataStartIndex + offset] = eq
       }
+
+      if (store.enderChestSlots)
+        for (const [key, stack] of Object.entries(store.enderChestSlots)) {
+          if (typeof stack === 'undefined') continue
+
+          const offset = manifest.slots.push(`ender${Number(key)}`)
+          items[storeDataStartIndex + offset] = stack
+        }
 
       for (const [key, stack] of Object.entries(store.slots)) {
         if (typeof stack === 'undefined') continue
 
-        const move = manifest.slots.push(Number(key))
-        items[storeIndex + move] = stack
+        const offset = manifest.slots.push(Number(key))
+        items[storeDataStartIndex + offset] = stack
       }
 
       const item = new ItemStack(MinecraftItemTypes.AcaciaBoat)
       const save = JSON.stringify(manifest).match(DatabaseUtils.chunkRegexp)
       if (!save) throw new DatabaseError('Failed to split save to chunks')
       item.setLore(save)
-      items[storeIndex] = item
+      items[storeDataStartIndex] = item
     }
 
     const totalEntities = Math.ceil(items.length / DatabaseUtils.inventorySize)
@@ -301,9 +347,31 @@ export class InventoryStore {
     DatabaseUtils.backup()
   }
 
-  remove(id: string) {
-    this.inventories.delete(id)
+  delete(key: string | Player) {
+    this.inventories.delete(key instanceof Player ? key.id : key)
     this.requestSave()
+  }
+
+  /** Gets inventory by id */
+  get(key: string | Player) {
+    return this.inventories.get(key instanceof Player ? key.id : key)
+  }
+
+  getOrThrow(key: string | Player) {
+    const inventory = this.get(key)
+    if (!inventory) throw new DatabaseError('Inventory not found')
+    return inventory
+  }
+
+  /** Saves an inventory to a store */
+  set(key: string | Player, inventory: Inventory) {
+    this.inventories.set(key instanceof Player ? key.id : key, inventory)
+    this.requestSave()
+  }
+
+  /** Checks if key was saved into this store */
+  has(key: string | Player) {
+    return this.inventories.has(key instanceof Player ? key.id : key)
   }
 
   private saving = false
@@ -330,69 +398,5 @@ export class InventoryStore {
       20,
     )
     this.saving = true
-  }
-
-  /**
-   * Gets entity store from saved and removes to avoid bugs
-   *
-   * @param {string} id - The ID of the entity whose store is being retrieved.
-   * @param {object} [o]
-   * @param {boolean} [o.remove] - A boolean parameter that determines whether the entity store should be removed from
-   *   the internal stores object after it has been retrieved. If set to true, the store will be deleted from the
-   *   object. If set to false, the store will remain in the object.
-   * @param {Inventory} [o.fallback] - Inventory to return if there is no inventory in store
-   * @returns The entity store associated with the given entity ID.
-   */
-  get(id: string, { remove = true, fallback }: { remove?: boolean; fallback?: Inventory } = {}) {
-    const store = this.inventories.get(id)
-    if (!store) {
-      if (fallback) return fallback
-      else throw new DatabaseError('Inventory not found')
-    }
-
-    if (remove) this.remove(id)
-    return store
-  }
-
-  /**
-   * Saves an player inventory to a store and requests a save.
-   *
-   * @param entity - The entity object that needs to be saved in the store.
-   * @param options - Options
-   * @param options.rewrite - A boolean parameter that determines whether or not to allow rewriting of an existing
-   *   entity in the store. If set to false and the entity already exists in the store, a DatabaseError will be thrown.
-   *   If set to true, the existing entity will be overwritten with the new entity.
-   * @param options.keepInventory - A boolean that determines keep entity's invetory or not
-   * @param options.key - Key to associate inventory with
-   */
-  saveFrom(
-    entity: Player,
-    {
-      rewrite = false,
-      keepInventory = false,
-      key = entity.id,
-    }: { rewrite?: boolean; keepInventory?: boolean; key?: string } = {},
-  ) {
-    if (key in this.inventories && !rewrite)
-      throw new DatabaseError('Cannot rewrite entity store with disabled rewriting.')
-
-    this.inventories.set(key, InventoryStore.get(entity))
-    this.requestSave()
-
-    if (!keepInventory) entity.container?.clearAll()
-  }
-
-  set(key: string, inventory: Inventory) {
-    this.inventories.set(key, inventory)
-    this.requestSave()
-  }
-
-  /**
-   * Checks if key was saved into this store
-   *
-   * @param key - Entity ID to check
-   */
-  has(key: string) {
-    return this.inventories.has(key)
   }
 }

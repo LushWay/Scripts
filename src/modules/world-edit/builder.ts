@@ -34,20 +34,9 @@ export function updateBuilderStatus(player: Player) {
   }
 
   function switchInv() {
-    const invToLoad = builderInventory.get(player.id, {
-      fallback: { equipment: {}, health: 20, slots: {}, xp: 0 },
-    })
-
-    builderInventory.saveFrom(player, {
-      rewrite: true,
-      keepInventory: true,
-    })
-
-    InventoryStore.load({
-      from: invToLoad,
-      clearAll: true,
-      to: player,
-    })
+    const invToLoad = builderInventory.get(player.id) ?? { equipment: {}, health: 20, slots: {}, xp: 0 }
+    builderInventory.set(player, InventoryStore.getFrom(player, { enderChest: true }))
+    InventoryStore.load({ from: invToLoad, to: player, enderChest: true })
   }
 }
 

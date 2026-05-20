@@ -3,7 +3,7 @@ import { GameMode, Player } from '@minecraft/server'
 import { consoleLang } from 'lib/assets/lang'
 import { InventoryStore } from 'lib/database/inventory'
 import { EventSignal } from 'lib/event-signal'
-import { i18n, noI18n, noI18nShared } from 'lib/i18n/text'
+import { i18n, noI18nShared } from 'lib/i18n/text'
 import { location, ValidLocation } from 'lib/location'
 import { Portal } from 'lib/portals'
 import { isNotPlaying } from 'lib/utils/game'
@@ -17,7 +17,6 @@ import { Spawn } from 'modules/places/spawn'
 import { showSurvivalHud } from 'modules/survival/sidebar'
 import { AreaWithInventory } from '../lib/area-with-inventory'
 import { RadioactiveZone } from './radioactive-zone'
-import { stringifyError } from 'lib/util'
 import('./airdrop')
 
 class AnarchyBuilder extends AreaWithInventory {
@@ -112,13 +111,11 @@ class AnarchyBuilder extends AreaWithInventory {
   loadInventory(player: Player) {
     if (this.inventoryStore.has(player.id)) {
       this.logger.player(player).info`Loading saved inventory`
-      InventoryStore.load({
-        to: player,
-        from: this.inventoryStore.get(player.id, { remove: true }),
-      })
+      InventoryStore.load({ from: this.inventoryStore.getOrThrow(player.id), to: player })
+      this.inventoryStore.delete(player.id)
     } else {
       this.logger.player(player).info`Loading empty inventory`
-      InventoryStore.load({ to: player, from: InventoryStore.emptyInventory })
+      InventoryStore.load({ from: InventoryStore.emptyInventory, to: player })
     }
 
     if (player.getGameMode() === GameMode.Adventure) player.setGameMode(GameMode.Survival)
@@ -126,13 +123,11 @@ class AnarchyBuilder extends AreaWithInventory {
   }
 
   saveInventory: AreaWithInventory['saveInventory'] = player => {
-    this.inventoryStore.saveFrom(player, {
-      rewrite: true,
-      keepInventory: false,
-    })
-    const inv = this.inventoryStore.get(player.id, { remove: false, fallback: InventoryStore.emptyInventory })
+    const inventory = InventoryStore.getFrom(player)
+    this.inventoryStore.set(player, inventory)
+    player.container?.clearAll()
 
-    this.logger.player(player).info`Saved inventory:\n${Object.entries(inv.slots)
+    this.logger.player(player).info`Saved inventory:\n${Object.entries(inventory.slots)
       .map(([slot, item]) => ` §6${slot}§f ${itemNameXCount(item, undefined, undefined, consoleLang)}`)
       .join('\n')}`
 

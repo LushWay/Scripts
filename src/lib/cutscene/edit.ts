@@ -145,7 +145,7 @@ onLoad(() => {
     player.setGameMode(GameMode.Creative)
     updateBuilderStatus(player)
 
-    inventoryDb.saveFrom(player, { rewrite: true, keepInventory: false })
+    inventoryDb.set(player, InventoryStore.getFrom(player))
     InventoryStore.load({
       from: {
         equipment: {},
@@ -300,7 +300,8 @@ onLoad(() => {
 
     if (player.isValid) {
       player.teleport(position)
-      InventoryStore.load({ from: inventoryDb.get(player.id, { remove: true }), to: player })
+      InventoryStore.load({ from: inventoryDb.getOrThrow(player), to: player })
+      inventoryDb.delete(player)
     }
   }
 

@@ -1,5 +1,5 @@
 import {
-  EntityHealthComponent,
+  EntityHurtBeforeEvent,
   Player,
   PlayerBreakBlockBeforeEvent,
   PlayerInteractWithBlockBeforeEvent,
@@ -8,14 +8,12 @@ import {
   world,
 } from '@minecraft/server'
 import { MinecraftEntityTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
-import { ActionbarPriority } from 'lib/extensions/on-screen-display'
-import { i18n, noI18n } from 'lib/i18n/text'
+import { noI18n } from 'lib/i18n/text'
 import { onPlayerMove } from 'lib/player-move'
 import { is } from 'lib/roles'
 import { isNotPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { AbstractPoint } from 'lib/utils/point'
-import { Vec } from 'lib/vector'
 import { EventSignal } from '../event-signal'
 import {
   BLOCK_CONTAINERS,
@@ -213,41 +211,50 @@ onPlayerMove.subscribe(({ player, location, dimensionType }) => {
   EventSignal.emit(RegionEvents.onInterval, { player, currentRegion })
 })
 
-// world.beforeEvents.entityHurt.subscribe(event => {
-//   event.cancel = true
-// })
+world.beforeEvents.entityHurt.subscribe(event => {
+  const {
+    hurtEntity,
+    damageSource: { damagingEntity },
+  } = event
 
-// TODO Migrate to entityHurtBeforeEvent
-world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource: { damagingEntity } }) => {
   if (!damagingEntity?.isValid || !hurtEntity.isValid) return
 
   const region = Region.getAt(hurtEntity)
   if (!region) return
 
-  const pvp = region.permissions.pvp
-  if (pvp === true) return
-  if (pvp === 'pve' && !(hurtEntity instanceof Player && damagingEntity instanceof Player)) return
+  const { pvp } = region.permissions
 
-  let direction = Vec.subtract(damagingEntity.location, hurtEntity.location).normalized()
-  direction = Vec.multiply(direction, 10)
+  if (hurtEntity instanceof Player && damagingEntity instanceof Player) {
+    if (pvp === true) {
+      let isAllowed = true
 
-  if (damagingEntity instanceof Player) {
-    damagingEntity.onScreenDisplay.setActionBar(
-      i18n.error`Нельзя сражаться в мирной зоне`.to(damagingEntity.lang),
-      ActionbarPriority.High,
-    )
-  }
-
-  const health = damagingEntity.getComponent(EntityHealthComponent.componentId)
-  if (!health) {
-    damagingEntity.kill()
+      for (const callback of isPvPallowed) {
+        const result = callback(damagingEntity, hurtEntity)
+        if (typeof result === 'boolean') {
+          isAllowed = result
+          break
+        }
+      }
+      if (!isAllowed) cancelPvp(event)
+    } else {
+      // pve or pvp disabled at all
+      event.cancel = true
+    }
+  } else if (pvp === 'pve' || pvp) {
+    // allow
   } else {
-    health.setCurrentValue(health.currentValue - damage)
-    damagingEntity.applyDamage(0)
-    //if (health.currentValue >= 0) damagingEntity.applyKnockback(direction, direction.y)
+    // pvp is disabled
+    event.cancel = true
   }
 })
 
+function cancelPvp(event: EntityHurtBeforeEvent) {
+  event.cancel = true
+}
+
+const isPvPallowed: ((attacker: Player, reciever: Player) => boolean | undefined)[] = []
+
 export const regionPermissions = {
   itemToProjectile,
+  isPvPallowed,
 }
