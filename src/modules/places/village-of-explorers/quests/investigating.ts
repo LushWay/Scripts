@@ -9,6 +9,7 @@ import { mineQuests } from 'modules/wiki/wiki'
 import { VillageOfExplorers } from '../village-of-explorers'
 
 export const villageOfExplorersInvestigating = new CityInvestigating(VillageOfExplorers, async (place, q, player) => {
+  await q.waitForLoad(mineQuests)
   await q.waitForLoad(VillageOfExplorers.slimeBoss.onRegionCreate)
 
   const slimeResourceLocation = ResourcesSource.getLocationsByResource(r => r instanceof ExperienceLevelResource).find(
