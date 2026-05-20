@@ -8,7 +8,7 @@ export const techCityInvestigating = new CityInvestigating(TechCity, (place, q, 
   q.cutscene('tsShowcase3', i18n`И переняли уцелевшие технологии прошлой эпохи`)
   q.cutscene('tsShowcase4', i18n`Идите к ${i18n.accent`Инженеру`}, он расскажет вам что такое ${i18n.accent`База`}`)
 
-  q.dialogue(place.engineer.npc)
+  q.dialogue(place.engineer.npc, undefined, true)
 
   q.cutscene('tsBase1', i18n`Чтобы ваши постройки не разложились из-за радиации...`)
   q.cutscene('tsBase2', i18n`...и не были разворованы другими выжившими...`)

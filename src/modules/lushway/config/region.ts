@@ -84,7 +84,7 @@ actionGuard((player, region, ctx) => {
       const scheduled = !!ScheduleBlockPlace.has(event.block, event.block.dimension.type)
 
       if (scheduled) return true
-      else return youCannot(player)
+      else return
     }
   }
 }, ActionGuardOrder.Permission)
