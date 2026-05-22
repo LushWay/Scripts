@@ -19,12 +19,6 @@ export const playerJson = {
           "client_sync": true
         },
 
-        "lw:newbie": {
-          "type": "bool",
-          "default": false,
-          "client_sync": false
-        },
-
         "lw:minigame_team": {
           "type": "enum",
           "values": ["no", "green", "red", "blue", "yellow"],
@@ -281,27 +275,6 @@ export const playerJson = {
               ]
             },
             "event": "minecraft:trigger_raid"
-          },
-
-          {
-            "filters": {
-              "all_of": [
-                {
-                  "test": "has_container_open"
-                }
-              ]
-            },
-            "event": "player:has_container_open"
-          },
-          {
-            "filters": {
-              "none_of": [
-                {
-                  "test": "has_container_open"
-                }
-              ]
-            },
-            "event": "player:no_container_open"
           }
         ]
       },
@@ -320,62 +293,11 @@ export const playerJson = {
               }
             },
             "deals_damage": false
-          },
-          {
-            "on_damage": {
-              "filters": {
-                "all_of": [
-                  { "all_of": [{ "test": "bool_property", "domain": "lw:newbie" }] },
-                  {
-                    "any_of": [
-                      { "test": "is_family", "subject": "other", "value": "player" },
-                      { "test": "has_damage", "value": "fire_tick" }
-                    ]
-                  }
-                ]
-              }
-            },
-            "deals_damage": false //if all of these filters evaluate to true in the current attack interaction, the target will not be hurt.
-          },
-          {
-            "on_damage": {
-              "filters": {
-                "any_of": [
-                  {
-                    "all_of": [
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "green" },
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "green" }
-                    ]
-                  },
-                  {
-                    "all_of": [
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "blue" },
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "blue" }
-                    ]
-                  },
-                  {
-                    "all_of": [
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "red" },
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "red" }
-                    ]
-                  },
-                  {
-                    "all_of": [
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "yellow" },
-                      { "test": "enum_property", "domain": "lw:can_climb", "value": "yellow" }
-                    ]
-                  }
-                ]
-              }
-            },
-            "deals_damage": false //if any of these filters evaluate to true in the current attack interaction, the target will not be hurt.
           }
         ]
       }
     },
     "events": {
-      "player:no_container_open": {},
-      "player:has_container_open": {},
       "player:warn": {
         "add": {
           "component_groups": ["warn"]
