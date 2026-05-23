@@ -195,13 +195,15 @@ export function migrateLocationName(oldGroup: string, oldName: string, newGroup:
   onLoad(() => {
     const group = Settings.worldDatabase.get(oldGroup)
     const location = group[oldName]
+    const newGroupDb = Settings.worldDatabase.get(newGroup)
+    const newValue = newGroupDb[newName]
     if (typeof location !== 'undefined') {
       console.debug(`Migrating location ${oldGroup}:${oldName} to ${newGroup}:${newName}`)
 
       Settings.worldDatabase.get(newGroup)[newName] = location
 
       Reflect.deleteProperty(Settings.worldDatabase.get(oldGroup), oldName)
-    } else if (!Settings.worldDatabase.get(newGroup)[newName]) {
+    } else if (!newValue) {
       console.warn(
         noI18n.warn`No location found at ${oldGroup}:${oldName}. Group: ${isEmpty(group) ? [...Settings.worldDatabase.keys()] : Object.keys(group)}`,
       )

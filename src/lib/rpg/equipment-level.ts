@@ -1,8 +1,6 @@
 import { EquipmentSlot, Player } from '@minecraft/server'
-import { register } from '@minecraft/server-gametest'
 import { emoji } from 'lib/assets/emoji'
 import { EventSignal } from 'lib/event-signal'
-import { regionTypes } from 'lib/region'
 import { ms } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 

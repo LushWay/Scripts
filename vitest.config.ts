@@ -1,35 +1,22 @@
-import tsconfigPaths from 'vite-tsconfig-paths'
-import { defineConfig } from 'vitest/config'
-import { generateDefine } from '../tools/define.ts'
+import { defineProjectConfig } from '../vitest.base.config'
 
-export default defineConfig({
-  define: generateDefine({ dev: true, test: true }),
+export default defineProjectConfig({
   test: {
     globals: true,
-
     isolate: false,
     pool: 'threads',
-
-    coverage: {
-      provider: 'istanbul',
-      reporter: process.env.CI ? ['lcov'] : ['html', 'json'],
-      include: ['src/lib', 'src/modules'],
-      exclude: ['src/lib/assets', 'src/lib/bds', 'src/test', '**/*.test.ts', '**/*.spec.ts'],
-    },
-    server: {
-      deps: {
-        inline: [/@formatjs/],
-      },
-    },
     setupFiles: ['src/test/setup.ts'],
     globalSetup: ['src/test/global.ts'],
     alias: {
-      '@minecraft/server': 'test/__mocks__/minecraft_server.ts',
-      '@minecraft/server-net': 'test/__mocks__/minecraft_server-net.ts',
-      '@minecraft/server-ui': 'test/__mocks__/minecraft_server-ui.ts',
-      '@minecraft/server-gametest': 'test/__mocks__/minecraft_server-gametest.ts',
+      '@minecraft/server': 'src/test/__mocks__/minecraft_server.ts',
+      '@minecraft/server-net': 'src/test/__mocks__/minecraft_server-net.ts',
+      '@minecraft/server-ui': 'src/test/__mocks__/minecraft_server-ui.ts',
+      '@minecraft/server-gametest': 'src/test/__mocks__/minecraft_server-gametest.ts',
+    },
+    coverage: {
+      include: ['src/lib', 'src/modules'],
+      exclude: ['src/lib/assets', 'src/lib/bds', 'src/test'],
     },
     exclude: ['**/*.spec.ts', 'node_modules/**', 'scripts'],
   },
-  plugins: [tsconfigPaths()],
 })

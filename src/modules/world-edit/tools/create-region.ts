@@ -2,14 +2,13 @@ import { ContainerSlot, ItemStack, Player } from '@minecraft/server'
 
 import { Items } from 'lib/assets/custom-items'
 import { ActionbarPriority } from 'lib/extensions/on-screen-display'
+import { ModalForm } from 'lib/form/modal'
 import { noI18n } from 'lib/i18n/text'
+import { Region } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
+import { Vec } from 'lib/vector'
 import { WeBackup, WorldEdit } from '../lib/world-edit'
 import { WorldEditTool } from '../lib/world-edit-tool'
-import { Vec } from 'lib/vector'
-import { Region } from 'lib/region'
-import { regionTypes } from 'lib/region'
-import { ModalForm } from 'lib/form/modal'
 
 interface Storage {
   version: number
@@ -41,7 +40,7 @@ class RegionTool extends WorldEditTool<Storage> {
     new ModalForm(this.name)
       .addDropdownFromObject(
         'Тип региона',
-        Object.fromEntries(regionTypes.map(e => [e.region.kind, e.name]).filter(e => !!e[0]) as [string, string][]),
+        Object.fromEntries(Region.types.map(e => [e.region.kind, e.name]).filter(e => !!e[0]) as [string, string][]),
         { defaultValueIndex: storage.regionKind },
       )
       .addSlider('Радиус', 2, 30, 1, storage.radius)
@@ -53,7 +52,7 @@ class RegionTool extends WorldEditTool<Storage> {
         storage.minDistance = minDistance
         storage.minDistanceSameKind = minDistanceSameKind
 
-        slot.nameTag = noI18n`Создать регион ${regionTypes.find(e => e.region.kind === storage.regionKind)?.name}`
+        slot.nameTag = noI18n`Создать регион ${Region.types.find(e => e.region.kind === storage.regionKind)?.name}`
         this.saveStorage(slot, storage)
       })
   }
@@ -61,7 +60,7 @@ class RegionTool extends WorldEditTool<Storage> {
   onUse(player: Player, _: ItemStack, storage: Storage): void {
     if (!storage.regionKind) return
 
-    const regionType = regionTypes.find(e => e.region.kind === storage.regionKind)
+    const regionType = Region.types.find(e => e.region.kind === storage.regionKind)
     if (!regionType)
       return player.onScreenDisplay.setActionBar(`§cUnknown region type: ${storage.regionKind}`, ActionbarPriority.High)
 

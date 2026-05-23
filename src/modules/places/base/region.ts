@@ -1,13 +1,12 @@
 import { Player } from '@minecraft/server'
 
 import { i18n, noI18n } from 'lib/i18n/text'
+import { disableAdventureNear } from 'lib/region'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { registerRegionType } from 'lib/region/command'
 import { registerSaveableRegion } from 'lib/region/database'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { getSafeFromRottingTime, materialsToRString } from './actions/rotting'
 import { baseLevels } from './base-levels'
-import { disableAdventureNear } from 'lib/region'
 
 interface BaseLDB extends JsonObject {
   level: number
@@ -83,5 +82,5 @@ export class BaseRegion extends RegionWithStructure {
 }
 
 registerSaveableRegion('base', BaseRegion)
-registerRegionType(noI18n`Базы`, BaseRegion)
+BaseRegion.register(noI18n`Базы`)
 disableAdventureNear.push(BaseRegion)

@@ -2,7 +2,6 @@ import { Entity, Player } from '@minecraft/server'
 import { EventSignal } from 'lib/event-signal'
 import { FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { registerRegionType } from 'lib/region/command'
 import { adventureModeRegions } from 'lib/region/kinds/safe-area'
 import { Boss } from 'lib/rpg/boss'
 import { Vec } from 'lib/vector'
@@ -65,5 +64,5 @@ export class BossArenaRegion extends Region {
     })
   }
 }
-registerRegionType('Boss Region', BossArenaRegion, false)
+BossArenaRegion.register('Boss Region', false)
 adventureModeRegions.push(BossArenaRegion)

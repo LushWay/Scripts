@@ -6,7 +6,7 @@ import { Cooldown } from 'lib/cooldown'
 import { FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
 import { anyPlayerNear } from 'lib/player-move'
-import { adventureModeRegions, registerRegionType, registerSaveableRegion } from 'lib/region'
+import { adventureModeRegions, registerSaveableRegion } from 'lib/region'
 import { Area } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
 import { Region, RegionCreationOptions, RegionPermissions } from 'lib/region/kinds/region'
@@ -58,7 +58,7 @@ export class DungeonRegion extends Region {
   static oldChestLogPositions = new Set<string>()
 
   static getChests(region: DungeonRegion): Immutable<DungeonChest[]> {
-    return region.chests as Immutable<DungeonChest[]>
+    return region.chests
   }
 
   static {
@@ -438,5 +438,5 @@ export class DungeonRegion extends Region {
   }
 }
 registerSaveableRegion('dungeon', DungeonRegion)
-registerRegionType(noI18n`Данжи`, DungeonRegion, false, true)
+DungeonRegion.register(noI18n`Данжи`, false, true)
 adventureModeRegions.push(DungeonRegion)

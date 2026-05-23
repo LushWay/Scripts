@@ -11,14 +11,6 @@ import { actionGuard, ActionGuardOrder } from '.'
 import { SphereArea } from './areas/sphere'
 import { regionForm } from './form'
 
-export const regionTypes: { name: string; region: typeof Region; creatable: boolean; displayName: boolean }[] = []
-export function registerRegionType(name: string, region: typeof Region, creatable = true, displayName = !creatable) {
-  // Unique to each region type
-  if (region.regions === Region.regions) region.regions = []
-
-  regionTypes.push({ name, region, creatable, displayName })
-}
-
 new Command('region')
   .setDescription(i18n`Управляет регионами`)
   .setPermissions('admin')
@@ -39,7 +31,7 @@ const tpform = form((f, { player }) => {
   const db = getTpDb(player)
   if (!db) return
 
-  for (const type of regionTypes) {
+  for (const type of Region.types) {
     const selected = db.type === type.name
     f.button((selected ? i18n.accent : i18n.disabled).join`${type.name}`.size(type.region.getAll().length), () => {
       db.type = type.name
@@ -65,7 +57,7 @@ new Command('regiontp')
   })
 
 function getTpArray(id: string) {
-  return regionTypes.find(e => e.name === id)?.region.getAll() ?? []
+  return Region.types.find(e => e.name === id)?.region.getAll() ?? []
 }
 
 system.delay(() => {

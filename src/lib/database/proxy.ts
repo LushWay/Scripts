@@ -99,15 +99,13 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
 
     if (object[IS_PROXIED]) return object
 
-    const cacheStorage = this.proxyCache.getOrInsertComputed(key, () => new WeakMap())
-    const cache = cacheStorage.get(object)
-    if (cache) return cache
-
-    const proxy = new Proxy(object, this.createProxy(key, trace))
-    Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
-
-    cacheStorage.set(object, proxy)
-    return proxy
+    return this.proxyCache
+      .getOrInsertComputed(key, () => new WeakMap())
+      .getOrInsertComputed(object, () => {
+        const proxy = new Proxy(object, this.createProxy(key, trace))
+        Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
+        return proxy
+      })
   }
 
   private createProxy(key: string, trace: string): ProxyHandler<ProxiedDynamicObject> {
@@ -115,8 +113,8 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
       get: (target, p, reciever) => {
         // Filter non db keys
         let value = Reflect.get(target, p, reciever)
-        if (typeof p === 'symbol' || p === 'toJSON') {
-          if (p === 'toJSON') return
+        if (p === 'toJSON') return
+        if (typeof p === 'symbol') {
           if (p === IS_PROXIED) return true
           if (p === PROXY_TARGET) return target
           return value
@@ -124,10 +122,12 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
 
         if (value && (value as ProxiedDynamicObject)[IS_PROXIED]) value = (value as ProxiedDynamicObject)[PROXY_TARGET]
 
-        // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
+          // Return subproxy on object
           return this.wrap(value, key, trace + '.' + p)
-        } else return value
+        } else {
+          return value
+        }
       },
       set: (target, p, value, reciever) => {
         // Filter non db keys

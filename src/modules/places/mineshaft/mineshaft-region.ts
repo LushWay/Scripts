@@ -2,7 +2,6 @@ import { LocationOutOfWorldBoundariesError, Player, PlayerBreakBlockBeforeEvent,
 
 import { FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
-import { registerRegionType } from 'lib/region'
 import { registerSaveableRegion } from 'lib/region/database'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
 import { createLogger } from 'lib/utils/logger'
@@ -76,4 +75,4 @@ export class MineshaftRegion extends MineareaRegion {
 }
 
 registerSaveableRegion('mine', MineshaftRegion)
-registerRegionType(noI18n`Шахты`, MineshaftRegion)
+MineshaftRegion.register(noI18n`Шахты`)

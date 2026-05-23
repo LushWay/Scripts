@@ -13,7 +13,6 @@ import { CylinderArea } from './areas/cylinder'
 import { FlattenedSphereArea } from './areas/flattened-sphere'
 import { RectangleArea } from './areas/rectangle'
 import { SphereArea } from './areas/sphere'
-import { regionTypes } from './command'
 import { Region } from './kinds/region'
 
 export const regionForm = form((f, { player, self }) => {
@@ -43,7 +42,7 @@ export const regionForm = form((f, { player, self }) => {
     )
   }
 
-  for (const type of regionTypes) {
+  for (const type of Region.types) {
     f.button(i18n.join`${type.name}`.size(type.region.getAll().length), () =>
       regionList(player, self, type.region, type.creatable, type.displayName),
     )

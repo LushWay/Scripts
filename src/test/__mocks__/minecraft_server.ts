@@ -2,6 +2,14 @@ import * as mc from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 
+import fs from 'fs-extra'
+import { Language } from 'lib/assets/lang'
+import { langs } from 'lib/assets/lang-big'
+import url from 'node:url'
+const items = fs.readJSONSync(
+  url.fileURLToPath(import.meta.resolve('./mojang-items.json')),
+) as typeof import('./mojang-items.json')
+
 export abstract class Component {
   abstract readonly typeId: string
 
@@ -32,6 +40,12 @@ export class ItemDurabilityComponent extends ItemComponent {
 }
 export class ItemFoodComponent extends ItemComponent {
   componentId = 'minecraft:food' as const
+}
+
+export class BlockPermutation {
+  static resolve() {
+    return undefined
+  }
 }
 
 export abstract class EntityComponent extends Component {
@@ -688,6 +702,9 @@ export class Scoreboard {
 
 export class MolangVariableMap {
   setColorRGBA = vi.fn()
+  setVector3 = vi.fn()
+  setFloat = vi.fn()
+  setSpeedAndDirection = vi.fn()
 }
 
 /** Contains an identity of the scoreboard item. */
@@ -841,6 +858,25 @@ export class ItemStack extends DynamicPropertiesProvider {
     return item
   }
 
+  get localizationKey() {
+    const serialization_id = items.data_items.find(e => e.command_name === this.typeId)?.serialization_id
+    let normalized = serialization_id
+      ? serialization_id.endsWith('.name')
+        ? serialization_id
+        : serialization_id + '.name'
+      : undefined
+
+    if (normalized) {
+      const has = normalized in langs[Language.en_US]
+      if (has) return normalized
+
+      const normalizedTile = normalized.replace(/^item\./, 'tile.')
+      if (normalizedTile in langs[Language.en_US]) return normalizedTile
+    }
+
+    return normalized
+  }
+
   maxAmount = 64
 
   isStackableWith(itemStack: ItemStack): boolean {
@@ -852,6 +888,10 @@ export class Dimension {
   heightRange = {
     min: -64,
     max: 365,
+  }
+
+  getEntities() {
+    return []
   }
 
   runCommand(cmd: string) {}

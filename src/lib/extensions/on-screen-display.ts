@@ -121,7 +121,7 @@ export const ScreenDisplayOverride: ScreenDisplayOverrideTypes & ScreenDisplayOv
     if (prefix !== $title) {
       const titleDisplay = playerScreenDisplay[$title]
 
-      if (titleDisplay && titleDisplay.expires) {
+      if (titleDisplay?.expires) {
         playerScreenDisplay.actions.push(player => {
           if (!titleDisplay.expires) return
 
@@ -240,7 +240,8 @@ function run() {
           if (event.title?.expires && event.title.expires < Date.now()) {
             player.onScreenDisplay.setHudTitle('', {
               ...defaultTitleOptions,
-              priority: (event.title.priority as number | undefined) ?? 0,
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+              priority: event.title.priority ?? 0,
             })
 
             titles.delete(id)

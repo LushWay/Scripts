@@ -56,6 +56,8 @@ export class DatabaseUtils {
   }
 
   private static tables(): TableEntity[] {
+    if (__TEST__) return []
+
     if (typeof this.allEntities !== 'undefined') return this.allEntities
     this.allEntities = this.getEntities()
 

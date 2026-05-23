@@ -28,7 +28,9 @@ import { RegionEvents } from './events'
 import './explosion'
 import { Region } from './kinds/region'
 
-export * from './command'
+// lazy
+import('./command')
+
 export * from './config'
 export * from './database'
 

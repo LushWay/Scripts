@@ -2,17 +2,15 @@ import { Block, GameMode, Player, StructureRotation, system, world } from '@mine
 import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 
 import { StructureDungeonsId, StructureFile } from 'lib/assets/structures'
+import { ModalForm } from 'lib/form/modal'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { RegionCreationOptions, registerSaveableRegion } from 'lib/region'
 import { Area } from 'lib/region/areas/area'
+import { is } from 'lib/roles'
+import { ms } from 'lib/utils/ms'
+import { Vec } from 'lib/vector'
 import { DungeonRegion, DungeonRegionDatabase } from './dungeon'
 import { Dungeon } from './loot'
-import { Vec } from 'lib/vector'
-import { ModalForm } from 'lib/form/modal'
-import { is } from 'lib/roles'
-import { registerRegionType } from 'lib/region'
-import { registerSaveableRegion } from 'lib/region'
-import { ms } from 'lib/utils/ms'
-import { RegionCreationOptions } from 'lib/region'
 
 interface CustomDungeonRegionDatabase extends DungeonRegionDatabase {
   chestLoot: {
@@ -127,7 +125,7 @@ export class CustomDungeonRegion extends DungeonRegion {
   }
 }
 registerSaveableRegion('customDungeon', CustomDungeonRegion)
-registerRegionType(noI18n`Кастомный данж`, CustomDungeonRegion, false, true)
+CustomDungeonRegion.register(noI18n`Кастомный данж`, false, true)
 
 function getDungeonRegionForTechAdmin(player: Player, block: Block) {
   if (!is(player.id, 'techAdmin')) return false

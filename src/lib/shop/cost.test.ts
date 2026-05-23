@@ -1,5 +1,7 @@
 import { ItemStack, Player } from '@minecraft/server'
 import { MinecraftItemTypes } from '@minecraft/vanilla-data'
+import { Language } from 'lib/assets/lang'
+import { translateTypeId } from 'lib/i18n/lang'
 import { TEST_createPlayer } from 'test/utils'
 import { Cost, ItemCost, MultiCost } from './cost'
 
@@ -69,13 +71,15 @@ describe('cost', () => {
 })
 
 describe('MultiCost', () => {
+  it('should translate', () => {
+    expect(translateTypeId(MinecraftItemTypes.Apple, Language.ru_RU)).toMatchInlineSnapshot(`"Яблоко"`)
+  })
+
   it('should stringify', () => {
     const player = TEST_createPlayer()
     const cost = new MultiCost().money(1000).item(MinecraftItemTypes.Apple).item(MinecraftItemTypes.NetheriteAxe).xp(10)
 
-    expect(cost.toString(player)).toMatchInlineSnapshot(
-      `"§61.000, §7 §r§f§7x1, §7 §r§f§7x1, §7§a10§7lvl"`,
-    )
+    expect(cost.toString(player)).toMatchInlineSnapshot(`"§61.000, §7Яблоко §r§f§7x1, §7Незеритовый топор §r§f§7x1, §7§a10§7lvl"`)
 
     expect(cost.toString(player, false)).toMatchInlineSnapshot(
       `"§c1.000, §cЯблоко §r§f§cx1, §cНезеритовый топор §r§f§cx1, §4§c10§4lvl"`,

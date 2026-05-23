@@ -68,10 +68,16 @@ export class Region {
     return key
   }
 
+  static types: { name: string; region: typeof Region; creatable: boolean; displayName: boolean }[] = []
+  static register(name: string, creatable = true, showDisplayName = !creatable) {
+    // Unique to each region type
+    if (this.regions === Region.regions) this.regions = []
+
+    this.types.push({ name, region: this, creatable, displayName: showDisplayName })
+  }
+
   /** Regions list specific to this type of region. Use {@link getAll} to get them */
   static regions: Region[] = []
-
-  private static regionsListType = ''
 
   /** Creates a new region */
   static create<T extends typeof Region>(

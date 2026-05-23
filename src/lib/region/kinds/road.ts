@@ -3,7 +3,7 @@ import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-d
 import { i18n, noI18n } from 'lib/i18n/text'
 import { onLoad } from 'lib/utils/load-ref'
 import { RegionEvents } from '../events'
-import { registerRegionType, registerSaveableRegion } from '../index'
+import { registerSaveableRegion } from '../index'
 import { Region, RegionPermissions } from './region'
 
 export class RoadRegion extends Region {
@@ -29,7 +29,7 @@ export class RoadRegion extends Region {
 }
 
 registerSaveableRegion('road', RoadRegion)
-registerRegionType(noI18n`Дороги`, RoadRegion)
+RoadRegion.register(noI18n`Дороги`)
 
 RegionEvents.onPlayerRegionsChange.subscribe(({ player, newest }) => {
   speed(player, newest)

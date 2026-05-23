@@ -7,7 +7,6 @@ import {
   ActionGuardOrder,
   disableAdventureNear,
   regionTypesThatIgnoreIsBuildingGuard,
-  registerRegionType,
 } from 'lib/region/index'
 import { Region, type RegionPermissions } from 'lib/region/kinds/region'
 import { RegionWithStructure } from 'lib/region/kinds/with-structure'
@@ -205,7 +204,7 @@ export class MineareaRegion extends RegionWithStructure {
 }
 
 registerSaveableRegion('minearea', MineareaRegion)
-registerRegionType(noI18n`Зоны добычи`, MineareaRegion)
+MineareaRegion.register(noI18n`Зоны добычи`)
 
 regionTypesThatIgnoreIsBuildingGuard.push(MineareaRegion)
 

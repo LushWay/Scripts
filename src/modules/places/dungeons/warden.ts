@@ -11,7 +11,6 @@ import {
   PVP_ENTITIES,
   Region,
   RegionPermissions,
-  registerRegionType,
   registerSaveableRegion,
 } from 'lib/region'
 import { noGroup } from 'lib/rpg/place'
@@ -59,7 +58,7 @@ class WardenDungeonRegion extends Region {
   }
 }
 registerSaveableRegion('wardenDungeon', WardenDungeonRegion)
-registerRegionType(noI18n`Данж вардена`, WardenDungeonRegion)
+WardenDungeonRegion.register(noI18n`Данж вардена`)
 
 onLoad(() => {
   WardenDungeonRegion.resources.add(
@@ -108,7 +107,7 @@ class WardenDungeonLootRegion extends Region {
   }
 }
 registerSaveableRegion('wardenDungeonLoot', WardenDungeonLootRegion)
-registerRegionType(noI18n`Лут данжа вардена`, WardenDungeonLootRegion)
+WardenDungeonLootRegion.register(noI18n`Лут данжа вардена`)
 disableAdventureNear.push(WardenDungeonLootRegion)
 
 actionGuard((player, region, ctx) => {

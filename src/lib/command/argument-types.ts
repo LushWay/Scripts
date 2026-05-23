@@ -126,7 +126,7 @@ export class LocationArgumentType<T extends boolean = false> extends IArgumentTy
 
   ctype: CustomCommandParamType = CustomCommandParamType.Location
 
-  type = { x: 0, y: 0, z: 0 } as Vector3
+  type = { x: 0, y: 0, z: 0 }
 
   typeName = 'location'
 

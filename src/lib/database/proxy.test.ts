@@ -51,6 +51,21 @@ describe('ProxyDatabase', () => {
     `)
   })
 
+  it('should delete cache', () => {
+    const value = { a: { b: 1 } }
+
+    database.set('key', value)
+    const proxy = database.get('key').a
+
+    expect(proxy.a).not.toEqual(value.a)
+
+    database.delete('key')
+
+    database.set('key', value)
+
+    expect(database.get('key').a === proxy).toBeFalsy()
+  })
+
   it('should save arrays', () => {
     database.set('array', [1, 2, 4, 5])
     expect(database.get('array')).toMatchInlineSnapshot(`

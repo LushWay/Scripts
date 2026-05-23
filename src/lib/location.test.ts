@@ -2,6 +2,7 @@ import { Player } from '@minecraft/server'
 import 'lib/database/scoreboard'
 import { noI18nShared } from 'lib/i18n/text'
 import { Vec } from 'lib/vector'
+import { TEST_clearDatabase } from 'test/utils'
 import { location, locationWithRadius, locationWithRotation, migrateLocationName } from './location'
 import { Group } from './rpg/place'
 import { Settings } from './settings'
@@ -11,7 +12,13 @@ const point = group.place('id').name(noI18nShared`name`)
 
 beforeEach(() => {
   Settings.worldConfigs = {}
-  for (const key of Settings.worldDatabase.keys()) Settings.worldDatabase.delete(key)
+  TEST_clearDatabase(Settings.worldDatabase)
+})
+
+afterEach(() => {
+  vi.clearAllMocks() // Resets call history
+  vi.resetAllMocks() // Resets history + removes mock implementations
+  vi.restoreAllMocks() // Restores original behavior of spied-on methods
 })
 
 describe('location', () => {
@@ -231,6 +238,9 @@ describe('locationWithRadius', () => {
 })
 
 describe('migrate', () => {
+  const group = new Group('id2')
+  const point = group.place('id2').name(noI18nShared`name`)
+
   it('should migrate location', () => {
     Settings.worldDatabase.get(group.id)[point.shortId] = '1 0 1'
     const consoleLogSpy = vi.spyOn(console, 'debug').mockImplementation(() => {})
@@ -241,7 +251,7 @@ describe('migrate', () => {
     expect(Settings.worldDatabase.get(group.id)['newname']).toBe('1 0 1')
     expect(consoleLogSpy.mock.calls[0]).toMatchInlineSnapshot(`
       [
-        "Migrating location locations:oldname to id:newname",
+        "Migrating location locations:oldname to id2:newname",
       ]
     `)
   })
@@ -252,7 +262,7 @@ describe('migrate', () => {
 
     migrateLocationName('unknown group', 'does not exists', group.id, point.shortId)
 
-    expect(consoleErrorSpy.mock.calls[0]).toBeUndefined()
+    expect(consoleErrorSpy.mock.calls[0]?.join()).toBeUndefined()
     expect(Settings.worldDatabase.get(group.id)[point.shortId]).toBe('1 0 1')
   })
 
@@ -265,7 +275,7 @@ describe('migrate', () => {
       [
         "§eNo location found at §funknown group§e:§fwas never defined§e. Group: [
         §2\`unknown group\`§r,
-        §2\`id\`§r
+        §2\`id2\`§r
       ]§e",
       ]
     `)
