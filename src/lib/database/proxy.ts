@@ -8,6 +8,8 @@ const PROXY_TARGET = Symbol('proxy_target')
 type DynamicObject = Record<string | number | symbol, unknown>
 type ProxiedDynamicObject = DynamicObject & { [IS_PROXIED]?: boolean }
 
+type ProxyDatabaseValueCache = WeakMap<DynamicObject, DynamicObject>
+
 export abstract class ProxyDatabase<Value = unknown, Key extends string = string> implements Table<Value, Key> {
   static tables: Record<string, UnknownTable> = {}
 
@@ -33,7 +35,7 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
   }
 
   get(key: Key): Value {
-    return this.wrap(this.getImmutable(key), '') as Value
+    return this.wrap(this.getImmutable(key), key, '') as Value
   }
 
   getImmutable(key: Key): Immutable<Value> {
@@ -50,6 +52,7 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
   delete(key: Key): boolean {
     if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const deleted = this.value.delete(key)
+    this.proxyCache.delete(key)
     if (deleted) this.needSave()
     return deleted
   }
@@ -78,7 +81,7 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
   entries(): [Key, Value][] {
     if (!this.loaded) throw new Error(`Proxy table ${this.id} is not yet loaded!`)
     const entries: [Key, Value][] = []
-    for (const [key, value] of this.value.entries()) entries.push([key, this.wrap(value, '') as Value])
+    for (const [key, value] of this.value.entries()) entries.push([key, this.wrap(value, key, '') as Value])
     return entries
   }
 
@@ -87,24 +90,27 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
     return this.value.entries() as MapIterator<[Key, Immutable<Value>]>
   }
 
-  private wrap(value: unknown, keys: string): unknown {
+  private proxyCache = new Map<string, ProxyDatabaseValueCache>()
+
+  private wrap(value: unknown, key: string, trace: string): unknown {
     if (typeof value !== 'object' || value === null) return value
 
     const object = value as ProxiedDynamicObject
 
     if (object[IS_PROXIED]) return object
 
-    const cache = this.proxyCache.get(object)
+    const cacheStorage = this.proxyCache.getOrInsertComputed(key, () => new WeakMap())
+    const cache = cacheStorage.get(object)
     if (cache) return cache
 
-    const proxy = new Proxy(object, this.createProxy(keys))
+    const proxy = new Proxy(object, this.createProxy(key, trace))
     Reflect.defineProperty(proxy, PROXY_TARGET, { value: object })
 
-    this.proxyCache.set(object, proxy)
+    cacheStorage.set(object, proxy)
     return proxy
   }
 
-  private createProxy(keys: string): ProxyHandler<ProxiedDynamicObject> {
+  private createProxy(key: string, trace: string): ProxyHandler<ProxiedDynamicObject> {
     return {
       get: (target, p, reciever) => {
         // Filter non db keys
@@ -120,7 +126,7 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
 
         // Return subproxy on object
         if (typeof value === 'object' && value !== null) {
-          return this.wrap(value as DynamicObject, keys + '.' + p)
+          return this.wrap(value, key, trace + '.' + p)
         } else return value
       },
       set: (target, p, value, reciever) => {
@@ -149,8 +155,6 @@ export abstract class ProxyDatabase<Value = unknown, Key extends string = string
   protected value = new Map<Key, Value>()
 
   loaded = false
-
-  private proxyCache = new WeakMap<DynamicObject, DynamicObject>()
 
   protected restore(from: Record<string, unknown>) {
     return Object.entries(from).map(([key, value]) => {
