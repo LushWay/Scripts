@@ -2,12 +2,16 @@ import * as mc from '@minecraft/server'
 import { MinecraftDimensionTypes } from '@minecraft/vanilla-data'
 import { EventSignal } from 'lib/event-signal'
 
-import fs from 'fs-extra'
 import { Language } from 'lib/assets/lang'
 import { langs } from 'lib/assets/lang-big'
+
+// @ts-expect-error We're not including node types to not pollute global
+import fs from 'node:fs'
+// @ts-expect-error We're not including node types to not pollute global
 import url from 'node:url'
-const items = fs.readJSONSync(
-  url.fileURLToPath(import.meta.resolve('./mojang-items.json')),
+const items = JSON.parse(
+  // @ts-expect-error We're not including node types to not pollute global
+  fs.readFileSync(url.fileURLToPath(import.meta.resolve('./mojang-items.json')), 'utf8'),
 ) as typeof import('./mojang-items.json')
 
 export abstract class Component {
