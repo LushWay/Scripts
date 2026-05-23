@@ -150,7 +150,7 @@ const allowed: InteractionAllowed = (player, region, context, regions) => {
 
 function getRegions(point: AbstractPoint) {
   const regions = Region.getManyAt(point)
-  const region = regions[0] as Region | undefined
+  const region = regions[0]
   return { region, regions }
 }
 
