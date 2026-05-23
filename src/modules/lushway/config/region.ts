@@ -1,6 +1,6 @@
 import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
 import { Items } from 'lib/assets/custom-items'
-import { PlayerEvents, PlayerProperties } from 'lib/assets/player-json'
+import { PlayerEvents } from 'lib/assets/player-json'
 import {
   actionGuard,
   ActionGuardOrder,
@@ -23,6 +23,7 @@ import { doNothing } from 'lib/util'
 import { ms } from 'lib/utils/ms'
 import { BaseRegion } from 'modules/places/base/region'
 
+import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import 'lib/clan/disable-clan-pvp'
 
 SafeAreaRegion.enableGamemodeChange()
@@ -105,7 +106,12 @@ actionGuard((player, region, ctx) => {
 }, ActionGuardOrder.Permission)
 
 actionGuard((player, region, ctx) => {
-  if (ctx.type === 'interactWithEntity') return true
+  if (ctx.type === 'interactWithEntity') {
+    if (region instanceof SafeAreaRegion) {
+      if (ctx.event.target.typeId === MinecraftEntityTypes.ArmorStand) return false
+    }
+    return true
+  }
   if (ctx.type === 'interactWithBlock') return false
 }, ActionGuardOrder.Lowest)
 
