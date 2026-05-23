@@ -1,10 +1,11 @@
 import { system, world } from '@minecraft/server'
+import { isNotPlaying } from 'lib/utils/game'
 
 function interval() {
   try {
     for (const player of world.getAllPlayers()) {
       // TODO Increase on rank
-      const freeSlots = 9
+      const freeSlots = isNotPlaying(player) ? 27 : 9
 
       // There is no way to access this thing without command lol
 
