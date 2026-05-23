@@ -12,5 +12,6 @@ import { Area } from 'lib/region/areas/area'
 Area.loaded = false
 
 setImmediate(() => {
+  // @ts-expect-error assssssssssssssssssssss
   EventSignal.emit(world.afterEvents.worldLoad, {})
 })
