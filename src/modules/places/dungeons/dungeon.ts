@@ -57,8 +57,8 @@ export class DungeonRegion extends Region {
 
   static oldChestLogPositions = new Set<string>()
 
-  static getChests(region: DungeonRegion): Immutable<DungeonChest[]> {
-    return region.chests
+  static getChests(region: DungeonRegion) {
+    return region.chests as Immutable<DungeonChest[]>
   }
 
   static {

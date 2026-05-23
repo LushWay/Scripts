@@ -28,25 +28,7 @@ export function intlPlural(language: Language, n: number) {
 
 declare global {
   namespace Intl {
-    interface Duration {
-      years?: number
-      months?: number
-      weeks?: number
-      days?: number
-      hours?: number
-      minutes?: number
-      seconds?: number
-      milliseconds?: number
-    }
-
-    class DurationFormat {
-      constructor(
-        lang: string,
-        options: { style: 'long' | 'short' | 'narrow'; localeMatcher: Intl.ListFormatLocaleMatcher },
-      )
-
-      format(time: Duration): string
-    }
+    type Duration = Partial<Record<DurationFormatUnit, number>>
   }
 }
 
