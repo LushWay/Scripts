@@ -9,6 +9,7 @@ import { RegionEvents } from 'lib/region/events'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { Boss } from 'lib/rpg/boss'
 import { Settings } from 'lib/settings'
+import { isNotPlaying, isPlaying } from 'lib/utils/game'
 import { ms } from 'lib/utils/ms'
 import { WeakPlayerMap } from 'lib/weak-player-storage'
 import { Anarchy } from 'modules/places/anarchy/anarchy'
@@ -54,7 +55,7 @@ const getPlayerSettings = Settings.player('PvP/PvE', 'pvp', {
   },
 })
 
-const lockAction = new LockAction(p => p.scores.pvp > 0, i18n`Вы находитесь в режиме сражения!`)
+const lockAction = new LockAction(p => isPlaying(p) && p.scores.pvp > 0, i18n`Вы находитесь в режиме сражения!`)
 
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
   if (deadEntity.isPlayer()) deadEntity.scores.pvp = 0

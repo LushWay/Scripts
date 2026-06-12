@@ -101,6 +101,10 @@ export function isNotPlaying(player: Player, uptodate = false) {
   return CURRENT_BUILDERS.has(player.id)
 }
 
+export function isPlaying(player: Player, uptodate = false) {
+  return !isNotPlaying(player, uptodate)
+}
+
 /**
  * Tries to load chunk at provided location by adding tickingarea and trying to get block at location 100 times. If
  * chunk is still unloaded, returns false. If chunk is finally loaded, returns block.
