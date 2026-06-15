@@ -237,6 +237,8 @@ export class MineareaRegion extends RegionWithStructure {
         region.deleteSchedules()
       }
 
+      player.success('Done')
+
       const newRegions = regions.map((region, i) => {
         const newArea = new SphereArea(
           { center: region.area.center, radius: ~~Vec.distance(region.area.center, player.location) - 1 },
@@ -249,7 +251,7 @@ export class MineareaRegion extends RegionWithStructure {
           apply() {
             region.delete()
             MineareaRegion.create(newArea)
-            player.info(`Moved ${i}/${regions.length}`)
+            player.info(`Moved ${i + 1}/${regions.length}`)
           },
         }
       })
@@ -260,6 +262,7 @@ export class MineareaRegion extends RegionWithStructure {
         'Применить',
         () => {
           newRegions.forEach(e => e.apply())
+          player.success('Done')
         },
       )
     })
