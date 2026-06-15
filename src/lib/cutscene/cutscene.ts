@@ -3,6 +3,7 @@ import { EasingType, Player, TicksPerSecond, system } from '@minecraft/server'
 import { MinecraftCameraPresetsTypes } from '@minecraft/vanilla-data'
 import { table } from 'lib/database/abstract'
 import { noI18n } from 'lib/i18n/text'
+import { regionPermissions } from 'lib/region'
 import { Compass } from 'lib/rpg/menu'
 import { Sidebar } from 'lib/sidebar'
 import { hexToRgb } from 'lib/util'
@@ -352,3 +353,7 @@ export class Cutscene {
     Cutscene.db.set(this.id, this.sections)
   }
 }
+
+regionPermissions.isGettingDamageAllowed.push(player => {
+  if (Cutscene.getCurrent(player)) return false
+})

@@ -221,6 +221,18 @@ world.beforeEvents.entityHurt.subscribe(event => {
 
   if (!damagingEntity?.isValid || !hurtEntity.isValid) return
 
+  if (hurtEntity instanceof Player) {
+    let isAllowed = true
+    for (const callback of isGettingDamageAllowed) {
+      const result = callback(hurtEntity)
+      if (typeof result === 'boolean') {
+        isAllowed = result
+        break
+      }
+    }
+    if (!isAllowed) cancelPvp(event)
+  }
+
   const region = Region.getAt(hurtEntity)
   if (!region) return
 
@@ -254,9 +266,11 @@ function cancelPvp(event: EntityHurtBeforeEvent) {
   event.cancel = true
 }
 
+const isGettingDamageAllowed: ((player: Player) => boolean | undefined)[] = []
 const isPvPallowed: ((attacker: Player, reciever: Player) => boolean | undefined)[] = []
 
 export const regionPermissions = {
   itemToProjectile,
   isPvPallowed,
+  isGettingDamageAllowed,
 }
