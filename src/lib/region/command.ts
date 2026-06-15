@@ -150,7 +150,7 @@ system.runInterval(
       const regions = Region.getNear(player, 30)
 
       const variables = new MolangVariableMap()
-      variables.setColorRGBA('color', { red: 0, green: 1, blue: 0, alpha: 0 })
+      variables.setColorRGBA('color', { red: 1, green: 1, blue: 1, alpha: 0 })
 
       for (const region of regions) {
         if (!(region.area instanceof SphereArea)) continue
