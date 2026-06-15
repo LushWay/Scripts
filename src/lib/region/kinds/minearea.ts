@@ -1,6 +1,7 @@
 import { ItemStack, Player, PlayerBreakBlockBeforeEvent, ShortcutDimensions, system } from '@minecraft/server'
-import { FormCreator } from 'lib/form/new'
+import { askNew, FormCreator } from 'lib/form/new'
 import { i18n, noI18n } from 'lib/i18n/text'
+import { SphereArea } from 'lib/region/areas/sphere'
 import { registerSaveableRegion } from 'lib/region/database'
 import {
   actionGuard,
@@ -120,6 +121,8 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   delete(): void {
+    if (this.building) throw new Error('Region is not ready to be deleted yet')
+    if (this.restoringStructurePromise) throw new Error('Region is restoring structure')
     if (typeof this.saveStructureRequest === 'number') system.clearRun(this.saveStructureRequest)
     super.delete()
   }
@@ -218,6 +221,48 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   customFormButtons(form: FormCreator, player: Player): void {
+    form.button('В этом месте не должно быть региона шахты, подвинуть все', async () => {
+      const regions = MineareaRegion.getManyAt(player)
+      player.info(`Found ${regions.length} region(s): ${regions.map(e => e.area.toString()).join(', ')}`)
+      for (const [i, region] of regions.entries()) {
+        if (region.building) {
+          player.fail(`Region ${region.area.toString()} is not ready yet, try again later...`)
+          return
+        }
+        if (region.restoringStructurePromise) {
+          player.fail(`Region ${region.area.toString()} is restoring, wait and try again later...`)
+        }
+        if (region.structure.exists) await region.structure.place()
+        player.info(`Placed ${i + 1}/${regions.length}`)
+        region.deleteSchedules()
+      }
+
+      const newRegions = regions.map((region, i) => {
+        const newArea = new SphereArea(
+          { center: region.area.center, radius: ~~Vec.distance(region.area.center, player.location) - 1 },
+          region.dimensionType,
+        )
+
+        return {
+          newArea,
+          oldArea: region.area,
+          apply() {
+            region.delete()
+            MineareaRegion.create(newArea)
+            player.info(`Moved ${i}/${regions.length}`)
+          },
+        }
+      })
+
+      askNew(
+        player,
+        `Будут изменены следующие регионы:\n${newRegions.map(e => e.oldArea.toString() + ' -> ' + e.newArea.toString()).join('\n')}`,
+        'Применить',
+        () => {
+          newRegions.forEach(e => e.apply())
+        },
+      )
+    })
     form.button('Индексировать для вики', () => {
       player.info('Start')
       this.indexResources()
