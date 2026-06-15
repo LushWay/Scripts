@@ -3,6 +3,7 @@ import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
 
 import { Sounds } from 'lib/assets/custom-sounds'
 import { emoji } from 'lib/assets/emoji'
+import { Cooldown } from 'lib/cooldown'
 import { ArrayForm } from 'lib/form/array'
 import { debounceMenu } from 'lib/form/utils'
 import { SharedI18nMessage } from 'lib/i18n/message'
@@ -16,6 +17,7 @@ import { Group } from 'lib/rpg/place'
 import { MultiCost } from 'lib/shop/cost'
 import { ErrorCost } from 'lib/shop/cost/cost'
 import { Product } from 'lib/shop/product'
+import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
 
 declare module '@minecraft/server' {
@@ -93,8 +95,9 @@ export class SafePlace {
     this.safeArea = SafeAreaRegion.create(new SphereArea({ center: location, radius: location.radius }, 'overworld'), {
       safeAreaName: this.name,
     })
+    const cooldown = new Cooldown(ms.from('sec', 3))
     RegionEvents.onEnter(this.safeArea, player => {
-      if (this.showOnEnterTitle(player)) {
+      if (this.showOnEnterTitle(player) && cooldown.isExpired(player)) {
         player.onScreenDisplay.setHudTitle(`§f${this.name.to(player.lang)}`, {
           subtitle: i18n.join`${emoji.shield.green} ${i18n.success`Мирная зона`}`.to(player.lang),
           fadeInDuration: 0.5 * TicksPerSecond,
