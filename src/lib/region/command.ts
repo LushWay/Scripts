@@ -158,7 +158,7 @@ system.runInterval(
         let skip = 0
         region.area.forEachVector((vector, isIn) => {
           skip++
-          if (skip % 2 === 0) return
+          if (skip % 4 === 0) return
           if (!Region.getAll().includes(region)) return // deleted
 
           try {
