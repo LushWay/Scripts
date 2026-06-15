@@ -145,6 +145,7 @@ system.runInterval(
               noI18n`${e.creator.name} dst=${~~Vec.distance(player.location, e.area.center)} ${e.area.constructor.name} r=${e.area.radius}`,
           )
           .join('  '),
+        ActionbarPriority.High,
       )
 
       const regions = Region.getNear(player, 30)
