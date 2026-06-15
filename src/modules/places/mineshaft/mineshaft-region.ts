@@ -71,6 +71,7 @@ export class MineshaftRegion extends MineareaRegion {
         .then(e => player.info(i18n`End ${e}`))
         .catch((e: unknown) => player.fail(i18n.error`${e}`))
     })
+    super.customFormButtons(form, player)
   }
 }
 
