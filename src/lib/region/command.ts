@@ -136,6 +136,17 @@ system.runInterval(
       const player = Player.getById(playerId)
       if (!player) continue
 
+      const at = Region.getManyAt(player)
+
+      player.onScreenDisplay.setActionBar(
+        at
+          .map(
+            e =>
+              noI18n`${e.creator.name} dst=${~~Vec.distance(player.location, e.area.center)} ${e.area.constructor.name} r=${e.area.radius}`,
+          )
+          .join('  '),
+      )
+
       const regions = Region.getNear(player, 30)
 
       const variables = new MolangVariableMap()
