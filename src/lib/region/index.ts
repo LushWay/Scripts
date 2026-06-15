@@ -234,9 +234,7 @@ world.beforeEvents.entityHurt.subscribe(event => {
   }
 
   const region = Region.getAt(hurtEntity)
-  if (!region) return
-
-  const { pvp } = region.permissions
+  const pvp = region?.permissions.pvp ?? true
 
   if (hurtEntity instanceof Player && damagingEntity instanceof Player) {
     if (pvp === true) {
@@ -252,13 +250,13 @@ world.beforeEvents.entityHurt.subscribe(event => {
       if (!isAllowed) cancelPvp(event)
     } else {
       // pve or pvp disabled at all
-      event.cancel = true
+      cancelPvp(event)
     }
   } else if (pvp === 'pve' || pvp) {
     // allow
   } else {
     // pvp is disabled
-    event.cancel = true
+    cancelPvp(event)
   }
 })
 
