@@ -241,7 +241,7 @@ export class MineareaRegion extends RegionWithStructure {
 
       const newRegions = regions.map((region, i) => {
         const newArea = new SphereArea(
-          { center: region.area.center, radius: ~~Vec.distance(region.area.center, player.location) - 1 },
+          { center: region.area.center, radius: ~~Vec.distance(region.area.center, player.location) },
           region.dimensionType,
         )
 
