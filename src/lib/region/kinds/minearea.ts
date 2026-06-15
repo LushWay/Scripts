@@ -13,7 +13,7 @@ import { RegionWithStructure } from 'lib/region/kinds/with-structure'
 import { isNewbie } from 'lib/rpg/newbie'
 import { ItemResource, ResourceLocationRegion, ResourcesSource } from 'lib/rpg/resource-source'
 import { ScheduleBlockPlace } from 'lib/scheduled-block-place'
-import { isNotPlaying } from 'lib/utils/game'
+import { isPlaying } from 'lib/utils/game'
 import { createLogger } from 'lib/utils/logger'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
@@ -119,6 +119,11 @@ export class MineareaRegion extends RegionWithStructure {
     this.scheduledToPlaceBlocks = []
   }
 
+  delete(): void {
+    if (typeof this.saveStructureRequest === 'number') system.clearRun(this.saveStructureRequest)
+    super.delete()
+  }
+
   protected async onCreate(action = 'Created new') {
     logger.info`${action} ${this.creator.name} region...`
     const crossRegions = await this.restoreAndResaveStructure()
@@ -133,6 +138,28 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   building = false
+
+  private saveStructureRequest?: number
+
+  requestStructureResave() {
+    if (this.saveStructureRequest) return
+
+    this.saveStructureRequest = system.runTimeout(
+      () => {
+        this.building = true
+        system.delay(async () => {
+          try {
+            this.structure.delete()
+            await this.structure.save()
+          } finally {
+            this.building = false
+          }
+        })
+      },
+      'MineArea.requestStructureResave',
+      ms.from('sec', 5),
+    )
+  }
 
   scheduledToPlaceBlocks: string[] = []
 
@@ -219,36 +246,38 @@ async function getSchedules(area: Area, dimensionType: ShortcutDimensions) {
   return schedules
 }
 
-actionGuard((player, region, ctx) => {
+actionGuard((player, region, ctx, regions) => {
   if (!(region instanceof MineareaRegion)) return
 
   if (region.newbie && !isNewbie(player))
     return player.fail(i18n.error`Вы не можете добывать блоки в зоне добычи новичков`)
 
-  const building = isNotPlaying(player)
+  const playing = isPlaying(player)
 
-  if (region.building && !building) return player.fail(i18n.error`Регион сохраняется`)
-  if (region.creating && !building)
+  if (region.building && playing) return player.fail(i18n.error`Регион сохраняется`)
+  if (region.creating && playing)
     return player.fail(i18n.error`Регион создается. ${~~region.restoringStructurePercent}%%`)
+
+  const mineAreas = regions.filter(e => e instanceof MineareaRegion)
 
   switch (ctx.type) {
     case 'interactWithBlock':
     case 'interactWithEntity':
-      if (!building) return true
-      else return notifyBuilder(player, region)
+      if (playing) return true
+      else return notifyBuilder(player, mineAreas)
 
     case 'break': {
-      if (!building) return region.onBlockBreak(player, ctx.event)
-      else return notifyBuilder(player, region)
+      if (playing) return region.onBlockBreak(player, ctx.event)
+      else return notifyBuilder(player, mineAreas)
     }
 
     case 'place': {
-      if (!building) {
+      if (playing) {
         const schedule = ScheduleBlockPlace.setBlock(ctx.event.block, ms.from('sec', 10))
         region.scheduledToPlaceBlocks.push(Vec.string(schedule.l))
 
         return true
-      } else return notifyBuilder(player, region)
+      } else return notifyBuilder(player, mineAreas)
     }
   }
 }, ActionGuardOrder.Low)
@@ -309,28 +338,24 @@ onFullRegionTypeRestore(MineareaRegion, region => {
   }
 })
 
-function notifyBuilder(player: Player, region: MineareaRegion) {
-  if (region.scheduledToPlaceBlocks.length || region.creating) {
+function notifyBuilder(player: Player, regions: MineareaRegion[]) {
+  if (regions.some(region => region.scheduledToPlaceBlocks.length || region.creating)) {
     system.delay(() => {
       player.fail(
-        noI18n.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${
-          region.creating ? noI18n`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`
-        }`,
+        noI18n.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${regions
+          .map(region =>
+            region.creating ? noI18n`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`,
+          )
+          .join(' ')}`,
       )
-      region.restoreStructure(() => void 0)
+      regions.forEach(e => e.restoreStructure(() => void 0))
     })
 
     return false
   } else {
-    region.building = true
-    system.delay(async () => {
-      try {
-        region.structure.delete()
-        await region.structure.save()
-      } finally {
-        region.building = false
-      }
-    })
+    for (const region of regions) {
+      region.requestStructureResave()
+    }
     return true
   }
 }
