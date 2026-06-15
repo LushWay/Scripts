@@ -305,15 +305,21 @@ actionGuard((player, region, ctx, regions) => {
 
   const mineAreas = regions.filter(e => e instanceof MineareaRegion)
 
+  let isFirst = true
+
   switch (ctx.type) {
     case 'interactWithBlock':
+      if (!ctx.event.isFirstEvent) isFirst = false
+      if (playing) return true
+      else return notifyBuilder(player, mineAreas, isFirst)
+
     case 'interactWithEntity':
       if (playing) return true
-      else return notifyBuilder(player, mineAreas)
+      else return notifyBuilder(player, mineAreas, isFirst)
 
     case 'break': {
       if (playing) return region.onBlockBreak(player, ctx.event)
-      else return notifyBuilder(player, mineAreas)
+      else return notifyBuilder(player, mineAreas, isFirst)
     }
 
     case 'place': {
@@ -322,7 +328,7 @@ actionGuard((player, region, ctx, regions) => {
         region.scheduledToPlaceBlocks.push(Vec.string(schedule.l))
 
         return true
-      } else return notifyBuilder(player, mineAreas)
+      } else return notifyBuilder(player, mineAreas, isFirst)
     }
   }
 }, ActionGuardOrder.Low)
@@ -383,18 +389,19 @@ onFullRegionTypeRestore(MineareaRegion, region => {
   }
 })
 
-function notifyBuilder(player: Player, regions: MineareaRegion[]) {
+function notifyBuilder(player: Player, regions: MineareaRegion[], isFirst: boolean) {
   if (regions.some(region => region.scheduledToPlaceBlocks.length || region.creating)) {
-    system.delay(() => {
-      player.fail(
-        noI18n.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${regions
-          .map(region =>
-            region.creating ? noI18n`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`,
-          )
-          .join(' ')}`,
-      )
-      regions.forEach(e => e.restoreStructure(() => void 0))
-    })
+    if (isFirst)
+      system.delay(() => {
+        player.fail(
+          noI18n.error`Изменения в этом регионе не сохранятся т.к. будет загружена структура. Подождите завершения загрузки. ${regions
+            .map(region =>
+              region.creating ? noI18n`Сохранение структуры...` : `${~~region.restoringStructurePercent}%%`,
+            )
+            .join(' ')}`,
+        )
+        regions.forEach(e => e.restoreStructure(() => void 0))
+      })
 
     return false
   } else {
