@@ -11,7 +11,6 @@ import { i18n, i18nShared } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
 import { Area, AreaAsJson } from 'lib/region/areas/area'
 import { SphereArea } from 'lib/region/areas/sphere'
-import { forceAllowSpawnInRegion } from 'lib/region/index'
 import { BossArenaRegion } from 'lib/region/kinds/boss-arena'
 import { warnAboutEnteringDangerousRegion } from 'lib/rpg/equipment-level-region'
 import { LootTable } from 'lib/rpg/loot-table'
@@ -300,28 +299,19 @@ export class Boss {
     if (!this.location.valid) return
 
     this.logger.info(
-      `Died. Got hits from ${[...this.damage.entries()]
+      `Died, dropLoot=${dropLoot}. Got hits from ${[...this.damage.entries()]
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(e => `§l${Player.name(e[0])}§r§f: §6${e[1]}§f`)
         .join(', ')}`,
     )
     EventSignal.emit(this.onBossEntityDie, undefined)
-    const location = this.entity?.isValid ? this.entity.location : this.location
-    delete this.entity
 
     Boss.db.set(this.options.place.id, { id: '', date: Date.now(), dead: true })
 
     if (dropLoot) {
-      for (const player of world.getAllPlayers()) player.tell(i18n.header`Убит босс ${this.options.place.name}!`)
-
-      this.options.loot.generate().forEach(e => {
-        if (e) {
-          const item = world[this.dimensionType].spawnItem(e, location)
-          forceAllowSpawnInRegion(item)
-        }
-      })
       const players = world.getAllPlayers()
+      for (const player of players) player.tell(i18n.header`Убит босс ${this.options.place.name}!`)
 
       for (const [playerId, damage] of this.damage) {
         const player = players.find(e => e.id === playerId)
@@ -329,6 +319,8 @@ export class Boss {
 
         givePlayerMoneyAndXp(player, ~~(damage * 5), ~~(damage / 6))
         player.scores.pvp = 0
+
+        this.options.loot.generate().forEach(item => item && player.container?.addItem(item))
       }
       this.damage.clear()
     }

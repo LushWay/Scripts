@@ -21,16 +21,14 @@ export function createBossSlime(group: Group) {
         .itemStack(MagicSlimeBall)
         .weight('100%')
         .amount({
-          '40...64': '2%',
-          '65...128': '1%',
+          '10...20': '100%',
         })
 
         .item('SlimeBall')
         .weight('100%')
         .amount({
           '0...10': '10%',
-          '11...64': '40%',
-          '65...256': '50%',
+          '11...60': '40%',
         }).build,
     )
     .respawnTime(ms.from('min', 10))
@@ -55,6 +53,18 @@ export function createBossSlime(group: Group) {
       })
       for (const frog of frogs) frog.remove()
     })
+
+  boss.onBossEntityDie.subscribe(() => {
+    if (boss.location.valid && boss.region) {
+      const slimes = world.overworld.getEntities({
+        location: boss.location,
+        maxDistance: boss.region.area.radius,
+        type: MinecraftEntityTypes.Slime,
+      })
+
+      slimes.forEach(e => e.remove())
+    }
+  })
 
   world.afterEvents.entityHurt.subscribe(({ hurtEntity }) => {
     if (!boss.location.valid || !boss.region || !boss.entity?.isValid) return
