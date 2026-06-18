@@ -142,9 +142,10 @@ export class SharedI18nMessage extends I18nMessage {
   }
 
   to(language: Language) {
+    const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
     return Message.concatTemplateStringsArray(
       language,
-      this.template,
+      translated,
       this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
       this.colors,
       this.postfixes,
