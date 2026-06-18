@@ -59,22 +59,24 @@ export class PlayerQuest {
           ? goGetQuestText
           : i18n`Завершите задание ${target.name}`,
     ).activate(ctx => {
-      if (target.isCompleted(this.player)) {
-        // Completed, skip
-        ctx.next()
-      } else if (!target.hadEntered(this.player)) {
-        // Not yet entered, point to a location
-        if (goGetLocation) ctx.target = goGetLocation
-      } else {
-        // Wait for completion
-        ctx.subscribe(Quest.onEnd, ({ quest, player }) => {
-          console.log('ABC', quest.id, target.id)
-          if (quest !== target || player.id !== this.player.id) return
+      system.delay(() => {
+        if (target.isCompleted(this.player)) {
+          // Completed, skip
+          ctx.next()
+        } else if (!target.hadEntered(this.player)) {
+          // Not yet entered, point to a location
+          if (goGetLocation) ctx.target = goGetLocation
+        } else {
+          // Wait for completion
+          ctx.subscribe(Quest.onEnd, ({ quest, player }) => {
+            console.log('ABC', quest.id, target.id)
+            if (quest !== target || player.id !== this.player.id) return
 
-          // To not spam with quests
-          system.delay(() => ctx.next())
-        })
-      }
+            // To not spam with quests
+            system.delay(() => ctx.next())
+          })
+        }
+      })
     })
   }
 
@@ -103,7 +105,7 @@ export class PlayerQuest {
   }
 
   end = (action: (ctx: PlayerQuest) => void) => {
-    this.onEnd = action.bind(this, this) as VoidFunction
+    this.onEnd = action.bind(this, this)
   }
 
   private onEnd: VoidFunction = () => false
