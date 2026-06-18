@@ -136,7 +136,8 @@ class DebugStick extends WorldEditTool<StorageSchema> {
     const stateName =
       this.blockLocationCache.get(cacheLocationId) ??
       this.blockTypeCache.get(cacheTypeId) ??
-      (stateNames[0] as unknown as string)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      stateNames[0]!
     return { stateNames, stateName, allStates, cacheTypeId, cacheLocationId }
   }
 }

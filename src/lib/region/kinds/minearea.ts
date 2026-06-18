@@ -221,7 +221,7 @@ export class MineareaRegion extends RegionWithStructure {
   }
 
   customFormButtons(form: FormCreator, player: Player): void {
-    form.button('В этом месте не должно быть региона шахты, подвинуть все', async () => {
+    form.button(i18n`В этом месте не должно быть региона шахты, подвинуть все`, async () => {
       const regions = MineareaRegion.getManyAt(player)
       player.info(`Found ${regions.length} region(s): ${regions.map(e => e.area.toString()).join(', ')}`)
       for (const [i, region] of regions.entries()) {
@@ -258,15 +258,15 @@ export class MineareaRegion extends RegionWithStructure {
 
       askNew(
         player,
-        `Будут изменены следующие регионы:\n${newRegions.map(e => e.oldArea.toString() + ' -> ' + e.newArea.toString()).join('\n')}`,
-        'Применить',
+        i18n`Будут изменены следующие регионы:\n${newRegions.map(e => e.oldArea.toString() + ' -> ' + e.newArea.toString()).join('\n')}`,
+        i18n`Применить`,
         () => {
           newRegions.forEach(e => e.apply())
           player.success('Done')
         },
       )
     })
-    form.button('Индексировать для вики', () => {
+    form.button(i18n`Индексировать для вики`, () => {
       player.info('Start')
       this.indexResources()
         .then(() => player.success())

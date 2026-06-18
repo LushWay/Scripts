@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { Player, system } from '@minecraft/server'
-import { EventSignal } from 'lib/event-signal'
 import type { Table } from 'lib/database/abstract'
+import { EventSignal } from 'lib/event-signal'
 import type { TestFormCallback, TFD } from 'test/__mocks__/minecraft_server-ui'
 
 interface MinecraftEventSignal<T> {
@@ -39,7 +39,7 @@ export function TEST_onFormOpen<T extends keyof TFD>(
   beforeReturn?: VoidFunction,
 ) {
   const onForm = ((player as TestPlayer).onForm ??= {})
-  const previousCallback = onForm[kind] as RejectableFunction<T> | undefined
+  const previousCallback = onForm[kind] as RejectableFunction<T> | null
   previousCallback?.reject?.(new Error('Form listen request was canceled by next call'))
 
   const { resolve, reject, promise } = Promise.withResolvers<void>()

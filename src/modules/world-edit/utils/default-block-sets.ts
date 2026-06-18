@@ -58,6 +58,7 @@ const air = onLoad(() => BlockPermutation.resolve(MinecraftBlockTypes.Air))
 
 export const DEFAULT_REPLACE_TARGET_SETS = onLoad(
   () =>
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     ({
       'Любое дерево': trees.value.map(fromBlockStateWeightToReplaceTarget).filter(noNullable),
     }) as Record<string, ReplaceTarget[]>,

@@ -68,7 +68,7 @@ export function getClanButtonName(clan: Clan, style: Text.Fn<Text, unknown> = i1
 
 const cooldown = onLoad(() => {
   const cd = new Cooldown(ms.from('day', 1), true, Cooldown.defaultDb.get('clan'))
-  registerResettableCooldown('Создание/изменение названия клана', cd)
+  registerResettableCooldown(i18n`Создание/изменение названия клана`, cd)
   return cd
 })
 

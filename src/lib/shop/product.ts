@@ -142,7 +142,7 @@ export class Product<T extends Cost = any> {
 function wrapWithCatch<T extends (...args: any[]) => unknown>(func: T, player: Player): T {
   return ((...args) => {
     try {
-      return func(...(args as Parameters<T>)) as ReturnType<T>
+      return func(...(args as Parameters<T>))
     } catch (e) {
       new MessageForm(
         i18n`Ошибка`.to(player.lang),

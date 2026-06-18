@@ -274,7 +274,7 @@ export function settingsGroupMenu(
   )
 
   for (const key in config) {
-    const saved = store[key] as string | number | boolean | undefined
+    const saved = store[key]
     const setting = config[key]
     if (!setting) throw new TypeError(`No setting for key ${key}`)
 
@@ -290,7 +290,7 @@ export function settingsGroupMenu(
 
     label += hints[key] ? `${hints[key]}\n` : ''
 
-    if (!paid) label += `§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n`
+    if (!paid) label += i18n`§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n`.to(player.lang)
 
     if (isRequired) label += '§c(!) '
     label += `§f§l${setting.name.to(player.lang)}§r§f` //§r
@@ -356,7 +356,7 @@ export function settingsGroupMenu(
     ])
   }
 
-  form.submitButton('Сохранить')
+  form.submitButton(i18n`Сохранить`.to(player.lang))
 
   form.show(player, (_, ...settings) => {
     const hints: Record<string, string> = {}

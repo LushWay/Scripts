@@ -62,7 +62,7 @@ export function setBlocksSet(id: string, setName: string, set: BlocksSet | undef
 }
 
 function getActiveBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {
-  return (getAllBlocksSets(playerId)[blocksSetName] as BlocksSet | undefined)?.filter(e => e[2] > 0)
+  return (getAllBlocksSets(playerId)[blocksSetName])?.filter(e => e[2] > 0)
 }
 
 export function getBlocksInSet([playerId, blocksSetName]: BlocksSetRef) {

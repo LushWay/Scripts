@@ -611,7 +611,7 @@ function createPlayerProxy(
       playSound: () => void 0,
       id: 'server',
       name: 'server',
-    } as Partial<Player>,
+    },
     {
       get(target, p, receiver) {
         if (!(p in target)) {
@@ -640,7 +640,7 @@ function execCmd(
       output.isSync = false
       result.catch((e: unknown) => {
         Command.logger.player(player).error(command.sys.name, '[async]', ...args, e)
-        player.fail('Ошибка в асинхронной команде ' + String(e))
+        player.fail(noI18n`Error in async command ${String(e)}`)
       })
     }
   } catch (e) {

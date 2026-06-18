@@ -190,7 +190,8 @@ export async function smoothVoxelData(
         if (radius > 5) player.success(prefix + 'Готово')
         resolve()
       } catch (e) {
-        reject(e as Error)
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+        reject(e)
       }
     }
     system.runJob(smootherJob())

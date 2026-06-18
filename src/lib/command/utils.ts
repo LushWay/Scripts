@@ -15,7 +15,7 @@ export function parseCommand(message: string, prefixSize = 1) {
   if (!match?.groups?.command) return false
 
   const cmd = match.groups.command
-  const input = (match.groups.input as string | undefined) ?? ''
+  const input = (match.groups.input) ?? ''
   const args = parseArguments(input)
 
   return { cmd, args, input }

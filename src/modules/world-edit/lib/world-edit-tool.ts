@@ -155,7 +155,7 @@ export abstract class WorldEditTool<Storage extends StorageType = any> {
   getStorage(slot: ContainerSlot | ItemStack, returnUndefined = false): Storage | undefined {
     const property = slot.getDynamicProperty(this.storageProperty)
     const propertyParsed = typeof property === 'string' ? this.parse(property, true) : undefined
-    return propertyParsed ?? this.parseLore(slot, returnUndefined as true)
+    return propertyParsed ?? this.parseLore(slot, returnUndefined)
   }
 
   saveStorage(slot: ContainerSlot | ItemStack, storage: Storage, writeLore = true) {

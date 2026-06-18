@@ -16,7 +16,7 @@ export function structureLikeRotate({
   return vectors.map(vector => {
     const relative = Vec.subtract(vector, position)
     const rotatedRelative = structureLikeRotateRelative(rotation, relative, size)
-    return Vec.add(rotatedRelative, position) as Vector3
+    return Vec.add(rotatedRelative, position)
   })
 }
 

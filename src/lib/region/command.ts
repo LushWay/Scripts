@@ -47,12 +47,12 @@ const tpdb = table<{ type: string; i: number; enabled: boolean }>('regionTpTest'
 }))
 new Command('regiontp')
   .setPermissions('admin')
-  .setDescription('Входит в режим телепортации по группе регионов. Полезно для поиска данжа')
+  .setDescription(i18n`Входит в режим телепортации по группе регионов. Полезно для поиска данжа`)
   .setGroup('test')
   .executes(ctx => {
     const db = tpdb.get(ctx.player.id)
     db.enabled = !db.enabled
-    if (!db.enabled) ctx.player.success('Выключено')
+    if (!db.enabled) ctx.player.success(i18n`Выключено`)
     else tpform.command(ctx)
   })
 

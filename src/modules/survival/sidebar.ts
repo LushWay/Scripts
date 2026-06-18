@@ -96,7 +96,7 @@ const survivalSidebar = new Sidebar(
         })
         return (player, settings) => {
           const regions = Region.getManyAt(player)
-          const region = regions[0] as Region | undefined
+          const region = regions[0]
           const base = '§l' + inventoryDisplay[player.database.inv].to(player.lang) + '§r§f'
           let text = base
           if (player.database.inv === 'anarchy') {

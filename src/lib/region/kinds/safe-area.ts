@@ -55,7 +55,7 @@ export class SafeAreaRegion extends Region {
         const regions = RegionEvents.playerInRegionsCache.get(player)
         if (!regions) return
 
-        const region = regions[0] as Region | undefined
+        const region = regions[0]
 
         const gamemode = player.getGameMode()
         const adventure = gamemode === GameMode.Adventure

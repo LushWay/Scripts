@@ -6,11 +6,11 @@ import { form, NewFormCallback } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { ms, Time } from 'lib/utils/ms'
 import { Chat } from './chat'
 
-function mute(type: Time, time: number, reason = 'за поведение', id: string, muter: Player) {
+function mute(type: Time, time: number, reason = noI18n`за поведение`, id: string, muter: Player) {
   const actualTime = ms.from(type, time)
   const muteInfo: Chat.MuteInfo = { mutedUntil: Date.now() + actualTime, reason }
   Chat.getInstance().muteDb.set(id, muteInfo)
@@ -25,7 +25,7 @@ function mute(type: Time, time: number, reason = 'за поведение', id: 
 
 function unmute(id: string, muter: Player) {
   const info = Chat.getInstance().muteDb.getImmutable(id)
-  if (!info) return muter.fail('Не был замьючен')
+  if (!info) return muter.fail(i18n`Не был замьючен`)
 
   const onlinePlayer = Player.getById(id)
   const fullname = onlinePlayer ? getFullname(onlinePlayer) : Player.nameOrUnknown(id)
@@ -42,11 +42,11 @@ function findOfflinePlayer(nameArg: string, ctx: CommandContext) {
   for (const [id, data] of Player.database.entriesImmutable()) {
     if (data.name === nameArg) return id
   }
-  ctx.error(`Игрок ${nameArg} не найден`)
+  ctx.error(i18n`Игрок ${nameArg} не найден`)
 }
 
 new Command('mute')
-  .setDescription('Заглушить игрока в чате')
+  .setDescription(i18n`Заглушить игрока в чате`)
   .setPermissions('helper')
   .string('name', true)
   .int('time', true)
@@ -54,7 +54,7 @@ new Command('mute')
   .string('reason', true)
   .executes((ctx, nameArg, timeArg = 5, typeArg = 'min', reasonArg) => {
     if (nameArg) {
-      if (typeof ms.converters[typeArg] === 'undefined') return ctx.error('Неизвестный тип времени')
+      if (typeof ms.converters[typeArg] === 'undefined') return ctx.error(i18n`Неизвестный тип времени`)
       const id = findOfflinePlayer(nameArg, ctx)
       if (id) mute(typeArg, timeArg, reasonArg, id, ctx.player)
       return
@@ -64,7 +64,7 @@ new Command('mute')
   })
 
 new Command('unmute')
-  .setDescription('Вернуть обратно')
+  .setDescription(i18n`Вернуть обратно`)
   .setPermissions('helper')
   .string('name', true)
   .executes((ctx, name) => {
@@ -78,20 +78,20 @@ new Command('unmute')
   })
 
 export function muteMenu(player: Player, back?: NewFormCallback) {
-  new ArrayForm('Муты', Chat.getInstance().muteDb.entries())
+  new ArrayForm(noI18n`Муты`, Chat.getInstance().muteDb.entries())
     .back(back)
     .addCustomButtonBeforeArray(f => {
-      f.button('Замутить', BUTTON['+'], selectForMute)
+      f.button(noI18n`Замутить`, BUTTON['+'], selectForMute)
     })
     .button(([id, info]) => {
       if (!info) return false
-      const until = `До: ${new Date(info.mutedUntil).toYYYYMMDD()} ${new Date(info.mutedUntil).toHHMM()}`
+      const until = noI18n`До: ${new Date(info.mutedUntil).toYYYYMMDD()} ${new Date(info.mutedUntil).toHHMM()}`
       return [
         `${getFullname(id)} ${until}\n${info.reason}`,
         form((f, { self }) => {
           f.title(getFullname(id))
-          f.body(`Причина: ${info.mutedUntil}\n${until}`)
-          f.button('Размутить', () => {
+          f.body(i18n`Причина: ${info.mutedUntil}\n${until}`)
+          f.button(i18n`Размутить`, () => {
             unmute(id, player)
             self()
           })
@@ -104,17 +104,17 @@ export function muteMenu(player: Player, back?: NewFormCallback) {
 muteMenu.size = () => Chat.getInstance().muteDb.size
 
 function selectForMute(player: Player, back?: NewFormCallback) {
-  selectPlayer(player, 'замутить', back).then(e => {
-    new ModalForm('Мут ' + e.name)
-      .addTextField('Время', 'введи', '5')
-      .addDropdownFromObject('Тип времени', {
-        min: 'Минуты',
-        hour: 'Часы',
+  selectPlayer(player, noI18n`замутить`, back).then(e => {
+    new ModalForm(noI18n`Мут ` + e.name)
+      .addTextField(noI18n`Время`, noI18n`введи`, '5')
+      .addDropdownFromObject(noI18n`Тип времени`, {
+        min: noI18n`Минуты`,
+        hour: noI18n`Часы`,
       })
-      .addTextField('Причина', 'за поведение')
+      .addTextField(noI18n`Причина`, noI18n`за поведение`)
       .show(player, (formctx, timeRaw, type, reason) => {
         const time = parseInt(timeRaw)
-        if (isNaN(time)) return formctx.error(`${timeRaw} это не число`)
+        if (isNaN(time)) return formctx.error(noI18n`${timeRaw} это не число`)
 
         mute(type, time, reason || undefined, e.id, player)
       })

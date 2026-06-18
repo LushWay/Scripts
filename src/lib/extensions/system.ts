@@ -143,7 +143,8 @@ expand(System.prototype, {
             }
             resolve()
           } catch (error: unknown) {
-            reject(error as Error)
+            // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+            reject(error)
           }
         })(),
       )

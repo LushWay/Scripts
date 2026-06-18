@@ -44,6 +44,7 @@ export const util = {
       }
     },
     {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       results: {} as Record<string, Record<string, number>>,
     },
   ),

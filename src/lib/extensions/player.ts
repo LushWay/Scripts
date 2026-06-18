@@ -150,7 +150,7 @@ export const ScreenDisplaySymbol = Symbol('screen_display')
 
 expand(Player.prototype, {
   get lang() {
-    return __TEST__ ? Language.ru_RU : Language.ru_RU
+    return __TEST__ ? Language.ru_RU : (this.clientSystemInfo?.locale ?? Language.en_US)
   },
 
   isSimulated() {

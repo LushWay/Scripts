@@ -121,7 +121,7 @@ export const inClanMenu = form.params<{ clan: Clan }>((f, formContext) => {
 
   if (is(player.id, 'techAdmin')) {
     f.button(i18n`Админ: добавить игрока`, () =>
-      selectPlayer(player, 'добавить в клан', self).then(e => {
+      selectPlayer(player, i18n`добавить в клан`, self).then(e => {
         clan.addMember(e.id)
         player.success()
       }),

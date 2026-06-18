@@ -61,7 +61,7 @@ export function warnAboutEnteringDangerousRegion(region: Region, level: Equippme
           [i18n`Зона`, region.displayName ?? region.name],
           '',
           [i18n`Требуемый уровень`, EquippmentLevel.emojiLevel[level]],
-          [i18n`Ваш уровень`, EquippmentLevel.getEmoji(player) || 'у вас вообще экипировки нет'],
+          [i18n`Ваш уровень`, EquippmentLevel.getEmoji(player) || i18n`у вас вообще экипировки нет`],
           '',
           region.permissions.pvp === 'pve' || isNewbie(player)
             ? i18n.success`Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.`

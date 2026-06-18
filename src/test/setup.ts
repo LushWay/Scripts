@@ -12,6 +12,7 @@ import { Area } from 'lib/region/areas/area'
 Area.loaded = false
 
 // @ts-expect-error We're not including node types to not pollute global
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 setImmediate(() => {
   // @ts-expect-error We're not including node types to not pollute global
   EventSignal.emit(world.afterEvents.worldLoad, {})

@@ -79,7 +79,7 @@ const wikiItems = formArray((f, { player }) => {
 
   f.array(items)
     .filters({
-      food: { name: 'Еда', value: false },
+      food: { name: i18n`Еда`, value: false },
     })
     .sort((arr, filters) => {
       if (filters.food) arr = arr.filter(e => e.resource instanceof ItemResource && e.resource.itemStack.food)

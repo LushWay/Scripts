@@ -29,7 +29,7 @@ export abstract class Area<T extends JsonObject = JsonObject> {
       )
     }
 
-    ;(this as unknown as typeof Area).areas.push(b as unknown as AreaWithType)
+    ;(this as unknown as typeof Area).areas.push(b)
     return b
   }
 
@@ -129,7 +129,8 @@ export abstract class Area<T extends JsonObject = JsonObject> {
             }
             resolve()
           } catch (e: unknown) {
-            reject(e as Error)
+            // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+            reject(e)
           }
         })(),
         `forEachRegionVectorJob ${stringifyError.stack.get(2)}`,

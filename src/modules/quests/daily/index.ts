@@ -32,7 +32,7 @@ const db = table<DB>('dailyQuest', () => ({ streak: 0, today: 0, streakDate: Dat
 new RecurringEvent(
   'dailyQuest',
   later.parse.recur().on('00:00').time(),
-  () => ({ questIds: [] as string[], cityId: '' as string }),
+  () => ({ questIds: [] as string[], cityId: '' }),
   (storage, ctx) => {
     let quests = [...DailyQuest.dailyQuests.values()]
     currentDailyQuests = []

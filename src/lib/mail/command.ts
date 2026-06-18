@@ -68,25 +68,26 @@ export function mailMenu(player: Player, back?: VoidFunction) {
     })
     .addCustomButtonBeforeArray((f, _, back) => {
       if (letters.length) {
-        f.button('Прочитать все\n§7(и собрать награды если есть)', () => {
+        f.button(i18n`Прочитать все
+§7(и собрать награды если есть)`, () => {
           Mail.readAllAndClaimRewards(player)
           player.success()
           mailMenu(player)
         })
       } else {
-        f.button('Все прочитано', back)
+        f.button(i18n`Все прочитано`, back)
       }
 
       if (is(player.id, 'moderator')) {
-        f.button('Объявление', BUTTON['+'], () => {
-          new ModalForm('Объявление для всего сервера')
-            .addTextField('Заголовок', 'вы крутые там д0а')
-            .addTextField('Строка 1', 'мы вас поздравляем')
-            .addTextField('Строка2', 'вы теперь можете')
-            .addTextField('Строка3', 'читать все сообщения в почте')
-            .addTextField('Строка 4', 'да')
-            .addTextField('Строка5', 'вот.')
-            .addSlider('Алмазов за прочтение', 0, 100, 1, 5)
+        f.button(i18n`Объявление`, BUTTON['+'], () => {
+          new ModalForm(i18n`Объявление для всего сервера`)
+            .addTextField(i18n`Заголовок`, i18n`вы крутые там д0а`)
+            .addTextField(i18n`Строка 1`, i18n`мы вас поздравляем`)
+            .addTextField(i18n`Строка2`, i18n`вы теперь можете`)
+            .addTextField(i18n`Строка3`, i18n`читать все сообщения в почте`)
+            .addTextField(i18n`Строка 4`, i18n`да`)
+            .addTextField(i18n`Строка5`, i18n`вот.`)
+            .addSlider(i18n`Алмазов за прочтение`, 0, 100, 1, 5)
             .show(player, (ctx, ...args) => {
               const diamonds = args.pop() as number
               const rewards = new Rewards()

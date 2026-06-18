@@ -154,7 +154,7 @@ export class ShopForm {
       type: typeId,
       ...template,
     })
-    return this as ShopForm
+    return this
   }
 
   /** Adds buyable item to shop menu */
