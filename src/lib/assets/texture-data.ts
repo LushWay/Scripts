@@ -10,7 +10,7 @@ export const textureData = {
   "lw:circuit_board": "textures/items/circuit_board",
   "lw:fireball": "textures/items/fireball",
   "lw:key": "textures/blocks/trip_wire_source",
-  "lw:menu": "textures/items/totem",
+  "lw:menu": "textures/items/menu",
   "lw:money": "textures/items/money",
   "we:brush": "textures/items/brush",
   "we:dash": "textures/items/compass_item",
