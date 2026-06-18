@@ -24,8 +24,11 @@ export const villageOfExplorersInvestigating = new CityInvestigating(VillageOfEx
   assertLoaded(TechCity.safeArea, 'TechCity.safeArea')
 
   q.cutscene('veShowcase1', i18n`Приветствуем в нашей деревне!`)
-  q.cutscene('sqOverview2', i18n`Здесь есть шахта, ведущая к ${i18n.accent`Вардену`}`)
-  q.cutscene('sqOverview2', i18n`У ${i18n.accent`Мага`} можно зачаровать предметы`)
+  q.cutscene(
+    'sqOverview2',
+    i18n`Здесь есть шахта, ведущая к ${i18n.accent`Вардену`} и ${i18n.accent`Магическому слайму`}`,
+  )
+  q.cutscene('sqOverview3', i18n`У ${i18n.accent`Мага`} можно зачаровать предметы`)
 
   q.dialogue(place.mage.npc, i18n`Посетите Мага`)
 
