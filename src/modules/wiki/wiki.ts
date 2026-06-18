@@ -202,7 +202,7 @@ export const mineQuests = onLoad(() =>
                   : i18n.error`Копать нужно на высоте от ${above} до ${below}. Ваш y = ${y}`,
               amount,
             )
-              .filter(({ type: { id } }) => ore.types.includes(id))
+              .filter(({ type: { id } }) => ore.all.includes(id))
               .activate(ctx => {
                 ctx.onInterval(() => {
                   y = ~~player.location.y
