@@ -40,10 +40,10 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "§9Хранилище": "script.shared.хранилище",
   "Посети город": "script.shared.посети_город",
   "Мясник": "script.shared.мясник",
-  "Ювелир": "script.shared.ювелир",
   "Мусорщик": "script.shared.мусорщик",
   "Каменщик": "script.shared.каменщик",
   "Дровосек": "script.shared.дровосек",
+  "Ювелир": "script.shared.ювелир",
   "Общее": "script.shared.общее",
   "Тетя Зина": "script.shared.тетя_зина",
   "Бармен": "script.shared.бармен",
@@ -95,1971 +95,16373 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Добыть: {0___rawtext_____translate__langToken_itemType______}": "script.shared.добыть_0_"
 }
 
-export const extractedTranslatedMessages: Record<Language, Record<MessageId, string>> = {
+/**
+ * Preprocessed simple messages.
+ * Structure: { s: string[], i: number[] }
+ */
+export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s: string[], i: number[] }>> = {
   "en_US": {
-    "Типы": "Types",
-    "Над": "Above",
-    "Под": "Below",
-    "Спуститесь в шахту и вскопайте указанный ресурс!": "Go down into the mineshaft and mine up the specified resource!",
-    "На этой высоте руд нет": "There are no ores at this height",
-    "Группа": "Group",
-    "Еда": "Food",
-    "Ресурсы по локациям": "Resources by locations",
-    "Ресурсы": "Resources",
-    "Руды": "Ores",
-    "Википедия": "Wikipedia",
-    "Что где как все расскажу": "I'll tell you everything: what, where, how",
-    "\nВыбрано": "\nSelected",
-    "Полная незеритовая броня": "Full netherite armor",
-    "1.000.000 монет": "1,000,000 coins",
-    "Все задания": "All quests",
-    "Получить базу": "Get base",
-    "Все достижения": "All achievements",
-    "Миниигра": "Minigame",
-    "Боковое меню": "Sidebar menu",
-    "Разделенные подсказки": "Separated hints",
-    "Определяет, где будет меню": "Determines where the menu will be",
-    "Режим отображения": "Display mode",
-    "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься": "Maximum allowed number of characters before words are wrapped",
-    "Максимальный размер бокового меню": "Maximum sidebar menu size",
-    "Определяет, включено ли внутриигровое меню": "Determines if the in-game menu is enabled",
-    "Использовать меню": "Use menu",
-    "События": "Events",
-    "Лидеры": "Leaders",
-    "Цели": "Goals",
-    "Еще": "More",
-    "§7Настройки": "§7Settings",
-    "§bВики": "§bWiki",
-    "§fПочта": "§fMail",
-    "§6Донат\n§7СКОРО!": "§6Donate\n§7COMING SOON!",
-    "§7СКОРО!": "§7COMING SOON!",
-    "Миниигры": "Minigames",
-    "Анархия": "Anarchy",
-    "Спавн": "Spawn",
-    "Вы получили ключ!": "You received a key!",
-    "Вы уже забрали награды сегодня! Заходите завтра": "You have already claimed rewards today! Come back tomorrow",
-    "Сначала выполните все ежедневные задания!": "Complete all daily quests first!",
-    "Выполнено подряд": "Completed in a row",
-    "Ежедневные задания": "Daily quests",
-    "Поздравляем! В будущем постарайтесь быть осторожнее.": "Congratulations! Try to be more careful in the future.",
-    "Могила оказалась пустой и была удалена": "The grave was empty and has been removed",
-    ", никто кроме вас их забрать не может": ", no one but you can take them",
-    "Ваше место смерти не сохранилось!": "Your death location was not saved!",
-    "Могила была удалена очисткой мусора.": "The grave was removed by garbage cleanup.",
-    "Верните вещи после смерти!": "Return your items after death!",
-    "Вернуть вещи": "Return items",
-    "Вы не можете открыть могилу игрока, умершего в зоне без сражения!": "You cannot open the grave of a player who died in a non-combat zone!",
-    "Вы не можете открыть могилу новичка!": "You cannot open a newbie's grave!",
-    "Включать ли задание по восстановлению инвентаря после смерти": "Enable quest to restore inventory after death",
-    "Задание \"Вернуть вещи\"": "Quest \"Return items\"",
-    "В этот раз еды не оказалось, однако в следующий раз может повезти больше.": "This time there was no food, but next time you might be luckier.",
-    "Откройте сундук в разрушенном магазине": "Open the chest in the ruined store",
-    "Зайдите в разрушенный магазин": "Enter the ruined store",
-    "В строениях возле дороги можно найти еду": "Food can be found in buildings near the road",
-    "Это место вам понадобится позже": "You will need this place later",
-    "Это деревня исследователей": "This is the explorers' village",
-    "Каменоломню": "the Quarry",
-    "Здесь нет печей для переплавки руды": "There are no furnaces for smelting ore here",
-    "Это деревня шахтеров": "This is the miners' village",
-    "Шахтер зовет вас наверх, чтобы поговорить!": "The miner is calling you upstairs to talk!",
-    "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!": "Return to the mineshaft and mine stone. There seems to be iron behind it!",
-    "Попробуйте копнуть поглубже": "Try mining deeper",
-    "На поверхности руд нет": "There are no ores on the surface",
-    "Вернитесь к верстаку и улучшите свой инструмент.": "Return to the crafting table and upgrade your tool.",
-    "Сделайте каменную кирку": "Make a stone pickaxe",
-    "Отправляйтесь в шахту, найдите и накопайте камня.": "Go to the mineshaft, find and mine some stone.",
-    "Используя верстак сделайте деревянную кирку!": "Use the crafting table to make a wooden pickaxe!",
-    "Сделайте деревянную кирку": "Make a wooden pickaxe",
-    "Следуя компасу, доберитесь до верстака": "Follow the compass to the crafting table",
-    "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет": "Take coins from your inventory and use them to add to your balance",
-    "Используй монеты в инвентаре": "Use coins in your inventory",
-    "Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение": "Airdrop not found\nUse .wipe to restart the tutorial",
-    "Заберите все из упавшего с неба сундука. На него указывает компас": "Take everything from the chest that fell from the sky. The compass points to it",
-    "Заберите все из сундука, упавшего с неба": "Take everything from the chest that fell from the sky",
-    "Деревья могут помешать. Выйди туда, где над тобой будет только небо": "Trees may interfere. Go where there is only sky above you",
-    "Выйди под открытое небо": "Go under the open sky",
-    "Нарубите дерева": "Chop wood",
-    "Обучение базовым механикам сервера": "Tutorial on basic server mechanics",
-    "Обучение": "Tutorial",
-    "Вперед!": "Go!",
-    "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.": "You are a survivor after the apocalypse, washed up on the shore. You don't know much, can't break blocks anywhere, and all you can do is follow the instructions above your inventory, follow the compass and the diamond on the minimap.",
-    "Режим Перерождение": "Rebirth mode",
-    "В мирной зоне ломать блоки запрещено.": "Breaking blocks is forbidden in the safe zone.",
-    "Блоки можно ломать только глубоко в шахте!": "Blocks can only be broken deep in the mineshaft!",
-    "Вы не можете ломать руду новичка.": "You cannot break newbie ore.",
-    "§r§6Начальный топор": "§r§6Starter axe",
-    "Гробовщику посвящается": "Dedicated to the gravedigger",
-    "Гробовщик: открой 10 могил разных игроков": "Gravedigger: open 10 graves of different players",
-    "Сделал себя сам: Получи первые 10.000 монет": "Self-made: Earn your first 10,000 coins",
-    "Активированный уголь": "Activated carbon",
-    "Вы находитесь в режиме рейдблока.": "You are in raid block mode.",
-    "вы разрушили блок на базе": "you broke a block at the base",
-    "вас рейдят": "you are being raided",
-    "х2 урон!": "x2 damage!",
-    "Способность": "Ability",
-    "10% шанс сделать двойной урон": "10% chance to deal double damage",
-    "Восстанавливает вам половину наносимого этим мечом урона": "Restores half the damage dealt by this sword to you",
-    "Неизвестная": "Unknown",
-    "Дополнительный урон": "Additional damage",
-    "Вампиризм": "Vampirism",
-    "Используйте, чтобы отправить все к снежной королеве подо льдину": "Use to send everything to the Snow Queen under the ice",
-    "§3Снежная бомба": "§3Snow bomb",
-    "Используйте, чтобы отправить все в огненный ад": "Use to send everything to fiery hell",
-    "Используй этот предмет сидя на пушке": "Use this item while sitting on the cannon",
-    "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.": "Use this item on the cannon to fire it. You can't shoot while sitting on the cannon.",
-    "Используй этот предмет, чтобы установить пушку": "Use this item to place a cannon",
-    "Возьми у меня задание и отправляйся в другое поселение следуя компасу.": "Take a quest from me and go to another settlement following the compass.",
-    "Как мне переплавить руду?": "How do I smelt ore?",
-    "Они есть... просто они сидят дома и смотрят стрим @shp1natqp": "They exist... they're just at home watching the @shp1natqp stream",
-    "Почему тут нет жителей?": "Why are there no villagers here?",
-    "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате.": "It's a starter airdrop. Survivors are supplied with these from time to time. You can track airdrops on the map or in chat.",
-    "Сверху упал сундук, что это?": "A chest fell from above, what is it?",
-    "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты.": "I don't get paid, I just enjoy watching newbies like you develop.",
-    "Сколько тебе платят?": "How much do you get paid?",
-    "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков.": "It's generally very dangerous and hides many secrets. I wouldn't recommend going far from the supports and bridges.",
-    "Я могу потеряться в шахте?": "Can I get lost in the mine?",
-    "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей.": "It's a magical mine. It regenerates itself after a while. As you noticed, you won't find ore on the surface, so mine deeper along the sides of the tunnels.",
-    "Почему шахта такая странная?": "Why is the mine so strange?",
-    "Можно узнать это, если посмотреть на карту и присесть.": "You can find out by looking at the map and crouching.",
-    "Сколько ещё сохранилось поселений?": "How many settlements have survived?",
-    "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении.": "No, I have colleagues. There is a special guide in every settlement.",
-    "Ты единственный путеводитель??": "Are you the only guide??",
-    "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны.": "This settlement is called \"Miners' Village\" - one of the surviving settlements after the war.",
-    "Где я?": "Where am I?",
-    "Шахтер": "Miner",
-    "Деревня шахтеров": "Miners' Village",
-    "Добыть алмазы": "Mine diamonds",
-    "Добыть уголь": "Mine coal",
-    "Добыть железо": "Mine iron",
-    "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!": "Go down the mineshaft in the Miners' Village and mine the specified resource!",
-    "А где мне базу сделать-то?": "Where should I make my base?",
-    "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ": "Explorers, you know, silly, travel, look, enjoy, EXPLORE",
-    "Исследователь": "Explorer",
-    "Деревня исследователей": "Explorers' Village",
-    "§a§lМагический слайм": "§a§lMagic Slime",
-    "§8Зачарование несовместимо": "§8Enchantment incompatible",
-    "Максимальный уровень": "Maximum level",
-    "Уровень зачара предмета как у книжки": "Item's enchantment level is the same as the book",
-    "Уровень зачара предмета уже выше книжки": "Item's enchantment level is already higher than the book",
-    "С чарками такого уровня не работаю, слетят": "I don't work with enchantments of this level, they will be lost",
-    "любой зачарованный предмет": "any enchanted item",
-    "Отсортировать чарки": "Sort enchanted items",
-    "Зелья": "Potions",
-    "Грибы": "Mushrooms",
-    "Все для магии": "Everything for magic",
-    "Оружие со способностями": "Weapon with abilities",
-    "Зачаровать": "Enchant",
-    "Предмет для зачарования": "Item to enchant",
-    "Предмет": "Item",
-    "Нет зачарований": "No enchantments",
-    "Использовать книгу чар": "Use enchantment book",
-    "любые топор, кирка, мотыга или лопата": "any axe, pickaxe, hoe, or shovel",
-    "Улучшить инструмент": "Upgrade tool",
-    "любой элемент брони": "any armor piece",
-    "Улучшить броню": "Upgrade armor",
-    "любой лук": "any bow",
-    "Улучшить лук": "Upgrade bow",
-    "любой меч": "any sword",
-    "Улучшить меч": "Upgrade sword",
-    "Чего пожелаешь?": "What do you wish for?",
-    "Маг": "Mage",
-    "Технограда": "Technograd",
-    "Зачаруйте любой предмет у Мага": "Enchant any item at the Mage",
-    "Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание": "Open Menu -> Wiki -> Ores -> Lapis Lazuli -> Take quest",
-    "Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание": "Open Menu -> Wiki -> Resources -> Experience -> Magic Slime -> Take quest",
-    "Посетите Мага": "Visit the Mage",
-    "Мага": "the Mage",
-    "Магическому слайму": "to the Magic Slime",
-    "Вардену": "to the Warden",
-    "Приветствуем в нашей деревне!": "Welcome to our village!",
-    "Ну крутой техно типо не понял что ли": "Well, cool techno guy, didn't you get it?",
-    "Техник": "Technician",
-    "Техноград": "Technograd",
-    "Используется у Инженера": "Used at the Engineer",
-    "§aМагическая слизь": "§aMagic slime",
-    "Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу": "Here he'll be like, take the quest to gather resources for the base. After that quest, he'll send you to the engineer himself, like, buy the base",
-    "Только я могу ее собрать": "Only I can assemble it",
-    "База - самый дорогой предмет в нашу эпоху, для нее нужно много ресурсов": "The base is the most expensive item in our era, it requires a lot of resources",
-    "Базу": "The Base",
-    "...и не были разворованы другими выжившими...": "...and weren't stolen by other survivors...",
-    "Чтобы ваши постройки не разложились из-за радиации...": "So that your buildings don't decay due to radiation...",
-    "База": "Base",
-    "Инженеру": "to the Engineer",
-    "И переняли уцелевшие технологии прошлой эпохи": "And adopted the surviving technologies of the past era",
-    "Мы обосновались вокруг озера, оставшегося после взрыва бункера": "We settled around the lake left after the bunker explosion",
-    "Приветствуем в самом технологичном городе!": "Welcome to the most technological city!",
-    "§b§lКамнедробилка": "§b§lStone Crusher",
-    "§6§lРобот": "§6§lRobot",
-    "Все для редстоуна": "Everything for redstone",
-    "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n": "Well, give me a blueprint and I'll craft something for you, yeah\r\n",
-    "Инженер": "Engineer",
-    "Вы не можете купить это в режиме новичка": "You cannot buy this in newbie mode",
-    "Используется для создания платы у Инжинера в Технограде": "Used to create a board at the Engineer in Technograd",
-    "Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота": "Used to create a base at the Engineer in Technograd\n\nCan be obtained from a reinforced chest and robot",
-    "Деревни исследователей": "Explorers' villages",
-    "Сделайте железные ботинки": "Craft iron boots",
-    "Сделайте железные поножи": "Craft iron leggings",
-    "Сделайте железный шлем": "Craft iron helmet",
-    "Сделайте железный нагрудник": "Craft iron chestplate",
-    "Сделайте железный меч": "Craft iron sword",
-    "Сделайте железную кирку": "Craft iron pickaxe",
-    "Переплавьте необработанное железо в слиток": "Smelt raw iron into an ingot",
-    "Откройте печку с помощью ключа": "Open the furnace with a key",
-    "Печкина": "Pechkin",
-    "Мы специализируемся на обработке руды": "We specialize in ore processing",
-    "Приветствуем в самом старом и большом городе новой эпохи!": "Welcome to the oldest and largest city of the new era!",
-    "Ну типа крутой камни ломаем вот да": "Well, we break cool stones here, yeah",
-    "А что за город": "What kind of city is this",
-    "Ломщик": "StoneBreaker",
-    "У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n": "You can buy a key to the smokers for cooking food from me\n\n",
-    "Баба Валя": "Grandma Valya",
-    "У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n": "You can buy a key to the smelters for smelting ore from me\n\n",
-    "Печкин": "Pechkin",
-    "Каменоломня": "StoneQuarry",
-    "Предмет целый, выберите другой": "Item is intact, choose another",
-    "Любой поломанный предмет": "Any broken item",
-    "Починить": "Repair",
-    "Улучшить": "Upgrade",
-    "Алмазный меч/инструмент/броня": "Diamond sword/tool/armor",
-    "Улучшить до незерита": "Upgrade to netherite",
-    "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.": "I forge weapons. If you have nothing to do, go away, don't distract me from work.",
-    "Оружейник": "Weaponsmith",
-    "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n": "Wtf, I mean I have nothing to offer you yet\r\n\r\n",
-    "Кучер": "Coachman",
-    "Вино": "Wine",
-    "Настойка из шпината": "Spinach tincture",
-    "Сидр": "Cider",
-    "Пиво": "Beer",
-    "Квас": "Kvass",
-    "Ну что, устал от жизни? Пришел попить?\n\n": "So, tired of life? Came for a drink?\n\n",
-    "Бармен": "Bartender",
-    "§r§cВремя истекло": "§r§cTime is up",
-    "§r§6Печка плавит...": "§r§6Furnace is smelting...",
-    "§r§aНе использован": "§r§aNot used",
-    "Статус": "Status",
-    "На": "On",
-    "Неизвестен": "Unknown",
-    "Продавец": "Vendor",
-    "§7Открывает печку в каменоломне.": "§7Opens the furnace in the quarry.",
-    "§6Ключ от печки": "§6Furnace key",
-    "Вы уже использовали этот ключ для другой печки.": "You have already used this key for another furnace.",
-    "Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке": "Key expired. Buy a new one if you need to retrieve resources left in this furnace",
-    "Этот ключ используется для других печек!": "This key is used for other furnaces!",
-    "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!": "To use furnaces, you need to buy a key from Pechkin and keep it in your inventory!",
-    "Ключ от печки": "Furnace key",
-    "Сдать неиспользуемый ключ": "Return unused key",
-    "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!": "The key is now bound to this furnace! For one hour you can open it with this key!",
-    "§r§bПеремещает на спавн": "§r§bTeleports to spawn",
-    "Определяет, будете ли вы телепортироваться на спавн при входе": "Determines if you will teleport to spawn on join",
-    "Телепорт на спавн": "Teleport to spawn",
-    "Вход": "Join",
-    "Общее": "General",
-    "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n": "Come in, make yourself comfortable. All food is fresh, straight from the oven! The apple too.\n\n",
-    "Тетя Зина": "Aunt Zina",
-    "§7Шахта": "§7Mine",
-    "Порталы": "Portals",
-    "Перемещение...": "Teleporting...",
-    "Портал в это поселение не разблокирован": "Portal to this settlement is not unlocked",
-    "Мирная зона": "Safe",
-    "Открыт новый портал! [Когда-нибудь здесь будет анимация...]": "New portal opened! [Someday there will be an animation here...]",
-    "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n": "I only chop wood with my axe, don't try to order a murder from me.\n\n",
-    "Дровосек": "Woodman",
-    "А камень я тебе дам.\n\n": "I'll give you stone.\n\n",
-    "Каменщик": "Stoner",
-    "Любой непродаваемый предмет": "Any unsellable item",
-    "Любой предмет": "Any item",
-    "Продай мне весь свой мусор": "Sell me all your junk",
-    "Мусорщик": "Scavenger",
-    "Украшения я делать пока не умею.\n\n": "I can't make jewelry yet.\n\n",
-    "Ювелир": "Jeweler",
-    "И рыбник.\n\n": "And fishmonger.\n\n",
-    "Мясник": "Butcher",
-    "Сходи в город, сделай запланированые покупки": "Go to the city, make your planned purchases",
-    "Посети город": "Visit the city",
-    "§9Хранилище": "§9Storage",
-    "§bУсиленный": "§bReinforced",
-    "§7Обычный": "§7Normal",
-    "Исследуйте новый город!": "Explore the new city!",
-    "Доберитесь до города!": "Reach the city!",
-    "Доберитесь до указанного города или деревни": "Reach the specified city or village",
-    "§dНезеритовая жила": "§dNetherite Vein",
-    "Может появиться в сундуке внутри кучи древних обломков": "May appear in a chest inside a pile of ancient debris",
-    "Лежит группами по 5-10 блоков рядом с сундуками": "Lies in groups of 5-10 blocks near chests",
-    "§5Варден": "§5Warden",
-    "§cПалатка аванпоста": "§cOutpost Tent",
-    "§4Бункер": "§4Bunker",
-    "§cАванпост": "§cOutpost",
-    "Гараж": "Garage",
-    "Заправка 4": "Gas Station 4",
-    "Заправка 3": "Gas Station 3",
-    "Заправка 2": "Gas Station 2",
-    "Заправка 1": "Gas Station 1",
-    "Поставьте эту бочку и она станет базой.": "Place this barrel and it will become a base.",
-    "§6База": "§6Base",
-    "(разрушена)": "(destroyed)",
-    "(гниет)": "(decaying)",
-    "Данж": "Dungeon",
-    "Телепорт!": "Teleport!",
-    "Это ваша база.": "This is your base.",
-    "У вас нет базы! Вступите в существующую или создайте свою.": "You don't have a base! Join an existing one or create your own.",
-    "Меню базы": "Base menu",
-    "База гниет! Положите материалы из .base -> Гниение в бочку": "Base is decaying! Put materials from .base -> Decay into the barrel",
-    "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью": "Base was raided. Sorry. You can still restore it if it hasn't completely decayed",
-    "Нужно срочно положить материалы в бочку!": "Urgently put materials in the barrel!",
-    "разрушена": "destroyed",
-    "гниет": "decaying",
-    "Состояние базы": "Base status",
-    "§cБаза гниет!\n§4Срочно пополните материалы!": "§cBase is decaying!\n§4Urgently replenish materials!",
-    "Гниение базы": "Base decay",
-    "скоро начнется гниение": "decay will start soon",
-    "Рядом есть другие регионы!": "There are other regions nearby!",
-    "владеете базой": "own a base",
-    "Теперь вы можете свободно создать базу!": "Now you can freely create a base!",
-    "решили создать базу": "decided to create a base",
-    "Очень высокая радиация!": "Very high radiation!",
-    "Высокая радиация!": "High radiation!",
-    "Найдено!": "Found!",
-    "Поиск случайной локации без воды...": "Searching for a random location without water...",
-    "Кварцевое озеро": "Quartz Lake",
-    "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку": "Clears saved anarchy point. When teleporting to anarchy, you will be thrown to a random location",
-    "§bПеремещает на анархию": "§bTeleports to anarchy",
-    "Выдает радиус границы анархии сейчас": "Shows current anarchy border radius",
-    "вы атаковали игрока": "you attacked a player",
-    "Нельзя сражаться с новичками!": "Can't fight newbies!",
-    "Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи": "You cannot break blocks not placed by players\noutside your base, mine, or mining zone",
-    "Вы вышли из сервера во время сражения, поэтому были убиты при входе.": "You left the server during combat, so you were killed on entry.",
-    "Вы находитесь в режиме сражения!": "You are in combat mode!",
-    "Звук попадания по существо из лука": "Bow hit sound",
-    "Звук лука": "Bow sound",
-    "Индикатор попадания по существу из лука": "Bow hit indicator",
-    "Индикатор": "Indicator",
-    "Вы уверены что хотите удалить точку восстановления?": "Are you sure you want to delete the restore point?",
-    "Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено": "Are you sure you want to load the restore point? Your current state will be deleted",
-    "Загрузиться": "Load",
-    "Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено": "Are you sure you want to overwrite the restore point FROM THE CURRENT STATE? The current restore point save will be deleted",
-    "Точки восстановления других игроков": "Other players' restore points",
-    "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:": "§cENDER CHEST IS NOT SAVED\n\n§f\nSaved:\nWorld position\nQuests\nInventory\nExperience\nCoins\nStatistics\nRestore point name:",
-    "Создать точку восстановления": "Create restore point",
-    "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения": "Are you sure you want to clear your anarchy inventory and return to spawn? Useful for testing the tutorial",
-    "Полный сброс": "Full reset",
-    "Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ": "Restore points needed for testing\n\n§cENDER CHEST IS NOT SAVED",
-    "Сохранения": "Saves",
-    "Очищает и сохраняет все данные (для тестов)": "Clears and saves all data (for testing)",
-    "Вы не можете создать точку восстановления не находясь в выживании или приключении": "You cannot create a restore point unless you are in survival or adventure",
-    "Вы не можете создать точку восстановления не находясь на анархии": "You cannot create a restore point unless you are in anarchy",
-    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.": "If enabled, when you interact with a block using an item with less than 99%% durability, the interaction will be canceled and the item will be saved.",
-    "Не давать ломать предмет": "Don't allow breaking item",
-    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран": "If enabled, when you interact with a block using an item with less than 90%% durability, show a full-screen notification",
-    "Уведомлять о ломающемся предмете": "Notify about breaking item",
-    "Версия майнкрафта": "Minecraft version",
-    "Версия сервера": "Server version",
-    "Нанесено/Получено": "Dealt/Received",
-    "Убийств/Смертей": "Kills/Deaths",
-    "Показывает статистику по игре": "Shows game statistics",
-    "Вы сели. Чтобы встать, крадитесь": "You sat down. To stand up, sneak",
-    "Вы не можете сесть в падении!": "You can't sit while falling!",
-    "Присаживает вас": "Makes you sit",
-    "§cплохой": "§cbad",
-    "§gнормальный": "§gnormal",
-    "§aхороший": "§agood",
-    "Понг! Проверяем...": "Pong! Checking...",
-    "Показывает пинг сервера": "Displays server ping",
-    "Отменяет телепортацию": "Cancels teleportation",
-    "Недоступно": "Unavailable",
-    "Телепортация в случайное место на анархии": "Teleport to a random place in anarchy",
-    "Вы не телепортируетесь!": "You are not teleporting!",
-    "Вы телепортируетесь!": "You are teleporting!",
-    "Лор прочитан": "Lore read",
-    "Статистика": "Statistics",
-    "открыть его меню": "open their menu",
-    "Другие игроки": "Other players",
-    "Общее меню игрока": "General player menu",
-    "Выдает ваш айди": "Displays your ID",
-    "Меняет имя": "Change name",
-    "Убивает вас. Используйте, если застряли где-то": "Kills you. Use if you are stuck somewhere",
-    "Выводит список команд": "Displays list of commands",
-    "Возвращает камеру в исходное состояние": "Resets camera to default state",
-    "Вы получили награды!": "You received rewards!",
-    "Ваш баланс": "Your balance",
-    "Подтверждение перед покупкой": "Confirmation before purchase",
-    "Сразу открывать меню покупки": "Open purchase menu immediately",
-    "Продаваемые предметы": "Sellable items",
-    "Показывать ли счет в меню (монеты, листья)": "Show balance in menu (coins, leaves)",
-    "Показывать счет": "Show balance",
-    "Определяет, включено ли подтверждение перед покупкой.": "Determines if confirmation before purchase is enabled.",
-    "Подтверждение покупки": "Purchase confirmation",
-    "Магазин\n§7Внутриигровой магазин": "Shop\n§7In-game shop",
-    "Продажа невозможна": "Sale not possible",
-    "Покупка невозможна": "Purchase not possible",
-    "Покупка отменена": "Purchase cancelled",
-    "Продажа отменена": "Sale cancelled",
-    "Купить!": "Buy!",
-    "Продать!": "Sell!",
-    "Подтверждение": "Confirmation",
-    "Магазин": "Shop",
-    "Цена динамическая": "Dynamic price",
-    "Недостаточно средств.": "Insufficient funds.",
-    "Нет предмета": "No item",
-    "Товар закончился": "Out of stock",
-    "Склад переполнен": "Warehouse is full",
-    "Купить": "Buy",
-    "Продать": "Sell",
-    "§dНастройки": "§dSettings",
-    "Переключатель": "Toggle",
-    "JSON-Объект": "JSON Object",
-    "Число": "Number",
-    "Строка": "String",
-    "Сохранено!": "Saved!",
-    "Введите число!": "Enter a number!",
-    "Настройка не изменится": "Setting will not change",
-    "§8(По умолчанию)\n": "§8(Default)\n",
-    "§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n": "§cBUY TO USE\n",
-    "Общие настройки мира\n§7Чат, спавн и тд": "General world settings\n§7Chat, spawn, etc.",
-    "Настройки мира": "World settings",
-    "Настройки": "Settings",
-    "Доберитесь до точки": "Reach the point",
-    "Следуйте компасу": "Follow the compass",
-    "Монеты": "Coins",
-    "Опыт": "Experience",
-    "Общие": "General",
-    "Внешнее пространство": "Outer space",
-    "Я не могу с вами говорить. Приходите позже.": "I can't talk with you now. Come back later.",
-    "Вводит в режим новичка": "Enters newbie mode",
-    "Вы не находитесь в режиме новичка.": "You are not in newbie mode.",
-    "использовали команду": "used the command",
-    "Используйте, чтобы выйти из режима новичка": "Use to exit newbie mode",
-    "НЕТ, НАЗАД": "NO, BACK",
-    "Я больше не новичок": "I'm no longer a newbie",
-    "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти": "If you perform this action, you will lose newbie status:\r\n - Other players will be able to damage you\r\n - Other players will be able to take your loot after death",
-    "Успешно отменено": "Successfully cancelled",
-    "меню": "menu",
-    "§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu": "§r§7Hold and use the item\n§r§7To remove from inventory, type in chat: §f.menu",
-    "Меню\n§7Разные настройки интерфейсов и меню в игре": "Menu\n§7Various interface and menu settings in the game",
-    "трлн": "T",
-    "млрд": "B",
-    "млн": "M",
-    "к": "k",
-    "Просмотр содержимого таблиц лута": "View loot table contents",
-    "Содержимое": "Contents",
-    "Я готов принять риск": "I am ready to take the risk",
-    "Вернуться назад": "Go back",
-    "Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне": "Other players will be able to take your resources after death in this zone",
-    "Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.": "Other players will not be able to take your resources after death in this zone.",
-    "у вас вообще экипировки нет": "you have no equipment at all",
-    "Ваш уровень": "Your level",
-    "Требуемый уровень": "Required level",
-    "Зона": "Zone",
-    "Опасно!": "Dangerous!",
-    "С помощью него вы можете сделать предмет у инженера": "With it you can craft an item at the engineer",
-    "§9Тестер": "§9Tester",
-    "§9Наблюдатель": "§9Observer",
-    "§fУчастник": "§fMember",
-    "§3Строитель": "§3Builder",
-    "§bГл. Строитель": "§bHead Builder",
-    "§eПомошник": "§eHelper",
-    "§6Модератор": "§6Moderator",
-    "§5Админ": "§5Admin",
-    "§dГл. Админ": "§dHead Admin",
-    "§cТех. Админ": "§cTech Admin",
-    "§6Куратор": "§6Curator",
-    "§aРуководство": "§aGuide",
-    "Роль сменена успешно": "Role changed successfully",
-    "Например, \"чел дурной, пол технограда снес\"": "For example, \"guy is crazy, destroyed half of Technograd\"",
-    "Причина смены роли": "Reason for role change",
-    "Роль": "Role",
-    "Показать Ваш ник в уведомлении": "Show your nickname in notification",
-    "Уведомлять": "Notify",
-    " §4Не сменить": " §4Cannot change",
-    "Без имени": "No name",
-    "§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)": "§3Change my role\n§7(Restore later: §f/rolerestore§7)",
-    "§6дате входа": "§6login date",
-    "§aролям": "§aroles",
-    "§bонлайну": "§bonline",
-    "\n\n§3Восстановить прошлую роль: §f.role restore": "\n\n§3Restore previous role: §f.role restore",
-    "Восстанавливает вашу роль": "Restores your role",
-    "Показывает вашу роль": "Displays your role",
-    "Дорога": "Road",
-    "Регион сохраняется": "Region is being saved",
-    "Вы не можете добывать блоки в зоне добычи новичков": "You cannot mine blocks in the newbie mining zone",
-    "Индексировать для вики": "Index for wiki",
-    "Применить": "Apply",
-    "В этом месте не должно быть региона шахты, подвинуть все": "There shouldn't be a mineshaft region in this place, move everything",
-    "§7Зона добычи": "§7Mining zone",
-    "§bЗона добычи новичков": "§bNewbie mining zone",
-    "Вы уверены что хотите удалить участника из региона?": "Are you sure you want to remove the member from the region?",
-    "Удалить участника": "Remove member",
-    "Передать права": "Transfer rights",
-    "Управление участником региона": "Manage region member",
-    "Добавить участника": "Add member",
-    "Добавить!": "Add!",
-    "Вы можете только посмотреть их": "You can only view them",
-    "Для управления участником нажмите на кнопку с его ником": "To manage a member, click the button with their nickname",
-    "Участники региона": "Region members",
-    "Центр региона": "Region center",
-    "Радиус\n§7Определяет радиус региона": "Radius\n§7Determines the region radius",
-    "Нет": "No",
-    "Только с сущностями (pve)": "Only with entities (pve)",
-    "Да": "Yes",
-    "Сражение\n§7Определяет, смогут ли игроки сражаться в регионе": "Combat\n§7Determines if players can fight in the region",
-    "Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.": "Gates\n§7Determines if players not added to the region can use gates.",
-    "Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)": "Containers\n§7Determines if players not added to the region can open containers (chests, shulkers, etc.)",
-    "Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.": "Trapdoors\n§7Determines if players not added to the region can use trapdoors.",
-    "Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.": "Levers and buttons\n§7Determines if players not added to the region can use levers and buttons.",
-    "Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.": "Doors\n§7Determines if players not added to the region can use doors.",
-    "Разрешения региона": "Region permissions",
-    "Структура": "Structure",
-    "Разрешения": "Permissions",
-    "Тип зоны": "Zone type",
-    "Тип региона": "Region type",
-    "Сохранить": "Save",
-    "Пересохранить": "Resave",
-    "Выключено": "Disabled",
-    "Входит в режим телепортации по группе регионов. Полезно для поиска данжа": "Enters teleport mode by region group. Useful for finding a dungeon",
-    "Управляет регионами": "Manages regions",
-    "Заберите награду": "Claim reward",
-    "Отправлять ли сообщение в чат при каждом новом разделе задания": "Send a chat message at each new quest section",
-    "Сообщение в чат при каждом шаге": "Chat message at each step",
-    "Задания\r\n§7Настройки игровых заданий": "Quests\r\n§7Game quest settings",
-    "Отказаться от задания?": "Abandon quest?",
-    "Отказаться": "Abandon",
-    "Сделать приоритетным": "Make priority",
-    "Задание завершено!": "Quest completed!",
-    "Измерение": "Dimension",
-    "Локация": "Location",
-    "Описание:": "Description:",
-    "Текущее действие": "Current action",
-    "Описание": "Description",
-    "Список завершенных заданий": "List of completed quests",
-    "Завершенные задания": "Completed quests",
-    "Нет активных заданий.": "No active quests.",
-    "Нет заданий": "No quests",
-    "Задания": "Quests",
-    "У вас нет активных заданий!": "You have no active quests!",
-    "Выйти": "Exit",
-    "Меню заданий": "Quest menu",
-    "Взять задание": "Take quest",
-    "§2Перемещение...": "§2Teleporting...",
-    "при входе игроков": "when players log in",
-    "о входе других игроков": "about other players logging in",
-    "Сообщение": "Message",
-    "§8Проснулся": "§8Woke up",
-    "§8Очнулся в воздухе": "§8Woke up in the air",
-    "Добро пожаловать!": "Welcome!",
-    "§3Добрый вечер": "§3Good evening",
-    "§bДобрый день": "§bGood afternoon",
-    "§6Доброе утро": "§6Good morning",
-    "§9Доброй ночи": "§9Good night",
-    "при входе": "on login",
-    "Время": "Time",
-    "Вход\n§7Все действия, связанные со входом": "Login\n§7All actions related to login",
-    "Имитирует первый вход": "Simulate first login",
-    "Удалить": "Delete",
-    "Удалить письмо": "Delete mail",
-    "Удалить письмо?": "Delete mail?",
-    "Награда успешно забрана!\n\n": "Reward successfully claimed!\n\n",
-    "Вы не можете забрать награды не находясь на анархии": "You cannot collect rewards while not in anarchy",
-    "Забрать награду": "Claim reward",
-    "Награды": "Rewards",
-    "Алмазов за прочтение": "Diamonds for reading",
-    "вот.": "here.",
-    "Строка5": "Line5",
-    "да": "yes",
-    "Строка 4": "Line 4",
-    "читать все сообщения в почте": "read all messages in mail",
-    "Строка3": "Line3",
-    "вы теперь можете": "you now can",
-    "Строка2": "Line2",
-    "мы вас поздравляем": "we congratulate you",
-    "Строка 1": "Line 1",
-    "вы крутые там д0а": "you are cool there, yeah",
-    "Заголовок": "Title",
-    "Объявление для всего сервера": "Announcement for the entire server",
-    "Объявление": "Announcement",
-    "Все прочитано": "All read",
-    "Прочитать все\n§7(и собрать награды если есть)": "Прочитать все\n§7(и собрать награды если есть)",
-    "Имени": "Name",
-    "Дате": "Date",
-    "У письма есть несобранные награды": "Mail has unclaimed rewards",
-    "Несобранные награды": "Unclaimed rewards",
-    "Показывать только непрочитанные сообщения": "Show only unread messages",
-    "Непрочитанные": "Unread",
-    "Почта:": "Mail:",
-    "Показывать ли при входе сообщение с кол-вом непрочитанных": "Show unread mail count on login",
-    "Почта": "Mail",
-    "Собирать ли награды при удалении письма": "Collect rewards when deleting mail",
-    "Собирать награды при удалении": "Collect rewards on delete",
-    "Почта\n§7Прочтение сообщения, инфо при входе": "Mail\n§7Message reading, info on login",
-    "Посмотреть входящие сообщения почты": "View incoming mail messages",
-    "§cНет": "§cNo",
-    "§fДа": "§fYes",
-    "§bНовичок": "§bNewbie",
-    "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова": "Failed to open form. Close chat or another menu and try again",
-    "Закрой чат!": "Close chat!",
-    "Закрыть": "Close",
-    "Назад": "Back",
-    "Дате входа": "Login date",
-    "Онлайну": "Online",
-    "Сортировать по": "Sort by",
-    "Выбрать всех": "Select all",
-    "Убрать выделение": "Deselect",
-    "Вы уверены?": "Are you sure?",
-    "Никакой": "None",
-    "История": "History",
-    "Хорошо, назад": "Okay, back",
-    "Ничего не произойдет": "Nothing will happen",
-    "Запрос": "Query",
-    "Поиск": "Search",
-    "Следующая": "Next",
-    "Предыдущая": "Previous",
-    "Фильтры": "Filters",
-    "Отмена": "Cancel",
-    "§r§3Назад": "§r§3Back",
-    "§l§b< §r§3Назад": "§l§b< §r§3Back",
-    "Успешно": "Success",
-    "Последний раз онлайн": "Last seen online",
-    "Последний раз онлайн на анархии": "Last seen online on anarchy",
-    "Время первого входа на анархию": "Anarchy join time",
-    "Онлайн на анархии": "Online time on Anarchy",
-    "Время первого входа": "Join time",
-    "Всего входов на сервер": "Join times",
-    "Урона нанесено": "Damage given",
-    "Урона получено": "Damage dealt",
-    "Фейрверков взорвано": "Fireworks exploded",
-    "Фейрверков запущено": "Fireworks launched",
-    "Блоков сломано": "Blocks broken",
-    "Блоков поставлено": "Blocks placed",
-    "Онлайн всего": "Online time",
-    "Рейд-блок": "Raid-block",
-    "Смертей": "Deaths",
-    "Убийств": "Kills",
-    "§6Монеты": "§6Money",
-    "§aЛистья": "§aLeafs",
-    "Катсцена": "Cutscene",
-    "Вы получили свою награду!": "You have received your reward!",
-    "Используйте этот ключ, чтобы открыть ящик с лутом!": "Use this key to open the loot chest!",
-    "Посмотреть содержимое": "View contents",
-    "Купить ключ": "Buy key",
-    "Чтобы открыть этот сундук, возьмите в руки ключ": "To open this chest, hold the key in your hand",
-    "Команда недоступна": "Command unavailable",
-    "Команда не готова": "Command not ready",
-    "Список всех доступных вам команд: §f.help": "List of all commands available to you: §f.help",
-    "Причина не была указана, участник остался в клане": "No reason specified, member remains in the clan",
-    "Причина обязательна": "Reason is required",
-    "Причина": "Reason",
-    "Выгнать": "Kick",
-    "Сменить роль": "Change role",
-    "Вы единственный владелец. Кнопка удаления клана находится в меню клана снизу": "You are the only owner. The delete clan button is at the bottom of the clan menu",
-    "Вы не можете отказаться от владения клана являясь единственным его владельцем": "You cannot give up clan ownership being the only owner",
-    "Вы уверены что хотите сбросить свою роль в клане до участника?": "Are you sure you want to demote your role in the clan to member?",
-    "Отказаться от владения": "Give up ownership",
-    "Участники клана": "Clan members",
-    "Не удалось пригласить в клан": "Failed to invite to clan",
-    "Вы были приглашены в клан! Чтобы вступить, используйте /clan или раздел кланов из основого меню": "You have been invited to a clan! To join, use /clan or the clans section from the main menu",
-    "пригласить в клан": "invite to clan",
-    "Да, отозать": "Yes, revoke",
-    "отозвать приглашение?": "revoke invitation?",
-    "Новое приглашение": "New invitation",
-    "Онет": "Oh no",
-    "Нет, не заслужил": "No, not deserved",
-    "Откройте меню клана с помощью .clan": "Open the clan menu using .clan",
-    "Принять!": "Accept!",
-    "Выбор": "Select",
-    "Другие кланы\n§7Посмотреть": "Other clans\n§7View",
-    "Хз почему": "Dunno why",
-    "Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку.": "Are you sure you want to leave the clan? If you change your mind, you will have to submit a new application.",
-    "Покинуть клан": "Leave clan",
-    "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.": "Unfortunately, the clan was disbanded. No idea why the creator didn't like it, find a better clan or create a new one, no need to be sad. You can still loot the clan bases, the creator probably didn't remove you from all of them.",
-    "Удалить клан без возможности восстановления?": "Delete clan without the possibility of recovery?",
-    "Удалить клан": "Delete clan",
-    "Изменить": "Change",
-    "Изменить название или тэг клана": "Change clan name or tag",
-    "Заявки на вступление": "Join requests",
-    "Участники": "Members",
-    "Дата создания": "Creation date",
-    "Имя клана": "Clan name",
-    "Меню клана": "Clan menu",
-    "Кланы": "Clans",
-    "Ваш клан": "Your clan",
-    "Выводит справку о команде": "Displays command help",
-    "Пусто": "Empty",
-    "Справка по скриптовым командам": "Help for script commands",
-    "Та ну не надоело": "Nah, aren't you tired of it",
-    "Щас исправлю": "I'll fix it now",
-    "Ошибка": "Error",
-    "Чтобы блатными в чате выглядеть": "To look cool in chat",
-    "Тэг клана": "Clan tag",
-    "Ну, давай, придумай чета оригинальное": "Come on, think of something original",
-    "Название клана": "Clan name",
-    "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов": "A player wants to join your clan, you can accept or reject them through the clan menu",
-    "Создать клан": "Create clan",
-    "Создать свой клан": "Create your own clan",
-    "Приглашения": "Invitations",
-    "Выберите клан, чтобы отправить заявку или создайте свой клан!": "Select a clan to send a join request or create your own clan!",
-    "Выбор клана": "Clan selection",
-    "Клан": "Clan",
-    "Размутить": "Unmute",
-    "Вернуть обратно": "Revert",
-    "Неизвестный тип времени": "Unknown time type",
-    "Заглушить игрока в чате": "Mute a player in chat",
-    "Не был замьючен": "Was not muted",
-    "Владелец": "Owner",
-    "Помошник": "Assistant",
-    "Участник": "Member",
-    "Звука сообщений от игроков поблизости": "Sound of messages from nearby players",
-    "Звук": "Sound",
-    "Чат\n§7Звуки и внешний вид чата": "Chat\n§7Chat sounds and appearance",
-    "Забрать награды": "Claim rewards",
-    "Награды забраны": "Rewards claimed",
-    "?\nНеизвестно": "?\nUnknown",
-    "Несобранные вверху": "Unclaimed on top",
-    "Скрыть неизвестные": "Hide unknown",
-    "По алфавиту": "Alphabetically",
-    "По дате получения": "By date received",
-    "Режим сортировки": "Sort mode",
-    "Достижения": "Achievements",
-    "Прочитать все\n§7(и собрать награды если есть)": "Read all\n§7(and collect rewards if any)",
-    "Ошибка в асинхронной команде ": "Error in async command ",
-    "добавить в клан": "add to clan",
-    "Создание/изменение названия клана": "Create/change clan name",
-    "Часы": "Hours",
-    "Минуты": "Minutes",
-    "Тип времени": "Time type",
-    "введи": "enter",
-    "Мут ": "Mute ",
-    "замутить": "mute",
-    "Замутить": "Mute",
-    "Муты": "Mutes",
-    "за поведение": "for behavior",
-    "забанить": "ban",
-    "Кикает и убирает игрока из вайтлиста": "Kicks and removes player from whitelist",
-    "§cВы были заморожены": "§cYou have been frozen",
-    "Выберите онлайн игрока": "Select an online player",
-    "заморозить": "freeze",
-    "§aВы были разморожены": "§aYou have been unfrozen",
-    "Заморозить": "Freeze",
-    "Заморозка": "Freeze",
-    "Возвращает движение игроку": "Restores player movement",
-    "Останавливает движение игрока до unfreeze": "Stops player movement until unfreeze",
-    "Верстак": "Crafting Table",
-    "Куда игроки будут тепаться при обучении": "Where players will teleport during tutorial",
-    "Наш город специализируется на обработке руды": "Our city specializes in ore processing",
-    "Приветствуем в городе!": "Welcome to the city!",
-    "портал до": "portal to",
-    "портал от": "portal from",
-    "портал телепортирует на": "portal teleports to",
-    "мирная зона": "peaceful zone",
-    "портал на анархию": "portal to anarchy",
-    "центр анархии": "anarchy center",
-    "Откройте меню клана с помощью /clan": "Open the clan menu using /clan",
-    "Админ: добавить игрока": "Admin: add player",
-    "Телепорт к игроку...": "Teleport to player...",
-    "Вы были приглашены в клан! Чтобы вступить, используйте .clan или раздел кланов из основого меню": "You have been invited to a clan! To join, use .clan or the clans section in the main menu",
-    "Ура": "Hooray",
-    "Краткое имя клана": "Clan short name",
-    "Та ну я лучше вступлю куда-то": "Nah, I'd rather join somewhere",
-    "Имя не может содержать параграф": "Name cannot contain paragraph symbol",
-    "Короткое имя не может содержать параграф": "Short name cannot contain paragraph symbol",
-    "Короткое имя должно быть КОРОТКИМ, меньше 5 символов": "Short name must be SHORT, less than 5 characters",
-    "Базы клана": "Clan bases",
-    "СКОРО": "COMING SOON",
-    "Понизить до участника": "Demote to member",
-    "Повысить до владельца": "Promote to owner",
-    "понижены": "demoted",
-    "повышены": "promoted",
-    "Ничего не произойдет, если вы не укажете причину": "Nothing will happen if you don't specify a reason",
-    "Выход из катсцены": "Exit cutscene",
-    "Вы не находитесь в катсцене!": "You are not in a cutscene!",
-    "Отказаться от задания": "Abandon quest",
-    "Пересохранить структуру": "Resave structure",
-    "Сохранить структуру": "Save structure",
-    "§7Владелец > ": "§7Owner > ",
-    "Передать права владельца региона": "Transfer region ownership",
-    "Назначить владельцем региона": "Assign as region owner",
-    "Передать": "Transfer",
-    "Нельзя сражаться в мирной зоне": "Cannot fight in safe zone",
-    "§r§l§6Цель\n§r§7(use)": "§r§l§6Цель\n§r§7(use)",
-    "ударили игрока": "hit a player",
-    "Будь осторожнее в следующий раз.": "Be more careful next time.",
-    "снова ударили игрока": "hit a player again",
-    "провели на анархии больше 2 часов": "spent more than 2 hours on anarchy",
-    " (долгое)": " (long)",
-    "Подсветка моих сообщений": "Highlight my messages",
-    "Если включено, вы будете видеть свои сообщения в чате так: §l§6Я: §r§fСообщение§r": "If enabled, you will see your messages in chat like this: §l§6Me: §r§fMessage§r",
-    "Выключение звука": "Mute",
-    "Выключение звука чужих сообщений": "Mute others' messages",
-    " Пусто": " Empty",
-    "Читать письмо при открытии": "Read mail on open",
-    "Помечать ли письмо прочитанным при открытии": "Mark mail as read on open",
-    "Соритровать по": "Sort by",
-    "Пометить как прочитанное": "Mark as read",
-    " Все награды будут собраны автоматически": " All rewards will be collected automatically",
-    " Вы потеряете все награды, прикрепленные к письму!": " You will lose all rewards attached to the mail!",
-    "§3Сменить мою роль\n§7(Восстановить потом: §f.role restore§7)": "§3Change my role\n§7(Restore later: §f.role restore§7)",
-    "Показывать относительную дату": "Show relative date",
-    "Показывать относительную дату на экране статистики": "Show relative date on the statistics screen",
-    "Открывает меню телепортации": "Opens teleport menu",
-    "Команда доступна только тестерам, наблюдателям и администраторам.": "Command available only to testers, observers, and administrators.",
-    "Выберите локацию": "Select location",
-    "Также доступна из команды .tp\n\nПосле выхода из беты команда не будет доступна!": "Also available from the .tp command\n\nAfter beta, the command will not be available!",
-    "Вы должны зайти на анархию или перейти в режим креатива, прежде чем телепортироваться! В противном случае вас просто вернет обратно на спавн.": "You must enter anarchy or switch to creative mode before teleporting! Otherwise, you will be returned to spawn.",
-    "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения.": "Are you sure you want to clear the anarchy inventory and return to spawn? Useful for tutorial testing.",
-    "Перезаписать": "Overwrite",
-    "Перезаписать точку восстановления": "Overwrite restore point",
-    "удалить точку": "delete point",
-    "Озеро Технограда": "Technograd Lake",
-    "Город не настроен!": "City not configured!",
-    "Обзор города": "City overview",
-    "У меня ты можешь купить ключ доступа к печкам\n\n": "You can buy a furnace access key from me\n\n",
-    "Алмазный предмет": "Diamond item",
-    "§6Печкин": "§6Печкин",
-    "§6Баба Валя": "§6Баба Валя",
-    "Камнедробилка": "Stone crusher",
-    "Робот": "Robot",
-    "Магический Слайм": "Magic Slime",
-    "Очистка\n§7От предметов/могилок": "Cleanup\n§7Of items/graves",
-    "Вы умерли без вещей!": "You died without items!",
-    "Сообщение при смерти с пустым инвентарём": "Message on death with empty inventory",
-    "Отправлять ли сообщение, если вы умерли, и в инвентаре не было предметов": "Send a message if you died and had no items in your inventory",
-    "Ваше место смерти потерялось!": "Your death location is lost!",
-    "Могила исчезла...": "The grave disappeared...",
-    "Задания\n§7Настройки игровых заданий": "Quests\n§7Settings of game quests",
-    "Если вы совершите это действие, вы потеряете статус новичка:\n - Другие игроки смогут наносить вам урон\n - Другие игроки смогут забирать ваш лут после смерти": "If you do this, you will lose your beginner status.:\n - Other players can damage you \n - Other players can take your loot after death",
-    "Wtf ой то есть мне пока нечего тебе предложить\n\n": "Wtf oh I mean I have nothing to offer you yet\n\n",
-    "Ну типа дай мне чертеж, a я те чета там наколупаю, да\n": "Well like give me the blueprint, and I'll poke something there for ya, right\n",
-    "{0_item_name}§c*\n§aЗаберите награды!": "{0_item_name}§c*\n§aЗаберите награды!",
-    "Награда: {0_achiv_reward_toString_player_}": "Награда: {0_achiv_reward_toString_player_}",
-    "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}",
-    "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}",
-    "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}",
-    "Игрок {0_nameArg} не найден": "Игрок {0_nameArg} не найден",
-    "Причина: {0_info_mutedUntil}\n{1_until}": "Причина: {0_info_mutedUntil}\n{1_until}",
-    "Вы приняли приглашение в клан '{0_clan_name}'": "Вы приняли приглашение в клан '{0_clan_name}'",
-    "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!",
-    "Заявка на вступление в клан '{0_clan_name}' отправлена!": "Заявка на вступление в клан '{0_clan_name}' отправлена!",
-    "Запрос на вступление в клан от '{0_player_name}'": "Запрос на вступление в клан от '{0_player_name}'",
-    "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}": "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}",
-    "Имя '{0_name}' не может содержать параграф": "Имя '{0_name}' не может содержать параграф",
-    "Короткое имя '{0_shortname}' не может содержать параграф": "Короткое имя '{0_shortname}' не может содержать параграф",
-    "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов",
-    "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'",
-    "Клан с именем '{0_name}' уже существует.": "Клан с именем '{0_name}' уже существует.",
-    "Короткое имя '{0_shortname}' уже занято.": "Короткое имя '{0_shortname}' уже занято.",
-    "Клан '{0_clan_name}' распущен": "Клан '{0_clan_name}' распущен",
-    "Игрок {0_player_name} покинул ваш клан": "Игрок {0_player_name} покинул ваш клан",
-    "Клан '{0_clan_name}' покинут успешно": "Клан '{0_clan_name}' покинут успешно",
-    "Короткое имя: {0_clan_shortname}": "Короткое имя: {0_clan_shortname}",
-    "Принять игрока '{0_name}' в клан?": "Принять игрока '{0_name}' в клан?",
-    "Вы приняты в клан {0_clan_name}": "Вы приняты в клан {0_clan_name}",
-    "Вы НЕ приняты в клан {0_clan_name}": "Вы НЕ приняты в клан {0_clan_name}",
-    "Приглашения в клан '{0_clan_name}'": "Приглашения в клан '{0_clan_name}'",
-    "Игрок {0_name} уже состоит в вашем клане!": "Игрок {0_name} уже состоит в вашем клане!",
-    "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": "Игрок {0_name} уже состоит в клане {1_playerClan_name}!",
-    "Приглашение в клан '{0_clan_name}'": "Приглашение в клан '{0_clan_name}'",
-    "Игрок {0_name} успешно приглашен в клан!": "Игрок {0_name} успешно приглашен в клан!",
-    "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.",
-    "Роль в клане {0_changeString}": "Роль в клане {0_changeString}",
-    "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}",
-    "Выгнать участника '{0_memberName}'": "Выгнать участника '{0_memberName}'",
-    "Вы выгнаны из клана '{0_clan_name}'": "Вы выгнаны из клана '{0_clan_name}'",
-    "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}",
-    "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": "Участник {0_memberName} успешно выгнан из клана {1_clan_name}",
-    "Сменить роль {0_Player_nameOrUnknown_member_id_}": "Сменить роль {0_Player_nameOrUnknown_member_id_}",
-    "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ",
-    "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─",
-    " (также {0_d_aliases_join______})": " (также {0_d_aliases_join______})",
-    "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}",
-    "Не так быстро! Попробуй через {0_i18n_time_after_}": "Не так быстро! Попробуй через {0_i18n_time_after_}",
-    "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?",
-    "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}",
-    "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help",
-    "При выполнении команды произошла ошибка. {0_developersAreWarned}": "При выполнении команды произошла ошибка. {0_developersAreWarned}",
-    "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}",
-    "{0_this_place_name} ящик": "{0_this_place_name} ящик",
-    "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}",
-    "Открыт ящик {0_this_name}!": "Открыт ящик {0_this_name}!",
-    "{0_i18n___this_name_______} > Содержимое": "{0_i18n___this_name_______} > Содержимое",
-    "{0_this_name} ящик": "{0_this_name} ящик",
-    "Ключ для ящика {0_Crate_getName_storage_crate_}": "Ключ для ящика {0_Crate_getName_storage_crate_}",
-    "Игрок {0_player_database_name} сменил ник на {1_player_name}": "Игрок {0_player_database_name} сменил ник на {1_player_name}",
-    "§cВы уверены, что хотите {0_text}?": "§cВы уверены, что хотите {0_text}?",
-    "Результаты поиска по запросу\n{0_searchQuery}": "Результаты поиска по запросу\n{0_searchQuery}",
-    "§3Выберите игрока чтобы {0_reason}": "§3Выберите игрока чтобы {0_reason}",
-    "{0_days} д. {1_hhmmss}": "{0_days} д. {1_hhmmss}",
-    "У вас {0_unreadCount} непрочитанных сообщений!": "У вас {0_unreadCount} непрочитанных сообщений!",
-    "Следующее письмо\n{0_letterOneLineName_next_letter_}": "Следующее письмо\n{0_letterOneLineName_next_letter_}",
-    "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}",
-    "{0_deleteDescription} Все награды будут собраны автоматически": "{0_deleteDescription} Все награды будут собраны автоматически",
-    "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!",
-    "{0_i18n_header_______}: {1_title}, просмотреть: /mail": "{0_i18n_header_______}: {1_title}, просмотреть: /mail",
-    "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}": "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}",
-    "{0_this_quest_name}\nЗавершен!": "{0_this_quest_name}\nЗавершен!",
-    "Задание\n{0_this_quest_name}": "Задание\n{0_this_quest_name}",
-    "Возьмите задание {0_target_name}": "Возьмите задание {0_target_name}",
-    "Завершите задание {0_target_name}": "Завершите задание {0_target_name}",
-    "При активации шага произошла ошибка. {0_developersAreWarned}": "При активации шага произошла ошибка. {0_developersAreWarned}",
-    "Задание {0_this_quest_name} сломалось: {1_text}": "Задание {0_this_quest_name} сломалось: {1_text}",
-    "{0_step_text__}\n§aЗавершено! §6Заберите награду.": "{0_step_text__}\n§aЗавершено! §6Заберите награду.",
-    "Вас ждет {0_i18n_accent___npc_name__}": "Вас ждет {0_i18n_accent___npc_name__}",
-    "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})",
-    "Не удалось сохранить структуру: {0_e}": "Не удалось сохранить структуру: {0_e}",
-    "Владелец > {0_name}": "Владелец > {0_name}",
-    "Вы уверены что хотите передать права владельца региона игроку {0_name}?": "Вы уверены что хотите передать права владельца региона игроку {0_name}?",
-    "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": "Вы уверены что хотите назначить владельцем региона игрока {0_name}?",
-    "§cБосс §6{0_this_bossName}": "§cБосс §6{0_this_bossName}",
-    "Макс кол-во: {0_resource_amount}": "Макс кол-во: {0_resource_amount}",
-    "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}",
-    "Регион создается. {0___region_restoringStructurePercent}%%": "Регион создается. {0___region_restoringStructurePercent}%%",
-    "Безопасная зона {0_this_safeAreaName}": "Безопасная зона {0_this_safeAreaName}",
-    "Вы вернули роль §r{0_ROLES_prevRole_}": "Вы вернули роль §r{0_ROLES_prevRole_}",
-    "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}",
-    "§3Ваша роль: {0_ROLES_prole_}": "§3Ваша роль: {0_ROLES_prole_}",
-    "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.",
-    "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}",
-    " игроком {0_player_name}": " игроком {0_player_name}",
-    "\nПричина: {0_message}": "\nПричина: {0_message}",
-    "Роль игрока {0_target_name} сменена успешно": "Роль игрока {0_target_name} сменена успешно",
-    "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}",
-    "Убит босс {0_this_options_place_name}!": "Убит босс {0_this_options_place_name}!",
-    "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}",
-    "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова",
-    "Выдает или убирает {0_itemNameTag} из инвентаря": "Выдает или убирает {0_itemNameTag} из инвентаря",
-    "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}",
-    "Вы {0_reason}, поэтому вышли из режима новичка.": "Вы {0_reason}, поэтому вышли из режима новичка.",
-    "Не удалось открыть диалог. {0_developersAreWarned}": "Не удалось открыть диалог. {0_developersAreWarned}",
-    "Доберитесь до: {0_this_place_name}": "Доберитесь до: {0_this_place_name}",
-    "\n§7§lЗначение:§r {0_stringify_value_}": "\n§7§lЗначение:§r {0_stringify_value_}",
-    "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}",
-    "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}",
-    "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить",
-    "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%",
-    "В инвентаре нет {0_this_text}": "В инвентаре нет {0_this_text}",
-    "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}",
-    "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}",
-    "Продать {0_costString} за {1_name}?": "Продать {0_costString} за {1_name}?",
-    "Купить {0_name} за {1_costString}?": "Купить {0_name} за {1_costString}?",
-    "Успешная продажа {0_name} за {1_costString}!": "Успешная продажа {0_name} за {1_costString}!",
-    "Успешная покупка {0_name} за {1_costString}!": "Успешная покупка {0_name} за {1_costString}!",
-    "При покупке произошла ошибка. {0_developersAreWarned}": "При покупке произошла ошибка. {0_developersAreWarned}",
-    "Нет места в инвентаре (нужно еще {0_amount})": "Нет места в инвентаре (нужно еще {0_amount})",
-    "Изменено на {0_newname}": "Изменено на {0_newname}",
-    "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}",
-    "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)",
-    "Порталы {0_portals__length____0}/{1_Portal_portals_size}": "Порталы {0_portals__length____0}/{1_Portal_portals_size}",
-    "Статистика игрока {0_Player_nameOrUnknown_targetId_}": "Статистика игрока {0_Player_nameOrUnknown_targetId_}",
-    "Анархия {0_n}": "Анархия {0_n}",
-    "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)",
-    "Усиленный аирдроп скоро упадет на {0_location}!": "Усиленный аирдроп скоро упадет на {0_location}!",
-    "Обычный аирдроп скоро упадет на {0_location}!": "Обычный аирдроп скоро упадет на {0_location}!",
-    "Радиус границы анархии сейчас: {0_this_zone__radius}": "Радиус границы анархии сейчас: {0_this_zone__radius}",
-    "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}",
-    "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.",
-    "Вода. Попытка {0_maxTries___i}/{1_maxTries}": "Вода. Попытка {0_maxTries___i}/{1_maxTries}",
-    "Нельзя создать базу на высоте ниже {0_underLimit}!": "Нельзя создать базу на высоте ниже {0_underLimit}!",
-    "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!",
-    "состоите в базе игрока '{0_region_ownerName}'": "состоите в базе игрока '{0_region_ownerName}'",
-    "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}",
-    "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n",
-    "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}",
-    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}",
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!",
-    "База с владельцем {0_base_ownerName} {1_messageAction}.": "База с владельцем {0_base_ownerName} {1_messageAction}.",
-    "Максимальный уровень\n{0_levelText}": "Максимальный уровень\n{0_levelText}",
-    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})",
-    "Улучшить базу: {0_levelText}": "Улучшить базу: {0_levelText}",
-    "База игрока {0_base_ownerName}": "База игрока {0_base_ownerName}",
-    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}",
-    "§6Ваша база {0_text}": "§6Ваша база {0_text}",
-    "{0_this_city_name}: задание исследования не настроено!": "{0_this_city_name}: задание исследования не настроено!",
-    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}",
-    "Вы уже заняли {0_personalKeys_length}/3 печек.": "Вы уже заняли {0_personalKeys_length}/3 печек.",
-    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": "Ваш клан уже занял {0_clanKeys_length}/3 печек.",
-    "Использован ключ из слота {0_index}": "Использован ключ из слота {0_index}",
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}",
-    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.",
-    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...",
-    "У {0_i18n_accent_________} можно купить ключ доступа к печам": "У {0_i18n_accent_________} можно купить ключ доступа к печам",
-    "Купите у {0_i18n_accent_________} ключ доступа к печам": "Купите у {0_i18n_accent_________} ключ доступа к печам",
-    "Доберитесь до {0_i18n_accent________________________} по дороге": "Доберитесь до {0_i18n_accent________________________} по дороге",
-    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}",
-    "...мы изобрели {0_i18n_accent______}": "...мы изобрели {0_i18n_accent______}",
-    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}",
-    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}",
-    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}",
-    "У {0_i18n_accent______} можно зачаровать предметы": "У {0_i18n_accent______} можно зачаровать предметы",
-    "Доберитесь до {0_i18n_accent____________} по дороге": "Доберитесь до {0_i18n_accent____________} по дороге",
-    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}",
-    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}",
-    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны",
-    "Дровосек: нарубите {0_v} дерева": "Дровосек: нарубите {0_v} дерева",
-    "Шахтер: накопайте {0_v} камня": "Шахтер: накопайте {0_v} камня",
-    "Угольный шахтер: накопайте {0_v} угля": "Угольный шахтер: накопайте {0_v} угля",
-    "Железный шахтер: накопайте {0_v} железа": "Железный шахтер: накопайте {0_v} железа",
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}",
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}",
-    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}",
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}",
-    "Добыто дерева: {0_current}/{1_end}": "Добыто дерева: {0_current}/{1_end}",
-    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}",
-    "Добыто железной руды: {0_i}/{1_end}": "Добыто железной руды: {0_i}/{1_end}",
-    "Отправляйтесь за ними в {0_i18n_accent_____________}": "Отправляйтесь за ними в {0_i18n_accent_____________}",
-    "Идите в {0_i18n_accent_____________} по дороге": "Идите в {0_i18n_accent_____________} по дороге",
-    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!",
-    "{0_extra___extra_to_player_lang____________}§8Вы тут": "{0_extra___extra_to_player_lang____________}§8Вы тут",
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}",
-    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": "Событие! {0_effectType} силой {1_amplifier} на {2} минут",
-    "Время: {0_new_Date___toHHMMSS__}": "Время: {0_new_Date___toHHMMSS__}",
-    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})",
-    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}",
-    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}",
-    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}",
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}",
-    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe",
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса",
-    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}",
-    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%",
-    "Добыть: {0___rawtext_____translate__langToken_itemType______}": "Добыть: {0___rawtext_____translate__langToken_itemType______}",
-    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}",
-    "Руды на {0_y}": "Руды на {0_y}"
+    "Типы": {
+      "s": [
+        "Types"
+      ],
+      "i": []
+    },
+    "Над": {
+      "s": [
+        "Above"
+      ],
+      "i": []
+    },
+    "Под": {
+      "s": [
+        "Below"
+      ],
+      "i": []
+    },
+    "Руды на \u0000": {
+      "s": [
+        "Ores at ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте от \u0000 до \u0000. Ваш y = \u0000": {
+      "s": [
+        "You need to mine at height from ",
+        " to ",
+        ". Your y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Спуститесь в шахту и вскопайте указанный ресурс!": {
+      "s": [
+        "Go down into the mineshaft and mine up the specified resource!"
+      ],
+      "i": []
+    },
+    "Добыть: \u0000": {
+      "s": [
+        "Mine: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000, \u0000, Группа: \u0000%%": {
+      "s": [
+        "",
+        ", ",
+        ", Group: ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "На этой высоте руд нет": {
+      "s": [
+        "There are no ores at this height"
+      ],
+      "i": []
+    },
+    "Руды на y: \u0000:\n\u0000": {
+      "s": [
+        "Ores at y: ",
+        ":\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса (\u0000) с помощью компаса": {
+      "s": [
+        "You can take this quest to track the direction of the resource source (",
+        ") using a compass"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Группа": {
+      "s": [
+        "Group"
+      ],
+      "i": []
+    },
+    "Еда": {
+      "s": [
+        "Food"
+      ],
+      "i": []
+    },
+    "Ресурсы по локациям": {
+      "s": [
+        "Resources by locations"
+      ],
+      "i": []
+    },
+    "Ресурсы": {
+      "s": [
+        "Resources"
+      ],
+      "i": []
+    },
+    "Руды": {
+      "s": [
+        "Ores"
+      ],
+      "i": []
+    },
+    "Википедия": {
+      "s": [
+        "Wikipedia"
+      ],
+      "i": []
+    },
+    "Что где как все расскажу": {
+      "s": [
+        "I'll tell you everything: what, where, how"
+      ],
+      "i": []
+    },
+    "Спидран '\u0000' начат. Для сброса времени воспользуйтесь .wipe": {
+      "s": [
+        "Speedrun '",
+        "' started. Use .wipe to reset the time"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nВыбрано": {
+      "s": [
+        "\nSelected"
+      ],
+      "i": []
+    },
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: \u0000": {
+      "s": [
+        "You can choose one of the categories below for speedrun. Time is counted only when you are in anarchy, i.e. when you are offline or standing at spawn, time is not counted. Your anarchy time now: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы не смогли побить ваш предыдущий рекорд \u0000! \u0000 -> \u0000": {
+      "s": [
+        "You couldn't beat your previous record ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы побили ваш предыдущий рекорд \u0000! \u0000 -> \u0000": {
+      "s": [
+        "You beat your previous record ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Ваш первый рекорд \u0000 поставлен! Это заняло \u0000": {
+      "s": [
+        "Your first record ",
+        " is set! It took ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Полная незеритовая броня": {
+      "s": [
+        "Full netherite armor"
+      ],
+      "i": []
+    },
+    "1.000.000 монет": {
+      "s": [
+        "1,000,000 coins"
+      ],
+      "i": []
+    },
+    "Все задания": {
+      "s": [
+        "All quests"
+      ],
+      "i": []
+    },
+    "Получить базу": {
+      "s": [
+        "Get base"
+      ],
+      "i": []
+    },
+    "Все достижения": {
+      "s": [
+        "All achievements"
+      ],
+      "i": []
+    },
+    "\u0000 \u0000\nЧерез \u0000 (\u0000)": {
+      "s": [
+        "",
+        " ",
+        "\nin ",
+        " (",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Время: \u0000": {
+      "s": [
+        "Time: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Событие! \u0000 силой \u0000 на \u0000 минут": {
+      "s": [
+        "Event! ",
+        " with strength ",
+        " for ",
+        " minutes"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Миниигра": {
+      "s": [
+        "Minigame"
+      ],
+      "i": []
+    },
+    "Боковое меню": {
+      "s": [
+        "Sidebar menu"
+      ],
+      "i": []
+    },
+    "Разделенные подсказки": {
+      "s": [
+        "Separated hints"
+      ],
+      "i": []
+    },
+    "Определяет, где будет меню": {
+      "s": [
+        "Determines where the menu will be"
+      ],
+      "i": []
+    },
+    "Режим отображения": {
+      "s": [
+        "Display mode"
+      ],
+      "i": []
+    },
+    "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься": {
+      "s": [
+        "Maximum allowed number of characters before words are wrapped"
+      ],
+      "i": []
+    },
+    "Максимальный размер бокового меню": {
+      "s": [
+        "Maximum sidebar menu size"
+      ],
+      "i": []
+    },
+    "Определяет, включено ли внутриигровое меню": {
+      "s": [
+        "Determines if the in-game menu is enabled"
+      ],
+      "i": []
+    },
+    "Использовать меню": {
+      "s": [
+        "Use menu"
+      ],
+      "i": []
+    },
+    "События": {
+      "s": [
+        "Events"
+      ],
+      "i": []
+    },
+    "Лидеры": {
+      "s": [
+        "Leaders"
+      ],
+      "i": []
+    },
+    "Цели": {
+      "s": [
+        "Goals"
+      ],
+      "i": []
+    },
+    "Еще": {
+      "s": [
+        "More"
+      ],
+      "i": []
+    },
+    "§7Настройки": {
+      "s": [
+        "§7Settings"
+      ],
+      "i": []
+    },
+    "§bВики": {
+      "s": [
+        "§bWiki"
+      ],
+      "i": []
+    },
+    "§fПочта": {
+      "s": [
+        "§fMail"
+      ],
+      "i": []
+    },
+    "§6Донат\n§7СКОРО!": {
+      "s": [
+        "§6Donate\n§7COMING SOON!"
+      ],
+      "i": []
+    },
+    "§7СКОРО!": {
+      "s": [
+        "§7COMING SOON!"
+      ],
+      "i": []
+    },
+    "Миниигры": {
+      "s": [
+        "Minigames"
+      ],
+      "i": []
+    },
+    "Анархия": {
+      "s": [
+        "Anarchy"
+      ],
+      "i": []
+    },
+    "\u0000§8Вы тут": {
+      "s": [
+        "",
+        "§8You are here"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Спавн": {
+      "s": [
+        "Spawn"
+      ],
+      "i": []
+    },
+    "Вы получили ключ!": {
+      "s": [
+        "You received a key!"
+      ],
+      "i": []
+    },
+    "Вы уже забрали награды сегодня! Заходите завтра": {
+      "s": [
+        "You have already claimed rewards today! Come back tomorrow"
+      ],
+      "i": []
+    },
+    "Сначала выполните все ежедневные задания!": {
+      "s": [
+        "Complete all daily quests first!"
+      ],
+      "i": []
+    },
+    "\u0000/\u0000 Награда: ключ от сундука\n\u0000": {
+      "s": [
+        "",
+        "/",
+        " Reward: chest key\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Выполнено подряд": {
+      "s": [
+        "Completed in a row"
+      ],
+      "i": []
+    },
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех \u0000 заданий вам дают награду. За выполнение всех ежедневных заданий \u0000 дня подряд вместо обычного ключа выдается донатный\n\n\u0000": {
+      "s": [
+        "Every day at 00:00, daily quests are updated. They are the same for all players. For completing all ",
+        " quests you get a reward. For completing all daily quests ",
+        " days in a row, instead of a regular key you get a donor key\n\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Ежедневные задания": {
+      "s": [
+        "Daily quests"
+      ],
+      "i": []
+    },
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: \u0000": {
+      "s": [
+        "Visit all settlements to unlock daily quests. You haven't visited: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не умею этим пользоваться, но знаю кто точно поможет: \u0000": {
+      "s": [
+        "I don't know how to use this, but I know someone who can definitely help: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Поздравляем! В будущем постарайтесь быть осторожнее.": {
+      "s": [
+        "Congratulations! Try to be more careful in the future."
+      ],
+      "i": []
+    },
+    "Могила оказалась пустой и была удалена": {
+      "s": [
+        "The grave was empty and has been removed"
+      ],
+      "i": []
+    },
+    ", никто кроме вас их забрать не может": {
+      "s": [
+        ", no one but you can take them"
+      ],
+      "i": []
+    },
+    "Верните свои вещи\u0000, они ждут вас на \u0000§6!": {
+      "s": [
+        "Return your items",
+        ", they are waiting for you at ",
+        "§6!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Ваше место смерти не сохранилось!": {
+      "s": [
+        "Your death location was not saved!"
+      ],
+      "i": []
+    },
+    "Могила была удалена очисткой мусора.": {
+      "s": [
+        "The grave was removed by garbage cleanup."
+      ],
+      "i": []
+    },
+    "Верните вещи после смерти!": {
+      "s": [
+        "Return your items after death!"
+      ],
+      "i": []
+    },
+    "Вернуть вещи": {
+      "s": [
+        "Return items"
+      ],
+      "i": []
+    },
+    "Вы не можете открыть могилу игрока, умершего в зоне без сражения!": {
+      "s": [
+        "You cannot open the grave of a player who died in a non-combat zone!"
+      ],
+      "i": []
+    },
+    "Вы не можете открыть могилу новичка!": {
+      "s": [
+        "You cannot open a newbie's grave!"
+      ],
+      "i": []
+    },
+    "Включать ли задание по восстановлению инвентаря после смерти": {
+      "s": [
+        "Enable quest to restore inventory after death"
+      ],
+      "i": []
+    },
+    "Задание \"Вернуть вещи\"": {
+      "s": [
+        "Quest \"Return items\""
+      ],
+      "i": []
+    },
+    "В этот раз еды не оказалось, однако в следующий раз может повезти больше.": {
+      "s": [
+        "This time there was no food, but next time you might be luckier."
+      ],
+      "i": []
+    },
+    "Откройте сундук в разрушенном магазине": {
+      "s": [
+        "Open the chest in the ruined store"
+      ],
+      "i": []
+    },
+    "Зайдите в разрушенный магазин": {
+      "s": [
+        "Enter the ruined store"
+      ],
+      "i": []
+    },
+    "В строениях возле дороги можно найти еду": {
+      "s": [
+        "Food can be found in buildings near the road"
+      ],
+      "i": []
+    },
+    "Это место вам понадобится позже": {
+      "s": [
+        "You will need this place later"
+      ],
+      "i": []
+    },
+    "Это деревня исследователей": {
+      "s": [
+        "This is the explorers' village"
+      ],
+      "i": []
+    },
+    "Идите в \u0000 по дороге": {
+      "s": [
+        "Go to ",
+        " along the road"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Каменоломню": {
+      "s": [
+        "the Quarry"
+      ],
+      "i": []
+    },
+    "Отправляйтесь за ними в \u0000": {
+      "s": [
+        "Follow them to ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Здесь нет печей для переплавки руды": {
+      "s": [
+        "There are no furnaces for smelting ore here"
+      ],
+      "i": []
+    },
+    "Это деревня шахтеров": {
+      "s": [
+        "This is the miners' village"
+      ],
+      "i": []
+    },
+    "Шахтер зовет вас наверх, чтобы поговорить!": {
+      "s": [
+        "The miner is calling you upstairs to talk!"
+      ],
+      "i": []
+    },
+    "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!": {
+      "s": [
+        "Return to the mineshaft and mine stone. There seems to be iron behind it!"
+      ],
+      "i": []
+    },
+    "Добыто железной руды: \u0000/\u0000": {
+      "s": [
+        "Iron ore mined: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Попробуйте копнуть поглубже": {
+      "s": [
+        "Try mining deeper"
+      ],
+      "i": []
+    },
+    "На поверхности руд нет": {
+      "s": [
+        "There are no ores on the surface"
+      ],
+      "i": []
+    },
+    "Вернитесь к верстаку и улучшите свой инструмент.": {
+      "s": [
+        "Return to the crafting table and upgrade your tool."
+      ],
+      "i": []
+    },
+    "Сделайте каменную кирку": {
+      "s": [
+        "Make a stone pickaxe"
+      ],
+      "i": []
+    },
+    "Отправляйтесь в шахту, найдите и накопайте камня.": {
+      "s": [
+        "Go to the mineshaft, find and mine some stone."
+      ],
+      "i": []
+    },
+    "Спуститесь в шахту и добудьте камня: \u0000/\u0000": {
+      "s": [
+        "Go down the mineshaft and collect stone: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Используя верстак сделайте деревянную кирку!": {
+      "s": [
+        "Use the crafting table to make a wooden pickaxe!"
+      ],
+      "i": []
+    },
+    "Сделайте деревянную кирку": {
+      "s": [
+        "Make a wooden pickaxe"
+      ],
+      "i": []
+    },
+    "Следуя компасу, доберитесь до верстака": {
+      "s": [
+        "Follow the compass to the crafting table"
+      ],
+      "i": []
+    },
+    "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет": {
+      "s": [
+        "Take coins from your inventory and use them to add to your balance"
+      ],
+      "i": []
+    },
+    "Используй монеты в инвентаре": {
+      "s": [
+        "Use coins in your inventory"
+      ],
+      "i": []
+    },
+    "Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение": {
+      "s": [
+        "Airdrop not found\nUse .wipe to restart the tutorial"
+      ],
+      "i": []
+    },
+    "Заберите все из упавшего с неба сундука. На него указывает компас": {
+      "s": [
+        "Take everything from the chest that fell from the sky. The compass points to it"
+      ],
+      "i": []
+    },
+    "Заберите все из сундука, упавшего с неба": {
+      "s": [
+        "Take everything from the chest that fell from the sky"
+      ],
+      "i": []
+    },
+    "Деревья могут помешать. Выйди туда, где над тобой будет только небо": {
+      "s": [
+        "Trees may interfere. Go where there is only sky above you"
+      ],
+      "i": []
+    },
+    "Выйди под открытое небо": {
+      "s": [
+        "Go under the open sky"
+      ],
+      "i": []
+    },
+    "Нарубите дерева": {
+      "s": [
+        "Chop wood"
+      ],
+      "i": []
+    },
+    "Добыто дерева: \u0000/\u0000": {
+      "s": [
+        "Wood collected: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы не можете покинуть зону добычи, пока не завершили задания \u0000/\u0000": {
+      "s": [
+        "You cannot leave the mining zone until you complete the quests ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Обучение базовым механикам сервера": {
+      "s": [
+        "Tutorial on basic server mechanics"
+      ],
+      "i": []
+    },
+    "Обучение": {
+      "s": [
+        "Tutorial"
+      ],
+      "i": []
+    },
+    "Вперед!": {
+      "s": [
+        "Go!"
+      ],
+      "i": []
+    },
+    "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.": {
+      "s": [
+        "You are a survivor after the apocalypse, washed up on the shore. You don't know much, can't break blocks anywhere, and all you can do is follow the instructions above your inventory, follow the compass and the diamond on the minimap."
+      ],
+      "i": []
+    },
+    "Режим Перерождение": {
+      "s": [
+        "Rebirth mode"
+      ],
+      "i": []
+    },
+    "В мирной зоне ломать блоки запрещено.": {
+      "s": [
+        "Breaking blocks is forbidden in the safe zone."
+      ],
+      "i": []
+    },
+    "Блоки можно ломать только глубоко в шахте!": {
+      "s": [
+        "Blocks can only be broken deep in the mineshaft!"
+      ],
+      "i": []
+    },
+    "Вы не можете ломать руду новичка.": {
+      "s": [
+        "You cannot break newbie ore."
+      ],
+      "i": []
+    },
+    "§r§6Начальный топор": {
+      "s": [
+        "§r§6Starter axe"
+      ],
+      "i": []
+    },
+    "Гробовщику посвящается": {
+      "s": [
+        "Dedicated to the gravedigger"
+      ],
+      "i": []
+    },
+    "Гробовщик: открой 10 могил разных игроков": {
+      "s": [
+        "Gravedigger: open 10 graves of different players"
+      ],
+      "i": []
+    },
+    "Сделал себя сам: Получи первые 10.000 монет": {
+      "s": [
+        "Self-made: Earn your first 10,000 coins"
+      ],
+      "i": []
+    },
+    "Активированный уголь": {
+      "s": [
+        "Activated carbon"
+      ],
+      "i": []
+    },
+    "Железный шахтер: накопайте \u0000 железа": {
+      "s": [
+        "Iron miner: mine ",
+        " iron"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Угольный шахтер: накопайте \u0000 угля": {
+      "s": [
+        "Coal miner: mine ",
+        " coal"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шахтер: накопайте \u0000 камня": {
+      "s": [
+        "Miner: mine ",
+        " stone"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Дровосек: нарубите \u0000 дерева": {
+      "s": [
+        "Lumberjack: chop ",
+        " wood"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы вошли в режим рейдблока, потому что \u0000. Некоторые функции могут быть недоступны": {
+      "s": [
+        "You entered raid block mode because ",
+        ". Some features may be unavailable"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 Осталось \u0000": {
+      "s": [
+        "",
+        " Left ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы находитесь в режиме рейдблока.": {
+      "s": [
+        "You are in raid block mode."
+      ],
+      "i": []
+    },
+    "вы разрушили блок на базе": {
+      "s": [
+        "you broke a block at the base"
+      ],
+      "i": []
+    },
+    "вас рейдят": {
+      "s": [
+        "you are being raided"
+      ],
+      "i": []
+    },
+    "х2 урон!": {
+      "s": [
+        "x2 damage!"
+      ],
+      "i": []
+    },
+    "Способность": {
+      "s": [
+        "Ability"
+      ],
+      "i": []
+    },
+    "10% шанс сделать двойной урон": {
+      "s": [
+        "10% chance to deal double damage"
+      ],
+      "i": []
+    },
+    "Восстанавливает вам половину наносимого этим мечом урона": {
+      "s": [
+        "Restores half the damage dealt by this sword to you"
+      ],
+      "i": []
+    },
+    "Неизвестная": {
+      "s": [
+        "Unknown"
+      ],
+      "i": []
+    },
+    "Дополнительный урон": {
+      "s": [
+        "Additional damage"
+      ],
+      "i": []
+    },
+    "Вампиризм": {
+      "s": [
+        "Vampirism"
+      ],
+      "i": []
+    },
+    "Используйте, чтобы отправить все к снежной королеве подо льдину": {
+      "s": [
+        "Use to send everything to the Snow Queen under the ice"
+      ],
+      "i": []
+    },
+    "§3Снежная бомба": {
+      "s": [
+        "§3Snow bomb"
+      ],
+      "i": []
+    },
+    "Используйте, чтобы отправить все в огненный ад": {
+      "s": [
+        "Use to send everything to fiery hell"
+      ],
+      "i": []
+    },
+    "Используй этот предмет сидя на пушке": {
+      "s": [
+        "Use this item while sitting on the cannon"
+      ],
+      "i": []
+    },
+    "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.": {
+      "s": [
+        "Use this item on the cannon to fire it. You can't shoot while sitting on the cannon."
+      ],
+      "i": []
+    },
+    "Используй этот предмет, чтобы установить пушку": {
+      "s": [
+        "Use this item to place a cannon"
+      ],
+      "i": []
+    },
+    "Возьми у меня задание и отправляйся в другое поселение следуя компасу.": {
+      "s": [
+        "Take a quest from me and go to another settlement following the compass."
+      ],
+      "i": []
+    },
+    "Как мне переплавить руду?": {
+      "s": [
+        "How do I smelt ore?"
+      ],
+      "i": []
+    },
+    "Они есть... просто они сидят дома и смотрят стрим @shp1natqp": {
+      "s": [
+        "They exist... they're just at home watching the @shp1natqp stream"
+      ],
+      "i": []
+    },
+    "Почему тут нет жителей?": {
+      "s": [
+        "Why are there no villagers here?"
+      ],
+      "i": []
+    },
+    "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате.": {
+      "s": [
+        "It's a starter airdrop. Survivors are supplied with these from time to time. You can track airdrops on the map or in chat."
+      ],
+      "i": []
+    },
+    "Сверху упал сундук, что это?": {
+      "s": [
+        "A chest fell from above, what is it?"
+      ],
+      "i": []
+    },
+    "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты.": {
+      "s": [
+        "I don't get paid, I just enjoy watching newbies like you develop."
+      ],
+      "i": []
+    },
+    "Сколько тебе платят?": {
+      "s": [
+        "How much do you get paid?"
+      ],
+      "i": []
+    },
+    "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков.": {
+      "s": [
+        "It's generally very dangerous and hides many secrets. I wouldn't recommend going far from the supports and bridges."
+      ],
+      "i": []
+    },
+    "Я могу потеряться в шахте?": {
+      "s": [
+        "Can I get lost in the mine?"
+      ],
+      "i": []
+    },
+    "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей.": {
+      "s": [
+        "It's a magical mine. It regenerates itself after a while. As you noticed, you won't find ore on the surface, so mine deeper along the sides of the tunnels."
+      ],
+      "i": []
+    },
+    "Почему шахта такая странная?": {
+      "s": [
+        "Why is the mine so strange?"
+      ],
+      "i": []
+    },
+    "Можно узнать это, если посмотреть на карту и присесть.": {
+      "s": [
+        "You can find out by looking at the map and crouching."
+      ],
+      "i": []
+    },
+    "Сколько ещё сохранилось поселений?": {
+      "s": [
+        "How many settlements have survived?"
+      ],
+      "i": []
+    },
+    "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении.": {
+      "s": [
+        "No, I have colleagues. There is a special guide in every settlement."
+      ],
+      "i": []
+    },
+    "Ты единственный путеводитель??": {
+      "s": [
+        "Are you the only guide??"
+      ],
+      "i": []
+    },
+    "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны.": {
+      "s": [
+        "This settlement is called \"Miners' Village\" - one of the surviving settlements after the war."
+      ],
+      "i": []
+    },
+    "Где я?": {
+      "s": [
+        "Where am I?"
+      ],
+      "i": []
+    },
+    "Шахтер": {
+      "s": [
+        "Miner"
+      ],
+      "i": []
+    },
+    "Деревня шахтеров": {
+      "s": [
+        "Miners' Village"
+      ],
+      "i": []
+    },
+    "Добыть алмазы": {
+      "s": [
+        "Mine diamonds"
+      ],
+      "i": []
+    },
+    "Добыть уголь": {
+      "s": [
+        "Mine coal"
+      ],
+      "i": []
+    },
+    "Добыть железо": {
+      "s": [
+        "Mine iron"
+      ],
+      "i": []
+    },
+    "Копать нужно на высоте \u0000..\u0000. Ваш y = \u0000": {
+      "s": [
+        "You need to mine at height ",
+        "..",
+        ". Your y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!": {
+      "s": [
+        "Go down the mineshaft in the Miners' Village and mine the specified resource!"
+      ],
+      "i": []
+    },
+    "А где мне базу сделать-то?": {
+      "s": [
+        "Where should I make my base?"
+      ],
+      "i": []
+    },
+    "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ": {
+      "s": [
+        "Explorers, you know, silly, travel, look, enjoy, EXPLORE"
+      ],
+      "i": []
+    },
+    "Исследователь": {
+      "s": [
+        "Explorer"
+      ],
+      "i": []
+    },
+    "Деревня исследователей": {
+      "s": [
+        "Explorers' Village"
+      ],
+      "i": []
+    },
+    "§a§lМагический слайм": {
+      "s": [
+        "§a§lMagic Slime"
+      ],
+      "i": []
+    },
+    "§8Зачарование несовместимо": {
+      "s": [
+        "§8Enchantment incompatible"
+      ],
+      "i": []
+    },
+    "Максимальный уровень": {
+      "s": [
+        "Maximum level"
+      ],
+      "i": []
+    },
+    "Уровень зачара предмета как у книжки": {
+      "s": [
+        "Item's enchantment level is the same as the book"
+      ],
+      "i": []
+    },
+    "Уровень зачара предмета уже выше книжки": {
+      "s": [
+        "Item's enchantment level is already higher than the book"
+      ],
+      "i": []
+    },
+    "С чарками такого уровня не работаю, слетят": {
+      "s": [
+        "I don't work with enchantments of this level, they will be lost"
+      ],
+      "i": []
+    },
+    "любой зачарованный предмет": {
+      "s": [
+        "any enchanted item"
+      ],
+      "i": []
+    },
+    "Отсортировать чарки": {
+      "s": [
+        "Sort enchanted items"
+      ],
+      "i": []
+    },
+    "Зелья": {
+      "s": [
+        "Potions"
+      ],
+      "i": []
+    },
+    "Грибы": {
+      "s": [
+        "Mushrooms"
+      ],
+      "i": []
+    },
+    "Все для магии": {
+      "s": [
+        "Everything for magic"
+      ],
+      "i": []
+    },
+    "§r§fМеч со способностью §7\u0000": {
+      "s": [
+        "§r§fSword with ability §7",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Оружие со способностями": {
+      "s": [
+        "Weapon with abilities"
+      ],
+      "i": []
+    },
+    "Зачаровать": {
+      "s": [
+        "Enchant"
+      ],
+      "i": []
+    },
+    "Выбранная книга: \u0000": {
+      "s": [
+        "Selected book: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Предмет для зачарования": {
+      "s": [
+        "Item to enchant"
+      ],
+      "i": []
+    },
+    "Предмет": {
+      "s": [
+        "Item"
+      ],
+      "i": []
+    },
+    "Нет зачарований": {
+      "s": [
+        "No enchantments"
+      ],
+      "i": []
+    },
+    "Использовать книгу чар": {
+      "s": [
+        "Use enchantment book"
+      ],
+      "i": []
+    },
+    "любые топор, кирка, мотыга или лопата": {
+      "s": [
+        "any axe, pickaxe, hoe, or shovel"
+      ],
+      "i": []
+    },
+    "Улучшить инструмент": {
+      "s": [
+        "Upgrade tool"
+      ],
+      "i": []
+    },
+    "любой элемент брони": {
+      "s": [
+        "any armor piece"
+      ],
+      "i": []
+    },
+    "Улучшить броню": {
+      "s": [
+        "Upgrade armor"
+      ],
+      "i": []
+    },
+    "любой лук": {
+      "s": [
+        "any bow"
+      ],
+      "i": []
+    },
+    "Улучшить лук": {
+      "s": [
+        "Upgrade bow"
+      ],
+      "i": []
+    },
+    "любой меч": {
+      "s": [
+        "any sword"
+      ],
+      "i": []
+    },
+    "Улучшить меч": {
+      "s": [
+        "Upgrade sword"
+      ],
+      "i": []
+    },
+    "Чего пожелаешь?": {
+      "s": [
+        "What do you wish for?"
+      ],
+      "i": []
+    },
+    "Маг": {
+      "s": [
+        "Mage"
+      ],
+      "i": []
+    },
+    "Технограда": {
+      "s": [
+        "Technograd"
+      ],
+      "i": []
+    },
+    "Зачаруйте любой предмет у Мага": {
+      "s": [
+        "Enchant any item at the Mage"
+      ],
+      "i": []
+    },
+    "Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание": {
+      "s": [
+        "Open Menu -> Wiki -> Ores -> Lapis Lazuli -> Take quest"
+      ],
+      "i": []
+    },
+    "Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание": {
+      "s": [
+        "Open Menu -> Wiki -> Resources -> Experience -> Magic Slime -> Take quest"
+      ],
+      "i": []
+    },
+    "Посетите Мага": {
+      "s": [
+        "Visit the Mage"
+      ],
+      "i": []
+    },
+    "Мага": {
+      "s": [
+        "the Mage"
+      ],
+      "i": []
+    },
+    "У \u0000 можно зачаровать предметы": {
+      "s": [
+        "At ",
+        " you can enchant items"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Магическому слайму": {
+      "s": [
+        "to the Magic Slime"
+      ],
+      "i": []
+    },
+    "Вардену": {
+      "s": [
+        "to the Warden"
+      ],
+      "i": []
+    },
+    "Здесь есть шахта, ведущая к \u0000 и \u0000": {
+      "s": [
+        "There is a mineshaft leading to ",
+        " and ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Приветствуем в нашей деревне!": {
+      "s": [
+        "Welcome to our village!"
+      ],
+      "i": []
+    },
+    "Ну крутой техно типо не понял что ли": {
+      "s": [
+        "Well, cool techno guy, didn't you get it?"
+      ],
+      "i": []
+    },
+    "Техник": {
+      "s": [
+        "Technician"
+      ],
+      "i": []
+    },
+    "Техноград": {
+      "s": [
+        "Technograd"
+      ],
+      "i": []
+    },
+    "Используется у Инженера": {
+      "s": [
+        "Used at the Engineer"
+      ],
+      "i": []
+    },
+    "§aМагическая слизь": {
+      "s": [
+        "§aMagic slime"
+      ],
+      "i": []
+    },
+    "Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу": {
+      "s": [
+        "Here he'll be like, take the quest to gather resources for the base. After that quest, he'll send you to the engineer himself, like, buy the base"
+      ],
+      "i": []
+    },
+    "Только я могу ее собрать": {
+      "s": [
+        "Only I can assemble it"
+      ],
+      "i": []
+    },
+    "База - самый дорогой предмет в нашу эпоху, для нее нужно много ресурсов": {
+      "s": [
+        "The base is the most expensive item in our era, it requires a lot of resources"
+      ],
+      "i": []
+    },
+    "Базу": {
+      "s": [
+        "The Base"
+      ],
+      "i": []
+    },
+    "...мы изобрели \u0000": {
+      "s": [
+        "...we invented ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "...и не были разворованы другими выжившими...": {
+      "s": [
+        "...and weren't stolen by other survivors..."
+      ],
+      "i": []
+    },
+    "Чтобы ваши постройки не разложились из-за радиации...": {
+      "s": [
+        "So that your buildings don't decay due to radiation..."
+      ],
+      "i": []
+    },
+    "База": {
+      "s": [
+        "Base"
+      ],
+      "i": []
+    },
+    "Инженеру": {
+      "s": [
+        "to the Engineer"
+      ],
+      "i": []
+    },
+    "Идите к \u0000, он расскажет вам что такое \u0000": {
+      "s": [
+        "Go to ",
+        ", he will tell you what ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "И переняли уцелевшие технологии прошлой эпохи": {
+      "s": [
+        "And adopted the surviving technologies of the past era"
+      ],
+      "i": []
+    },
+    "Мы обосновались вокруг озера, оставшегося после взрыва бункера": {
+      "s": [
+        "We settled around the lake left after the bunker explosion"
+      ],
+      "i": []
+    },
+    "Приветствуем в самом технологичном городе!": {
+      "s": [
+        "Welcome to the most technological city!"
+      ],
+      "i": []
+    },
+    "§b§lКамнедробилка": {
+      "s": [
+        "§b§lStone Crusher"
+      ],
+      "i": []
+    },
+    "§6§lРобот": {
+      "s": [
+        "§6§lRobot"
+      ],
+      "i": []
+    },
+    "Все для редстоуна": {
+      "s": [
+        "Everything for redstone"
+      ],
+      "i": []
+    },
+    "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n": {
+      "s": [
+        "Well, give me a blueprint and I'll craft something for you, yeah\r\n"
+      ],
+      "i": []
+    },
+    "Инженер": {
+      "s": [
+        "Engineer"
+      ],
+      "i": []
+    },
+    "Вы не можете купить это в режиме новичка": {
+      "s": [
+        "You cannot buy this in newbie mode"
+      ],
+      "i": []
+    },
+    "Используется для создания платы у Инжинера в Технограде": {
+      "s": [
+        "Used to create a board at the Engineer in Technograd"
+      ],
+      "i": []
+    },
+    "Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота": {
+      "s": [
+        "Used to create a base at the Engineer in Technograd\n\nCan be obtained from a reinforced chest and robot"
+      ],
+      "i": []
+    },
+    "Деревни исследователей": {
+      "s": [
+        "Explorers' villages"
+      ],
+      "i": []
+    },
+    "Доберитесь до \u0000 по дороге": {
+      "s": [
+        "Get to ",
+        " along the road"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сделайте железные ботинки": {
+      "s": [
+        "Craft iron boots"
+      ],
+      "i": []
+    },
+    "Сделайте железные поножи": {
+      "s": [
+        "Craft iron leggings"
+      ],
+      "i": []
+    },
+    "Сделайте железный шлем": {
+      "s": [
+        "Craft iron helmet"
+      ],
+      "i": []
+    },
+    "Сделайте железный нагрудник": {
+      "s": [
+        "Craft iron chestplate"
+      ],
+      "i": []
+    },
+    "Сделайте железный меч": {
+      "s": [
+        "Craft iron sword"
+      ],
+      "i": []
+    },
+    "Сделайте железную кирку": {
+      "s": [
+        "Craft iron pickaxe"
+      ],
+      "i": []
+    },
+    "Переплавьте необработанное железо в слиток": {
+      "s": [
+        "Smelt raw iron into an ingot"
+      ],
+      "i": []
+    },
+    "Откройте печку с помощью ключа": {
+      "s": [
+        "Open the furnace with a key"
+      ],
+      "i": []
+    },
+    "Купите у \u0000 ключ доступа к печам": {
+      "s": [
+        "Buy from ",
+        " a key to the furnaces"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Печкина": {
+      "s": [
+        "Pechkin"
+      ],
+      "i": []
+    },
+    "У \u0000 можно купить ключ доступа к печам": {
+      "s": [
+        "From ",
+        " you can buy a key to the furnaces"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Мы специализируемся на обработке руды": {
+      "s": [
+        "We specialize in ore processing"
+      ],
+      "i": []
+    },
+    "Приветствуем в самом старом и большом городе новой эпохи!": {
+      "s": [
+        "Welcome to the oldest and largest city of the new era!"
+      ],
+      "i": []
+    },
+    "Ну типа крутой камни ломаем вот да": {
+      "s": [
+        "Well, we break cool stones here, yeah"
+      ],
+      "i": []
+    },
+    "А что за город": {
+      "s": [
+        "What kind of city is this"
+      ],
+      "i": []
+    },
+    "Ломщик": {
+      "s": [
+        "StoneBreaker"
+      ],
+      "i": []
+    },
+    "У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n": {
+      "s": [
+        "You can buy a key to the smokers for cooking food from me\n\n"
+      ],
+      "i": []
+    },
+    "Баба Валя": {
+      "s": [
+        "Grandma Valya"
+      ],
+      "i": []
+    },
+    "У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n": {
+      "s": [
+        "You can buy a key to the smelters for smelting ore from me\n\n"
+      ],
+      "i": []
+    },
+    "Печкин": {
+      "s": [
+        "Pechkin"
+      ],
+      "i": []
+    },
+    "Каменоломня": {
+      "s": [
+        "StoneQuarry"
+      ],
+      "i": []
+    },
+    "Онет, кажется, зачарование \u0000 уровнем \u0000 потерялось...": {
+      "s": [
+        "Oh no, it seems the enchantment ",
+        " level ",
+        " was lost..."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Зачарование \u0000 не удалось перенести.": {
+      "s": [
+        "Enchantment ",
+        " could not be transferred."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Предмет целый, выберите другой": {
+      "s": [
+        "Item is intact, choose another"
+      ],
+      "i": []
+    },
+    "Любой поломанный предмет": {
+      "s": [
+        "Any broken item"
+      ],
+      "i": []
+    },
+    "Починить": {
+      "s": [
+        "Repair"
+      ],
+      "i": []
+    },
+    "Улучшить": {
+      "s": [
+        "Upgrade"
+      ],
+      "i": []
+    },
+    "Алмазный меч/инструмент/броня": {
+      "s": [
+        "Diamond sword/tool/armor"
+      ],
+      "i": []
+    },
+    "Улучшить до незерита": {
+      "s": [
+        "Upgrade to netherite"
+      ],
+      "i": []
+    },
+    "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.": {
+      "s": [
+        "I forge weapons. If you have nothing to do, go away, don't distract me from work."
+      ],
+      "i": []
+    },
+    "Оружейник": {
+      "s": [
+        "Weaponsmith"
+      ],
+      "i": []
+    },
+    "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n": {
+      "s": [
+        "Wtf, I mean I have nothing to offer you yet\r\n\r\n"
+      ],
+      "i": []
+    },
+    "Кучер": {
+      "s": [
+        "Coachman"
+      ],
+      "i": []
+    },
+    "Вино": {
+      "s": [
+        "Wine"
+      ],
+      "i": []
+    },
+    "Настойка из шпината": {
+      "s": [
+        "Spinach tincture"
+      ],
+      "i": []
+    },
+    "Сидр": {
+      "s": [
+        "Cider"
+      ],
+      "i": []
+    },
+    "Пиво": {
+      "s": [
+        "Beer"
+      ],
+      "i": []
+    },
+    "Квас": {
+      "s": [
+        "Kvass"
+      ],
+      "i": []
+    },
+    "Ну что, устал от жизни? Пришел попить?\n\n": {
+      "s": [
+        "So, tired of life? Came for a drink?\n\n"
+      ],
+      "i": []
+    },
+    "Бармен": {
+      "s": [
+        "Bartender"
+      ],
+      "i": []
+    },
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на \u0000, ключ: \u0000": {
+      "s": [
+        "In 5 minutes, resources in your furnace will no longer be private! Furnace is at ",
+        ", key: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§r§cВремя истекло": {
+      "s": [
+        "§r§cTime is up"
+      ],
+      "i": []
+    },
+    "§r§6Печка плавит...": {
+      "s": [
+        "§r§6Furnace is smelting..."
+      ],
+      "i": []
+    },
+    "§r§aНе использован": {
+      "s": [
+        "§r§aNot used"
+      ],
+      "i": []
+    },
+    "Статус": {
+      "s": [
+        "Status"
+      ],
+      "i": []
+    },
+    "На": {
+      "s": [
+        "On"
+      ],
+      "i": []
+    },
+    "Неизвестен": {
+      "s": [
+        "Unknown"
+      ],
+      "i": []
+    },
+    "Продавец": {
+      "s": [
+        "Vendor"
+      ],
+      "i": []
+    },
+    "§7Открывает печку в каменоломне.": {
+      "s": [
+        "§7Opens the furnace in the quarry."
+      ],
+      "i": []
+    },
+    "§6Ключ от печки": {
+      "s": [
+        "§6Furnace key"
+      ],
+      "i": []
+    },
+    "Использован ключ из слота \u0000": {
+      "s": [
+        "Key used from slot ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже использовали этот ключ для другой печки.": {
+      "s": [
+        "You have already used this key for another furnace."
+      ],
+      "i": []
+    },
+    "Ваш клан уже занял \u0000/3 печек.": {
+      "s": [
+        "Your clan has already occupied ",
+        "/3 furnaces."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже заняли \u0000/3 печек.": {
+      "s": [
+        "You have already occupied ",
+        "/3 furnaces."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Эта печка уже занята. Печка освободится через \u0000, ключ: \u0000": {
+      "s": [
+        "This furnace is already occupied. It will be free in ",
+        ", key: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке": {
+      "s": [
+        "Key expired. Buy a new one if you need to retrieve resources left in this furnace"
+      ],
+      "i": []
+    },
+    "Этот ключ используется для других печек!": {
+      "s": [
+        "This key is used for other furnaces!"
+      ],
+      "i": []
+    },
+    "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!": {
+      "s": [
+        "To use furnaces, you need to buy a key from Pechkin and keep it in your inventory!"
+      ],
+      "i": []
+    },
+    "Ключ от печки": {
+      "s": [
+        "Furnace key"
+      ],
+      "i": []
+    },
+    "Сдать неиспользуемый ключ": {
+      "s": [
+        "Return unused key"
+      ],
+      "i": []
+    },
+    "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!": {
+      "s": [
+        "The key is now bound to this furnace! For one hour you can open it with this key!"
+      ],
+      "i": []
+    },
+    "§r§bПеремещает на спавн": {
+      "s": [
+        "§r§bTeleports to spawn"
+      ],
+      "i": []
+    },
+    "Определяет, будете ли вы телепортироваться на спавн при входе": {
+      "s": [
+        "Determines if you will teleport to spawn on join"
+      ],
+      "i": []
+    },
+    "Телепорт на спавн": {
+      "s": [
+        "Teleport to spawn"
+      ],
+      "i": []
+    },
+    "Вход": {
+      "s": [
+        "Join"
+      ],
+      "i": []
+    },
+    "Общее": {
+      "s": [
+        "General"
+      ],
+      "i": []
+    },
+    "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n": {
+      "s": [
+        "Come in, make yourself comfortable. All food is fresh, straight from the oven! The apple too.\n\n"
+      ],
+      "i": []
+    },
+    "Тетя Зина": {
+      "s": [
+        "Aunt Zina"
+      ],
+      "i": []
+    },
+    "§7Шахта": {
+      "s": [
+        "§7Mine"
+      ],
+      "i": []
+    },
+    "Порталы": {
+      "s": [
+        "Portals"
+      ],
+      "i": []
+    },
+    "Перемещение...": {
+      "s": [
+        "Teleporting..."
+      ],
+      "i": []
+    },
+    "Портал в это поселение не разблокирован": {
+      "s": [
+        "Portal to this settlement is not unlocked"
+      ],
+      "i": []
+    },
+    "Мирная зона": {
+      "s": [
+        "Safe"
+      ],
+      "i": []
+    },
+    "Открыт новый портал! [Когда-нибудь здесь будет анимация...]": {
+      "s": [
+        "New portal opened! [Someday there will be an animation here...]"
+      ],
+      "i": []
+    },
+    "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n": {
+      "s": [
+        "I only chop wood with my axe, don't try to order a murder from me.\n\n"
+      ],
+      "i": []
+    },
+    "Дровосек": {
+      "s": [
+        "Woodman"
+      ],
+      "i": []
+    },
+    "А камень я тебе дам.\n\n": {
+      "s": [
+        "I'll give you stone.\n\n"
+      ],
+      "i": []
+    },
+    "Каменщик": {
+      "s": [
+        "Stoner"
+      ],
+      "i": []
+    },
+    "Любой непродаваемый предмет": {
+      "s": [
+        "Any unsellable item"
+      ],
+      "i": []
+    },
+    "Любой предмет": {
+      "s": [
+        "Any item"
+      ],
+      "i": []
+    },
+    "Продай мне весь свой мусор": {
+      "s": [
+        "Sell me all your junk"
+      ],
+      "i": []
+    },
+    "Мусорщик": {
+      "s": [
+        "Scavenger"
+      ],
+      "i": []
+    },
+    "Украшения я делать пока не умею.\n\n": {
+      "s": [
+        "I can't make jewelry yet.\n\n"
+      ],
+      "i": []
+    },
+    "Ювелир": {
+      "s": [
+        "Jeweler"
+      ],
+      "i": []
+    },
+    "И рыбник.\n\n": {
+      "s": [
+        "And fishmonger.\n\n"
+      ],
+      "i": []
+    },
+    "Мясник": {
+      "s": [
+        "Butcher"
+      ],
+      "i": []
+    },
+    "Сходи в город, сделай запланированые покупки": {
+      "s": [
+        "Go to the city, make your planned purchases"
+      ],
+      "i": []
+    },
+    "Посети город": {
+      "s": [
+        "Visit the city"
+      ],
+      "i": []
+    },
+    "§9Хранилище": {
+      "s": [
+        "§9Storage"
+      ],
+      "i": []
+    },
+    "§bУсиленный": {
+      "s": [
+        "§bReinforced"
+      ],
+      "i": []
+    },
+    "§7Обычный": {
+      "s": [
+        "§7Normal"
+      ],
+      "i": []
+    },
+    "Исследуйте новый город!": {
+      "s": [
+        "Explore the new city!"
+      ],
+      "i": []
+    },
+    "Доберитесь до города!": {
+      "s": [
+        "Reach the city!"
+      ],
+      "i": []
+    },
+    "\u0000: задание исследования не настроено!": {
+      "s": [
+        "",
+        ": exploration quest not set up!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до указанного города или деревни": {
+      "s": [
+        "Reach the specified city or village"
+      ],
+      "i": []
+    },
+    "§dНезеритовая жила": {
+      "s": [
+        "§dNetherite Vein"
+      ],
+      "i": []
+    },
+    "Может появиться в сундуке внутри кучи древних обломков": {
+      "s": [
+        "May appear in a chest inside a pile of ancient debris"
+      ],
+      "i": []
+    },
+    "Лежит группами по 5-10 блоков рядом с сундуками": {
+      "s": [
+        "Lies in groups of 5-10 blocks near chests"
+      ],
+      "i": []
+    },
+    "§5Варден": {
+      "s": [
+        "§5Warden"
+      ],
+      "i": []
+    },
+    "§cПалатка аванпоста": {
+      "s": [
+        "§cOutpost Tent"
+      ],
+      "i": []
+    },
+    "§4Бункер": {
+      "s": [
+        "§4Bunker"
+      ],
+      "i": []
+    },
+    "§cАванпост": {
+      "s": [
+        "§cOutpost"
+      ],
+      "i": []
+    },
+    "Гараж": {
+      "s": [
+        "Garage"
+      ],
+      "i": []
+    },
+    "Заправка 4": {
+      "s": [
+        "Gas Station 4"
+      ],
+      "i": []
+    },
+    "Заправка 3": {
+      "s": [
+        "Gas Station 3"
+      ],
+      "i": []
+    },
+    "Заправка 2": {
+      "s": [
+        "Gas Station 2"
+      ],
+      "i": []
+    },
+    "Заправка 1": {
+      "s": [
+        "Gas Station 1"
+      ],
+      "i": []
+    },
+    "Поставьте эту бочку и она станет базой.": {
+      "s": [
+        "Place this barrel and it will become a base."
+      ],
+      "i": []
+    },
+    "§6База": {
+      "s": [
+        "§6Base"
+      ],
+      "i": []
+    },
+    "§6Ваша база \u0000": {
+      "s": [
+        "§6Your base ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "(разрушена)": {
+      "s": [
+        "(destroyed)"
+      ],
+      "i": []
+    },
+    "(гниет)": {
+      "s": [
+        "(decaying)"
+      ],
+      "i": []
+    },
+    "Данж": {
+      "s": [
+        "Dungeon"
+      ],
+      "i": []
+    },
+    "Телепорт!": {
+      "s": [
+        "Teleport!"
+      ],
+      "i": []
+    },
+    "\n\nКоординаты: \u0000\nРадиус: \u0000": {
+      "s": [
+        "\n\nCoordinates: ",
+        "\nRadius: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "База игрока \u0000": {
+      "s": [
+        "Base of player ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Это ваша база.": {
+      "s": [
+        "This is your base."
+      ],
+      "i": []
+    },
+    "У вас нет базы! Вступите в существующую или создайте свою.": {
+      "s": [
+        "You don't have a base! Join an existing one or create your own."
+      ],
+      "i": []
+    },
+    "Меню базы": {
+      "s": [
+        "Base menu"
+      ],
+      "i": []
+    },
+    "База гниет! Положите материалы из .base -> Гниение в бочку": {
+      "s": [
+        "Base is decaying! Put materials from .base -> Decay into the barrel"
+      ],
+      "i": []
+    },
+    "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью": {
+      "s": [
+        "Base was raided. Sorry. You can still restore it if it hasn't completely decayed"
+      ],
+      "i": []
+    },
+    "Нужно срочно положить материалы в бочку!": {
+      "s": [
+        "Urgently put materials in the barrel!"
+      ],
+      "i": []
+    },
+    "База с владельцем \u0000 \u0000.": {
+      "s": [
+        "Base with owner ",
+        " ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "разрушена": {
+      "s": [
+        "destroyed"
+      ],
+      "i": []
+    },
+    "гниет": {
+      "s": [
+        "decaying"
+      ],
+      "i": []
+    },
+    "Состояние базы": {
+      "s": [
+        "Base status"
+      ],
+      "i": []
+    },
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на \u0000!": {
+      "s": [
+        "§cBase destroyed!\n§4Urgently place the base block at ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§cБаза гниет!\n§4Срочно пополните материалы!": {
+      "s": [
+        "§cBase is decaying!\n§4Urgently replenish materials!"
+      ],
+      "i": []
+    },
+    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n\u0000\nМатериалы в бочке:\n\u0000\n\u0000\nДо следующего сбора ресурсов: \u0000": {
+      "s": [
+        "To prevent base decay, the barrel must contain the following resources daily:\n",
+        "\nMaterials in barrel:\n",
+        "\n",
+        "\nUntil next resource collection: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Гниение базы": {
+      "s": [
+        "Base decay"
+      ],
+      "i": []
+    },
+    "Не хватает ресурсов:\n\u0000": {
+      "s": [
+        "Not enough resources:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Всех материалов хватает!\nБаза защищена от гниения на \u0000§r\n": {
+      "s": [
+        "All materials are sufficient!\nBase protected from decay for ",
+        "§r\n"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "скоро начнется гниение": {
+      "s": [
+        "decay will start soon"
+      ],
+      "i": []
+    },
+    "База успешно создана! Чтобы открыть меню базы используйте команду \u0000": {
+      "s": [
+        "Base successfully created! To open the base menu, use command ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Рядом есть другие регионы!": {
+      "s": [
+        "There are other regions nearby!"
+      ],
+      "i": []
+    },
+    "состоите в базе игрока '\u0000'": {
+      "s": [
+        "are in the base of player '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "владеете базой": {
+      "s": [
+        "own a base"
+      ],
+      "i": []
+    },
+    "§cВы уже \u0000!": {
+      "s": [
+        "§cYou are already ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нельзя создать базу на высоте ниже \u0000!": {
+      "s": [
+        "Cannot create a base below height ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Теперь вы можете свободно создать базу!": {
+      "s": [
+        "Now you can freely create a base!"
+      ],
+      "i": []
+    },
+    "решили создать базу": {
+      "s": [
+        "decided to create a base"
+      ],
+      "i": []
+    },
+    "Улучшить базу: \u0000": {
+      "s": [
+        "Upgrade base: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 (радиус \u0000 -> \u0000)": {
+      "s": [
+        "",
+        " (radius ",
+        " -> ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Максимальный уровень\n\u0000": {
+      "s": [
+        "Maximum level\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Очень высокая радиация!": {
+      "s": [
+        "Very high radiation!"
+      ],
+      "i": []
+    },
+    "Высокая радиация!": {
+      "s": [
+        "High radiation!"
+      ],
+      "i": []
+    },
+    "Вода. Попытка \u0000/\u0000": {
+      "s": [
+        "Water. Attempt ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Найдено!": {
+      "s": [
+        "Found!"
+      ],
+      "i": []
+    },
+    "Поиск случайной локации без воды...": {
+      "s": [
+        "Searching for a random location without water..."
+      ],
+      "i": []
+    },
+    "Кварцевое озеро": {
+      "s": [
+        "Quartz Lake"
+      ],
+      "i": []
+    },
+    "Успех! Теперь вы можете использовать \u0000 для перемещения на случайную позицию.": {
+      "s": [
+        "Success! Now you can use ",
+        " to teleport to a random position."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку": {
+      "s": [
+        "Clears saved anarchy point. When teleporting to anarchy, you will be thrown to a random location"
+      ],
+      "i": []
+    },
+    "§bПеремещает на анархию": {
+      "s": [
+        "§bTeleports to anarchy"
+      ],
+      "i": []
+    },
+    "Вы уже находитесь на анархии! Если это не так, используйте \u0000": {
+      "s": [
+        "You are already in anarchy! If not, use ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Радиус границы анархии сейчас: \u0000": {
+      "s": [
+        "Anarchy border radius now: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выдает радиус границы анархии сейчас": {
+      "s": [
+        "Shows current anarchy border radius"
+      ],
+      "i": []
+    },
+    "Обычный аирдроп скоро упадет на \u0000!": {
+      "s": [
+        "Regular airdrop will soon fall at ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Усиленный аирдроп скоро упадет на \u0000!": {
+      "s": [
+        "Reinforced airdrop will soon fall at ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "вы атаковали игрока": {
+      "s": [
+        "you attacked a player"
+      ],
+      "i": []
+    },
+    "Нельзя сражаться с новичками!": {
+      "s": [
+        "Can't fight newbies!"
+      ],
+      "i": []
+    },
+    "Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи": {
+      "s": [
+        "You cannot break blocks not placed by players\noutside your base, mine, or mining zone"
+      ],
+      "i": []
+    },
+    "Вы вышли из сервера во время сражения, поэтому были убиты при входе.": {
+      "s": [
+        "You left the server during combat, so you were killed on entry."
+      ],
+      "i": []
+    },
+    "Вы находитесь в режиме сражения!": {
+      "s": [
+        "You are in combat mode!"
+      ],
+      "i": []
+    },
+    "Звук попадания по существо из лука": {
+      "s": [
+        "Bow hit sound"
+      ],
+      "i": []
+    },
+    "Звук лука": {
+      "s": [
+        "Bow sound"
+      ],
+      "i": []
+    },
+    "Индикатор попадания по существу из лука": {
+      "s": [
+        "Bow hit indicator"
+      ],
+      "i": []
+    },
+    "Индикатор": {
+      "s": [
+        "Indicator"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите удалить точку восстановления?": {
+      "s": [
+        "Are you sure you want to delete the restore point?"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено": {
+      "s": [
+        "Are you sure you want to load the restore point? Your current state will be deleted"
+      ],
+      "i": []
+    },
+    "Загрузиться": {
+      "s": [
+        "Load"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено": {
+      "s": [
+        "Are you sure you want to overwrite the restore point FROM THE CURRENT STATE? The current restore point save will be deleted"
+      ],
+      "i": []
+    },
+    "Точки восстановления других игроков": {
+      "s": [
+        "Other players' restore points"
+      ],
+      "i": []
+    },
+    "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:": {
+      "s": [
+        "§cENDER CHEST IS NOT SAVED\n\n§f\nSaved:\nWorld position\nQuests\nInventory\nExperience\nCoins\nStatistics\nRestore point name:"
+      ],
+      "i": []
+    },
+    "Создать точку восстановления": {
+      "s": [
+        "Create restore point"
+      ],
+      "i": []
+    },
+    "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения": {
+      "s": [
+        "Are you sure you want to clear your anarchy inventory and return to spawn? Useful for testing the tutorial"
+      ],
+      "i": []
+    },
+    "Полный сброс": {
+      "s": [
+        "Full reset"
+      ],
+      "i": []
+    },
+    "Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ": {
+      "s": [
+        "Restore points needed for testing\n\n§cENDER CHEST IS NOT SAVED"
+      ],
+      "i": []
+    },
+    "Сохранения": {
+      "s": [
+        "Saves"
+      ],
+      "i": []
+    },
+    "Очищает и сохраняет все данные (для тестов)": {
+      "s": [
+        "Clears and saves all data (for testing)"
+      ],
+      "i": []
+    },
+    "Вы не можете создать точку восстановления не находясь в выживании или приключении": {
+      "s": [
+        "You cannot create a restore point unless you are in survival or adventure"
+      ],
+      "i": []
+    },
+    "Вы не можете создать точку восстановления не находясь на анархии": {
+      "s": [
+        "You cannot create a restore point unless you are in anarchy"
+      ],
+      "i": []
+    },
+    "Инструмент скоро сломается! \u0000/\u0000 (\u0000%)": {
+      "s": [
+        "Tool will break soon! ",
+        "/",
+        " (",
+        "%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.": {
+      "s": [
+        "If enabled, when you interact with a block using an item with less than 99%% durability, the interaction will be canceled and the item will be saved."
+      ],
+      "i": []
+    },
+    "Не давать ломать предмет": {
+      "s": [
+        "Don't allow breaking item"
+      ],
+      "i": []
+    },
+    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран": {
+      "s": [
+        "If enabled, when you interact with a block using an item with less than 90%% durability, show a full-screen notification"
+      ],
+      "i": []
+    },
+    "Уведомлять о ломающемся предмете": {
+      "s": [
+        "Notify about breaking item"
+      ],
+      "i": []
+    },
+    "Версия майнкрафта": {
+      "s": [
+        "Minecraft version"
+      ],
+      "i": []
+    },
+    "Версия сервера": {
+      "s": [
+        "Server version"
+      ],
+      "i": []
+    },
+    "Нанесено/Получено": {
+      "s": [
+        "Dealt/Received"
+      ],
+      "i": []
+    },
+    "Убийств/Смертей": {
+      "s": [
+        "Kills/Deaths"
+      ],
+      "i": []
+    },
+    "Анархия \u0000": {
+      "s": [
+        "Anarchy ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Статистика игрока \u0000": {
+      "s": [
+        "Player statistics ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Показывает статистику по игре": {
+      "s": [
+        "Shows game statistics"
+      ],
+      "i": []
+    },
+    "Вы сели. Чтобы встать, крадитесь": {
+      "s": [
+        "You sat down. To stand up, sneak"
+      ],
+      "i": []
+    },
+    "Вы не можете сесть в падении!": {
+      "s": [
+        "You can't sit while falling!"
+      ],
+      "i": []
+    },
+    "Присаживает вас": {
+      "s": [
+        "Makes you sit"
+      ],
+      "i": []
+    },
+    "§cплохой": {
+      "s": [
+        "§cbad"
+      ],
+      "i": []
+    },
+    "§gнормальный": {
+      "s": [
+        "§gnormal"
+      ],
+      "i": []
+    },
+    "§aхороший": {
+      "s": [
+        "§agood"
+      ],
+      "i": []
+    },
+    "TPS сервера \u0000§f: \u0000": {
+      "s": [
+        "Server TPS ",
+        "§f: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Понг! Проверяем...": {
+      "s": [
+        "Pong! Checking..."
+      ],
+      "i": []
+    },
+    "Показывает пинг сервера": {
+      "s": [
+        "Displays server ping"
+      ],
+      "i": []
+    },
+    "Отменяет телепортацию": {
+      "s": [
+        "Cancels teleportation"
+      ],
+      "i": []
+    },
+    "Недоступно": {
+      "s": [
+        "Unavailable"
+      ],
+      "i": []
+    },
+    "Телепортация в случайное место на анархии": {
+      "s": [
+        "Teleport to a random place in anarchy"
+      ],
+      "i": []
+    },
+    "Вы не телепортируетесь!": {
+      "s": [
+        "You are not teleporting!"
+      ],
+      "i": []
+    },
+    "Вы телепортируетесь!": {
+      "s": [
+        "You are teleporting!"
+      ],
+      "i": []
+    },
+    "Лор прочитан": {
+      "s": [
+        "Lore read"
+      ],
+      "i": []
+    },
+    "Порталы \u0000/\u0000": {
+      "s": [
+        "Portals ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Достижения \u0000/\u0000 (\u0000%%)": {
+      "s": [
+        "Achievements ",
+        "/",
+        " (",
+        "%%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Статистика": {
+      "s": [
+        "Statistics"
+      ],
+      "i": []
+    },
+    "открыть его меню": {
+      "s": [
+        "open their menu"
+      ],
+      "i": []
+    },
+    "Другие игроки": {
+      "s": [
+        "Other players"
+      ],
+      "i": []
+    },
+    "Общее меню игрока": {
+      "s": [
+        "General player menu"
+      ],
+      "i": []
+    },
+    "Выдает ваш айди": {
+      "s": [
+        "Displays your ID"
+      ],
+      "i": []
+    },
+    "Изменено на \u0000": {
+      "s": [
+        "Changed to ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Меняет имя": {
+      "s": [
+        "Change name"
+      ],
+      "i": []
+    },
+    "Убивает вас. Используйте, если застряли где-то": {
+      "s": [
+        "Kills you. Use if you are stuck somewhere"
+      ],
+      "i": []
+    },
+    "Выводит список команд": {
+      "s": [
+        "Displays list of commands"
+      ],
+      "i": []
+    },
+    "Возвращает камеру в исходное состояние": {
+      "s": [
+        "Resets camera to default state"
+      ],
+      "i": []
+    },
+    "Вы получили награды!": {
+      "s": [
+        "You received rewards!"
+      ],
+      "i": []
+    },
+    "Ваш баланс": {
+      "s": [
+        "Your balance"
+      ],
+      "i": []
+    },
+    "Подтверждение перед покупкой": {
+      "s": [
+        "Confirmation before purchase"
+      ],
+      "i": []
+    },
+    "Сразу открывать меню покупки": {
+      "s": [
+        "Open purchase menu immediately"
+      ],
+      "i": []
+    },
+    "Продаваемые предметы": {
+      "s": [
+        "Sellable items"
+      ],
+      "i": []
+    },
+    "Показывать ли счет в меню (монеты, листья)": {
+      "s": [
+        "Show balance in menu (coins, leaves)"
+      ],
+      "i": []
+    },
+    "Показывать счет": {
+      "s": [
+        "Show balance"
+      ],
+      "i": []
+    },
+    "Определяет, включено ли подтверждение перед покупкой.": {
+      "s": [
+        "Determines if confirmation before purchase is enabled."
+      ],
+      "i": []
+    },
+    "Подтверждение покупки": {
+      "s": [
+        "Purchase confirmation"
+      ],
+      "i": []
+    },
+    "Магазин\n§7Внутриигровой магазин": {
+      "s": [
+        "Shop\n§7In-game shop"
+      ],
+      "i": []
+    },
+    "Нет места в инвентаре (нужно еще \u0000)": {
+      "s": [
+        "No space in inventory (need ",
+        " more)"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Продажа невозможна": {
+      "s": [
+        "Sale not possible"
+      ],
+      "i": []
+    },
+    "Покупка невозможна": {
+      "s": [
+        "Purchase not possible"
+      ],
+      "i": []
+    },
+    "При покупке произошла ошибка. \u0000": {
+      "s": [
+        "An error occurred during purchase. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Успешная покупка \u0000 за \u0000!": {
+      "s": [
+        "Successfully bought ",
+        " for ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Успешная продажа \u0000 за \u0000!": {
+      "s": [
+        "Successfully sold ",
+        " for ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Покупка отменена": {
+      "s": [
+        "Purchase cancelled"
+      ],
+      "i": []
+    },
+    "Продажа отменена": {
+      "s": [
+        "Sale cancelled"
+      ],
+      "i": []
+    },
+    "Купить!": {
+      "s": [
+        "Buy!"
+      ],
+      "i": []
+    },
+    "Продать!": {
+      "s": [
+        "Sell!"
+      ],
+      "i": []
+    },
+    "Купить \u0000 за \u0000?": {
+      "s": [
+        "Buy ",
+        " for ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Продать \u0000 за \u0000?": {
+      "s": [
+        "Sell ",
+        " for ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Подтверждение": {
+      "s": [
+        "Confirmation"
+      ],
+      "i": []
+    },
+    "Покупка невозможна:\u0000\u0000": {
+      "s": [
+        "Purchase not possible:",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Магазин": {
+      "s": [
+        "Shop"
+      ],
+      "i": []
+    },
+    "Цена динамическая": {
+      "s": [
+        "Dynamic price"
+      ],
+      "i": []
+    },
+    "Нужно уровней опыта: \u0000, \u0000/\u0000": {
+      "s": [
+        "Required experience levels: ",
+        ", ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Недостаточно средств.": {
+      "s": [
+        "Insufficient funds."
+      ],
+      "i": []
+    },
+    "Нет предмета": {
+      "s": [
+        "No item"
+      ],
+      "i": []
+    },
+    "В инвентаре нет \u0000": {
+      "s": [
+        "No ",
+        " in inventory"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Товар закончился": {
+      "s": [
+        "Out of stock"
+      ],
+      "i": []
+    },
+    "Склад переполнен": {
+      "s": [
+        "Warehouse is full"
+      ],
+      "i": []
+    },
+    "Купить": {
+      "s": [
+        "Buy"
+      ],
+      "i": []
+    },
+    "Продать": {
+      "s": [
+        "Sell"
+      ],
+      "i": []
+    },
+    "Товара на складе: \u0000/\u0000, \u0000%%": {
+      "s": [
+        "Items in stock: ",
+        "/",
+        ", ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "§dНастройки": {
+      "s": [
+        "§dSettings"
+      ],
+      "i": []
+    },
+    "Переключатель": {
+      "s": [
+        "Toggle"
+      ],
+      "i": []
+    },
+    "JSON-Объект": {
+      "s": [
+        "JSON Object"
+      ],
+      "i": []
+    },
+    "Число": {
+      "s": [
+        "Number"
+      ],
+      "i": []
+    },
+    "Строка": {
+      "s": [
+        "String"
+      ],
+      "i": []
+    },
+    "Сохранено!": {
+      "s": [
+        "Saved!"
+      ],
+      "i": []
+    },
+    "Введите число!": {
+      "s": [
+        "Enter a number!"
+      ],
+      "i": []
+    },
+    "Настройка не изменится": {
+      "s": [
+        "Setting will not change"
+      ],
+      "i": []
+    },
+    "\n§7§lТип: §r§f\u0000": {
+      "s": [
+        "\n§7§lType: §r§f",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n§7§lЗначение:§r \u0000": {
+      "s": [
+        "\n§7§lValue:§r ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§8(По умолчанию)\n": {
+      "s": [
+        "§8(Default)\n"
+      ],
+      "i": []
+    },
+    "§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n": {
+      "s": [
+        "§cBUY TO USE\n"
+      ],
+      "i": []
+    },
+    "Общие настройки мира\n§7Чат, спавн и тд": {
+      "s": [
+        "General world settings\n§7Chat, spawn, etc."
+      ],
+      "i": []
+    },
+    "Выбранный предмет: \u0000\nНажмите, чтобы сменить": {
+      "s": [
+        "Selected item: ",
+        "\nClick to change"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Зачарования:\n\u0000": {
+      "s": [
+        "Enchantments:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Настройки мира": {
+      "s": [
+        "World settings"
+      ],
+      "i": []
+    },
+    "Настройки": {
+      "s": [
+        "Settings"
+      ],
+      "i": []
+    },
+    "Доберитесь до точки": {
+      "s": [
+        "Reach the point"
+      ],
+      "i": []
+    },
+    "Следуйте компасу": {
+      "s": [
+        "Follow the compass"
+      ],
+      "i": []
+    },
+    "Доберитесь до: \u0000": {
+      "s": [
+        "Reach: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Монеты": {
+      "s": [
+        "Coins"
+      ],
+      "i": []
+    },
+    "Опыт": {
+      "s": [
+        "Experience"
+      ],
+      "i": []
+    },
+    "Общие": {
+      "s": [
+        "General"
+      ],
+      "i": []
+    },
+    "Внешнее пространство": {
+      "s": [
+        "Outer space"
+      ],
+      "i": []
+    },
+    "Не удалось открыть диалог. \u0000": {
+      "s": [
+        "Failed to open dialog. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Я не могу с вами говорить. Приходите позже.": {
+      "s": [
+        "I can't talk with you now. Come back later."
+      ],
+      "i": []
+    },
+    "Вводит в режим новичка": {
+      "s": [
+        "Enters newbie mode"
+      ],
+      "i": []
+    },
+    "Вы не находитесь в режиме новичка.": {
+      "s": [
+        "You are not in newbie mode."
+      ],
+      "i": []
+    },
+    "использовали команду": {
+      "s": [
+        "used the command"
+      ],
+      "i": []
+    },
+    "Используйте, чтобы выйти из режима новичка": {
+      "s": [
+        "Use to exit newbie mode"
+      ],
+      "i": []
+    },
+    "НЕТ, НАЗАД": {
+      "s": [
+        "NO, BACK"
+      ],
+      "i": []
+    },
+    "Я больше не новичок": {
+      "s": [
+        "I'm no longer a newbie"
+      ],
+      "i": []
+    },
+    "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти": {
+      "s": [
+        "If you perform this action, you will lose newbie status:\r\n - Other players will be able to damage you\r\n - Other players will be able to take your loot after death"
+      ],
+      "i": []
+    },
+    "Успешно отменено": {
+      "s": [
+        "Successfully cancelled"
+      ],
+      "i": []
+    },
+    "Вы \u0000, поэтому вышли из режима новичка.": {
+      "s": [
+        "You are ",
+        ", so you left newbie mode."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выдает или убирает \u0000 из инвентаря": {
+      "s": [
+        "Gives or removes ",
+        " from inventory"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Используйте \u0000 чтобы убрать этот предмет из инвентаря или получить его снова": {
+      "s": [
+        "Use ",
+        " to remove this item from inventory and to get it back"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "меню": {
+      "s": [
+        "menu"
+      ],
+      "i": []
+    },
+    "§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu": {
+      "s": [
+        "§r§7Hold and use the item\n§r§7To remove from inventory, type in chat: §f.menu"
+      ],
+      "i": []
+    },
+    "Меню\n§7Разные настройки интерфейсов и меню в игре": {
+      "s": [
+        "Menu\n§7Various interface and menu settings in the game"
+      ],
+      "i": []
+    },
+    "Шанс: \u0000%%, Кол-во: \u0000...\u0000": {
+      "s": [
+        "Chance: ",
+        "%%, Amount: ",
+        "...",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "трлн": {
+      "s": [
+        "T"
+      ],
+      "i": []
+    },
+    "млрд": {
+      "s": [
+        "B"
+      ],
+      "i": []
+    },
+    "млн": {
+      "s": [
+        "M"
+      ],
+      "i": []
+    },
+    "к": {
+      "s": [
+        "k"
+      ],
+      "i": []
+    },
+    "Просмотр содержимого таблиц лута": {
+      "s": [
+        "View loot table contents"
+      ],
+      "i": []
+    },
+    "Содержимое": {
+      "s": [
+        "Contents"
+      ],
+      "i": []
+    },
+    "Я готов принять риск": {
+      "s": [
+        "I am ready to take the risk"
+      ],
+      "i": []
+    },
+    "Вернуться назад": {
+      "s": [
+        "Go back"
+      ],
+      "i": []
+    },
+    "Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне": {
+      "s": [
+        "Other players will be able to take your resources after death in this zone"
+      ],
+      "i": []
+    },
+    "Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.": {
+      "s": [
+        "Other players will not be able to take your resources after death in this zone."
+      ],
+      "i": []
+    },
+    "у вас вообще экипировки нет": {
+      "s": [
+        "you have no equipment at all"
+      ],
+      "i": []
+    },
+    "Ваш уровень": {
+      "s": [
+        "Your level"
+      ],
+      "i": []
+    },
+    "Требуемый уровень": {
+      "s": [
+        "Required level"
+      ],
+      "i": []
+    },
+    "Зона": {
+      "s": [
+        "Zone"
+      ],
+      "i": []
+    },
+    "Опасно!": {
+      "s": [
+        "Dangerous!"
+      ],
+      "i": []
+    },
+    "С помощью него вы можете сделать предмет у инженера": {
+      "s": [
+        "With it you can craft an item at the engineer"
+      ],
+      "i": []
+    },
+    "§fЧертеж предмета \u0000": {
+      "s": [
+        "§fItem blueprint ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Убит босс \u0000!": {
+      "s": [
+        "Boss ",
+        " defeated!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000\nДо появления\nосталось \u0000": {
+      "s": [
+        "",
+        "\nДо появления\nосталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§9Тестер": {
+      "s": [
+        "§9Tester"
+      ],
+      "i": []
+    },
+    "§9Наблюдатель": {
+      "s": [
+        "§9Observer"
+      ],
+      "i": []
+    },
+    "§fУчастник": {
+      "s": [
+        "§fMember"
+      ],
+      "i": []
+    },
+    "§3Строитель": {
+      "s": [
+        "§3Builder"
+      ],
+      "i": []
+    },
+    "§bГл. Строитель": {
+      "s": [
+        "§bHead Builder"
+      ],
+      "i": []
+    },
+    "§eПомошник": {
+      "s": [
+        "§eHelper"
+      ],
+      "i": []
+    },
+    "§6Модератор": {
+      "s": [
+        "§6Moderator"
+      ],
+      "i": []
+    },
+    "§5Админ": {
+      "s": [
+        "§5Admin"
+      ],
+      "i": []
+    },
+    "§dГл. Админ": {
+      "s": [
+        "§dHead Admin"
+      ],
+      "i": []
+    },
+    "§cТех. Админ": {
+      "s": [
+        "§cTech Admin"
+      ],
+      "i": []
+    },
+    "§6Куратор": {
+      "s": [
+        "§6Curator"
+      ],
+      "i": []
+    },
+    "§aРуководство": {
+      "s": [
+        "§aGuide"
+      ],
+      "i": []
+    },
+    "Роль сменена успешно": {
+      "s": [
+        "Role changed successfully"
+      ],
+      "i": []
+    },
+    "Роль игрока \u0000 сменена успешно": {
+      "s": [
+        "Role of player ",
+        " changed successfully"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nПричина: \u0000": {
+      "s": [
+        "\nReason: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    " игроком \u0000": {
+      "s": [
+        " by player ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваша роль сменена c \u0000 на \u0000\u0000\u0000": {
+      "s": [
+        "Your role has been changed from ",
+        " to ",
+        "",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Например, \"чел дурной, пол технограда снес\"": {
+      "s": [
+        "For example, \"guy is crazy, destroyed half of Technograd\""
+      ],
+      "i": []
+    },
+    "Причина смены роли": {
+      "s": [
+        "Reason for role change"
+      ],
+      "i": []
+    },
+    "Роль": {
+      "s": [
+        "Role"
+      ],
+      "i": []
+    },
+    "Показать Ваш ник в уведомлении": {
+      "s": [
+        "Show your nickname in notification"
+      ],
+      "i": []
+    },
+    "Уведомлять": {
+      "s": [
+        "Notify"
+      ],
+      "i": []
+    },
+    "У игрока \u0000 роль выше или такая же как у вас, вы не можете ее сменить.": {
+      "s": [
+        "Player ",
+        " has a role higher or equal to yours, you cannot change it."
+      ],
+      "i": [
+        0
+      ]
+    },
+    " §4Не сменить": {
+      "s": [
+        " §4Cannot change"
+      ],
+      "i": []
+    },
+    "Без имени": {
+      "s": [
+        "No name"
+      ],
+      "i": []
+    },
+    "§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)": {
+      "s": [
+        "§3Change my role\n§7(Restore later: §f/rolerestore§7)"
+      ],
+      "i": []
+    },
+    "§6дате входа": {
+      "s": [
+        "§6login date"
+      ],
+      "i": []
+    },
+    "§aролям": {
+      "s": [
+        "§aroles"
+      ],
+      "i": []
+    },
+    "§bонлайну": {
+      "s": [
+        "§bonline"
+      ],
+      "i": []
+    },
+    "§3Ваша роль: \u0000": {
+      "s": [
+        "§3Your role: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n\n§3Восстановить прошлую роль: §f.role restore": {
+      "s": [
+        "\n\n§3Restore previous role: §f.role restore"
+      ],
+      "i": []
+    },
+    "Ваша роль: \u0000\u0000": {
+      "s": [
+        "Your role: ",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы вернули роль §r\u0000": {
+      "s": [
+        "You restored role §r",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Восстанавливает вашу роль": {
+      "s": [
+        "Restores your role"
+      ],
+      "i": []
+    },
+    "Показывает вашу роль": {
+      "s": [
+        "Displays your role"
+      ],
+      "i": []
+    },
+    "Безопасная зона \u0000": {
+      "s": [
+        "Safe ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Дорога": {
+      "s": [
+        "Road"
+      ],
+      "i": []
+    },
+    "Регион создается. \u0000%%": {
+      "s": [
+        "Region is being created. ",
+        "%%"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Регион сохраняется": {
+      "s": [
+        "Region is being saved"
+      ],
+      "i": []
+    },
+    "Вы не можете добывать блоки в зоне добычи новичков": {
+      "s": [
+        "You cannot mine blocks in the newbie mining zone"
+      ],
+      "i": []
+    },
+    "Индексировать для вики": {
+      "s": [
+        "Index for wiki"
+      ],
+      "i": []
+    },
+    "Применить": {
+      "s": [
+        "Apply"
+      ],
+      "i": []
+    },
+    "Будут изменены следующие регионы:\n\u0000": {
+      "s": [
+        "The following regions will be modified:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "В этом месте не должно быть региона шахты, подвинуть все": {
+      "s": [
+        "There shouldn't be a mineshaft region in this place, move everything"
+      ],
+      "i": []
+    },
+    "Макс кол-во: \u0000": {
+      "s": [
+        "Max amount: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§7Зона добычи": {
+      "s": [
+        "§7Mining zone"
+      ],
+      "i": []
+    },
+    "§bЗона добычи новичков": {
+      "s": [
+        "§bNewbie mining zone"
+      ],
+      "i": []
+    },
+    "§cБосс §6\u0000": {
+      "s": [
+        "§cBoss §6",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите удалить участника из региона?": {
+      "s": [
+        "Are you sure you want to remove the member from the region?"
+      ],
+      "i": []
+    },
+    "Удалить участника": {
+      "s": [
+        "Remove member"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите назначить владельцем региона игрока \u0000?": {
+      "s": [
+        "Are you sure you want to appoint player ",
+        " as the region owner?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите передать права владельца региона игроку \u0000?": {
+      "s": [
+        "Are you sure you want to transfer region ownership rights to player ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Передать права": {
+      "s": [
+        "Transfer rights"
+      ],
+      "i": []
+    },
+    "Управление участником региона": {
+      "s": [
+        "Manage region member"
+      ],
+      "i": []
+    },
+    "Владелец > \u0000": {
+      "s": [
+        "Owner > ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Добавить участника": {
+      "s": [
+        "Add member"
+      ],
+      "i": []
+    },
+    "Добавить!": {
+      "s": [
+        "Add!"
+      ],
+      "i": []
+    },
+    "Вы можете только посмотреть их": {
+      "s": [
+        "You can only view them"
+      ],
+      "i": []
+    },
+    "Для управления участником нажмите на кнопку с его ником": {
+      "s": [
+        "To manage a member, click the button with their nickname"
+      ],
+      "i": []
+    },
+    "Участники региона": {
+      "s": [
+        "Region members"
+      ],
+      "i": []
+    },
+    "Центр региона": {
+      "s": [
+        "Region center"
+      ],
+      "i": []
+    },
+    "Радиус\n§7Определяет радиус региона": {
+      "s": [
+        "Radius\n§7Determines the region radius"
+      ],
+      "i": []
+    },
+    "Нет": {
+      "s": [
+        "No"
+      ],
+      "i": []
+    },
+    "Только с сущностями (pve)": {
+      "s": [
+        "Only with entities (pve)"
+      ],
+      "i": []
+    },
+    "Да": {
+      "s": [
+        "Yes"
+      ],
+      "i": []
+    },
+    "Сражение\n§7Определяет, смогут ли игроки сражаться в регионе": {
+      "s": [
+        "Combat\n§7Determines if players can fight in the region"
+      ],
+      "i": []
+    },
+    "Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.": {
+      "s": [
+        "Gates\n§7Determines if players not added to the region can use gates."
+      ],
+      "i": []
+    },
+    "Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)": {
+      "s": [
+        "Containers\n§7Determines if players not added to the region can open containers (chests, shulkers, etc.)"
+      ],
+      "i": []
+    },
+    "Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.": {
+      "s": [
+        "Trapdoors\n§7Determines if players not added to the region can use trapdoors."
+      ],
+      "i": []
+    },
+    "Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.": {
+      "s": [
+        "Levers and buttons\n§7Determines if players not added to the region can use levers and buttons."
+      ],
+      "i": []
+    },
+    "Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.": {
+      "s": [
+        "Doors\n§7Determines if players not added to the region can use doors."
+      ],
+      "i": []
+    },
+    "Разрешения региона": {
+      "s": [
+        "Region permissions"
+      ],
+      "i": []
+    },
+    "Структура": {
+      "s": [
+        "Structure"
+      ],
+      "i": []
+    },
+    "Разрешения": {
+      "s": [
+        "Permissions"
+      ],
+      "i": []
+    },
+    "Тип зоны": {
+      "s": [
+        "Zone type"
+      ],
+      "i": []
+    },
+    "Тип региона": {
+      "s": [
+        "Region type"
+      ],
+      "i": []
+    },
+    "Не удалось сохранить структуру: \u0000": {
+      "s": [
+        "Failed to save structure: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сохранить": {
+      "s": [
+        "Save"
+      ],
+      "i": []
+    },
+    "Пересохранить": {
+      "s": [
+        "Resave"
+      ],
+      "i": []
+    },
+    "Нельзя создать регион, область которого ниже -64 (y: \u0000 radius: \u0000 result: \u0000)": {
+      "s": [
+        "Cannot create a region with area below -64 (y: ",
+        " radius: ",
+        " result: ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Выключено": {
+      "s": [
+        "Disabled"
+      ],
+      "i": []
+    },
+    "Входит в режим телепортации по группе регионов. Полезно для поиска данжа": {
+      "s": [
+        "Enters teleport mode by region group. Useful for finding a dungeon"
+      ],
+      "i": []
+    },
+    "Управляет регионами": {
+      "s": [
+        "Manages regions"
+      ],
+      "i": []
+    },
+    "Вас ждет \u0000": {
+      "s": [
+        "You are awaited by ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000\n§aЗавершено! §6Заберите награду.": {
+      "s": [
+        "",
+        "\n§aCompleted! §6Claim your reward."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Заберите награду": {
+      "s": [
+        "Claim reward"
+      ],
+      "i": []
+    },
+    "Задание \u0000 сломалось: \u0000": {
+      "s": [
+        "Quest ",
+        " broke: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "При активации шага произошла ошибка. \u0000": {
+      "s": [
+        "An error occurred while activating the step. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Отправлять ли сообщение в чат при каждом новом разделе задания": {
+      "s": [
+        "Send a chat message at each new quest section"
+      ],
+      "i": []
+    },
+    "Сообщение в чат при каждом шаге": {
+      "s": [
+        "Chat message at each step"
+      ],
+      "i": []
+    },
+    "Задания\r\n§7Настройки игровых заданий": {
+      "s": [
+        "Quests\r\n§7Game quest settings"
+      ],
+      "i": []
+    },
+    "Завершите задание \u0000": {
+      "s": [
+        "Complete the quest ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Возьмите задание \u0000": {
+      "s": [
+        "Take the quest ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Отказаться от задания?": {
+      "s": [
+        "Abandon quest?"
+      ],
+      "i": []
+    },
+    "Отказаться": {
+      "s": [
+        "Abandon"
+      ],
+      "i": []
+    },
+    "Сделать приоритетным": {
+      "s": [
+        "Make priority"
+      ],
+      "i": []
+    },
+    "Задание завершено!": {
+      "s": [
+        "Quest completed!"
+      ],
+      "i": []
+    },
+    "Измерение": {
+      "s": [
+        "Dimension"
+      ],
+      "i": []
+    },
+    "Локация": {
+      "s": [
+        "Location"
+      ],
+      "i": []
+    },
+    "Описание:": {
+      "s": [
+        "Description:"
+      ],
+      "i": []
+    },
+    "Текущее действие": {
+      "s": [
+        "Current action"
+      ],
+      "i": []
+    },
+    "Описание": {
+      "s": [
+        "Description"
+      ],
+      "i": []
+    },
+    "Список завершенных заданий": {
+      "s": [
+        "List of completed quests"
+      ],
+      "i": []
+    },
+    "Завершенные задания": {
+      "s": [
+        "Completed quests"
+      ],
+      "i": []
+    },
+    "Нет активных заданий.": {
+      "s": [
+        "No active quests."
+      ],
+      "i": []
+    },
+    "Нет заданий": {
+      "s": [
+        "No quests"
+      ],
+      "i": []
+    },
+    "Задания": {
+      "s": [
+        "Quests"
+      ],
+      "i": []
+    },
+    "У вас нет активных заданий!": {
+      "s": [
+        "You have no active quests!"
+      ],
+      "i": []
+    },
+    "Выйти": {
+      "s": [
+        "Exit"
+      ],
+      "i": []
+    },
+    "Меню заданий": {
+      "s": [
+        "Quest menu"
+      ],
+      "i": []
+    },
+    "Взять задание": {
+      "s": [
+        "Take quest"
+      ],
+      "i": []
+    },
+    "Задание\n\u0000": {
+      "s": [
+        "Quest\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000\nЗавершен!": {
+      "s": [
+        "",
+        "\nCompleted!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§2Перемещение...": {
+      "s": [
+        "§2Teleporting..."
+      ],
+      "i": []
+    },
+    "при входе игроков": {
+      "s": [
+        "when players log in"
+      ],
+      "i": []
+    },
+    "о входе других игроков": {
+      "s": [
+        "about other players logging in"
+      ],
+      "i": []
+    },
+    "Сообщение": {
+      "s": [
+        "Message"
+      ],
+      "i": []
+    },
+    "§8Проснулся": {
+      "s": [
+        "§8Woke up"
+      ],
+      "i": []
+    },
+    "§8Очнулся в воздухе": {
+      "s": [
+        "§8Woke up in the air"
+      ],
+      "i": []
+    },
+    "Добро пожаловать!": {
+      "s": [
+        "Welcome!"
+      ],
+      "i": []
+    },
+    "§3Добрый вечер": {
+      "s": [
+        "§3Good evening"
+      ],
+      "i": []
+    },
+    "§bДобрый день": {
+      "s": [
+        "§bGood afternoon"
+      ],
+      "i": []
+    },
+    "§6Доброе утро": {
+      "s": [
+        "§6Good morning"
+      ],
+      "i": []
+    },
+    "§9Доброй ночи": {
+      "s": [
+        "§9Good night"
+      ],
+      "i": []
+    },
+    "\u0000, \u0000!\n§r§3Время §b• §3\u0000": {
+      "s": [
+        "",
+        ", ",
+        "!\n§r§3Time §b• §3",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "при входе": {
+      "s": [
+        "on login"
+      ],
+      "i": []
+    },
+    "Время": {
+      "s": [
+        "Time"
+      ],
+      "i": []
+    },
+    "Вход\n§7Все действия, связанные со входом": {
+      "s": [
+        "Login\n§7All actions related to login"
+      ],
+      "i": []
+    },
+    "Имитирует первый вход": {
+      "s": [
+        "Simulate first login"
+      ],
+      "i": []
+    },
+    "\u0000: \u0000, просмотреть: /mail": {
+      "s": [
+        "",
+        ": ",
+        ", view: /mail"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Удалить": {
+      "s": [
+        "Delete"
+      ],
+      "i": []
+    },
+    "Удалить письмо": {
+      "s": [
+        "Delete mail"
+      ],
+      "i": []
+    },
+    "\u0000 Вы потеряете все награды, прикрепленные к письму!": {
+      "s": [
+        "",
+        " You will lose all rewards attached to the letter!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 Все награды будут собраны автоматически": {
+      "s": [
+        "",
+        " All rewards will be collected automatically"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Удалить письмо?": {
+      "s": [
+        "Delete mail?"
+      ],
+      "i": []
+    },
+    "Предыдущее письмо\n\u0000": {
+      "s": [
+        "Previous letter\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Следующее письмо\n\u0000": {
+      "s": [
+        "Next letter\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Награда успешно забрана!\n\n": {
+      "s": [
+        "Reward successfully claimed!\n\n"
+      ],
+      "i": []
+    },
+    "Вы не можете забрать награды не находясь на анархии": {
+      "s": [
+        "You cannot collect rewards while not in anarchy"
+      ],
+      "i": []
+    },
+    "Забрать награду": {
+      "s": [
+        "Claim reward"
+      ],
+      "i": []
+    },
+    "Награды": {
+      "s": [
+        "Rewards"
+      ],
+      "i": []
+    },
+    "Алмазов за прочтение": {
+      "s": [
+        "Diamonds for reading"
+      ],
+      "i": []
+    },
+    "вот.": {
+      "s": [
+        "here."
+      ],
+      "i": []
+    },
+    "Строка5": {
+      "s": [
+        "Line5"
+      ],
+      "i": []
+    },
+    "да": {
+      "s": [
+        "yes"
+      ],
+      "i": []
+    },
+    "Строка 4": {
+      "s": [
+        "Line 4"
+      ],
+      "i": []
+    },
+    "читать все сообщения в почте": {
+      "s": [
+        "read all messages in mail"
+      ],
+      "i": []
+    },
+    "Строка3": {
+      "s": [
+        "Line3"
+      ],
+      "i": []
+    },
+    "вы теперь можете": {
+      "s": [
+        "you now can"
+      ],
+      "i": []
+    },
+    "Строка2": {
+      "s": [
+        "Line2"
+      ],
+      "i": []
+    },
+    "мы вас поздравляем": {
+      "s": [
+        "we congratulate you"
+      ],
+      "i": []
+    },
+    "Строка 1": {
+      "s": [
+        "Line 1"
+      ],
+      "i": []
+    },
+    "вы крутые там д0а": {
+      "s": [
+        "you are cool there, yeah"
+      ],
+      "i": []
+    },
+    "Заголовок": {
+      "s": [
+        "Title"
+      ],
+      "i": []
+    },
+    "Объявление для всего сервера": {
+      "s": [
+        "Announcement for the entire server"
+      ],
+      "i": []
+    },
+    "Объявление": {
+      "s": [
+        "Announcement"
+      ],
+      "i": []
+    },
+    "Все прочитано": {
+      "s": [
+        "All read"
+      ],
+      "i": []
+    },
+    "Прочитать все\n§7(и собрать награды если есть)": {
+      "s": [
+        "Прочитать все\n§7(и собрать награды если есть)"
+      ],
+      "i": []
+    },
+    "Имени": {
+      "s": [
+        "Name"
+      ],
+      "i": []
+    },
+    "Дате": {
+      "s": [
+        "Date"
+      ],
+      "i": []
+    },
+    "У письма есть несобранные награды": {
+      "s": [
+        "Mail has unclaimed rewards"
+      ],
+      "i": []
+    },
+    "Несобранные награды": {
+      "s": [
+        "Unclaimed rewards"
+      ],
+      "i": []
+    },
+    "Показывать только непрочитанные сообщения": {
+      "s": [
+        "Show only unread messages"
+      ],
+      "i": []
+    },
+    "Непрочитанные": {
+      "s": [
+        "Unread"
+      ],
+      "i": []
+    },
+    "Почта:": {
+      "s": [
+        "Mail:"
+      ],
+      "i": []
+    },
+    "Показывать ли при входе сообщение с кол-вом непрочитанных": {
+      "s": [
+        "Show unread mail count on login"
+      ],
+      "i": []
+    },
+    "Почта": {
+      "s": [
+        "Mail"
+      ],
+      "i": []
+    },
+    "Собирать ли награды при удалении письма": {
+      "s": [
+        "Collect rewards when deleting mail"
+      ],
+      "i": []
+    },
+    "Собирать награды при удалении": {
+      "s": [
+        "Collect rewards on delete"
+      ],
+      "i": []
+    },
+    "Почта\n§7Прочтение сообщения, инфо при входе": {
+      "s": [
+        "Mail\n§7Message reading, info on login"
+      ],
+      "i": []
+    },
+    "Посмотреть входящие сообщения почты": {
+      "s": [
+        "View incoming mail messages"
+      ],
+      "i": []
+    },
+    "§cНет": {
+      "s": [
+        "§cNo"
+      ],
+      "i": []
+    },
+    "§fДа": {
+      "s": [
+        "§fYes"
+      ],
+      "i": []
+    },
+    "\u0000 д. \u0000": {
+      "s": [
+        "",
+        "d ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§bНовичок": {
+      "s": [
+        "§bNewbie"
+      ],
+      "i": []
+    },
+    "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова": {
+      "s": [
+        "Failed to open form. Close chat or another menu and try again"
+      ],
+      "i": []
+    },
+    "Закрой чат!": {
+      "s": [
+        "Close chat!"
+      ],
+      "i": []
+    },
+    "Закрыть": {
+      "s": [
+        "Close"
+      ],
+      "i": []
+    },
+    "Назад": {
+      "s": [
+        "Back"
+      ],
+      "i": []
+    },
+    "Дате входа": {
+      "s": [
+        "Login date"
+      ],
+      "i": []
+    },
+    "Онлайну": {
+      "s": [
+        "Online"
+      ],
+      "i": []
+    },
+    "Сортировать по": {
+      "s": [
+        "Sort by"
+      ],
+      "i": []
+    },
+    "§3Выберите игрока чтобы \u0000": {
+      "s": [
+        "§3Select a player to ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбрать всех": {
+      "s": [
+        "Select all"
+      ],
+      "i": []
+    },
+    "Убрать выделение": {
+      "s": [
+        "Deselect"
+      ],
+      "i": []
+    },
+    "Вы уверены?": {
+      "s": [
+        "Are you sure?"
+      ],
+      "i": []
+    },
+    "Никакой": {
+      "s": [
+        "None"
+      ],
+      "i": []
+    },
+    "История": {
+      "s": [
+        "History"
+      ],
+      "i": []
+    },
+    "Хорошо, назад": {
+      "s": [
+        "Okay, back"
+      ],
+      "i": []
+    },
+    "Ничего не произойдет": {
+      "s": [
+        "Nothing will happen"
+      ],
+      "i": []
+    },
+    "Запрос": {
+      "s": [
+        "Query"
+      ],
+      "i": []
+    },
+    "Результаты поиска по запросу\n\u0000": {
+      "s": [
+        "Search results for\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Поиск": {
+      "s": [
+        "Search"
+      ],
+      "i": []
+    },
+    "Следующая": {
+      "s": [
+        "Next"
+      ],
+      "i": []
+    },
+    "Предыдущая": {
+      "s": [
+        "Previous"
+      ],
+      "i": []
+    },
+    "Фильтры": {
+      "s": [
+        "Filters"
+      ],
+      "i": []
+    },
+    "§cВы уверены, что хотите \u0000?": {
+      "s": [
+        "§cAre you sure you want to ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Отмена": {
+      "s": [
+        "Cancel"
+      ],
+      "i": []
+    },
+    "§r§3Назад": {
+      "s": [
+        "§r§3Back"
+      ],
+      "i": []
+    },
+    "§l§b< §r§3Назад": {
+      "s": [
+        "§l§b< §r§3Back"
+      ],
+      "i": []
+    },
+    "Успешно": {
+      "s": [
+        "Success"
+      ],
+      "i": []
+    },
+    "Последний раз онлайн": {
+      "s": [
+        "Last seen online"
+      ],
+      "i": []
+    },
+    "Последний раз онлайн на анархии": {
+      "s": [
+        "Last seen online on anarchy"
+      ],
+      "i": []
+    },
+    "Время первого входа на анархию": {
+      "s": [
+        "Anarchy join time"
+      ],
+      "i": []
+    },
+    "Онлайн на анархии": {
+      "s": [
+        "Online time on Anarchy"
+      ],
+      "i": []
+    },
+    "Время первого входа": {
+      "s": [
+        "Join time"
+      ],
+      "i": []
+    },
+    "Всего входов на сервер": {
+      "s": [
+        "Join times"
+      ],
+      "i": []
+    },
+    "Урона нанесено": {
+      "s": [
+        "Damage given"
+      ],
+      "i": []
+    },
+    "Урона получено": {
+      "s": [
+        "Damage dealt"
+      ],
+      "i": []
+    },
+    "Фейрверков взорвано": {
+      "s": [
+        "Fireworks exploded"
+      ],
+      "i": []
+    },
+    "Фейрверков запущено": {
+      "s": [
+        "Fireworks launched"
+      ],
+      "i": []
+    },
+    "Блоков сломано": {
+      "s": [
+        "Blocks broken"
+      ],
+      "i": []
+    },
+    "Блоков поставлено": {
+      "s": [
+        "Blocks placed"
+      ],
+      "i": []
+    },
+    "Онлайн всего": {
+      "s": [
+        "Online time"
+      ],
+      "i": []
+    },
+    "Рейд-блок": {
+      "s": [
+        "Raid-block"
+      ],
+      "i": []
+    },
+    "Смертей": {
+      "s": [
+        "Deaths"
+      ],
+      "i": []
+    },
+    "Убийств": {
+      "s": [
+        "Kills"
+      ],
+      "i": []
+    },
+    "§6Монеты": {
+      "s": [
+        "§6Money"
+      ],
+      "i": []
+    },
+    "§aЛистья": {
+      "s": [
+        "§aLeafs"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 сменил ник на \u0000": {
+      "s": [
+        "Player ",
+        " changed nickname to ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Катсцена": {
+      "s": [
+        "Cutscene"
+      ],
+      "i": []
+    },
+    "Вы получили свою награду!": {
+      "s": [
+        "You have received your reward!"
+      ],
+      "i": []
+    },
+    "Используйте этот ключ, чтобы открыть ящик с лутом!": {
+      "s": [
+        "Use this key to open the loot chest!"
+      ],
+      "i": []
+    },
+    "Ключ для ящика \u0000": {
+      "s": [
+        "Key for crate ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 > Содержимое": {
+      "s": [
+        "",
+        " > Contents"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Посмотреть содержимое": {
+      "s": [
+        "View contents"
+      ],
+      "i": []
+    },
+    "Купить ключ": {
+      "s": [
+        "Buy key"
+      ],
+      "i": []
+    },
+    "Чтобы открыть этот сундук, возьмите в руки ключ": {
+      "s": [
+        "To open this chest, hold the key in your hand"
+      ],
+      "i": []
+    },
+    "Открыт ящик \u0000!": {
+      "s": [
+        "Crate ",
+        " opened!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ключ для \u0000 не подходит к ящику \u0000": {
+      "s": [
+        "Key for ",
+        " is not suitable for crate ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "\u0000 ящик": {
+      "s": [
+        "",
+        " crate"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Команда недоступна": {
+      "s": [
+        "Command unavailable"
+      ],
+      "i": []
+    },
+    "Команда доступна только начиная с роли \u0000. Ваша роль: \u0000": {
+      "s": [
+        "Command available only starting from role ",
+        ". Your role: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Команда не готова": {
+      "s": [
+        "Command not ready"
+      ],
+      "i": []
+    },
+    "При выполнении команды произошла ошибка. \u0000": {
+      "s": [
+        "An error occurred while executing the command. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "У вас нет разрешения для использования команды \u0000\u0000\nСписок всех доступных вам команд: §f.help": {
+      "s": [
+        "You do not have permission to use command ",
+        "",
+        "\nList of all commands available to you: §f.help"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "\nКоманда доступна начиная с роли \u0000": {
+      "s": [
+        "\nCommand available from role ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы имели ввиду \u0000?": {
+      "s": [
+        "Did you mean ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Список всех доступных вам команд: §f.help": {
+      "s": [
+        "List of all commands available to you: §f.help"
+      ],
+      "i": []
+    },
+    "Не так быстро! Попробуй через \u0000": {
+      "s": [
+        "Not so fast! Try again in ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сменить роль \u0000": {
+      "s": [
+        "Change role ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Причина не была указана, участник остался в клане": {
+      "s": [
+        "No reason specified, member remains in the clan"
+      ],
+      "i": []
+    },
+    "Участник \u0000 успешно выгнан из клана \u0000": {
+      "s": [
+        "Member ",
+        " successfully kicked from clan ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы были выгнаны из клана игроком '\u0000'. Причина: \u0000": {
+      "s": [
+        "You were kicked from the clan by player '",
+        "'. Reason: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы выгнаны из клана '\u0000'": {
+      "s": [
+        "You have been kicked from the clan '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Причина обязательна": {
+      "s": [
+        "Reason is required"
+      ],
+      "i": []
+    },
+    "Причина": {
+      "s": [
+        "Reason"
+      ],
+      "i": []
+    },
+    "Выгнать участника '\u0000'": {
+      "s": [
+        "Kick member '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выгнать": {
+      "s": [
+        "Kick"
+      ],
+      "i": []
+    },
+    "В клане '\u0000', сменена игроком \u0000": {
+      "s": [
+        "In clan '",
+        "', changed by player ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Роль в клане \u0000": {
+      "s": [
+        "Role in clan ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Роль участника клана \u0000 сменена успешно: \u0000.": {
+      "s": [
+        "Clan member ",
+        "'s role changed successfully: ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Сменить роль": {
+      "s": [
+        "Change role"
+      ],
+      "i": []
+    },
+    "Вы единственный владелец. Кнопка удаления клана находится в меню клана снизу": {
+      "s": [
+        "You are the only owner. The delete clan button is at the bottom of the clan menu"
+      ],
+      "i": []
+    },
+    "Вы не можете отказаться от владения клана являясь единственным его владельцем": {
+      "s": [
+        "You cannot give up clan ownership being the only owner"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите сбросить свою роль в клане до участника?": {
+      "s": [
+        "Are you sure you want to demote your role in the clan to member?"
+      ],
+      "i": []
+    },
+    "Отказаться от владения": {
+      "s": [
+        "Give up ownership"
+      ],
+      "i": []
+    },
+    "Участники клана": {
+      "s": [
+        "Clan members"
+      ],
+      "i": []
+    },
+    "Не удалось пригласить в клан": {
+      "s": [
+        "Failed to invite to clan"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 успешно приглашен в клан!": {
+      "s": [
+        "Player ",
+        " successfully invited to the clan!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы были приглашены в клан! Чтобы вступить, используйте /clan или раздел кланов из основого меню": {
+      "s": [
+        "You have been invited to a clan! To join, use /clan or the clans section from the main menu"
+      ],
+      "i": []
+    },
+    "Приглашение в клан '\u0000'": {
+      "s": [
+        "Clan invitation to '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок \u0000 уже состоит в клане \u0000!": {
+      "s": [
+        "Player ",
+        " is already in clan ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Игрок \u0000 уже состоит в вашем клане!": {
+      "s": [
+        "Player ",
+        " is already in your clan!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "пригласить в клан": {
+      "s": [
+        "invite to clan"
+      ],
+      "i": []
+    },
+    "Да, отозать": {
+      "s": [
+        "Yes, revoke"
+      ],
+      "i": []
+    },
+    "отозвать приглашение?": {
+      "s": [
+        "revoke invitation?"
+      ],
+      "i": []
+    },
+    "Новое приглашение": {
+      "s": [
+        "New invitation"
+      ],
+      "i": []
+    },
+    "Приглашения в клан '\u0000'": {
+      "s": [
+        "Invitations to clan '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Онет": {
+      "s": [
+        "Oh no"
+      ],
+      "i": []
+    },
+    "Вы НЕ приняты в клан \u0000": {
+      "s": [
+        "You were NOT accepted into clan ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нет, не заслужил": {
+      "s": [
+        "No, not deserved"
+      ],
+      "i": []
+    },
+    "Откройте меню клана с помощью .clan": {
+      "s": [
+        "Open the clan menu using .clan"
+      ],
+      "i": []
+    },
+    "Вы приняты в клан \u0000": {
+      "s": [
+        "You have been accepted into clan ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Принять!": {
+      "s": [
+        "Accept!"
+      ],
+      "i": []
+    },
+    "Принять игрока '\u0000' в клан?": {
+      "s": [
+        "Accept player '",
+        "' into clan?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбор": {
+      "s": [
+        "Select"
+      ],
+      "i": []
+    },
+    "Короткое имя: \u0000": {
+      "s": [
+        "Short name: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Другие кланы\n§7Посмотреть": {
+      "s": [
+        "Other clans\n§7View"
+      ],
+      "i": []
+    },
+    "Клан '\u0000' покинут успешно": {
+      "s": [
+        "Clan '",
+        "' left successfully"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Хз почему": {
+      "s": [
+        "Dunno why"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 покинул ваш клан": {
+      "s": [
+        "Player ",
+        " left your clan"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку.": {
+      "s": [
+        "Are you sure you want to leave the clan? If you change your mind, you will have to submit a new application."
+      ],
+      "i": []
+    },
+    "Покинуть клан": {
+      "s": [
+        "Leave clan"
+      ],
+      "i": []
+    },
+    "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.": {
+      "s": [
+        "Unfortunately, the clan was disbanded. No idea why the creator didn't like it, find a better clan or create a new one, no need to be sad. You can still loot the clan bases, the creator probably didn't remove you from all of them."
+      ],
+      "i": []
+    },
+    "Клан '\u0000' распущен": {
+      "s": [
+        "Clan '",
+        "' disbanded"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Удалить клан без возможности восстановления?": {
+      "s": [
+        "Delete clan without the possibility of recovery?"
+      ],
+      "i": []
+    },
+    "Удалить клан": {
+      "s": [
+        "Delete clan"
+      ],
+      "i": []
+    },
+    "Изменить": {
+      "s": [
+        "Change"
+      ],
+      "i": []
+    },
+    "Изменить название или тэг клана": {
+      "s": [
+        "Change clan name or tag"
+      ],
+      "i": []
+    },
+    "Заявки на вступление": {
+      "s": [
+        "Join requests"
+      ],
+      "i": []
+    },
+    "Участники": {
+      "s": [
+        "Members"
+      ],
+      "i": []
+    },
+    "Дата создания": {
+      "s": [
+        "Creation date"
+      ],
+      "i": []
+    },
+    "Имя клана": {
+      "s": [
+        "Clan name"
+      ],
+      "i": []
+    },
+    "Меню клана": {
+      "s": [
+        "Clan menu"
+      ],
+      "i": []
+    },
+    "Кланы": {
+      "s": [
+        "Clans"
+      ],
+      "i": []
+    },
+    "Ваш клан": {
+      "s": [
+        "Your clan"
+      ],
+      "i": []
+    },
+    "Выводит справку о команде": {
+      "s": [
+        "Displays command help"
+      ],
+      "i": []
+    },
+    "   §fКоманда §6.\u0000\u0000§7§o - \u0000": {
+      "s": [
+        "   §fCommand §6.",
+        "",
+        "§7§o - ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    " (также \u0000)": {
+      "s": [
+        " (also ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000─═─═─═§f Доступно: \u0000/\u0000 \u0000═─═─═─═─": {
+      "s": [
+        "",
+        "─═─═─═§f Available: ",
+        "/",
+        " ",
+        "═─═─═─═─"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Пусто": {
+      "s": [
+        "Empty"
+      ],
+      "i": []
+    },
+    "Справка по скриптовым командам": {
+      "s": [
+        "Help for script commands"
+      ],
+      "i": []
+    },
+    "Неизвестный аргумент: \u0000.\nДоступные командлеты: \n\u0000\n ": {
+      "s": [
+        "Unknown argument: ",
+        ".\nAvailable subcommands: \n",
+        "\n "
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Короткое имя '\u0000' уже занято.": {
+      "s": [
+        "Short name '",
+        "' is already taken."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Клан с именем '\u0000' уже существует.": {
+      "s": [
+        "Clan with name '",
+        "' already exists."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '\u0000' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '\u0000'": {
+      "s": [
+        "Short name '",
+        "' cannot be TOO short, minimum 2 characters. Otherwise how to understand what clan is '",
+        "'"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Короткое имя '\u0000' должно быть КОРОТКИМ, меньше 5 символов": {
+      "s": [
+        "Short name '",
+        "' must be SHORT, less than 5 characters"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '\u0000' не может содержать параграф": {
+      "s": [
+        "Short name '",
+        "' cannot contain the paragraph symbol"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Имя '\u0000' не может содержать параграф": {
+      "s": [
+        "Name '",
+        "' cannot contain the paragraph symbol"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Та ну не надоело": {
+      "s": [
+        "Nah, aren't you tired of it"
+      ],
+      "i": []
+    },
+    "Щас исправлю": {
+      "s": [
+        "I'll fix it now"
+      ],
+      "i": []
+    },
+    "Ошибка": {
+      "s": [
+        "Error"
+      ],
+      "i": []
+    },
+    "Чтобы блатными в чате выглядеть": {
+      "s": [
+        "To look cool in chat"
+      ],
+      "i": []
+    },
+    "Тэг клана": {
+      "s": [
+        "Clan tag"
+      ],
+      "i": []
+    },
+    "Ну, давай, придумай чета оригинальное": {
+      "s": [
+        "Come on, think of something original"
+      ],
+      "i": []
+    },
+    "Название клана": {
+      "s": [
+        "Clan name"
+      ],
+      "i": []
+    },
+    "[\u0000] \u0000\nУчастники: \u0000 \u0000": {
+      "s": [
+        "[",
+        "] ",
+        "\nMembers: ",
+        " ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов": {
+      "s": [
+        "A player wants to join your clan, you can accept or reject them through the clan menu"
+      ],
+      "i": []
+    },
+    "Запрос на вступление в клан от '\u0000'": {
+      "s": [
+        "Request to join clan from '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Заявка на вступление в клан '\u0000' отправлена!": {
+      "s": [
+        "Join request to clan '",
+        "' sent!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже отправили заявку в клан '\u0000'!": {
+      "s": [
+        "You have already sent a request to clan '",
+        "'!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Создать клан": {
+      "s": [
+        "Create clan"
+      ],
+      "i": []
+    },
+    "Создать свой клан": {
+      "s": [
+        "Create your own clan"
+      ],
+      "i": []
+    },
+    "Вы приняли приглашение в клан '\u0000'": {
+      "s": [
+        "You accepted the invitation to clan '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Приглашения": {
+      "s": [
+        "Invitations"
+      ],
+      "i": []
+    },
+    "Выберите клан, чтобы отправить заявку или создайте свой клан!": {
+      "s": [
+        "Select a clan to send a join request or create your own clan!"
+      ],
+      "i": []
+    },
+    "Выбор клана": {
+      "s": [
+        "Clan selection"
+      ],
+      "i": []
+    },
+    "Клан": {
+      "s": [
+        "Clan"
+      ],
+      "i": []
+    },
+    "Размутить": {
+      "s": [
+        "Unmute"
+      ],
+      "i": []
+    },
+    "Причина: \u0000\n\u0000": {
+      "s": [
+        "Reason: ",
+        "\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вернуть обратно": {
+      "s": [
+        "Revert"
+      ],
+      "i": []
+    },
+    "Неизвестный тип времени": {
+      "s": [
+        "Unknown time type"
+      ],
+      "i": []
+    },
+    "Заглушить игрока в чате": {
+      "s": [
+        "Mute a player in chat"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 не найден": {
+      "s": [
+        "Player ",
+        " not found"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Размьючен игрок \u0000 который был замьючен по причине \u0000, до конца оставалось \u0000": {
+      "s": [
+        "Unmuted player ",
+        " who was muted for ",
+        ", time remaining was ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Не был замьючен": {
+      "s": [
+        "Was not muted"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 был замьючен на \u0000 по причине: \u0000": {
+      "s": [
+        "Player ",
+        " has been muted for ",
+        " for: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Владелец": {
+      "s": [
+        "Owner"
+      ],
+      "i": []
+    },
+    "Помошник": {
+      "s": [
+        "Assistant"
+      ],
+      "i": []
+    },
+    "Участник": {
+      "s": [
+        "Member"
+      ],
+      "i": []
+    },
+    "Звука сообщений от игроков поблизости": {
+      "s": [
+        "Sound of messages from nearby players"
+      ],
+      "i": []
+    },
+    "Звук": {
+      "s": [
+        "Sound"
+      ],
+      "i": []
+    },
+    "Чат\n§7Звуки и внешний вид чата": {
+      "s": [
+        "Chat\n§7Chat sounds and appearance"
+      ],
+      "i": []
+    },
+    "Забрать награды": {
+      "s": [
+        "Claim rewards"
+      ],
+      "i": []
+    },
+    "Награды забраны": {
+      "s": [
+        "Rewards claimed"
+      ],
+      "i": []
+    },
+    "Награда: \u0000": {
+      "s": [
+        "Reward: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "?\nНеизвестно": {
+      "s": [
+        "?\nUnknown"
+      ],
+      "i": []
+    },
+    "\u0000§c*\n§aЗаберите награды!": {
+      "s": [
+        "",
+        "§c*\n§aClaim your rewards!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Несобранные вверху": {
+      "s": [
+        "Unclaimed on top"
+      ],
+      "i": []
+    },
+    "Скрыть неизвестные": {
+      "s": [
+        "Hide unknown"
+      ],
+      "i": []
+    },
+    "По алфавиту": {
+      "s": [
+        "Alphabetically"
+      ],
+      "i": []
+    },
+    "По дате получения": {
+      "s": [
+        "By date received"
+      ],
+      "i": []
+    },
+    "Режим сортировки": {
+      "s": [
+        "Sort mode"
+      ],
+      "i": []
+    },
+    "Достижения": {
+      "s": [
+        "Achievements"
+      ],
+      "i": []
+    },
+    "Достижение получено: \u0000! Заберите награды, используя \u0000": {
+      "s": [
+        "Achievement unlocked: ",
+        "! Claim your rewards using ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_item_name}§c*\n§aЗаберите награды!": {
+      "s": [
+        "",
+        "§c*\n§aЗаберите награды!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Награда: {0_achiv_reward_toString_player_}": {
+      "s": [
+        "Награда: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": {
+      "s": [
+        "Достижение получено: ",
+        "! Заберите награды, используя ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": {
+      "s": [
+        "Игрок ",
+        " был замьючен на ",
+        " по причине: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": {
+      "s": [
+        "Размьючен игрок ",
+        " который был замьючен по причине ",
+        ", до конца оставалось ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Игрок {0_nameArg} не найден": {
+      "s": [
+        "Игрок ",
+        " не найден"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Причина: {0_info_mutedUntil}\n{1_until}": {
+      "s": [
+        "Причина: ",
+        "\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы приняли приглашение в клан '{0_clan_name}'": {
+      "s": [
+        "Вы приняли приглашение в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": {
+      "s": [
+        "Вы уже отправили заявку в клан '",
+        "'!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Заявка на вступление в клан '{0_clan_name}' отправлена!": {
+      "s": [
+        "Заявка на вступление в клан '",
+        "' отправлена!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Запрос на вступление в клан от '{0_player_name}'": {
+      "s": [
+        "Запрос на вступление в клан от '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}": {
+      "s": [
+        "[",
+        "] ",
+        "\nУчастники: ",
+        " ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Имя '{0_name}' не может содержать параграф": {
+      "s": [
+        "Имя '",
+        "' не может содержать параграф"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' не может содержать параграф": {
+      "s": [
+        "Короткое имя '",
+        "' не может содержать параграф"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": {
+      "s": [
+        "Короткое имя '",
+        "' должно быть КОРОТКИМ, меньше 5 символов"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": {
+      "s": [
+        "Короткое имя '",
+        "' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '",
+        "'"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Клан с именем '{0_name}' уже существует.": {
+      "s": [
+        "Клан с именем '",
+        "' уже существует."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' уже занято.": {
+      "s": [
+        "Короткое имя '",
+        "' уже занято."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Клан '{0_clan_name}' распущен": {
+      "s": [
+        "Клан '",
+        "' распущен"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_player_name} покинул ваш клан": {
+      "s": [
+        "Игрок ",
+        " покинул ваш клан"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Клан '{0_clan_name}' покинут успешно": {
+      "s": [
+        "Клан '",
+        "' покинут успешно"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя: {0_clan_shortname}": {
+      "s": [
+        "Короткое имя: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Принять игрока '{0_name}' в клан?": {
+      "s": [
+        "Принять игрока '",
+        "' в клан?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы приняты в клан {0_clan_name}": {
+      "s": [
+        "Вы приняты в клан ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы НЕ приняты в клан {0_clan_name}": {
+      "s": [
+        "Вы НЕ приняты в клан ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Приглашения в клан '{0_clan_name}'": {
+      "s": [
+        "Приглашения в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_name} уже состоит в вашем клане!": {
+      "s": [
+        "Игрок ",
+        " уже состоит в вашем клане!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": {
+      "s": [
+        "Игрок ",
+        " уже состоит в клане ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Приглашение в клан '{0_clan_name}'": {
+      "s": [
+        "Приглашение в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_name} успешно приглашен в клан!": {
+      "s": [
+        "Игрок ",
+        " успешно приглашен в клан!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": {
+      "s": [
+        "Роль участника клана ",
+        " сменена успешно: ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Роль в клане {0_changeString}": {
+      "s": [
+        "Роль в клане ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": {
+      "s": [
+        "В клане '",
+        "', сменена игроком ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Выгнать участника '{0_memberName}'": {
+      "s": [
+        "Выгнать участника '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы выгнаны из клана '{0_clan_name}'": {
+      "s": [
+        "Вы выгнаны из клана '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": {
+      "s": [
+        "Вы были выгнаны из клана игроком '",
+        "'. Причина: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": {
+      "s": [
+        "Участник ",
+        " успешно выгнан из клана ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Сменить роль {0_Player_nameOrUnknown_member_id_}": {
+      "s": [
+        "Сменить роль ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": {
+      "s": [
+        "Неизвестный аргумент: ",
+        ".\nДоступные командлеты: \n",
+        "\n "
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": {
+      "s": [
+        "",
+        "─═─═─═§f Доступно: ",
+        "/",
+        " ",
+        "═─═─═─═─"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    " (также {0_d_aliases_join______})": {
+      "s": [
+        " (также ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": {
+      "s": [
+        "   §fКоманда §6.",
+        "",
+        "§7§o - ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Не так быстро! Попробуй через {0_i18n_time_after_}": {
+      "s": [
+        "Не так быстро! Попробуй через ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": {
+      "s": [
+        "Вы имели ввиду ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": {
+      "s": [
+        "\nКоманда доступна начиная с роли ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": {
+      "s": [
+        "У вас нет разрешения для использования команды ",
+        "",
+        "\nСписок всех доступных вам команд: §f.help"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "При выполнении команды произошла ошибка. {0_developersAreWarned}": {
+      "s": [
+        "При выполнении команды произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": {
+      "s": [
+        "Команда доступна только начиная с роли ",
+        ". Ваша роль: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_this_place_name} ящик": {
+      "s": [
+        "",
+        " ящик"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": {
+      "s": [
+        "Ключ для ",
+        " не подходит к ящику ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Открыт ящик {0_this_name}!": {
+      "s": [
+        "Открыт ящик ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_i18n___this_name_______} > Содержимое": {
+      "s": [
+        "",
+        " > Содержимое"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_this_name} ящик": {
+      "s": [
+        "",
+        " ящик"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ключ для ящика {0_Crate_getName_storage_crate_}": {
+      "s": [
+        "Ключ для ящика ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_player_database_name} сменил ник на {1_player_name}": {
+      "s": [
+        "Игрок ",
+        " сменил ник на ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§cВы уверены, что хотите {0_text}?": {
+      "s": [
+        "§cВы уверены, что хотите ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Результаты поиска по запросу\n{0_searchQuery}": {
+      "s": [
+        "Результаты поиска по запросу\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§3Выберите игрока чтобы {0_reason}": {
+      "s": [
+        "§3Выберите игрока чтобы ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_days} д. {1_hhmmss}": {
+      "s": [
+        "",
+        " д. ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У вас {0_unreadCount} непрочитанных сообщений!": {
+      "s": [
+        "У вас ",
+        " непрочитанных сообщений!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Следующее письмо\n{0_letterOneLineName_next_letter_}": {
+      "s": [
+        "Следующее письмо\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": {
+      "s": [
+        "Предыдущее письмо\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_deleteDescription} Все награды будут собраны автоматически": {
+      "s": [
+        "",
+        " Все награды будут собраны автоматически"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": {
+      "s": [
+        "",
+        " Вы потеряете все награды, прикрепленные к письму!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_i18n_header_______}: {1_title}, просмотреть: /mail": {
+      "s": [
+        "",
+        ": ",
+        ", просмотреть: /mail"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}": {
+      "s": [
+        "",
+        ", ",
+        "!\n§r§3Время §b• §3",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_this_quest_name}\nЗавершен!": {
+      "s": [
+        "",
+        "\nЗавершен!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Задание\n{0_this_quest_name}": {
+      "s": [
+        "Задание\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Возьмите задание {0_target_name}": {
+      "s": [
+        "Возьмите задание ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Завершите задание {0_target_name}": {
+      "s": [
+        "Завершите задание ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "При активации шага произошла ошибка. {0_developersAreWarned}": {
+      "s": [
+        "При активации шага произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Задание {0_this_quest_name} сломалось: {1_text}": {
+      "s": [
+        "Задание ",
+        " сломалось: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_step_text__}\n§aЗавершено! §6Заберите награду.": {
+      "s": [
+        "",
+        "\n§aЗавершено! §6Заберите награду."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вас ждет {0_i18n_accent___npc_name__}": {
+      "s": [
+        "Вас ждет ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": {
+      "s": [
+        "Нельзя создать регион, область которого ниже -64 (y: ",
+        " radius: ",
+        " result: ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Не удалось сохранить структуру: {0_e}": {
+      "s": [
+        "Не удалось сохранить структуру: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Владелец > {0_name}": {
+      "s": [
+        "Владелец > ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите передать права владельца региона игроку {0_name}?": {
+      "s": [
+        "Вы уверены что хотите передать права владельца региона игроку ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": {
+      "s": [
+        "Вы уверены что хотите назначить владельцем региона игрока ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§cБосс §6{0_this_bossName}": {
+      "s": [
+        "§cБосс §6",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Макс кол-во: {0_resource_amount}": {
+      "s": [
+        "Макс кол-во: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": {
+      "s": [
+        "Будут изменены следующие регионы:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Регион создается. {0___region_restoringStructurePercent}%%": {
+      "s": [
+        "Регион создается. ",
+        "%%"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Безопасная зона {0_this_safeAreaName}": {
+      "s": [
+        "Безопасная зона ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы вернули роль §r{0_ROLES_prevRole_}": {
+      "s": [
+        "Вы вернули роль §r",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": {
+      "s": [
+        "Ваша роль: ",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§3Ваша роль: {0_ROLES_prole_}": {
+      "s": [
+        "§3Ваша роль: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": {
+      "s": [
+        "У игрока ",
+        " роль выше или такая же как у вас, вы не можете ее сменить."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": {
+      "s": [
+        "Ваша роль сменена c ",
+        " на ",
+        "",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    " игроком {0_player_name}": {
+      "s": [
+        " игроком ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nПричина: {0_message}": {
+      "s": [
+        "\nПричина: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Роль игрока {0_target_name} сменена успешно": {
+      "s": [
+        "Роль игрока ",
+        " сменена успешно"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": {
+      "s": [
+        "",
+        "\nДо появления\nосталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Убит босс {0_this_options_place_name}!": {
+      "s": [
+        "Убит босс ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": {
+      "s": [
+        "§fЧертеж предмета ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": {
+      "s": [
+        "Используйте ",
+        " чтобы убрать этот предмет из инвентаря или получить его снова"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выдает или убирает {0_itemNameTag} из инвентаря": {
+      "s": [
+        "Выдает или убирает ",
+        " из инвентаря"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": {
+      "s": [
+        "Шанс: ",
+        "%%, Кол-во: ",
+        "...",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы {0_reason}, поэтому вышли из режима новичка.": {
+      "s": [
+        "Вы ",
+        ", поэтому вышли из режима новичка."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не удалось открыть диалог. {0_developersAreWarned}": {
+      "s": [
+        "Не удалось открыть диалог. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до: {0_this_place_name}": {
+      "s": [
+        "Доберитесь до: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n§7§lЗначение:§r {0_stringify_value_}": {
+      "s": [
+        "\n§7§lЗначение:§r ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": {
+      "s": [
+        "\n§7§lТип: §r§f",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": {
+      "s": [
+        "Зачарования:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": {
+      "s": [
+        "Выбранный предмет: ",
+        "\nНажмите, чтобы сменить"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": {
+      "s": [
+        "Товара на складе: ",
+        "/",
+        ", ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "В инвентаре нет {0_this_text}": {
+      "s": [
+        "В инвентаре нет ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": {
+      "s": [
+        "Нужно уровней опыта: ",
+        ", ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": {
+      "s": [
+        "Покупка невозможна:",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Продать {0_costString} за {1_name}?": {
+      "s": [
+        "Продать ",
+        " за ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Купить {0_name} за {1_costString}?": {
+      "s": [
+        "Купить ",
+        " за ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Успешная продажа {0_name} за {1_costString}!": {
+      "s": [
+        "Успешная продажа ",
+        " за ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Успешная покупка {0_name} за {1_costString}!": {
+      "s": [
+        "Успешная покупка ",
+        " за ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "При покупке произошла ошибка. {0_developersAreWarned}": {
+      "s": [
+        "При покупке произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нет места в инвентаре (нужно еще {0_amount})": {
+      "s": [
+        "Нет места в инвентаре (нужно еще ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Изменено на {0_newname}": {
+      "s": [
+        "Изменено на ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": {
+      "s": [
+        "TPS сервера ",
+        "§f: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": {
+      "s": [
+        "Достижения ",
+        "/",
+        " (",
+        "%%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Порталы {0_portals__length____0}/{1_Portal_portals_size}": {
+      "s": [
+        "Порталы ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Статистика игрока {0_Player_nameOrUnknown_targetId_}": {
+      "s": [
+        "Статистика игрока ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Анархия {0_n}": {
+      "s": [
+        "Анархия ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": {
+      "s": [
+        "Инструмент скоро сломается! ",
+        "/",
+        " (",
+        "%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Усиленный аирдроп скоро упадет на {0_location}!": {
+      "s": [
+        "Усиленный аирдроп скоро упадет на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Обычный аирдроп скоро упадет на {0_location}!": {
+      "s": [
+        "Обычный аирдроп скоро упадет на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Радиус границы анархии сейчас: {0_this_zone__radius}": {
+      "s": [
+        "Радиус границы анархии сейчас: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": {
+      "s": [
+        "Вы уже находитесь на анархии! Если это не так, используйте ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": {
+      "s": [
+        "Успех! Теперь вы можете использовать ",
+        " для перемещения на случайную позицию."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вода. Попытка {0_maxTries___i}/{1_maxTries}": {
+      "s": [
+        "Вода. Попытка ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Нельзя создать базу на высоте ниже {0_underLimit}!": {
+      "s": [
+        "Нельзя создать базу на высоте ниже ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": {
+      "s": [
+        "§cВы уже ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "состоите в базе игрока '{0_region_ownerName}'": {
+      "s": [
+        "состоите в базе игрока '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": {
+      "s": [
+        "База успешно создана! Чтобы открыть меню базы используйте команду ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": {
+      "s": [
+        "Всех материалов хватает!\nБаза защищена от гниения на ",
+        "§r\n"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": {
+      "s": [
+        "Не хватает ресурсов:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": {
+      "s": [
+        "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n",
+        "\nМатериалы в бочке:\n",
+        "\n",
+        "\nДо следующего сбора ресурсов: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": {
+      "s": [
+        "§cБаза разрушена!\n§4Срочно поставьте блок базы на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "База с владельцем {0_base_ownerName} {1_messageAction}.": {
+      "s": [
+        "База с владельцем ",
+        " ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Максимальный уровень\n{0_levelText}": {
+      "s": [
+        "Максимальный уровень\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": {
+      "s": [
+        "",
+        " (радиус ",
+        " -> ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Улучшить базу: {0_levelText}": {
+      "s": [
+        "Улучшить базу: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "База игрока {0_base_ownerName}": {
+      "s": [
+        "База игрока ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": {
+      "s": [
+        "\n\nКоординаты: ",
+        "\nРадиус: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§6Ваша база {0_text}": {
+      "s": [
+        "§6Ваша база ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_this_city_name}: задание исследования не настроено!": {
+      "s": [
+        "",
+        ": задание исследования не настроено!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": {
+      "s": [
+        "Эта печка уже занята. Печка освободится через ",
+        ", ключ: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы уже заняли {0_personalKeys_length}/3 печек.": {
+      "s": [
+        "Вы уже заняли ",
+        "/3 печек."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": {
+      "s": [
+        "Ваш клан уже занял ",
+        "/3 печек."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Использован ключ из слота {0_index}": {
+      "s": [
+        "Использован ключ из слота ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": {
+      "s": [
+        "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ",
+        ", ключ: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": {
+      "s": [
+        "Зачарование ",
+        " не удалось перенести."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": {
+      "s": [
+        "Онет, кажется, зачарование ",
+        " уровнем ",
+        " потерялось..."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У {0_i18n_accent_________} можно купить ключ доступа к печам": {
+      "s": [
+        "У ",
+        " можно купить ключ доступа к печам"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Купите у {0_i18n_accent_________} ключ доступа к печам": {
+      "s": [
+        "Купите у ",
+        " ключ доступа к печам"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до {0_i18n_accent________________________} по дороге": {
+      "s": [
+        "Доберитесь до ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": {
+      "s": [
+        "Идите к ",
+        ", он расскажет вам что такое ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "...мы изобрели {0_i18n_accent______}": {
+      "s": [
+        "...мы изобрели ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": {
+      "s": [
+        "Выбранная книга: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": {
+      "s": [
+        "§r§fМеч со способностью §7",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": {
+      "s": [
+        "Здесь есть шахта, ведущая к ",
+        " и ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У {0_i18n_accent______} можно зачаровать предметы": {
+      "s": [
+        "У ",
+        " можно зачаровать предметы"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до {0_i18n_accent____________} по дороге": {
+      "s": [
+        "Доберитесь до ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
+      "s": [
+        "Копать нужно на высоте ",
+        "..",
+        ". Ваш y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": {
+      "s": [
+        "",
+        " Осталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": {
+      "s": [
+        "Вы вошли в режим рейдблока, потому что ",
+        ". Некоторые функции могут быть недоступны"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Дровосек: нарубите {0_v} дерева": {
+      "s": [
+        "Дровосек: нарубите ",
+        " дерева"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шахтер: накопайте {0_v} камня": {
+      "s": [
+        "Шахтер: накопайте ",
+        " камня"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Угольный шахтер: накопайте {0_v} угля": {
+      "s": [
+        "Угольный шахтер: накопайте ",
+        " угля"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Железный шахтер: накопайте {0_v} железа": {
+      "s": [
+        "Железный шахтер: накопайте ",
+        " железа"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": {
+      "s": [
+        "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": {
+      "s": [
+        "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ",
+        " заданий вам дают награду. За выполнение всех ежедневных заданий ",
+        " дня подряд вместо обычного ключа выдается донатный\n\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": {
+      "s": [
+        "",
+        "/",
+        " Награда: ключ от сундука\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": {
+      "s": [
+        "Вы не можете покинуть зону добычи, пока не завершили задания ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Добыто дерева: {0_current}/{1_end}": {
+      "s": [
+        "Добыто дерева: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": {
+      "s": [
+        "Спуститесь в шахту и добудьте камня: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Добыто железной руды: {0_i}/{1_end}": {
+      "s": [
+        "Добыто железной руды: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Отправляйтесь за ними в {0_i18n_accent_____________}": {
+      "s": [
+        "Отправляйтесь за ними в ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Идите в {0_i18n_accent_____________} по дороге": {
+      "s": [
+        "Идите в ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": {
+      "s": [
+        "Верните свои вещи",
+        ", они ждут вас на ",
+        "§6!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_extra___extra_to_player_lang____________}§8Вы тут": {
+      "s": [
+        "",
+        "§8Вы тут"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": {
+      "s": [
+        "Не умею этим пользоваться, но знаю кто точно поможет: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": {
+      "s": [
+        "Событие! ",
+        " силой ",
+        " на ",
+        " минут"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Время: {0_new_Date___toHHMMSS__}": {
+      "s": [
+        "Время: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": {
+      "s": [
+        "",
+        " ",
+        "\nЧерез ",
+        " (",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": {
+      "s": [
+        "Ваш первый рекорд ",
+        " поставлен! Это заняло ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+      "s": [
+        "Вы побили ваш предыдущий рекорд ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+      "s": [
+        "Вы не смогли побить ваш предыдущий рекорд ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": {
+      "s": [
+        "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": {
+      "s": [
+        "Спидран '",
+        "' начат. Для сброса времени воспользуйтесь .wipe"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": {
+      "s": [
+        "Вы можете взять это задание чтобы отслеживать направления источника ресурса (",
+        ") с помощью компаса"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": {
+      "s": [
+        "Руды на y: ",
+        ":\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": {
+      "s": [
+        "",
+        ", ",
+        ", Группа: ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Добыть: {0___rawtext_____translate__langToken_itemType______}": {
+      "s": [
+        "Добыть: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": {
+      "s": [
+        "Копать нужно на высоте от ",
+        " до ",
+        ". Ваш y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Руды на {0_y}": {
+      "s": [
+        "Руды на ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    }
   },
   "ru_RU": {
-    "Типы": "Типы",
-    "Над": "Над",
-    "Под": "Под",
-    "Спуститесь в шахту и вскопайте указанный ресурс!": "Спуститесь в шахту и вскопайте указанный ресурс!",
-    "На этой высоте руд нет": "На этой высоте руд нет",
-    "Группа": "Группа",
-    "Еда": "Еда",
-    "Ресурсы по локациям": "Ресурсы по локациям",
-    "Ресурсы": "Ресурсы",
-    "Руды": "Руды",
-    "Википедия": "Википедия",
-    "Что где как все расскажу": "Что где как все расскажу",
-    "\nВыбрано": "\nВыбрано",
-    "Полная незеритовая броня": "Полная незеритовая броня",
-    "1.000.000 монет": "1.000.000 монет",
-    "Все задания": "Все задания",
-    "Получить базу": "Получить базу",
-    "Все достижения": "Все достижения",
-    "Миниигра": "Миниигра",
-    "Боковое меню": "Боковое меню",
-    "Разделенные подсказки": "Разделенные подсказки",
-    "Определяет, где будет меню": "Определяет, где будет меню",
-    "Режим отображения": "Режим отображения",
-    "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься": "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься",
-    "Максимальный размер бокового меню": "Максимальный размер бокового меню",
-    "Определяет, включено ли внутриигровое меню": "Определяет, включено ли внутриигровое меню",
-    "Использовать меню": "Использовать меню",
-    "События": "События",
-    "Лидеры": "Лидеры",
-    "Цели": "Цели",
-    "Еще": "Еще",
-    "§7Настройки": "§7Настройки",
-    "§bВики": "§bВики",
-    "§fПочта": "§fПочта",
-    "§6Донат\n§7СКОРО!": "§6Донат\n§7СКОРО!",
-    "§7СКОРО!": "§7СКОРО!",
-    "Миниигры": "Миниигры",
-    "Анархия": "Анархия",
-    "Спавн": "Спавн",
-    "Вы получили ключ!": "Вы получили ключ!",
-    "Вы уже забрали награды сегодня! Заходите завтра": "Вы уже забрали награды сегодня! Заходите завтра",
-    "Сначала выполните все ежедневные задания!": "Сначала выполните все ежедневные задания!",
-    "Выполнено подряд": "Выполнено подряд",
-    "Ежедневные задания": "Ежедневные задания",
-    "Поздравляем! В будущем постарайтесь быть осторожнее.": "Поздравляем! В будущем постарайтесь быть осторожнее.",
-    "Могила оказалась пустой и была удалена": "Могила оказалась пустой и была удалена",
-    ", никто кроме вас их забрать не может": ", никто кроме вас их забрать не может",
-    "Ваше место смерти не сохранилось!": "Ваше место смерти не сохранилось!",
-    "Могила была удалена очисткой мусора.": "Могила была удалена очисткой мусора.",
-    "Верните вещи после смерти!": "Верните вещи после смерти!",
-    "Вернуть вещи": "Вернуть вещи",
-    "Вы не можете открыть могилу игрока, умершего в зоне без сражения!": "Вы не можете открыть могилу игрока, умершего в зоне без сражения!",
-    "Вы не можете открыть могилу новичка!": "Вы не можете открыть могилу новичка!",
-    "Включать ли задание по восстановлению инвентаря после смерти": "Включать ли задание по восстановлению инвентаря после смерти",
-    "Задание \"Вернуть вещи\"": "Задание \"Вернуть вещи\"",
-    "В этот раз еды не оказалось, однако в следующий раз может повезти больше.": "В этот раз еды не оказалось, однако в следующий раз может повезти больше.",
-    "Откройте сундук в разрушенном магазине": "Откройте сундук в разрушенном магазине",
-    "Зайдите в разрушенный магазин": "Зайдите в разрушенный магазин",
-    "В строениях возле дороги можно найти еду": "В строениях возле дороги можно найти еду",
-    "Это место вам понадобится позже": "Это место вам понадобится позже",
-    "Это деревня исследователей": "Это деревня исследователей",
-    "Каменоломню": "Каменоломню",
-    "Здесь нет печей для переплавки руды": "Здесь нет печей для переплавки руды",
-    "Это деревня шахтеров": "Это деревня шахтеров",
-    "Шахтер зовет вас наверх, чтобы поговорить!": "Шахтер зовет вас наверх, чтобы поговорить!",
-    "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!": "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!",
-    "Попробуйте копнуть поглубже": "Попробуйте копнуть поглубже",
-    "На поверхности руд нет": "На поверхности руд нет",
-    "Вернитесь к верстаку и улучшите свой инструмент.": "Вернитесь к верстаку и улучшите свой инструмент.",
-    "Сделайте каменную кирку": "Сделайте каменную кирку",
-    "Отправляйтесь в шахту, найдите и накопайте камня.": "Отправляйтесь в шахту, найдите и накопайте камня.",
-    "Используя верстак сделайте деревянную кирку!": "Используя верстак сделайте деревянную кирку!",
-    "Сделайте деревянную кирку": "Сделайте деревянную кирку",
-    "Следуя компасу, доберитесь до верстака": "Следуя компасу, доберитесь до верстака",
-    "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет": "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет",
-    "Используй монеты в инвентаре": "Используй монеты в инвентаре",
-    "Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение": "Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение",
-    "Заберите все из упавшего с неба сундука. На него указывает компас": "Заберите все из упавшего с неба сундука. На него указывает компас",
-    "Заберите все из сундука, упавшего с неба": "Заберите все из сундука, упавшего с неба",
-    "Деревья могут помешать. Выйди туда, где над тобой будет только небо": "Деревья могут помешать. Выйди туда, где над тобой будет только небо",
-    "Выйди под открытое небо": "Выйди под открытое небо",
-    "Нарубите дерева": "Нарубите дерева",
-    "Обучение базовым механикам сервера": "Обучение базовым механикам сервера",
-    "Обучение": "Обучение",
-    "Вперед!": "Вперед!",
-    "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.": "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.",
-    "Режим Перерождение": "Режим Перерождение",
-    "В мирной зоне ломать блоки запрещено.": "В мирной зоне ломать блоки запрещено.",
-    "Блоки можно ломать только глубоко в шахте!": "Блоки можно ломать только глубоко в шахте!",
-    "Вы не можете ломать руду новичка.": "Вы не можете ломать руду новичка.",
-    "§r§6Начальный топор": "§r§6Начальный топор",
-    "Гробовщику посвящается": "Гробовщику посвящается",
-    "Гробовщик: открой 10 могил разных игроков": "Гробовщик: открой 10 могил разных игроков",
-    "Сделал себя сам: Получи первые 10.000 монет": "Сделал себя сам: Получи первые 10.000 монет",
-    "Активированный уголь": "Активированный уголь",
-    "Вы находитесь в режиме рейдблока.": "Вы находитесь в режиме рейдблока.",
-    "вы разрушили блок на базе": "вы разрушили блок на базе",
-    "вас рейдят": "вас рейдят",
-    "х2 урон!": "х2 урон!",
-    "Способность": "Способность",
-    "10% шанс сделать двойной урон": "10% шанс сделать двойной урон",
-    "Восстанавливает вам половину наносимого этим мечом урона": "Восстанавливает вам половину наносимого этим мечом урона",
-    "Неизвестная": "Неизвестная",
-    "Дополнительный урон": "Дополнительный урон",
-    "Вампиризм": "Вампиризм",
-    "Используйте, чтобы отправить все к снежной королеве подо льдину": "Используйте, чтобы отправить все к снежной королеве подо льдину",
-    "§3Снежная бомба": "§3Снежная бомба",
-    "Используйте, чтобы отправить все в огненный ад": "Используйте, чтобы отправить все в огненный ад",
-    "Используй этот предмет сидя на пушке": "Используй этот предмет сидя на пушке",
-    "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.": "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.",
-    "Используй этот предмет, чтобы установить пушку": "Используй этот предмет, чтобы установить пушку",
-    "Возьми у меня задание и отправляйся в другое поселение следуя компасу.": "Возьми у меня задание и отправляйся в другое поселение следуя компасу.",
-    "Как мне переплавить руду?": "Как мне переплавить руду?",
-    "Они есть... просто они сидят дома и смотрят стрим @shp1natqp": "Они есть... просто они сидят дома и смотрят стрим @shp1natqp",
-    "Почему тут нет жителей?": "Почему тут нет жителей?",
-    "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате.": "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате.",
-    "Сверху упал сундук, что это?": "Сверху упал сундук, что это?",
-    "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты.": "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты.",
-    "Сколько тебе платят?": "Сколько тебе платят?",
-    "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков.": "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков.",
-    "Я могу потеряться в шахте?": "Я могу потеряться в шахте?",
-    "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей.": "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей.",
-    "Почему шахта такая странная?": "Почему шахта такая странная?",
-    "Можно узнать это, если посмотреть на карту и присесть.": "Можно узнать это, если посмотреть на карту и присесть.",
-    "Сколько ещё сохранилось поселений?": "Сколько ещё сохранилось поселений?",
-    "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении.": "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении.",
-    "Ты единственный путеводитель??": "Ты единственный путеводитель??",
-    "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны.": "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны.",
-    "Где я?": "Где я?",
-    "Шахтер": "Шахтер",
-    "Деревня шахтеров": "Деревня шахтеров",
-    "Добыть алмазы": "Добыть алмазы",
-    "Добыть уголь": "Добыть уголь",
-    "Добыть железо": "Добыть железо",
-    "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!": "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!",
-    "А где мне базу сделать-то?": "А где мне базу сделать-то?",
-    "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ": "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ",
-    "Исследователь": "Исследователь",
-    "Деревня исследователей": "Деревня исследователей",
-    "§a§lМагический слайм": "§a§lМагический слайм",
-    "§8Зачарование несовместимо": "§8Зачарование несовместимо",
-    "Максимальный уровень": "Максимальный уровень",
-    "Уровень зачара предмета как у книжки": "Уровень зачара предмета как у книжки",
-    "Уровень зачара предмета уже выше книжки": "Уровень зачара предмета уже выше книжки",
-    "С чарками такого уровня не работаю, слетят": "С чарками такого уровня не работаю, слетят",
-    "любой зачарованный предмет": "любой зачарованный предмет",
-    "Отсортировать чарки": "Отсортировать чарки",
-    "Зелья": "Зелья",
-    "Грибы": "Грибы",
-    "Все для магии": "Все для магии",
-    "Оружие со способностями": "Оружие со способностями",
-    "Зачаровать": "Зачаровать",
-    "Предмет для зачарования": "Предмет для зачарования",
-    "Предмет": "Предмет",
-    "Нет зачарований": "Нет зачарований",
-    "Использовать книгу чар": "Использовать книгу чар",
-    "любые топор, кирка, мотыга или лопата": "любые топор, кирка, мотыга или лопата",
-    "Улучшить инструмент": "Улучшить инструмент",
-    "любой элемент брони": "любой элемент брони",
-    "Улучшить броню": "Улучшить броню",
-    "любой лук": "любой лук",
-    "Улучшить лук": "Улучшить лук",
-    "любой меч": "любой меч",
-    "Улучшить меч": "Улучшить меч",
-    "Чего пожелаешь?": "Чего пожелаешь?",
-    "Маг": "Маг",
-    "Технограда": "Технограда",
-    "Зачаруйте любой предмет у Мага": "Зачаруйте любой предмет у Мага",
-    "Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание": "Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание",
-    "Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание": "Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание",
-    "Посетите Мага": "Посетите Мага",
-    "Мага": "Мага",
-    "Магическому слайму": "Магическому слайму",
-    "Вардену": "Вардену",
-    "Приветствуем в нашей деревне!": "Приветствуем в нашей деревне!",
-    "Ну крутой техно типо не понял что ли": "Ну крутой техно типо не понял что ли",
-    "Техник": "Техник",
-    "Техноград": "Техноград",
-    "Используется у Инженера": "Используется у Инженера",
-    "§aМагическая слизь": "§aМагическая слизь",
-    "Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу": "Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу",
-    "Только я могу ее собрать": "Только я могу ее собрать",
-    "База - самый дорогой предмет в нашу эпоху, для нее нужно много ресурсов": "База - самый дорогой предмет в нашу эпоху, для нее нужно много ресурсов",
-    "Базу": "Базу",
-    "...и не были разворованы другими выжившими...": "...и не были разворованы другими выжившими...",
-    "Чтобы ваши постройки не разложились из-за радиации...": "Чтобы ваши постройки не разложились из-за радиации...",
-    "База": "База",
-    "Инженеру": "Инженеру",
-    "И переняли уцелевшие технологии прошлой эпохи": "И переняли уцелевшие технологии прошлой эпохи",
-    "Мы обосновались вокруг озера, оставшегося после взрыва бункера": "Мы обосновались вокруг озера, оставшегося после взрыва бункера",
-    "Приветствуем в самом технологичном городе!": "Приветствуем в самом технологичном городе!",
-    "§b§lКамнедробилка": "§b§lКамнедробилка",
-    "§6§lРобот": "§6§lРобот",
-    "Все для редстоуна": "Все для редстоуна",
-    "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n": "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n",
-    "Инженер": "Инженер",
-    "Вы не можете купить это в режиме новичка": "Вы не можете купить это в режиме новичка",
-    "Используется для создания платы у Инжинера в Технограде": "Используется для создания платы у Инжинера в Технограде",
-    "Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота": "Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота",
-    "Деревни исследователей": "Деревни исследователей",
-    "Сделайте железные ботинки": "Сделайте железные ботинки",
-    "Сделайте железные поножи": "Сделайте железные поножи",
-    "Сделайте железный шлем": "Сделайте железный шлем",
-    "Сделайте железный нагрудник": "Сделайте железный нагрудник",
-    "Сделайте железный меч": "Сделайте железный меч",
-    "Сделайте железную кирку": "Сделайте железную кирку",
-    "Переплавьте необработанное железо в слиток": "Переплавьте необработанное железо в слиток",
-    "Откройте печку с помощью ключа": "Откройте печку с помощью ключа",
-    "Печкина": "Печкина",
-    "Мы специализируемся на обработке руды": "Мы специализируемся на обработке руды",
-    "Приветствуем в самом старом и большом городе новой эпохи!": "Приветствуем в самом старом и большом городе новой эпохи!",
-    "Ну типа крутой камни ломаем вот да": "Ну типа крутой камни ломаем вот да",
-    "А что за город": "А что за город",
-    "Ломщик": "Ломщик",
-    "У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n": "У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n",
-    "Баба Валя": "Баба Валя",
-    "У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n": "У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n",
-    "Печкин": "Печкин",
-    "Каменоломня": "Каменоломня",
-    "Предмет целый, выберите другой": "Предмет целый, выберите другой",
-    "Любой поломанный предмет": "Любой поломанный предмет",
-    "Починить": "Починить",
-    "Улучшить": "Улучшить",
-    "Алмазный меч/инструмент/броня": "Алмазный меч/инструмент/броня",
-    "Улучшить до незерита": "Улучшить до незерита",
-    "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.": "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.",
-    "Оружейник": "Оружейник",
-    "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n": "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n",
-    "Кучер": "Кучер",
-    "Вино": "Вино",
-    "Настойка из шпината": "Настойка из шпината",
-    "Сидр": "Сидр",
-    "Пиво": "Пиво",
-    "Квас": "Квас",
-    "Ну что, устал от жизни? Пришел попить?\n\n": "Ну что, устал от жизни? Пришел попить?\n\n",
-    "Бармен": "Бармен",
-    "§r§cВремя истекло": "§r§cВремя истекло",
-    "§r§6Печка плавит...": "§r§6Печка плавит...",
-    "§r§aНе использован": "§r§aНе использован",
-    "Статус": "Статус",
-    "На": "На",
-    "Неизвестен": "Неизвестен",
-    "Продавец": "Продавец",
-    "§7Открывает печку в каменоломне.": "§7Открывает печку в каменоломне.",
-    "§6Ключ от печки": "§6Ключ от печки",
-    "Вы уже использовали этот ключ для другой печки.": "Вы уже использовали этот ключ для другой печки.",
-    "Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке": "Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке",
-    "Этот ключ используется для других печек!": "Этот ключ используется для других печек!",
-    "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!": "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!",
-    "Ключ от печки": "Ключ от печки",
-    "Сдать неиспользуемый ключ": "Сдать неиспользуемый ключ",
-    "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!": "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!",
-    "§r§bПеремещает на спавн": "§r§bПеремещает на спавн",
-    "Определяет, будете ли вы телепортироваться на спавн при входе": "Определяет, будете ли вы телепортироваться на спавн при входе",
-    "Телепорт на спавн": "Телепорт на спавн",
-    "Вход": "Вход",
-    "Общее": "Общее",
-    "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n": "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n",
-    "Тетя Зина": "Тетя Зина",
-    "§7Шахта": "§7Шахта",
-    "Порталы": "Порталы",
-    "Перемещение...": "Перемещение...",
-    "Портал в это поселение не разблокирован": "Портал в это поселение не разблокирован",
-    "Мирная зона": "Мирная зона",
-    "Открыт новый портал! [Когда-нибудь здесь будет анимация...]": "Открыт новый портал! [Когда-нибудь здесь будет анимация...]",
-    "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n": "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n",
-    "Дровосек": "Дровосек",
-    "А камень я тебе дам.\n\n": "А камень я тебе дам.\n\n",
-    "Каменщик": "Каменщик",
-    "Любой непродаваемый предмет": "Любой непродаваемый предмет",
-    "Любой предмет": "Любой предмет",
-    "Продай мне весь свой мусор": "Продай мне весь свой мусор",
-    "Мусорщик": "Мусорщик",
-    "Украшения я делать пока не умею.\n\n": "Украшения я делать пока не умею.\n\n",
-    "Ювелир": "Ювелир",
-    "И рыбник.\n\n": "И рыбник.\n\n",
-    "Мясник": "Мясник",
-    "Сходи в город, сделай запланированые покупки": "Сходи в город, сделай запланированые покупки",
-    "Посети город": "Посети город",
-    "§9Хранилище": "§9Хранилище",
-    "§bУсиленный": "§bУсиленный",
-    "§7Обычный": "§7Обычный",
-    "Исследуйте новый город!": "Исследуйте новый город!",
-    "Доберитесь до города!": "Доберитесь до города!",
-    "Доберитесь до указанного города или деревни": "Доберитесь до указанного города или деревни",
-    "§dНезеритовая жила": "§dНезеритовая жила",
-    "Может появиться в сундуке внутри кучи древних обломков": "Может появиться в сундуке внутри кучи древних обломков",
-    "Лежит группами по 5-10 блоков рядом с сундуками": "Лежит группами по 5-10 блоков рядом с сундуками",
-    "§5Варден": "§5Варден",
-    "§cПалатка аванпоста": "§cПалатка аванпоста",
-    "§4Бункер": "§4Бункер",
-    "§cАванпост": "§cАванпост",
-    "Гараж": "Гараж",
-    "Заправка 4": "Заправка 4",
-    "Заправка 3": "Заправка 3",
-    "Заправка 2": "Заправка 2",
-    "Заправка 1": "Заправка 1",
-    "Поставьте эту бочку и она станет базой.": "Поставьте эту бочку и она станет базой.",
-    "§6База": "§6База",
-    "(разрушена)": "(разрушена)",
-    "(гниет)": "(гниет)",
-    "Данж": "Данж",
-    "Телепорт!": "Телепорт!",
-    "Это ваша база.": "Это ваша база.",
-    "У вас нет базы! Вступите в существующую или создайте свою.": "У вас нет базы! Вступите в существующую или создайте свою.",
-    "Меню базы": "Меню базы",
-    "База гниет! Положите материалы из .base -> Гниение в бочку": "База гниет! Положите материалы из .base -> Гниение в бочку",
-    "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью": "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью",
-    "Нужно срочно положить материалы в бочку!": "Нужно срочно положить материалы в бочку!",
-    "разрушена": "разрушена",
-    "гниет": "гниет",
-    "Состояние базы": "Состояние базы",
-    "§cБаза гниет!\n§4Срочно пополните материалы!": "§cБаза гниет!\n§4Срочно пополните материалы!",
-    "Гниение базы": "Гниение базы",
-    "скоро начнется гниение": "скоро начнется гниение",
-    "Рядом есть другие регионы!": "Рядом есть другие регионы!",
-    "владеете базой": "владеете базой",
-    "Теперь вы можете свободно создать базу!": "Теперь вы можете свободно создать базу!",
-    "решили создать базу": "решили создать базу",
-    "Очень высокая радиация!": "Очень высокая радиация!",
-    "Высокая радиация!": "Высокая радиация!",
-    "Найдено!": "Найдено!",
-    "Поиск случайной локации без воды...": "Поиск случайной локации без воды...",
-    "Кварцевое озеро": "Кварцевое озеро",
-    "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку": "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку",
-    "§bПеремещает на анархию": "§bПеремещает на анархию",
-    "Выдает радиус границы анархии сейчас": "Выдает радиус границы анархии сейчас",
-    "вы атаковали игрока": "вы атаковали игрока",
-    "Нельзя сражаться с новичками!": "Нельзя сражаться с новичками!",
-    "Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи": "Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи",
-    "Вы вышли из сервера во время сражения, поэтому были убиты при входе.": "Вы вышли из сервера во время сражения, поэтому были убиты при входе.",
-    "Вы находитесь в режиме сражения!": "Вы находитесь в режиме сражения!",
-    "Звук попадания по существо из лука": "Звук попадания по существо из лука",
-    "Звук лука": "Звук лука",
-    "Индикатор попадания по существу из лука": "Индикатор попадания по существу из лука",
-    "Индикатор": "Индикатор",
-    "Вы уверены что хотите удалить точку восстановления?": "Вы уверены что хотите удалить точку восстановления?",
-    "Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено": "Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено",
-    "Загрузиться": "Загрузиться",
-    "Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено": "Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено",
-    "Точки восстановления других игроков": "Точки восстановления других игроков",
-    "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:": "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:",
-    "Создать точку восстановления": "Создать точку восстановления",
-    "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения": "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения",
-    "Полный сброс": "Полный сброс",
-    "Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ": "Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ",
-    "Сохранения": "Сохранения",
-    "Очищает и сохраняет все данные (для тестов)": "Очищает и сохраняет все данные (для тестов)",
-    "Вы не можете создать точку восстановления не находясь в выживании или приключении": "Вы не можете создать точку восстановления не находясь в выживании или приключении",
-    "Вы не можете создать точку восстановления не находясь на анархии": "Вы не можете создать точку восстановления не находясь на анархии",
-    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.": "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.",
-    "Не давать ломать предмет": "Не давать ломать предмет",
-    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран": "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран",
-    "Уведомлять о ломающемся предмете": "Уведомлять о ломающемся предмете",
-    "Версия майнкрафта": "Версия майнкрафта",
-    "Версия сервера": "Версия сервера",
-    "Нанесено/Получено": "Нанесено/Получено",
-    "Убийств/Смертей": "Убийств/Смертей",
-    "Показывает статистику по игре": "Показывает статистику по игре",
-    "Вы сели. Чтобы встать, крадитесь": "Вы сели. Чтобы встать, крадитесь",
-    "Вы не можете сесть в падении!": "Вы не можете сесть в падении!",
-    "Присаживает вас": "Присаживает вас",
-    "§cплохой": "§cплохой",
-    "§gнормальный": "§gнормальный",
-    "§aхороший": "§aхороший",
-    "Понг! Проверяем...": "Понг! Проверяем...",
-    "Показывает пинг сервера": "Показывает пинг сервера",
-    "Отменяет телепортацию": "Отменяет телепортацию",
-    "Недоступно": "Недоступно",
-    "Телепортация в случайное место на анархии": "Телепортация в случайное место на анархии",
-    "Вы не телепортируетесь!": "Вы не телепортируетесь!",
-    "Вы телепортируетесь!": "Вы телепортируетесь!",
-    "Лор прочитан": "Лор прочитан",
-    "Статистика": "Статистика",
-    "открыть его меню": "открыть его меню",
-    "Другие игроки": "Другие игроки",
-    "Общее меню игрока": "Общее меню игрока",
-    "Выдает ваш айди": "Выдает ваш айди",
-    "Меняет имя": "Меняет имя",
-    "Убивает вас. Используйте, если застряли где-то": "Убивает вас. Используйте, если застряли где-то",
-    "Выводит список команд": "Выводит список команд",
-    "Возвращает камеру в исходное состояние": "Возвращает камеру в исходное состояние",
-    "Вы получили награды!": "Вы получили награды!",
-    "Ваш баланс": "Ваш баланс",
-    "Подтверждение перед покупкой": "Подтверждение перед покупкой",
-    "Сразу открывать меню покупки": "Сразу открывать меню покупки",
-    "Продаваемые предметы": "Продаваемые предметы",
-    "Показывать ли счет в меню (монеты, листья)": "Показывать ли счет в меню (монеты, листья)",
-    "Показывать счет": "Показывать счет",
-    "Определяет, включено ли подтверждение перед покупкой.": "Определяет, включено ли подтверждение перед покупкой.",
-    "Подтверждение покупки": "Подтверждение покупки",
-    "Магазин\n§7Внутриигровой магазин": "Магазин\n§7Внутриигровой магазин",
-    "Продажа невозможна": "Продажа невозможна",
-    "Покупка невозможна": "Покупка невозможна",
-    "Покупка отменена": "Покупка отменена",
-    "Продажа отменена": "Продажа отменена",
-    "Купить!": "Купить!",
-    "Продать!": "Продать!",
-    "Подтверждение": "Подтверждение",
-    "Магазин": "Магазин",
-    "Цена динамическая": "Цена динамическая",
-    "Недостаточно средств.": "Недостаточно средств.",
-    "Нет предмета": "Нет предмета",
-    "Товар закончился": "Товар закончился",
-    "Склад переполнен": "Склад переполнен",
-    "Купить": "Купить",
-    "Продать": "Продать",
-    "§dНастройки": "§dНастройки",
-    "Переключатель": "Переключатель",
-    "JSON-Объект": "JSON-Объект",
-    "Число": "Число",
-    "Строка": "Строка",
-    "Сохранено!": "Сохранено!",
-    "Введите число!": "Введите число!",
-    "Настройка не изменится": "Настройка не изменится",
-    "§8(По умолчанию)\n": "§8(По умолчанию)\n",
-    "§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n": "§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n",
-    "Общие настройки мира\n§7Чат, спавн и тд": "Общие настройки мира\n§7Чат, спавн и тд",
-    "Настройки мира": "Настройки мира",
-    "Настройки": "Настройки",
-    "Доберитесь до точки": "Доберитесь до точки",
-    "Следуйте компасу": "Следуйте компасу",
-    "Монеты": "Монеты",
-    "Опыт": "Опыт",
-    "Общие": "Общие",
-    "Внешнее пространство": "Внешнее пространство",
-    "Я не могу с вами говорить. Приходите позже.": "Я не могу с вами говорить. Приходите позже.",
-    "Вводит в режим новичка": "Вводит в режим новичка",
-    "Вы не находитесь в режиме новичка.": "Вы не находитесь в режиме новичка.",
-    "использовали команду": "использовали команду",
-    "Используйте, чтобы выйти из режима новичка": "Используйте, чтобы выйти из режима новичка",
-    "НЕТ, НАЗАД": "НЕТ, НАЗАД",
-    "Я больше не новичок": "Я больше не новичок",
-    "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти": "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти",
-    "Успешно отменено": "Успешно отменено",
-    "меню": "меню",
-    "§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu": "§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu",
-    "Меню\n§7Разные настройки интерфейсов и меню в игре": "Меню\n§7Разные настройки интерфейсов и меню в игре",
-    "трлн": "трлн",
-    "млрд": "млрд",
-    "млн": "млн",
-    "к": "к",
-    "Просмотр содержимого таблиц лута": "Просмотр содержимого таблиц лута",
-    "Содержимое": "Содержимое",
-    "Я готов принять риск": "Я готов принять риск",
-    "Вернуться назад": "Вернуться назад",
-    "Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне": "Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне",
-    "Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.": "Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.",
-    "у вас вообще экипировки нет": "у вас вообще экипировки нет",
-    "Ваш уровень": "Ваш уровень",
-    "Требуемый уровень": "Требуемый уровень",
-    "Зона": "Зона",
-    "Опасно!": "Опасно!",
-    "С помощью него вы можете сделать предмет у инженера": "С помощью него вы можете сделать предмет у инженера",
-    "§9Тестер": "§9Тестер",
-    "§9Наблюдатель": "§9Наблюдатель",
-    "§fУчастник": "§fУчастник",
-    "§3Строитель": "§3Строитель",
-    "§bГл. Строитель": "§bГл. Строитель",
-    "§eПомошник": "§eПомошник",
-    "§6Модератор": "§6Модератор",
-    "§5Админ": "§5Админ",
-    "§dГл. Админ": "§dГл. Админ",
-    "§cТех. Админ": "§cТех. Админ",
-    "§6Куратор": "§6Куратор",
-    "§aРуководство": "§aРуководство",
-    "Роль сменена успешно": "Роль сменена успешно",
-    "Например, \"чел дурной, пол технограда снес\"": "Например, \"чел дурной, пол технограда снес\"",
-    "Причина смены роли": "Причина смены роли",
-    "Роль": "Роль",
-    "Показать Ваш ник в уведомлении": "Показать Ваш ник в уведомлении",
-    "Уведомлять": "Уведомлять",
-    " §4Не сменить": " §4Не сменить",
-    "Без имени": "Без имени",
-    "§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)": "§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)",
-    "§6дате входа": "§6дате входа",
-    "§aролям": "§aролям",
-    "§bонлайну": "§bонлайну",
-    "\n\n§3Восстановить прошлую роль: §f.role restore": "\n\n§3Восстановить прошлую роль: §f.role restore",
-    "Восстанавливает вашу роль": "Восстанавливает вашу роль",
-    "Показывает вашу роль": "Показывает вашу роль",
-    "Дорога": "Дорога",
-    "Регион сохраняется": "Регион сохраняется",
-    "Вы не можете добывать блоки в зоне добычи новичков": "Вы не можете добывать блоки в зоне добычи новичков",
-    "Индексировать для вики": "Индексировать для вики",
-    "Применить": "Применить",
-    "В этом месте не должно быть региона шахты, подвинуть все": "В этом месте не должно быть региона шахты, подвинуть все",
-    "§7Зона добычи": "§7Зона добычи",
-    "§bЗона добычи новичков": "§bЗона добычи новичков",
-    "Вы уверены что хотите удалить участника из региона?": "Вы уверены что хотите удалить участника из региона?",
-    "Удалить участника": "Удалить участника",
-    "Передать права": "Передать права",
-    "Управление участником региона": "Управление участником региона",
-    "Добавить участника": "Добавить участника",
-    "Добавить!": "Добавить!",
-    "Вы можете только посмотреть их": "Вы можете только посмотреть их",
-    "Для управления участником нажмите на кнопку с его ником": "Для управления участником нажмите на кнопку с его ником",
-    "Участники региона": "Участники региона",
-    "Центр региона": "Центр региона",
-    "Радиус\n§7Определяет радиус региона": "Радиус\n§7Определяет радиус региона",
-    "Нет": "Нет",
-    "Только с сущностями (pve)": "Только с сущностями (pve)",
-    "Да": "Да",
-    "Сражение\n§7Определяет, смогут ли игроки сражаться в регионе": "Сражение\n§7Определяет, смогут ли игроки сражаться в регионе",
-    "Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.": "Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.",
-    "Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)": "Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)",
-    "Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.": "Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.",
-    "Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.": "Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.",
-    "Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.": "Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.",
-    "Разрешения региона": "Разрешения региона",
-    "Структура": "Структура",
-    "Разрешения": "Разрешения",
-    "Тип зоны": "Тип зоны",
-    "Тип региона": "Тип региона",
-    "Сохранить": "Сохранить",
-    "Пересохранить": "Пересохранить",
-    "Выключено": "Выключено",
-    "Входит в режим телепортации по группе регионов. Полезно для поиска данжа": "Входит в режим телепортации по группе регионов. Полезно для поиска данжа",
-    "Управляет регионами": "Управляет регионами",
-    "Заберите награду": "Заберите награду",
-    "Отправлять ли сообщение в чат при каждом новом разделе задания": "Отправлять ли сообщение в чат при каждом новом разделе задания",
-    "Сообщение в чат при каждом шаге": "Сообщение в чат при каждом шаге",
-    "Задания\r\n§7Настройки игровых заданий": "Задания\r\n§7Настройки игровых заданий",
-    "Отказаться от задания?": "Отказаться от задания?",
-    "Отказаться": "Отказаться",
-    "Сделать приоритетным": "Сделать приоритетным",
-    "Задание завершено!": "Задание завершено!",
-    "Измерение": "Измерение",
-    "Локация": "Локация",
-    "Описание:": "Описание:",
-    "Текущее действие": "Текущее действие",
-    "Описание": "Описание",
-    "Список завершенных заданий": "Список завершенных заданий",
-    "Завершенные задания": "Завершенные задания",
-    "Нет активных заданий.": "Нет активных заданий.",
-    "Нет заданий": "Нет заданий",
-    "Задания": "Задания",
-    "У вас нет активных заданий!": "У вас нет активных заданий!",
-    "Выйти": "Выйти",
-    "Меню заданий": "Меню заданий",
-    "Взять задание": "Взять задание",
-    "§2Перемещение...": "§2Перемещение...",
-    "при входе игроков": "при входе игроков",
-    "о входе других игроков": "о входе других игроков",
-    "Сообщение": "Сообщение",
-    "§8Проснулся": "§8Проснулся",
-    "§8Очнулся в воздухе": "§8Очнулся в воздухе",
-    "Добро пожаловать!": "Добро пожаловать!",
-    "§3Добрый вечер": "§3Добрый вечер",
-    "§bДобрый день": "§bДобрый день",
-    "§6Доброе утро": "§6Доброе утро",
-    "§9Доброй ночи": "§9Доброй ночи",
-    "при входе": "при входе",
-    "Время": "Время",
-    "Вход\n§7Все действия, связанные со входом": "Вход\n§7Все действия, связанные со входом",
-    "Имитирует первый вход": "Имитирует первый вход",
-    "Удалить": "Удалить",
-    "Удалить письмо": "Удалить письмо",
-    "Удалить письмо?": "Удалить письмо?",
-    "Награда успешно забрана!\n\n": "Награда успешно забрана!\n\n",
-    "Вы не можете забрать награды не находясь на анархии": "Вы не можете забрать награды не находясь на анархии",
-    "Забрать награду": "Забрать награду",
-    "Награды": "Награды",
-    "Алмазов за прочтение": "Алмазов за прочтение",
-    "вот.": "вот.",
-    "Строка5": "Строка5",
-    "да": "да",
-    "Строка 4": "Строка 4",
-    "читать все сообщения в почте": "читать все сообщения в почте",
-    "Строка3": "Строка3",
-    "вы теперь можете": "вы теперь можете",
-    "Строка2": "Строка2",
-    "мы вас поздравляем": "мы вас поздравляем",
-    "Строка 1": "Строка 1",
-    "вы крутые там д0а": "вы крутые там д0а",
-    "Заголовок": "Заголовок",
-    "Объявление для всего сервера": "Объявление для всего сервера",
-    "Объявление": "Объявление",
-    "Все прочитано": "Все прочитано",
-    "Прочитать все\n§7(и собрать награды если есть)": "Прочитать все\n§7(и собрать награды если есть)",
-    "Имени": "Имени",
-    "Дате": "Дате",
-    "У письма есть несобранные награды": "У письма есть несобранные награды",
-    "Несобранные награды": "Несобранные награды",
-    "Показывать только непрочитанные сообщения": "Показывать только непрочитанные сообщения",
-    "Непрочитанные": "Непрочитанные",
-    "Почта:": "Почта:",
-    "Показывать ли при входе сообщение с кол-вом непрочитанных": "Показывать ли при входе сообщение с кол-вом непрочитанных",
-    "Почта": "Почта",
-    "Собирать ли награды при удалении письма": "Собирать ли награды при удалении письма",
-    "Собирать награды при удалении": "Собирать награды при удалении",
-    "Почта\n§7Прочтение сообщения, инфо при входе": "Почта\n§7Прочтение сообщения, инфо при входе",
-    "Посмотреть входящие сообщения почты": "Посмотреть входящие сообщения почты",
-    "§cНет": "§cНет",
-    "§fДа": "§fДа",
-    "§bНовичок": "§bНовичок",
-    "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова": "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова",
-    "Закрой чат!": "Закрой чат!",
-    "Закрыть": "Закрыть",
-    "Назад": "Назад",
-    "Дате входа": "Дате входа",
-    "Онлайну": "Онлайну",
-    "Сортировать по": "Сортировать по",
-    "Выбрать всех": "Выбрать всех",
-    "Убрать выделение": "Убрать выделение",
-    "Вы уверены?": "Вы уверены?",
-    "Никакой": "Никакой",
-    "История": "История",
-    "Хорошо, назад": "Хорошо, назад",
-    "Ничего не произойдет": "Ничего не произойдет",
-    "Запрос": "Запрос",
-    "Поиск": "Поиск",
-    "Следующая": "Следующая",
-    "Предыдущая": "Предыдущая",
-    "Фильтры": "Фильтры",
-    "Отмена": "Отмена",
-    "§r§3Назад": "§r§3Назад",
-    "§l§b< §r§3Назад": "§l§b< §r§3Назад",
-    "Успешно": "Успешно",
-    "Последний раз онлайн": "Последний раз онлайн",
-    "Последний раз онлайн на анархии": "Последний раз онлайн на анархии",
-    "Время первого входа на анархию": "Время первого входа на анархию",
-    "Онлайн на анархии": "Онлайн на анархии",
-    "Время первого входа": "Время первого входа",
-    "Всего входов на сервер": "Всего входов на сервер",
-    "Урона нанесено": "Урона нанесено",
-    "Урона получено": "Урона получено",
-    "Фейрверков взорвано": "Фейрверков взорвано",
-    "Фейрверков запущено": "Фейрверков запущено",
-    "Блоков сломано": "Блоков сломано",
-    "Блоков поставлено": "Блоков поставлено",
-    "Онлайн всего": "Онлайн всего",
-    "Рейд-блок": "Рейд-блок",
-    "Смертей": "Смертей",
-    "Убийств": "Убийств",
-    "§6Монеты": "§6Монеты",
-    "§aЛистья": "§aЛистья",
-    "Катсцена": "Катсцена",
-    "Вы получили свою награду!": "Вы получили свою награду!",
-    "Используйте этот ключ, чтобы открыть ящик с лутом!": "Используйте этот ключ, чтобы открыть ящик с лутом!",
-    "Посмотреть содержимое": "Посмотреть содержимое",
-    "Купить ключ": "Купить ключ",
-    "Чтобы открыть этот сундук, возьмите в руки ключ": "Чтобы открыть этот сундук, возьмите в руки ключ",
-    "Команда недоступна": "Команда недоступна",
-    "Команда не готова": "Команда не готова",
-    "Список всех доступных вам команд: §f.help": "Список всех доступных вам команд: §f.help",
-    "Причина не была указана, участник остался в клане": "Причина не была указана, участник остался в клане",
-    "Причина обязательна": "Причина обязательна",
-    "Причина": "Причина",
-    "Выгнать": "Выгнать",
-    "Сменить роль": "Сменить роль",
-    "Вы единственный владелец. Кнопка удаления клана находится в меню клана снизу": "Вы единственный владелец. Кнопка удаления клана находится в меню клана снизу",
-    "Вы не можете отказаться от владения клана являясь единственным его владельцем": "Вы не можете отказаться от владения клана являясь единственным его владельцем",
-    "Вы уверены что хотите сбросить свою роль в клане до участника?": "Вы уверены что хотите сбросить свою роль в клане до участника?",
-    "Отказаться от владения": "Отказаться от владения",
-    "Участники клана": "Участники клана",
-    "Не удалось пригласить в клан": "Не удалось пригласить в клан",
-    "Вы были приглашены в клан! Чтобы вступить, используйте /clan или раздел кланов из основого меню": "Вы были приглашены в клан! Чтобы вступить, используйте /clan или раздел кланов из основого меню",
-    "пригласить в клан": "пригласить в клан",
-    "Да, отозать": "Да, отозать",
-    "отозвать приглашение?": "отозвать приглашение?",
-    "Новое приглашение": "Новое приглашение",
-    "Онет": "Онет",
-    "Нет, не заслужил": "Нет, не заслужил",
-    "Откройте меню клана с помощью .clan": "Откройте меню клана с помощью .clan",
-    "Принять!": "Принять!",
-    "Выбор": "Выбор",
-    "Другие кланы\n§7Посмотреть": "Другие кланы\n§7Посмотреть",
-    "Хз почему": "Хз почему",
-    "Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку.": "Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку.",
-    "Покинуть клан": "Покинуть клан",
-    "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.": "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.",
-    "Удалить клан без возможности восстановления?": "Удалить клан без возможности восстановления?",
-    "Удалить клан": "Удалить клан",
-    "Изменить": "Изменить",
-    "Изменить название или тэг клана": "Изменить название или тэг клана",
-    "Заявки на вступление": "Заявки на вступление",
-    "Участники": "Участники",
-    "Дата создания": "Дата создания",
-    "Имя клана": "Имя клана",
-    "Меню клана": "Меню клана",
-    "Кланы": "Кланы",
-    "Ваш клан": "Ваш клан",
-    "Выводит справку о команде": "Выводит справку о команде",
-    "Пусто": "Пусто",
-    "Справка по скриптовым командам": "Справка по скриптовым командам",
-    "Та ну не надоело": "Та ну не надоело",
-    "Щас исправлю": "Щас исправлю",
-    "Ошибка": "Ошибка",
-    "Чтобы блатными в чате выглядеть": "Чтобы блатными в чате выглядеть",
-    "Тэг клана": "Тэг клана",
-    "Ну, давай, придумай чета оригинальное": "Ну, давай, придумай чета оригинальное",
-    "Название клана": "Название клана",
-    "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов": "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов",
-    "Создать клан": "Создать клан",
-    "Создать свой клан": "Создать свой клан",
-    "Приглашения": "Приглашения",
-    "Выберите клан, чтобы отправить заявку или создайте свой клан!": "Выберите клан, чтобы отправить заявку или создайте свой клан!",
-    "Выбор клана": "Выбор клана",
-    "Клан": "Клан",
-    "Размутить": "Размутить",
-    "Вернуть обратно": "Вернуть обратно",
-    "Неизвестный тип времени": "Неизвестный тип времени",
-    "Заглушить игрока в чате": "Заглушить игрока в чате",
-    "Не был замьючен": "Не был замьючен",
-    "Владелец": "Владелец",
-    "Помошник": "Помошник",
-    "Участник": "Участник",
-    "Звука сообщений от игроков поблизости": "Звука сообщений от игроков поблизости",
-    "Звук": "Звук",
-    "Чат\n§7Звуки и внешний вид чата": "Чат\n§7Звуки и внешний вид чата",
-    "Забрать награды": "Забрать награды",
-    "Награды забраны": "Награды забраны",
-    "?\nНеизвестно": "?\nНеизвестно",
-    "Несобранные вверху": "Несобранные вверху",
-    "Скрыть неизвестные": "Скрыть неизвестные",
-    "По алфавиту": "По алфавиту",
-    "По дате получения": "По дате получения",
-    "Режим сортировки": "Режим сортировки",
-    "Достижения": "Достижения",
-    "{0_item_name}§c*\n§aЗаберите награды!": "{0_item_name}§c*\n§aЗаберите награды!",
-    "Награда: {0_achiv_reward_toString_player_}": "Награда: {0_achiv_reward_toString_player_}",
-    "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}",
-    "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}",
-    "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}",
-    "Игрок {0_nameArg} не найден": "Игрок {0_nameArg} не найден",
-    "Причина: {0_info_mutedUntil}\n{1_until}": "Причина: {0_info_mutedUntil}\n{1_until}",
-    "Вы приняли приглашение в клан '{0_clan_name}'": "Вы приняли приглашение в клан '{0_clan_name}'",
-    "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!",
-    "Заявка на вступление в клан '{0_clan_name}' отправлена!": "Заявка на вступление в клан '{0_clan_name}' отправлена!",
-    "Запрос на вступление в клан от '{0_player_name}'": "Запрос на вступление в клан от '{0_player_name}'",
-    "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}": "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}",
-    "Имя '{0_name}' не может содержать параграф": "Имя '{0_name}' не может содержать параграф",
-    "Короткое имя '{0_shortname}' не может содержать параграф": "Короткое имя '{0_shortname}' не может содержать параграф",
-    "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов",
-    "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'",
-    "Клан с именем '{0_name}' уже существует.": "Клан с именем '{0_name}' уже существует.",
-    "Короткое имя '{0_shortname}' уже занято.": "Короткое имя '{0_shortname}' уже занято.",
-    "Клан '{0_clan_name}' распущен": "Клан '{0_clan_name}' распущен",
-    "Игрок {0_player_name} покинул ваш клан": "Игрок {0_player_name} покинул ваш клан",
-    "Клан '{0_clan_name}' покинут успешно": "Клан '{0_clan_name}' покинут успешно",
-    "Короткое имя: {0_clan_shortname}": "Короткое имя: {0_clan_shortname}",
-    "Принять игрока '{0_name}' в клан?": "Принять игрока '{0_name}' в клан?",
-    "Вы приняты в клан {0_clan_name}": "Вы приняты в клан {0_clan_name}",
-    "Вы НЕ приняты в клан {0_clan_name}": "Вы НЕ приняты в клан {0_clan_name}",
-    "Приглашения в клан '{0_clan_name}'": "Приглашения в клан '{0_clan_name}'",
-    "Игрок {0_name} уже состоит в вашем клане!": "Игрок {0_name} уже состоит в вашем клане!",
-    "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": "Игрок {0_name} уже состоит в клане {1_playerClan_name}!",
-    "Приглашение в клан '{0_clan_name}'": "Приглашение в клан '{0_clan_name}'",
-    "Игрок {0_name} успешно приглашен в клан!": "Игрок {0_name} успешно приглашен в клан!",
-    "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.",
-    "Роль в клане {0_changeString}": "Роль в клане {0_changeString}",
-    "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}",
-    "Выгнать участника '{0_memberName}'": "Выгнать участника '{0_memberName}'",
-    "Вы выгнаны из клана '{0_clan_name}'": "Вы выгнаны из клана '{0_clan_name}'",
-    "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}",
-    "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": "Участник {0_memberName} успешно выгнан из клана {1_clan_name}",
-    "Сменить роль {0_Player_nameOrUnknown_member_id_}": "Сменить роль {0_Player_nameOrUnknown_member_id_}",
-    "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ",
-    "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─",
-    " (также {0_d_aliases_join______})": " (также {0_d_aliases_join______})",
-    "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}",
-    "Не так быстро! Попробуй через {0_i18n_time_after_}": "Не так быстро! Попробуй через {0_i18n_time_after_}",
-    "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?",
-    "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}",
-    "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help",
-    "При выполнении команды произошла ошибка. {0_developersAreWarned}": "При выполнении команды произошла ошибка. {0_developersAreWarned}",
-    "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}",
-    "{0_this_place_name} ящик": "{0_this_place_name} ящик",
-    "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}",
-    "Открыт ящик {0_this_name}!": "Открыт ящик {0_this_name}!",
-    "{0_i18n___this_name_______} > Содержимое": "{0_i18n___this_name_______} > Содержимое",
-    "{0_this_name} ящик": "{0_this_name} ящик",
-    "Ключ для ящика {0_Crate_getName_storage_crate_}": "Ключ для ящика {0_Crate_getName_storage_crate_}",
-    "Игрок {0_player_database_name} сменил ник на {1_player_name}": "Игрок {0_player_database_name} сменил ник на {1_player_name}",
-    "§cВы уверены, что хотите {0_text}?": "§cВы уверены, что хотите {0_text}?",
-    "Результаты поиска по запросу\n{0_searchQuery}": "Результаты поиска по запросу\n{0_searchQuery}",
-    "§3Выберите игрока чтобы {0_reason}": "§3Выберите игрока чтобы {0_reason}",
-    "{0_days} д. {1_hhmmss}": "{0_days} д. {1_hhmmss}",
-    "У вас {0_unreadCount} непрочитанных сообщений!": "У вас {0_unreadCount} непрочитанных сообщений!",
-    "Следующее письмо\n{0_letterOneLineName_next_letter_}": "Следующее письмо\n{0_letterOneLineName_next_letter_}",
-    "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}",
-    "{0_deleteDescription} Все награды будут собраны автоматически": "{0_deleteDescription} Все награды будут собраны автоматически",
-    "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!",
-    "{0_i18n_header_______}: {1_title}, просмотреть: /mail": "{0_i18n_header_______}: {1_title}, просмотреть: /mail",
-    "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}": "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}",
-    "{0_this_quest_name}\nЗавершен!": "{0_this_quest_name}\nЗавершен!",
-    "Задание\n{0_this_quest_name}": "Задание\n{0_this_quest_name}",
-    "Возьмите задание {0_target_name}": "Возьмите задание {0_target_name}",
-    "Завершите задание {0_target_name}": "Завершите задание {0_target_name}",
-    "При активации шага произошла ошибка. {0_developersAreWarned}": "При активации шага произошла ошибка. {0_developersAreWarned}",
-    "Задание {0_this_quest_name} сломалось: {1_text}": "Задание {0_this_quest_name} сломалось: {1_text}",
-    "{0_step_text__}\n§aЗавершено! §6Заберите награду.": "{0_step_text__}\n§aЗавершено! §6Заберите награду.",
-    "Вас ждет {0_i18n_accent___npc_name__}": "Вас ждет {0_i18n_accent___npc_name__}",
-    "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})",
-    "Не удалось сохранить структуру: {0_e}": "Не удалось сохранить структуру: {0_e}",
-    "Владелец > {0_name}": "Владелец > {0_name}",
-    "Вы уверены что хотите передать права владельца региона игроку {0_name}?": "Вы уверены что хотите передать права владельца региона игроку {0_name}?",
-    "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": "Вы уверены что хотите назначить владельцем региона игрока {0_name}?",
-    "§cБосс §6{0_this_bossName}": "§cБосс §6{0_this_bossName}",
-    "Макс кол-во: {0_resource_amount}": "Макс кол-во: {0_resource_amount}",
-    "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}",
-    "Регион создается. {0___region_restoringStructurePercent}%%": "Регион создается. {0___region_restoringStructurePercent}%%",
-    "Безопасная зона {0_this_safeAreaName}": "Безопасная зона {0_this_safeAreaName}",
-    "Вы вернули роль §r{0_ROLES_prevRole_}": "Вы вернули роль §r{0_ROLES_prevRole_}",
-    "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}",
-    "§3Ваша роль: {0_ROLES_prole_}": "§3Ваша роль: {0_ROLES_prole_}",
-    "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.",
-    "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}",
-    " игроком {0_player_name}": " игроком {0_player_name}",
-    "\nПричина: {0_message}": "\nПричина: {0_message}",
-    "Роль игрока {0_target_name} сменена успешно": "Роль игрока {0_target_name} сменена успешно",
-    "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}",
-    "Убит босс {0_this_options_place_name}!": "Убит босс {0_this_options_place_name}!",
-    "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}",
-    "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова",
-    "Выдает или убирает {0_itemNameTag} из инвентаря": "Выдает или убирает {0_itemNameTag} из инвентаря",
-    "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}",
-    "Вы {0_reason}, поэтому вышли из режима новичка.": "Вы {0_reason}, поэтому вышли из режима новичка.",
-    "Не удалось открыть диалог. {0_developersAreWarned}": "Не удалось открыть диалог. {0_developersAreWarned}",
-    "Доберитесь до: {0_this_place_name}": "Доберитесь до: {0_this_place_name}",
-    "\n§7§lЗначение:§r {0_stringify_value_}": "\n§7§lЗначение:§r {0_stringify_value_}",
-    "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}",
-    "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}",
-    "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить",
-    "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%",
-    "В инвентаре нет {0_this_text}": "В инвентаре нет {0_this_text}",
-    "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}",
-    "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}",
-    "Продать {0_costString} за {1_name}?": "Продать {0_costString} за {1_name}?",
-    "Купить {0_name} за {1_costString}?": "Купить {0_name} за {1_costString}?",
-    "Успешная продажа {0_name} за {1_costString}!": "Успешная продажа {0_name} за {1_costString}!",
-    "Успешная покупка {0_name} за {1_costString}!": "Успешная покупка {0_name} за {1_costString}!",
-    "При покупке произошла ошибка. {0_developersAreWarned}": "При покупке произошла ошибка. {0_developersAreWarned}",
-    "Нет места в инвентаре (нужно еще {0_amount})": "Нет места в инвентаре (нужно еще {0_amount})",
-    "Изменено на {0_newname}": "Изменено на {0_newname}",
-    "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}",
-    "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)",
-    "Порталы {0_portals__length____0}/{1_Portal_portals_size}": "Порталы {0_portals__length____0}/{1_Portal_portals_size}",
-    "Статистика игрока {0_Player_nameOrUnknown_targetId_}": "Статистика игрока {0_Player_nameOrUnknown_targetId_}",
-    "Анархия {0_n}": "Анархия {0_n}",
-    "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)",
-    "Усиленный аирдроп скоро упадет на {0_location}!": "Усиленный аирдроп скоро упадет на {0_location}!",
-    "Обычный аирдроп скоро упадет на {0_location}!": "Обычный аирдроп скоро упадет на {0_location}!",
-    "Радиус границы анархии сейчас: {0_this_zone__radius}": "Радиус границы анархии сейчас: {0_this_zone__radius}",
-    "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}",
-    "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.",
-    "Вода. Попытка {0_maxTries___i}/{1_maxTries}": "Вода. Попытка {0_maxTries___i}/{1_maxTries}",
-    "Нельзя создать базу на высоте ниже {0_underLimit}!": "Нельзя создать базу на высоте ниже {0_underLimit}!",
-    "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!",
-    "состоите в базе игрока '{0_region_ownerName}'": "состоите в базе игрока '{0_region_ownerName}'",
-    "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}",
-    "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n",
-    "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}",
-    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}",
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!",
-    "База с владельцем {0_base_ownerName} {1_messageAction}.": "База с владельцем {0_base_ownerName} {1_messageAction}.",
-    "Максимальный уровень\n{0_levelText}": "Максимальный уровень\n{0_levelText}",
-    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})",
-    "Улучшить базу: {0_levelText}": "Улучшить базу: {0_levelText}",
-    "База игрока {0_base_ownerName}": "База игрока {0_base_ownerName}",
-    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}",
-    "§6Ваша база {0_text}": "§6Ваша база {0_text}",
-    "{0_this_city_name}: задание исследования не настроено!": "{0_this_city_name}: задание исследования не настроено!",
-    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}",
-    "Вы уже заняли {0_personalKeys_length}/3 печек.": "Вы уже заняли {0_personalKeys_length}/3 печек.",
-    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": "Ваш клан уже занял {0_clanKeys_length}/3 печек.",
-    "Использован ключ из слота {0_index}": "Использован ключ из слота {0_index}",
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}",
-    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.",
-    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...",
-    "У {0_i18n_accent_________} можно купить ключ доступа к печам": "У {0_i18n_accent_________} можно купить ключ доступа к печам",
-    "Купите у {0_i18n_accent_________} ключ доступа к печам": "Купите у {0_i18n_accent_________} ключ доступа к печам",
-    "Доберитесь до {0_i18n_accent________________________} по дороге": "Доберитесь до {0_i18n_accent________________________} по дороге",
-    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}",
-    "...мы изобрели {0_i18n_accent______}": "...мы изобрели {0_i18n_accent______}",
-    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}",
-    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}",
-    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}",
-    "У {0_i18n_accent______} можно зачаровать предметы": "У {0_i18n_accent______} можно зачаровать предметы",
-    "Доберитесь до {0_i18n_accent____________} по дороге": "Доберитесь до {0_i18n_accent____________} по дороге",
-    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}",
-    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}",
-    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны",
-    "Дровосек: нарубите {0_v} дерева": "Дровосек: нарубите {0_v} дерева",
-    "Шахтер: накопайте {0_v} камня": "Шахтер: накопайте {0_v} камня",
-    "Угольный шахтер: накопайте {0_v} угля": "Угольный шахтер: накопайте {0_v} угля",
-    "Железный шахтер: накопайте {0_v} железа": "Железный шахтер: накопайте {0_v} железа",
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}",
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}",
-    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}",
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}",
-    "Добыто дерева: {0_current}/{1_end}": "Добыто дерева: {0_current}/{1_end}",
-    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}",
-    "Добыто железной руды: {0_i}/{1_end}": "Добыто железной руды: {0_i}/{1_end}",
-    "Отправляйтесь за ними в {0_i18n_accent_____________}": "Отправляйтесь за ними в {0_i18n_accent_____________}",
-    "Идите в {0_i18n_accent_____________} по дороге": "Идите в {0_i18n_accent_____________} по дороге",
-    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!",
-    "{0_extra___extra_to_player_lang____________}§8Вы тут": "{0_extra___extra_to_player_lang____________}§8Вы тут",
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}",
-    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": "Событие! {0_effectType} силой {1_amplifier} на {2} минут",
-    "Время: {0_new_Date___toHHMMSS__}": "Время: {0_new_Date___toHHMMSS__}",
-    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})",
-    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}",
-    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}",
-    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}",
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}",
-    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe",
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса",
-    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}",
-    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%",
-    "Добыть: {0___rawtext_____translate__langToken_itemType______}": "Добыть: {0___rawtext_____translate__langToken_itemType______}",
-    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}",
-    "Руды на {0_y}": "Руды на {0_y}"
+    "Типы": {
+      "s": [
+        "Типы"
+      ],
+      "i": []
+    },
+    "Над": {
+      "s": [
+        "Над"
+      ],
+      "i": []
+    },
+    "Под": {
+      "s": [
+        "Под"
+      ],
+      "i": []
+    },
+    "Руды на \u0000": {
+      "s": [
+        "Руды на ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте от \u0000 до \u0000. Ваш y = \u0000": {
+      "s": [
+        "Копать нужно на высоте от ",
+        " до ",
+        ". Ваш y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Спуститесь в шахту и вскопайте указанный ресурс!": {
+      "s": [
+        "Спуститесь в шахту и вскопайте указанный ресурс!"
+      ],
+      "i": []
+    },
+    "Добыть: \u0000": {
+      "s": [
+        "Добыть: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000, \u0000, Группа: \u0000%%": {
+      "s": [
+        "",
+        ", ",
+        ", Группа: ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "На этой высоте руд нет": {
+      "s": [
+        "На этой высоте руд нет"
+      ],
+      "i": []
+    },
+    "Руды на y: \u0000:\n\u0000": {
+      "s": [
+        "Руды на y: ",
+        ":\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса (\u0000) с помощью компаса": {
+      "s": [
+        "Вы можете взять это задание чтобы отслеживать направления источника ресурса (",
+        ") с помощью компаса"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Группа": {
+      "s": [
+        "Группа"
+      ],
+      "i": []
+    },
+    "Еда": {
+      "s": [
+        "Еда"
+      ],
+      "i": []
+    },
+    "Ресурсы по локациям": {
+      "s": [
+        "Ресурсы по локациям"
+      ],
+      "i": []
+    },
+    "Ресурсы": {
+      "s": [
+        "Ресурсы"
+      ],
+      "i": []
+    },
+    "Руды": {
+      "s": [
+        "Руды"
+      ],
+      "i": []
+    },
+    "Википедия": {
+      "s": [
+        "Википедия"
+      ],
+      "i": []
+    },
+    "Что где как все расскажу": {
+      "s": [
+        "Что где как все расскажу"
+      ],
+      "i": []
+    },
+    "Спидран '\u0000' начат. Для сброса времени воспользуйтесь .wipe": {
+      "s": [
+        "Спидран '",
+        "' начат. Для сброса времени воспользуйтесь .wipe"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nВыбрано": {
+      "s": [
+        "\nВыбрано"
+      ],
+      "i": []
+    },
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: \u0000": {
+      "s": [
+        "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы не смогли побить ваш предыдущий рекорд \u0000! \u0000 -> \u0000": {
+      "s": [
+        "Вы не смогли побить ваш предыдущий рекорд ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы побили ваш предыдущий рекорд \u0000! \u0000 -> \u0000": {
+      "s": [
+        "Вы побили ваш предыдущий рекорд ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Ваш первый рекорд \u0000 поставлен! Это заняло \u0000": {
+      "s": [
+        "Ваш первый рекорд ",
+        " поставлен! Это заняло ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Полная незеритовая броня": {
+      "s": [
+        "Полная незеритовая броня"
+      ],
+      "i": []
+    },
+    "1.000.000 монет": {
+      "s": [
+        "1.000.000 монет"
+      ],
+      "i": []
+    },
+    "Все задания": {
+      "s": [
+        "Все задания"
+      ],
+      "i": []
+    },
+    "Получить базу": {
+      "s": [
+        "Получить базу"
+      ],
+      "i": []
+    },
+    "Все достижения": {
+      "s": [
+        "Все достижения"
+      ],
+      "i": []
+    },
+    "\u0000 \u0000\nЧерез \u0000 (\u0000)": {
+      "s": [
+        "",
+        " ",
+        "\nЧерез ",
+        " (",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Время: \u0000": {
+      "s": [
+        "Время: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Событие! \u0000 силой \u0000 на \u0000 минут": {
+      "s": [
+        "Событие! ",
+        " силой ",
+        " на ",
+        " минут"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Миниигра": {
+      "s": [
+        "Миниигра"
+      ],
+      "i": []
+    },
+    "Боковое меню": {
+      "s": [
+        "Боковое меню"
+      ],
+      "i": []
+    },
+    "Разделенные подсказки": {
+      "s": [
+        "Разделенные подсказки"
+      ],
+      "i": []
+    },
+    "Определяет, где будет меню": {
+      "s": [
+        "Определяет, где будет меню"
+      ],
+      "i": []
+    },
+    "Режим отображения": {
+      "s": [
+        "Режим отображения"
+      ],
+      "i": []
+    },
+    "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься": {
+      "s": [
+        "Максимально допустимое кол-во символов, при достижении которого слова будут переноситься"
+      ],
+      "i": []
+    },
+    "Максимальный размер бокового меню": {
+      "s": [
+        "Максимальный размер бокового меню"
+      ],
+      "i": []
+    },
+    "Определяет, включено ли внутриигровое меню": {
+      "s": [
+        "Определяет, включено ли внутриигровое меню"
+      ],
+      "i": []
+    },
+    "Использовать меню": {
+      "s": [
+        "Использовать меню"
+      ],
+      "i": []
+    },
+    "События": {
+      "s": [
+        "События"
+      ],
+      "i": []
+    },
+    "Лидеры": {
+      "s": [
+        "Лидеры"
+      ],
+      "i": []
+    },
+    "Цели": {
+      "s": [
+        "Цели"
+      ],
+      "i": []
+    },
+    "Еще": {
+      "s": [
+        "Еще"
+      ],
+      "i": []
+    },
+    "§7Настройки": {
+      "s": [
+        "§7Настройки"
+      ],
+      "i": []
+    },
+    "§bВики": {
+      "s": [
+        "§bВики"
+      ],
+      "i": []
+    },
+    "§fПочта": {
+      "s": [
+        "§fПочта"
+      ],
+      "i": []
+    },
+    "§6Донат\n§7СКОРО!": {
+      "s": [
+        "§6Донат\n§7СКОРО!"
+      ],
+      "i": []
+    },
+    "§7СКОРО!": {
+      "s": [
+        "§7СКОРО!"
+      ],
+      "i": []
+    },
+    "Миниигры": {
+      "s": [
+        "Миниигры"
+      ],
+      "i": []
+    },
+    "Анархия": {
+      "s": [
+        "Анархия"
+      ],
+      "i": []
+    },
+    "\u0000§8Вы тут": {
+      "s": [
+        "",
+        "§8Вы тут"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Спавн": {
+      "s": [
+        "Спавн"
+      ],
+      "i": []
+    },
+    "Вы получили ключ!": {
+      "s": [
+        "Вы получили ключ!"
+      ],
+      "i": []
+    },
+    "Вы уже забрали награды сегодня! Заходите завтра": {
+      "s": [
+        "Вы уже забрали награды сегодня! Заходите завтра"
+      ],
+      "i": []
+    },
+    "Сначала выполните все ежедневные задания!": {
+      "s": [
+        "Сначала выполните все ежедневные задания!"
+      ],
+      "i": []
+    },
+    "\u0000/\u0000 Награда: ключ от сундука\n\u0000": {
+      "s": [
+        "",
+        "/",
+        " Награда: ключ от сундука\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Выполнено подряд": {
+      "s": [
+        "Выполнено подряд"
+      ],
+      "i": []
+    },
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех \u0000 заданий вам дают награду. За выполнение всех ежедневных заданий \u0000 дня подряд вместо обычного ключа выдается донатный\n\n\u0000": {
+      "s": [
+        "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ",
+        " заданий вам дают награду. За выполнение всех ежедневных заданий ",
+        " дня подряд вместо обычного ключа выдается донатный\n\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Ежедневные задания": {
+      "s": [
+        "Ежедневные задания"
+      ],
+      "i": []
+    },
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: \u0000": {
+      "s": [
+        "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не умею этим пользоваться, но знаю кто точно поможет: \u0000": {
+      "s": [
+        "Не умею этим пользоваться, но знаю кто точно поможет: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Поздравляем! В будущем постарайтесь быть осторожнее.": {
+      "s": [
+        "Поздравляем! В будущем постарайтесь быть осторожнее."
+      ],
+      "i": []
+    },
+    "Могила оказалась пустой и была удалена": {
+      "s": [
+        "Могила оказалась пустой и была удалена"
+      ],
+      "i": []
+    },
+    ", никто кроме вас их забрать не может": {
+      "s": [
+        ", никто кроме вас их забрать не может"
+      ],
+      "i": []
+    },
+    "Верните свои вещи\u0000, они ждут вас на \u0000§6!": {
+      "s": [
+        "Верните свои вещи",
+        ", они ждут вас на ",
+        "§6!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Ваше место смерти не сохранилось!": {
+      "s": [
+        "Ваше место смерти не сохранилось!"
+      ],
+      "i": []
+    },
+    "Могила была удалена очисткой мусора.": {
+      "s": [
+        "Могила была удалена очисткой мусора."
+      ],
+      "i": []
+    },
+    "Верните вещи после смерти!": {
+      "s": [
+        "Верните вещи после смерти!"
+      ],
+      "i": []
+    },
+    "Вернуть вещи": {
+      "s": [
+        "Вернуть вещи"
+      ],
+      "i": []
+    },
+    "Вы не можете открыть могилу игрока, умершего в зоне без сражения!": {
+      "s": [
+        "Вы не можете открыть могилу игрока, умершего в зоне без сражения!"
+      ],
+      "i": []
+    },
+    "Вы не можете открыть могилу новичка!": {
+      "s": [
+        "Вы не можете открыть могилу новичка!"
+      ],
+      "i": []
+    },
+    "Включать ли задание по восстановлению инвентаря после смерти": {
+      "s": [
+        "Включать ли задание по восстановлению инвентаря после смерти"
+      ],
+      "i": []
+    },
+    "Задание \"Вернуть вещи\"": {
+      "s": [
+        "Задание \"Вернуть вещи\""
+      ],
+      "i": []
+    },
+    "В этот раз еды не оказалось, однако в следующий раз может повезти больше.": {
+      "s": [
+        "В этот раз еды не оказалось, однако в следующий раз может повезти больше."
+      ],
+      "i": []
+    },
+    "Откройте сундук в разрушенном магазине": {
+      "s": [
+        "Откройте сундук в разрушенном магазине"
+      ],
+      "i": []
+    },
+    "Зайдите в разрушенный магазин": {
+      "s": [
+        "Зайдите в разрушенный магазин"
+      ],
+      "i": []
+    },
+    "В строениях возле дороги можно найти еду": {
+      "s": [
+        "В строениях возле дороги можно найти еду"
+      ],
+      "i": []
+    },
+    "Это место вам понадобится позже": {
+      "s": [
+        "Это место вам понадобится позже"
+      ],
+      "i": []
+    },
+    "Это деревня исследователей": {
+      "s": [
+        "Это деревня исследователей"
+      ],
+      "i": []
+    },
+    "Идите в \u0000 по дороге": {
+      "s": [
+        "Идите в ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Каменоломню": {
+      "s": [
+        "Каменоломню"
+      ],
+      "i": []
+    },
+    "Отправляйтесь за ними в \u0000": {
+      "s": [
+        "Отправляйтесь за ними в ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Здесь нет печей для переплавки руды": {
+      "s": [
+        "Здесь нет печей для переплавки руды"
+      ],
+      "i": []
+    },
+    "Это деревня шахтеров": {
+      "s": [
+        "Это деревня шахтеров"
+      ],
+      "i": []
+    },
+    "Шахтер зовет вас наверх, чтобы поговорить!": {
+      "s": [
+        "Шахтер зовет вас наверх, чтобы поговорить!"
+      ],
+      "i": []
+    },
+    "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!": {
+      "s": [
+        "Вернитесь в шахту и вскопайте камень. Кажется, за ним прячется железо!"
+      ],
+      "i": []
+    },
+    "Добыто железной руды: \u0000/\u0000": {
+      "s": [
+        "Добыто железной руды: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Попробуйте копнуть поглубже": {
+      "s": [
+        "Попробуйте копнуть поглубже"
+      ],
+      "i": []
+    },
+    "На поверхности руд нет": {
+      "s": [
+        "На поверхности руд нет"
+      ],
+      "i": []
+    },
+    "Вернитесь к верстаку и улучшите свой инструмент.": {
+      "s": [
+        "Вернитесь к верстаку и улучшите свой инструмент."
+      ],
+      "i": []
+    },
+    "Сделайте каменную кирку": {
+      "s": [
+        "Сделайте каменную кирку"
+      ],
+      "i": []
+    },
+    "Отправляйтесь в шахту, найдите и накопайте камня.": {
+      "s": [
+        "Отправляйтесь в шахту, найдите и накопайте камня."
+      ],
+      "i": []
+    },
+    "Спуститесь в шахту и добудьте камня: \u0000/\u0000": {
+      "s": [
+        "Спуститесь в шахту и добудьте камня: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Используя верстак сделайте деревянную кирку!": {
+      "s": [
+        "Используя верстак сделайте деревянную кирку!"
+      ],
+      "i": []
+    },
+    "Сделайте деревянную кирку": {
+      "s": [
+        "Сделайте деревянную кирку"
+      ],
+      "i": []
+    },
+    "Следуя компасу, доберитесь до верстака": {
+      "s": [
+        "Следуя компасу, доберитесь до верстака"
+      ],
+      "i": []
+    },
+    "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет": {
+      "s": [
+        "Возьми в руки монеты из инвентаря и используй, чтобы добавить на свой счет"
+      ],
+      "i": []
+    },
+    "Используй монеты в инвентаре": {
+      "s": [
+        "Используй монеты в инвентаре"
+      ],
+      "i": []
+    },
+    "Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение": {
+      "s": [
+        "Не удалось найти аирдроп\nИспользуйте .wipe чтобы перепройти обучение"
+      ],
+      "i": []
+    },
+    "Заберите все из упавшего с неба сундука. На него указывает компас": {
+      "s": [
+        "Заберите все из упавшего с неба сундука. На него указывает компас"
+      ],
+      "i": []
+    },
+    "Заберите все из сундука, упавшего с неба": {
+      "s": [
+        "Заберите все из сундука, упавшего с неба"
+      ],
+      "i": []
+    },
+    "Деревья могут помешать. Выйди туда, где над тобой будет только небо": {
+      "s": [
+        "Деревья могут помешать. Выйди туда, где над тобой будет только небо"
+      ],
+      "i": []
+    },
+    "Выйди под открытое небо": {
+      "s": [
+        "Выйди под открытое небо"
+      ],
+      "i": []
+    },
+    "Нарубите дерева": {
+      "s": [
+        "Нарубите дерева"
+      ],
+      "i": []
+    },
+    "Добыто дерева: \u0000/\u0000": {
+      "s": [
+        "Добыто дерева: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы не можете покинуть зону добычи, пока не завершили задания \u0000/\u0000": {
+      "s": [
+        "Вы не можете покинуть зону добычи, пока не завершили задания ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Обучение базовым механикам сервера": {
+      "s": [
+        "Обучение базовым механикам сервера"
+      ],
+      "i": []
+    },
+    "Обучение": {
+      "s": [
+        "Обучение"
+      ],
+      "i": []
+    },
+    "Вперед!": {
+      "s": [
+        "Вперед!"
+      ],
+      "i": []
+    },
+    "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте.": {
+      "s": [
+        "Ты - выживший после апокалипсиса, которого выкинуло на берег. Ты мало чего умеешь, не можешь ломать блоки где попало и все что остается - следовать указаниям над инвентарем, следовать компасу и алмазу на миникарте."
+      ],
+      "i": []
+    },
+    "Режим Перерождение": {
+      "s": [
+        "Режим Перерождение"
+      ],
+      "i": []
+    },
+    "В мирной зоне ломать блоки запрещено.": {
+      "s": [
+        "В мирной зоне ломать блоки запрещено."
+      ],
+      "i": []
+    },
+    "Блоки можно ломать только глубоко в шахте!": {
+      "s": [
+        "Блоки можно ломать только глубоко в шахте!"
+      ],
+      "i": []
+    },
+    "Вы не можете ломать руду новичка.": {
+      "s": [
+        "Вы не можете ломать руду новичка."
+      ],
+      "i": []
+    },
+    "§r§6Начальный топор": {
+      "s": [
+        "§r§6Начальный топор"
+      ],
+      "i": []
+    },
+    "Гробовщику посвящается": {
+      "s": [
+        "Гробовщику посвящается"
+      ],
+      "i": []
+    },
+    "Гробовщик: открой 10 могил разных игроков": {
+      "s": [
+        "Гробовщик: открой 10 могил разных игроков"
+      ],
+      "i": []
+    },
+    "Сделал себя сам: Получи первые 10.000 монет": {
+      "s": [
+        "Сделал себя сам: Получи первые 10.000 монет"
+      ],
+      "i": []
+    },
+    "Активированный уголь": {
+      "s": [
+        "Активированный уголь"
+      ],
+      "i": []
+    },
+    "Железный шахтер: накопайте \u0000 железа": {
+      "s": [
+        "Железный шахтер: накопайте ",
+        " железа"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Угольный шахтер: накопайте \u0000 угля": {
+      "s": [
+        "Угольный шахтер: накопайте ",
+        " угля"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шахтер: накопайте \u0000 камня": {
+      "s": [
+        "Шахтер: накопайте ",
+        " камня"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Дровосек: нарубите \u0000 дерева": {
+      "s": [
+        "Дровосек: нарубите ",
+        " дерева"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы вошли в режим рейдблока, потому что \u0000. Некоторые функции могут быть недоступны": {
+      "s": [
+        "Вы вошли в режим рейдблока, потому что ",
+        ". Некоторые функции могут быть недоступны"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 Осталось \u0000": {
+      "s": [
+        "",
+        " Осталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы находитесь в режиме рейдблока.": {
+      "s": [
+        "Вы находитесь в режиме рейдблока."
+      ],
+      "i": []
+    },
+    "вы разрушили блок на базе": {
+      "s": [
+        "вы разрушили блок на базе"
+      ],
+      "i": []
+    },
+    "вас рейдят": {
+      "s": [
+        "вас рейдят"
+      ],
+      "i": []
+    },
+    "х2 урон!": {
+      "s": [
+        "х2 урон!"
+      ],
+      "i": []
+    },
+    "Способность": {
+      "s": [
+        "Способность"
+      ],
+      "i": []
+    },
+    "10% шанс сделать двойной урон": {
+      "s": [
+        "10% шанс сделать двойной урон"
+      ],
+      "i": []
+    },
+    "Восстанавливает вам половину наносимого этим мечом урона": {
+      "s": [
+        "Восстанавливает вам половину наносимого этим мечом урона"
+      ],
+      "i": []
+    },
+    "Неизвестная": {
+      "s": [
+        "Неизвестная"
+      ],
+      "i": []
+    },
+    "Дополнительный урон": {
+      "s": [
+        "Дополнительный урон"
+      ],
+      "i": []
+    },
+    "Вампиризм": {
+      "s": [
+        "Вампиризм"
+      ],
+      "i": []
+    },
+    "Используйте, чтобы отправить все к снежной королеве подо льдину": {
+      "s": [
+        "Используйте, чтобы отправить все к снежной королеве подо льдину"
+      ],
+      "i": []
+    },
+    "§3Снежная бомба": {
+      "s": [
+        "§3Снежная бомба"
+      ],
+      "i": []
+    },
+    "Используйте, чтобы отправить все в огненный ад": {
+      "s": [
+        "Используйте, чтобы отправить все в огненный ад"
+      ],
+      "i": []
+    },
+    "Используй этот предмет сидя на пушке": {
+      "s": [
+        "Используй этот предмет сидя на пушке"
+      ],
+      "i": []
+    },
+    "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.": {
+      "s": [
+        "Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя."
+      ],
+      "i": []
+    },
+    "Используй этот предмет, чтобы установить пушку": {
+      "s": [
+        "Используй этот предмет, чтобы установить пушку"
+      ],
+      "i": []
+    },
+    "Возьми у меня задание и отправляйся в другое поселение следуя компасу.": {
+      "s": [
+        "Возьми у меня задание и отправляйся в другое поселение следуя компасу."
+      ],
+      "i": []
+    },
+    "Как мне переплавить руду?": {
+      "s": [
+        "Как мне переплавить руду?"
+      ],
+      "i": []
+    },
+    "Они есть... просто они сидят дома и смотрят стрим @shp1natqp": {
+      "s": [
+        "Они есть... просто они сидят дома и смотрят стрим @shp1natqp"
+      ],
+      "i": []
+    },
+    "Почему тут нет жителей?": {
+      "s": [
+        "Почему тут нет жителей?"
+      ],
+      "i": []
+    },
+    "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате.": {
+      "s": [
+        "Это стартовый аирдроп. Подобными переодически снабжают выживших. Отслеживать аирдропы можно на карте или в чате."
+      ],
+      "i": []
+    },
+    "Сверху упал сундук, что это?": {
+      "s": [
+        "Сверху упал сундук, что это?"
+      ],
+      "i": []
+    },
+    "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты.": {
+      "s": [
+        "Мне не платят, мне просто интересно смотреть за развитием таких лошков новичков, как ты."
+      ],
+      "i": []
+    },
+    "Сколько тебе платят?": {
+      "s": [
+        "Сколько тебе платят?"
+      ],
+      "i": []
+    },
+    "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков.": {
+      "s": [
+        "Она в целом очень опасная и скрывает множество тайн. Я бы не советовал далеко отходить от опор и мостиков."
+      ],
+      "i": []
+    },
+    "Я могу потеряться в шахте?": {
+      "s": [
+        "Я могу потеряться в шахте?"
+      ],
+      "i": []
+    },
+    "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей.": {
+      "s": [
+        "Это магическая шахта. Она сама восстанавливается через некоторое время. Как ты заметил, руду на поверхности ты не найдёшь, так что копай вглубь по бокам тунелей."
+      ],
+      "i": []
+    },
+    "Почему шахта такая странная?": {
+      "s": [
+        "Почему шахта такая странная?"
+      ],
+      "i": []
+    },
+    "Можно узнать это, если посмотреть на карту и присесть.": {
+      "s": [
+        "Можно узнать это, если посмотреть на карту и присесть."
+      ],
+      "i": []
+    },
+    "Сколько ещё сохранилось поселений?": {
+      "s": [
+        "Сколько ещё сохранилось поселений?"
+      ],
+      "i": []
+    },
+    "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении.": {
+      "s": [
+        "Нет, у меня есть коллеги. Особый путеводитель есть в каждом поселении."
+      ],
+      "i": []
+    },
+    "Ты единственный путеводитель??": {
+      "s": [
+        "Ты единственный путеводитель??"
+      ],
+      "i": []
+    },
+    "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны.": {
+      "s": [
+        "Это поселение называется \"Деревня Шахтеров\" - одно из сохранившихся поселений после войны."
+      ],
+      "i": []
+    },
+    "Где я?": {
+      "s": [
+        "Где я?"
+      ],
+      "i": []
+    },
+    "Шахтер": {
+      "s": [
+        "Шахтер"
+      ],
+      "i": []
+    },
+    "Деревня шахтеров": {
+      "s": [
+        "Деревня шахтеров"
+      ],
+      "i": []
+    },
+    "Добыть алмазы": {
+      "s": [
+        "Добыть алмазы"
+      ],
+      "i": []
+    },
+    "Добыть уголь": {
+      "s": [
+        "Добыть уголь"
+      ],
+      "i": []
+    },
+    "Добыть железо": {
+      "s": [
+        "Добыть железо"
+      ],
+      "i": []
+    },
+    "Копать нужно на высоте \u0000..\u0000. Ваш y = \u0000": {
+      "s": [
+        "Копать нужно на высоте ",
+        "..",
+        ". Ваш y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!": {
+      "s": [
+        "Спустись в шахту в деревне шахтеров и вскопай указанный ресурс!"
+      ],
+      "i": []
+    },
+    "А где мне базу сделать-то?": {
+      "s": [
+        "А где мне базу сделать-то?"
+      ],
+      "i": []
+    },
+    "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ": {
+      "s": [
+        "Исследователи тип, не понял что ли, глупик, путешествуй смотри наслаждайся, ИССЛЕДУЙ"
+      ],
+      "i": []
+    },
+    "Исследователь": {
+      "s": [
+        "Исследователь"
+      ],
+      "i": []
+    },
+    "Деревня исследователей": {
+      "s": [
+        "Деревня исследователей"
+      ],
+      "i": []
+    },
+    "§a§lМагический слайм": {
+      "s": [
+        "§a§lМагический слайм"
+      ],
+      "i": []
+    },
+    "§8Зачарование несовместимо": {
+      "s": [
+        "§8Зачарование несовместимо"
+      ],
+      "i": []
+    },
+    "Максимальный уровень": {
+      "s": [
+        "Максимальный уровень"
+      ],
+      "i": []
+    },
+    "Уровень зачара предмета как у книжки": {
+      "s": [
+        "Уровень зачара предмета как у книжки"
+      ],
+      "i": []
+    },
+    "Уровень зачара предмета уже выше книжки": {
+      "s": [
+        "Уровень зачара предмета уже выше книжки"
+      ],
+      "i": []
+    },
+    "С чарками такого уровня не работаю, слетят": {
+      "s": [
+        "С чарками такого уровня не работаю, слетят"
+      ],
+      "i": []
+    },
+    "любой зачарованный предмет": {
+      "s": [
+        "любой зачарованный предмет"
+      ],
+      "i": []
+    },
+    "Отсортировать чарки": {
+      "s": [
+        "Отсортировать чарки"
+      ],
+      "i": []
+    },
+    "Зелья": {
+      "s": [
+        "Зелья"
+      ],
+      "i": []
+    },
+    "Грибы": {
+      "s": [
+        "Грибы"
+      ],
+      "i": []
+    },
+    "Все для магии": {
+      "s": [
+        "Все для магии"
+      ],
+      "i": []
+    },
+    "§r§fМеч со способностью §7\u0000": {
+      "s": [
+        "§r§fМеч со способностью §7",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Оружие со способностями": {
+      "s": [
+        "Оружие со способностями"
+      ],
+      "i": []
+    },
+    "Зачаровать": {
+      "s": [
+        "Зачаровать"
+      ],
+      "i": []
+    },
+    "Выбранная книга: \u0000": {
+      "s": [
+        "Выбранная книга: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Предмет для зачарования": {
+      "s": [
+        "Предмет для зачарования"
+      ],
+      "i": []
+    },
+    "Предмет": {
+      "s": [
+        "Предмет"
+      ],
+      "i": []
+    },
+    "Нет зачарований": {
+      "s": [
+        "Нет зачарований"
+      ],
+      "i": []
+    },
+    "Использовать книгу чар": {
+      "s": [
+        "Использовать книгу чар"
+      ],
+      "i": []
+    },
+    "любые топор, кирка, мотыга или лопата": {
+      "s": [
+        "любые топор, кирка, мотыга или лопата"
+      ],
+      "i": []
+    },
+    "Улучшить инструмент": {
+      "s": [
+        "Улучшить инструмент"
+      ],
+      "i": []
+    },
+    "любой элемент брони": {
+      "s": [
+        "любой элемент брони"
+      ],
+      "i": []
+    },
+    "Улучшить броню": {
+      "s": [
+        "Улучшить броню"
+      ],
+      "i": []
+    },
+    "любой лук": {
+      "s": [
+        "любой лук"
+      ],
+      "i": []
+    },
+    "Улучшить лук": {
+      "s": [
+        "Улучшить лук"
+      ],
+      "i": []
+    },
+    "любой меч": {
+      "s": [
+        "любой меч"
+      ],
+      "i": []
+    },
+    "Улучшить меч": {
+      "s": [
+        "Улучшить меч"
+      ],
+      "i": []
+    },
+    "Чего пожелаешь?": {
+      "s": [
+        "Чего пожелаешь?"
+      ],
+      "i": []
+    },
+    "Маг": {
+      "s": [
+        "Маг"
+      ],
+      "i": []
+    },
+    "Технограда": {
+      "s": [
+        "Технограда"
+      ],
+      "i": []
+    },
+    "Зачаруйте любой предмет у Мага": {
+      "s": [
+        "Зачаруйте любой предмет у Мага"
+      ],
+      "i": []
+    },
+    "Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание": {
+      "s": [
+        "Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание"
+      ],
+      "i": []
+    },
+    "Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание": {
+      "s": [
+        "Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание"
+      ],
+      "i": []
+    },
+    "Посетите Мага": {
+      "s": [
+        "Посетите Мага"
+      ],
+      "i": []
+    },
+    "Мага": {
+      "s": [
+        "Мага"
+      ],
+      "i": []
+    },
+    "У \u0000 можно зачаровать предметы": {
+      "s": [
+        "У ",
+        " можно зачаровать предметы"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Магическому слайму": {
+      "s": [
+        "Магическому слайму"
+      ],
+      "i": []
+    },
+    "Вардену": {
+      "s": [
+        "Вардену"
+      ],
+      "i": []
+    },
+    "Здесь есть шахта, ведущая к \u0000 и \u0000": {
+      "s": [
+        "Здесь есть шахта, ведущая к ",
+        " и ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Приветствуем в нашей деревне!": {
+      "s": [
+        "Приветствуем в нашей деревне!"
+      ],
+      "i": []
+    },
+    "Ну крутой техно типо не понял что ли": {
+      "s": [
+        "Ну крутой техно типо не понял что ли"
+      ],
+      "i": []
+    },
+    "Техник": {
+      "s": [
+        "Техник"
+      ],
+      "i": []
+    },
+    "Техноград": {
+      "s": [
+        "Техноград"
+      ],
+      "i": []
+    },
+    "Используется у Инженера": {
+      "s": [
+        "Используется у Инженера"
+      ],
+      "i": []
+    },
+    "§aМагическая слизь": {
+      "s": [
+        "§aМагическая слизь"
+      ],
+      "i": []
+    },
+    "Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу": {
+      "s": [
+        "Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу"
+      ],
+      "i": []
+    },
+    "Только я могу ее собрать": {
+      "s": [
+        "Только я могу ее собрать"
+      ],
+      "i": []
+    },
+    "База - самый дорогой предмет в нашу эпоху, для нее нужно много ресурсов": {
+      "s": [
+        "База - самый дорогой предмет в нашу эпоху, для нее нужно много ресурсов"
+      ],
+      "i": []
+    },
+    "Базу": {
+      "s": [
+        "Базу"
+      ],
+      "i": []
+    },
+    "...мы изобрели \u0000": {
+      "s": [
+        "...мы изобрели ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "...и не были разворованы другими выжившими...": {
+      "s": [
+        "...и не были разворованы другими выжившими..."
+      ],
+      "i": []
+    },
+    "Чтобы ваши постройки не разложились из-за радиации...": {
+      "s": [
+        "Чтобы ваши постройки не разложились из-за радиации..."
+      ],
+      "i": []
+    },
+    "База": {
+      "s": [
+        "База"
+      ],
+      "i": []
+    },
+    "Инженеру": {
+      "s": [
+        "Инженеру"
+      ],
+      "i": []
+    },
+    "Идите к \u0000, он расскажет вам что такое \u0000": {
+      "s": [
+        "Идите к ",
+        ", он расскажет вам что такое ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "И переняли уцелевшие технологии прошлой эпохи": {
+      "s": [
+        "И переняли уцелевшие технологии прошлой эпохи"
+      ],
+      "i": []
+    },
+    "Мы обосновались вокруг озера, оставшегося после взрыва бункера": {
+      "s": [
+        "Мы обосновались вокруг озера, оставшегося после взрыва бункера"
+      ],
+      "i": []
+    },
+    "Приветствуем в самом технологичном городе!": {
+      "s": [
+        "Приветствуем в самом технологичном городе!"
+      ],
+      "i": []
+    },
+    "§b§lКамнедробилка": {
+      "s": [
+        "§b§lКамнедробилка"
+      ],
+      "i": []
+    },
+    "§6§lРобот": {
+      "s": [
+        "§6§lРобот"
+      ],
+      "i": []
+    },
+    "Все для редстоуна": {
+      "s": [
+        "Все для редстоуна"
+      ],
+      "i": []
+    },
+    "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n": {
+      "s": [
+        "Ну типа дай мне чертеж, a я те чета там наколупаю, да\r\n"
+      ],
+      "i": []
+    },
+    "Инженер": {
+      "s": [
+        "Инженер"
+      ],
+      "i": []
+    },
+    "Вы не можете купить это в режиме новичка": {
+      "s": [
+        "Вы не можете купить это в режиме новичка"
+      ],
+      "i": []
+    },
+    "Используется для создания платы у Инжинера в Технограде": {
+      "s": [
+        "Используется для создания платы у Инжинера в Технограде"
+      ],
+      "i": []
+    },
+    "Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота": {
+      "s": [
+        "Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота"
+      ],
+      "i": []
+    },
+    "Деревни исследователей": {
+      "s": [
+        "Деревни исследователей"
+      ],
+      "i": []
+    },
+    "Доберитесь до \u0000 по дороге": {
+      "s": [
+        "Доберитесь до ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сделайте железные ботинки": {
+      "s": [
+        "Сделайте железные ботинки"
+      ],
+      "i": []
+    },
+    "Сделайте железные поножи": {
+      "s": [
+        "Сделайте железные поножи"
+      ],
+      "i": []
+    },
+    "Сделайте железный шлем": {
+      "s": [
+        "Сделайте железный шлем"
+      ],
+      "i": []
+    },
+    "Сделайте железный нагрудник": {
+      "s": [
+        "Сделайте железный нагрудник"
+      ],
+      "i": []
+    },
+    "Сделайте железный меч": {
+      "s": [
+        "Сделайте железный меч"
+      ],
+      "i": []
+    },
+    "Сделайте железную кирку": {
+      "s": [
+        "Сделайте железную кирку"
+      ],
+      "i": []
+    },
+    "Переплавьте необработанное железо в слиток": {
+      "s": [
+        "Переплавьте необработанное железо в слиток"
+      ],
+      "i": []
+    },
+    "Откройте печку с помощью ключа": {
+      "s": [
+        "Откройте печку с помощью ключа"
+      ],
+      "i": []
+    },
+    "Купите у \u0000 ключ доступа к печам": {
+      "s": [
+        "Купите у ",
+        " ключ доступа к печам"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Печкина": {
+      "s": [
+        "Печкина"
+      ],
+      "i": []
+    },
+    "У \u0000 можно купить ключ доступа к печам": {
+      "s": [
+        "У ",
+        " можно купить ключ доступа к печам"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Мы специализируемся на обработке руды": {
+      "s": [
+        "Мы специализируемся на обработке руды"
+      ],
+      "i": []
+    },
+    "Приветствуем в самом старом и большом городе новой эпохи!": {
+      "s": [
+        "Приветствуем в самом старом и большом городе новой эпохи!"
+      ],
+      "i": []
+    },
+    "Ну типа крутой камни ломаем вот да": {
+      "s": [
+        "Ну типа крутой камни ломаем вот да"
+      ],
+      "i": []
+    },
+    "А что за город": {
+      "s": [
+        "А что за город"
+      ],
+      "i": []
+    },
+    "Ломщик": {
+      "s": [
+        "Ломщик"
+      ],
+      "i": []
+    },
+    "У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n": {
+      "s": [
+        "У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n"
+      ],
+      "i": []
+    },
+    "Баба Валя": {
+      "s": [
+        "Баба Валя"
+      ],
+      "i": []
+    },
+    "У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n": {
+      "s": [
+        "У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n"
+      ],
+      "i": []
+    },
+    "Печкин": {
+      "s": [
+        "Печкин"
+      ],
+      "i": []
+    },
+    "Каменоломня": {
+      "s": [
+        "Каменоломня"
+      ],
+      "i": []
+    },
+    "Онет, кажется, зачарование \u0000 уровнем \u0000 потерялось...": {
+      "s": [
+        "Онет, кажется, зачарование ",
+        " уровнем ",
+        " потерялось..."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Зачарование \u0000 не удалось перенести.": {
+      "s": [
+        "Зачарование ",
+        " не удалось перенести."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Предмет целый, выберите другой": {
+      "s": [
+        "Предмет целый, выберите другой"
+      ],
+      "i": []
+    },
+    "Любой поломанный предмет": {
+      "s": [
+        "Любой поломанный предмет"
+      ],
+      "i": []
+    },
+    "Починить": {
+      "s": [
+        "Починить"
+      ],
+      "i": []
+    },
+    "Улучшить": {
+      "s": [
+        "Улучшить"
+      ],
+      "i": []
+    },
+    "Алмазный меч/инструмент/броня": {
+      "s": [
+        "Алмазный меч/инструмент/броня"
+      ],
+      "i": []
+    },
+    "Улучшить до незерита": {
+      "s": [
+        "Улучшить до незерита"
+      ],
+      "i": []
+    },
+    "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.": {
+      "s": [
+        "Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы."
+      ],
+      "i": []
+    },
+    "Оружейник": {
+      "s": [
+        "Оружейник"
+      ],
+      "i": []
+    },
+    "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n": {
+      "s": [
+        "Wtf ой то есть мне пока нечего тебе предложить\r\n\r\n"
+      ],
+      "i": []
+    },
+    "Кучер": {
+      "s": [
+        "Кучер"
+      ],
+      "i": []
+    },
+    "Вино": {
+      "s": [
+        "Вино"
+      ],
+      "i": []
+    },
+    "Настойка из шпината": {
+      "s": [
+        "Настойка из шпината"
+      ],
+      "i": []
+    },
+    "Сидр": {
+      "s": [
+        "Сидр"
+      ],
+      "i": []
+    },
+    "Пиво": {
+      "s": [
+        "Пиво"
+      ],
+      "i": []
+    },
+    "Квас": {
+      "s": [
+        "Квас"
+      ],
+      "i": []
+    },
+    "Ну что, устал от жизни? Пришел попить?\n\n": {
+      "s": [
+        "Ну что, устал от жизни? Пришел попить?\n\n"
+      ],
+      "i": []
+    },
+    "Бармен": {
+      "s": [
+        "Бармен"
+      ],
+      "i": []
+    },
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на \u0000, ключ: \u0000": {
+      "s": [
+        "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ",
+        ", ключ: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§r§cВремя истекло": {
+      "s": [
+        "§r§cВремя истекло"
+      ],
+      "i": []
+    },
+    "§r§6Печка плавит...": {
+      "s": [
+        "§r§6Печка плавит..."
+      ],
+      "i": []
+    },
+    "§r§aНе использован": {
+      "s": [
+        "§r§aНе использован"
+      ],
+      "i": []
+    },
+    "Статус": {
+      "s": [
+        "Статус"
+      ],
+      "i": []
+    },
+    "На": {
+      "s": [
+        "На"
+      ],
+      "i": []
+    },
+    "Неизвестен": {
+      "s": [
+        "Неизвестен"
+      ],
+      "i": []
+    },
+    "Продавец": {
+      "s": [
+        "Продавец"
+      ],
+      "i": []
+    },
+    "§7Открывает печку в каменоломне.": {
+      "s": [
+        "§7Открывает печку в каменоломне."
+      ],
+      "i": []
+    },
+    "§6Ключ от печки": {
+      "s": [
+        "§6Ключ от печки"
+      ],
+      "i": []
+    },
+    "Использован ключ из слота \u0000": {
+      "s": [
+        "Использован ключ из слота ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже использовали этот ключ для другой печки.": {
+      "s": [
+        "Вы уже использовали этот ключ для другой печки."
+      ],
+      "i": []
+    },
+    "Ваш клан уже занял \u0000/3 печек.": {
+      "s": [
+        "Ваш клан уже занял ",
+        "/3 печек."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже заняли \u0000/3 печек.": {
+      "s": [
+        "Вы уже заняли ",
+        "/3 печек."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Эта печка уже занята. Печка освободится через \u0000, ключ: \u0000": {
+      "s": [
+        "Эта печка уже занята. Печка освободится через ",
+        ", ключ: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке": {
+      "s": [
+        "Ключ истек. Купите новый, если вам нужно забрать ресурсы, оставшиеся в этой печке"
+      ],
+      "i": []
+    },
+    "Этот ключ используется для других печек!": {
+      "s": [
+        "Этот ключ используется для других печек!"
+      ],
+      "i": []
+    },
+    "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!": {
+      "s": [
+        "Для использования печек вам нужно купить ключ у печкина и держать его в инвентаре!"
+      ],
+      "i": []
+    },
+    "Ключ от печки": {
+      "s": [
+        "Ключ от печки"
+      ],
+      "i": []
+    },
+    "Сдать неиспользуемый ключ": {
+      "s": [
+        "Сдать неиспользуемый ключ"
+      ],
+      "i": []
+    },
+    "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!": {
+      "s": [
+        "Ключ теперь привязан к этой печке! В течении часа вы можете открывать ее с помощью этого ключа!"
+      ],
+      "i": []
+    },
+    "§r§bПеремещает на спавн": {
+      "s": [
+        "§r§bПеремещает на спавн"
+      ],
+      "i": []
+    },
+    "Определяет, будете ли вы телепортироваться на спавн при входе": {
+      "s": [
+        "Определяет, будете ли вы телепортироваться на спавн при входе"
+      ],
+      "i": []
+    },
+    "Телепорт на спавн": {
+      "s": [
+        "Телепорт на спавн"
+      ],
+      "i": []
+    },
+    "Вход": {
+      "s": [
+        "Вход"
+      ],
+      "i": []
+    },
+    "Общее": {
+      "s": [
+        "Общее"
+      ],
+      "i": []
+    },
+    "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n": {
+      "s": [
+        "Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n"
+      ],
+      "i": []
+    },
+    "Тетя Зина": {
+      "s": [
+        "Тетя Зина"
+      ],
+      "i": []
+    },
+    "§7Шахта": {
+      "s": [
+        "§7Шахта"
+      ],
+      "i": []
+    },
+    "Порталы": {
+      "s": [
+        "Порталы"
+      ],
+      "i": []
+    },
+    "Перемещение...": {
+      "s": [
+        "Перемещение..."
+      ],
+      "i": []
+    },
+    "Портал в это поселение не разблокирован": {
+      "s": [
+        "Портал в это поселение не разблокирован"
+      ],
+      "i": []
+    },
+    "Мирная зона": {
+      "s": [
+        "Мирная зона"
+      ],
+      "i": []
+    },
+    "Открыт новый портал! [Когда-нибудь здесь будет анимация...]": {
+      "s": [
+        "Открыт новый портал! [Когда-нибудь здесь будет анимация...]"
+      ],
+      "i": []
+    },
+    "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n": {
+      "s": [
+        "Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n"
+      ],
+      "i": []
+    },
+    "Дровосек": {
+      "s": [
+        "Дровосек"
+      ],
+      "i": []
+    },
+    "А камень я тебе дам.\n\n": {
+      "s": [
+        "А камень я тебе дам.\n\n"
+      ],
+      "i": []
+    },
+    "Каменщик": {
+      "s": [
+        "Каменщик"
+      ],
+      "i": []
+    },
+    "Любой непродаваемый предмет": {
+      "s": [
+        "Любой непродаваемый предмет"
+      ],
+      "i": []
+    },
+    "Любой предмет": {
+      "s": [
+        "Любой предмет"
+      ],
+      "i": []
+    },
+    "Продай мне весь свой мусор": {
+      "s": [
+        "Продай мне весь свой мусор"
+      ],
+      "i": []
+    },
+    "Мусорщик": {
+      "s": [
+        "Мусорщик"
+      ],
+      "i": []
+    },
+    "Украшения я делать пока не умею.\n\n": {
+      "s": [
+        "Украшения я делать пока не умею.\n\n"
+      ],
+      "i": []
+    },
+    "Ювелир": {
+      "s": [
+        "Ювелир"
+      ],
+      "i": []
+    },
+    "И рыбник.\n\n": {
+      "s": [
+        "И рыбник.\n\n"
+      ],
+      "i": []
+    },
+    "Мясник": {
+      "s": [
+        "Мясник"
+      ],
+      "i": []
+    },
+    "Сходи в город, сделай запланированые покупки": {
+      "s": [
+        "Сходи в город, сделай запланированые покупки"
+      ],
+      "i": []
+    },
+    "Посети город": {
+      "s": [
+        "Посети город"
+      ],
+      "i": []
+    },
+    "§9Хранилище": {
+      "s": [
+        "§9Хранилище"
+      ],
+      "i": []
+    },
+    "§bУсиленный": {
+      "s": [
+        "§bУсиленный"
+      ],
+      "i": []
+    },
+    "§7Обычный": {
+      "s": [
+        "§7Обычный"
+      ],
+      "i": []
+    },
+    "Исследуйте новый город!": {
+      "s": [
+        "Исследуйте новый город!"
+      ],
+      "i": []
+    },
+    "Доберитесь до города!": {
+      "s": [
+        "Доберитесь до города!"
+      ],
+      "i": []
+    },
+    "\u0000: задание исследования не настроено!": {
+      "s": [
+        "",
+        ": задание исследования не настроено!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до указанного города или деревни": {
+      "s": [
+        "Доберитесь до указанного города или деревни"
+      ],
+      "i": []
+    },
+    "§dНезеритовая жила": {
+      "s": [
+        "§dНезеритовая жила"
+      ],
+      "i": []
+    },
+    "Может появиться в сундуке внутри кучи древних обломков": {
+      "s": [
+        "Может появиться в сундуке внутри кучи древних обломков"
+      ],
+      "i": []
+    },
+    "Лежит группами по 5-10 блоков рядом с сундуками": {
+      "s": [
+        "Лежит группами по 5-10 блоков рядом с сундуками"
+      ],
+      "i": []
+    },
+    "§5Варден": {
+      "s": [
+        "§5Варден"
+      ],
+      "i": []
+    },
+    "§cПалатка аванпоста": {
+      "s": [
+        "§cПалатка аванпоста"
+      ],
+      "i": []
+    },
+    "§4Бункер": {
+      "s": [
+        "§4Бункер"
+      ],
+      "i": []
+    },
+    "§cАванпост": {
+      "s": [
+        "§cАванпост"
+      ],
+      "i": []
+    },
+    "Гараж": {
+      "s": [
+        "Гараж"
+      ],
+      "i": []
+    },
+    "Заправка 4": {
+      "s": [
+        "Заправка 4"
+      ],
+      "i": []
+    },
+    "Заправка 3": {
+      "s": [
+        "Заправка 3"
+      ],
+      "i": []
+    },
+    "Заправка 2": {
+      "s": [
+        "Заправка 2"
+      ],
+      "i": []
+    },
+    "Заправка 1": {
+      "s": [
+        "Заправка 1"
+      ],
+      "i": []
+    },
+    "Поставьте эту бочку и она станет базой.": {
+      "s": [
+        "Поставьте эту бочку и она станет базой."
+      ],
+      "i": []
+    },
+    "§6База": {
+      "s": [
+        "§6База"
+      ],
+      "i": []
+    },
+    "§6Ваша база \u0000": {
+      "s": [
+        "§6Ваша база ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "(разрушена)": {
+      "s": [
+        "(разрушена)"
+      ],
+      "i": []
+    },
+    "(гниет)": {
+      "s": [
+        "(гниет)"
+      ],
+      "i": []
+    },
+    "Данж": {
+      "s": [
+        "Данж"
+      ],
+      "i": []
+    },
+    "Телепорт!": {
+      "s": [
+        "Телепорт!"
+      ],
+      "i": []
+    },
+    "\n\nКоординаты: \u0000\nРадиус: \u0000": {
+      "s": [
+        "\n\nКоординаты: ",
+        "\nРадиус: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "База игрока \u0000": {
+      "s": [
+        "База игрока ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Это ваша база.": {
+      "s": [
+        "Это ваша база."
+      ],
+      "i": []
+    },
+    "У вас нет базы! Вступите в существующую или создайте свою.": {
+      "s": [
+        "У вас нет базы! Вступите в существующую или создайте свою."
+      ],
+      "i": []
+    },
+    "Меню базы": {
+      "s": [
+        "Меню базы"
+      ],
+      "i": []
+    },
+    "База гниет! Положите материалы из .base -> Гниение в бочку": {
+      "s": [
+        "База гниет! Положите материалы из .base -> Гниение в бочку"
+      ],
+      "i": []
+    },
+    "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью": {
+      "s": [
+        "База была зарейжена. Сожалеем. Вы все еще можете восстановить ее, если она не сгнила полностью"
+      ],
+      "i": []
+    },
+    "Нужно срочно положить материалы в бочку!": {
+      "s": [
+        "Нужно срочно положить материалы в бочку!"
+      ],
+      "i": []
+    },
+    "База с владельцем \u0000 \u0000.": {
+      "s": [
+        "База с владельцем ",
+        " ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "разрушена": {
+      "s": [
+        "разрушена"
+      ],
+      "i": []
+    },
+    "гниет": {
+      "s": [
+        "гниет"
+      ],
+      "i": []
+    },
+    "Состояние базы": {
+      "s": [
+        "Состояние базы"
+      ],
+      "i": []
+    },
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на \u0000!": {
+      "s": [
+        "§cБаза разрушена!\n§4Срочно поставьте блок базы на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§cБаза гниет!\n§4Срочно пополните материалы!": {
+      "s": [
+        "§cБаза гниет!\n§4Срочно пополните материалы!"
+      ],
+      "i": []
+    },
+    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n\u0000\nМатериалы в бочке:\n\u0000\n\u0000\nДо следующего сбора ресурсов: \u0000": {
+      "s": [
+        "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n",
+        "\nМатериалы в бочке:\n",
+        "\n",
+        "\nДо следующего сбора ресурсов: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Гниение базы": {
+      "s": [
+        "Гниение базы"
+      ],
+      "i": []
+    },
+    "Не хватает ресурсов:\n\u0000": {
+      "s": [
+        "Не хватает ресурсов:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Всех материалов хватает!\nБаза защищена от гниения на \u0000§r\n": {
+      "s": [
+        "Всех материалов хватает!\nБаза защищена от гниения на ",
+        "§r\n"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "скоро начнется гниение": {
+      "s": [
+        "скоро начнется гниение"
+      ],
+      "i": []
+    },
+    "База успешно создана! Чтобы открыть меню базы используйте команду \u0000": {
+      "s": [
+        "База успешно создана! Чтобы открыть меню базы используйте команду ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Рядом есть другие регионы!": {
+      "s": [
+        "Рядом есть другие регионы!"
+      ],
+      "i": []
+    },
+    "состоите в базе игрока '\u0000'": {
+      "s": [
+        "состоите в базе игрока '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "владеете базой": {
+      "s": [
+        "владеете базой"
+      ],
+      "i": []
+    },
+    "§cВы уже \u0000!": {
+      "s": [
+        "§cВы уже ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нельзя создать базу на высоте ниже \u0000!": {
+      "s": [
+        "Нельзя создать базу на высоте ниже ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Теперь вы можете свободно создать базу!": {
+      "s": [
+        "Теперь вы можете свободно создать базу!"
+      ],
+      "i": []
+    },
+    "решили создать базу": {
+      "s": [
+        "решили создать базу"
+      ],
+      "i": []
+    },
+    "Улучшить базу: \u0000": {
+      "s": [
+        "Улучшить базу: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 (радиус \u0000 -> \u0000)": {
+      "s": [
+        "",
+        " (радиус ",
+        " -> ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Максимальный уровень\n\u0000": {
+      "s": [
+        "Максимальный уровень\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Очень высокая радиация!": {
+      "s": [
+        "Очень высокая радиация!"
+      ],
+      "i": []
+    },
+    "Высокая радиация!": {
+      "s": [
+        "Высокая радиация!"
+      ],
+      "i": []
+    },
+    "Вода. Попытка \u0000/\u0000": {
+      "s": [
+        "Вода. Попытка ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Найдено!": {
+      "s": [
+        "Найдено!"
+      ],
+      "i": []
+    },
+    "Поиск случайной локации без воды...": {
+      "s": [
+        "Поиск случайной локации без воды..."
+      ],
+      "i": []
+    },
+    "Кварцевое озеро": {
+      "s": [
+        "Кварцевое озеро"
+      ],
+      "i": []
+    },
+    "Успех! Теперь вы можете использовать \u0000 для перемещения на случайную позицию.": {
+      "s": [
+        "Успех! Теперь вы можете использовать ",
+        " для перемещения на случайную позицию."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку": {
+      "s": [
+        "Очищает сохраненную точку анархии. При перемещении на анархию вы будете выброшены в случайную точку"
+      ],
+      "i": []
+    },
+    "§bПеремещает на анархию": {
+      "s": [
+        "§bПеремещает на анархию"
+      ],
+      "i": []
+    },
+    "Вы уже находитесь на анархии! Если это не так, используйте \u0000": {
+      "s": [
+        "Вы уже находитесь на анархии! Если это не так, используйте ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Радиус границы анархии сейчас: \u0000": {
+      "s": [
+        "Радиус границы анархии сейчас: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выдает радиус границы анархии сейчас": {
+      "s": [
+        "Выдает радиус границы анархии сейчас"
+      ],
+      "i": []
+    },
+    "Обычный аирдроп скоро упадет на \u0000!": {
+      "s": [
+        "Обычный аирдроп скоро упадет на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Усиленный аирдроп скоро упадет на \u0000!": {
+      "s": [
+        "Усиленный аирдроп скоро упадет на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "вы атаковали игрока": {
+      "s": [
+        "вы атаковали игрока"
+      ],
+      "i": []
+    },
+    "Нельзя сражаться с новичками!": {
+      "s": [
+        "Нельзя сражаться с новичками!"
+      ],
+      "i": []
+    },
+    "Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи": {
+      "s": [
+        "Вы не можете ломать не поставленные игроками блоки\nвне вашей базы, шахты или зоны добычи"
+      ],
+      "i": []
+    },
+    "Вы вышли из сервера во время сражения, поэтому были убиты при входе.": {
+      "s": [
+        "Вы вышли из сервера во время сражения, поэтому были убиты при входе."
+      ],
+      "i": []
+    },
+    "Вы находитесь в режиме сражения!": {
+      "s": [
+        "Вы находитесь в режиме сражения!"
+      ],
+      "i": []
+    },
+    "Звук попадания по существо из лука": {
+      "s": [
+        "Звук попадания по существо из лука"
+      ],
+      "i": []
+    },
+    "Звук лука": {
+      "s": [
+        "Звук лука"
+      ],
+      "i": []
+    },
+    "Индикатор попадания по существу из лука": {
+      "s": [
+        "Индикатор попадания по существу из лука"
+      ],
+      "i": []
+    },
+    "Индикатор": {
+      "s": [
+        "Индикатор"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите удалить точку восстановления?": {
+      "s": [
+        "Вы уверены что хотите удалить точку восстановления?"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено": {
+      "s": [
+        "Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено"
+      ],
+      "i": []
+    },
+    "Загрузиться": {
+      "s": [
+        "Загрузиться"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено": {
+      "s": [
+        "Вы уверены что хотите перезаписать точку восстановления ИЗ ТЕКУЩЕГО СОСТОЯНИЯ? Текущее сохранение точки восстановления будет удалено"
+      ],
+      "i": []
+    },
+    "Точки восстановления других игроков": {
+      "s": [
+        "Точки восстановления других игроков"
+      ],
+      "i": []
+    },
+    "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:": {
+      "s": [
+        "§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ\n\n§f\nСохраняются:\nПозиция в мирe\nЗадания\nИнвентарь\nОпыт\nМонеты\nСтатистика\nНазвание точки восстановления:"
+      ],
+      "i": []
+    },
+    "Создать точку восстановления": {
+      "s": [
+        "Создать точку восстановления"
+      ],
+      "i": []
+    },
+    "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения": {
+      "s": [
+        "Вы уверены, что хотите очистить инвентарь анархии и вернуться на спавн? Полезно для тестирования обучения"
+      ],
+      "i": []
+    },
+    "Полный сброс": {
+      "s": [
+        "Полный сброс"
+      ],
+      "i": []
+    },
+    "Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ": {
+      "s": [
+        "Точки восстановления, нужные для тестирования\n\n§cЭНДЕР СУНДУК НЕ СОХРАНЯЕТСЯ"
+      ],
+      "i": []
+    },
+    "Сохранения": {
+      "s": [
+        "Сохранения"
+      ],
+      "i": []
+    },
+    "Очищает и сохраняет все данные (для тестов)": {
+      "s": [
+        "Очищает и сохраняет все данные (для тестов)"
+      ],
+      "i": []
+    },
+    "Вы не можете создать точку восстановления не находясь в выживании или приключении": {
+      "s": [
+        "Вы не можете создать точку восстановления не находясь в выживании или приключении"
+      ],
+      "i": []
+    },
+    "Вы не можете создать точку восстановления не находясь на анархии": {
+      "s": [
+        "Вы не можете создать точку восстановления не находясь на анархии"
+      ],
+      "i": []
+    },
+    "Инструмент скоро сломается! \u0000/\u0000 (\u0000%)": {
+      "s": [
+        "Инструмент скоро сломается! ",
+        "/",
+        " (",
+        "%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.": {
+      "s": [
+        "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен."
+      ],
+      "i": []
+    },
+    "Не давать ломать предмет": {
+      "s": [
+        "Не давать ломать предмет"
+      ],
+      "i": []
+    },
+    "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран": {
+      "s": [
+        "Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран"
+      ],
+      "i": []
+    },
+    "Уведомлять о ломающемся предмете": {
+      "s": [
+        "Уведомлять о ломающемся предмете"
+      ],
+      "i": []
+    },
+    "Версия майнкрафта": {
+      "s": [
+        "Версия майнкрафта"
+      ],
+      "i": []
+    },
+    "Версия сервера": {
+      "s": [
+        "Версия сервера"
+      ],
+      "i": []
+    },
+    "Нанесено/Получено": {
+      "s": [
+        "Нанесено/Получено"
+      ],
+      "i": []
+    },
+    "Убийств/Смертей": {
+      "s": [
+        "Убийств/Смертей"
+      ],
+      "i": []
+    },
+    "Анархия \u0000": {
+      "s": [
+        "Анархия ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Статистика игрока \u0000": {
+      "s": [
+        "Статистика игрока ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Показывает статистику по игре": {
+      "s": [
+        "Показывает статистику по игре"
+      ],
+      "i": []
+    },
+    "Вы сели. Чтобы встать, крадитесь": {
+      "s": [
+        "Вы сели. Чтобы встать, крадитесь"
+      ],
+      "i": []
+    },
+    "Вы не можете сесть в падении!": {
+      "s": [
+        "Вы не можете сесть в падении!"
+      ],
+      "i": []
+    },
+    "Присаживает вас": {
+      "s": [
+        "Присаживает вас"
+      ],
+      "i": []
+    },
+    "§cплохой": {
+      "s": [
+        "§cплохой"
+      ],
+      "i": []
+    },
+    "§gнормальный": {
+      "s": [
+        "§gнормальный"
+      ],
+      "i": []
+    },
+    "§aхороший": {
+      "s": [
+        "§aхороший"
+      ],
+      "i": []
+    },
+    "TPS сервера \u0000§f: \u0000": {
+      "s": [
+        "TPS сервера ",
+        "§f: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Понг! Проверяем...": {
+      "s": [
+        "Понг! Проверяем..."
+      ],
+      "i": []
+    },
+    "Показывает пинг сервера": {
+      "s": [
+        "Показывает пинг сервера"
+      ],
+      "i": []
+    },
+    "Отменяет телепортацию": {
+      "s": [
+        "Отменяет телепортацию"
+      ],
+      "i": []
+    },
+    "Недоступно": {
+      "s": [
+        "Недоступно"
+      ],
+      "i": []
+    },
+    "Телепортация в случайное место на анархии": {
+      "s": [
+        "Телепортация в случайное место на анархии"
+      ],
+      "i": []
+    },
+    "Вы не телепортируетесь!": {
+      "s": [
+        "Вы не телепортируетесь!"
+      ],
+      "i": []
+    },
+    "Вы телепортируетесь!": {
+      "s": [
+        "Вы телепортируетесь!"
+      ],
+      "i": []
+    },
+    "Лор прочитан": {
+      "s": [
+        "Лор прочитан"
+      ],
+      "i": []
+    },
+    "Порталы \u0000/\u0000": {
+      "s": [
+        "Порталы ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Достижения \u0000/\u0000 (\u0000%%)": {
+      "s": [
+        "Достижения ",
+        "/",
+        " (",
+        "%%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Статистика": {
+      "s": [
+        "Статистика"
+      ],
+      "i": []
+    },
+    "открыть его меню": {
+      "s": [
+        "открыть его меню"
+      ],
+      "i": []
+    },
+    "Другие игроки": {
+      "s": [
+        "Другие игроки"
+      ],
+      "i": []
+    },
+    "Общее меню игрока": {
+      "s": [
+        "Общее меню игрока"
+      ],
+      "i": []
+    },
+    "Выдает ваш айди": {
+      "s": [
+        "Выдает ваш айди"
+      ],
+      "i": []
+    },
+    "Изменено на \u0000": {
+      "s": [
+        "Изменено на ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Меняет имя": {
+      "s": [
+        "Меняет имя"
+      ],
+      "i": []
+    },
+    "Убивает вас. Используйте, если застряли где-то": {
+      "s": [
+        "Убивает вас. Используйте, если застряли где-то"
+      ],
+      "i": []
+    },
+    "Выводит список команд": {
+      "s": [
+        "Выводит список команд"
+      ],
+      "i": []
+    },
+    "Возвращает камеру в исходное состояние": {
+      "s": [
+        "Возвращает камеру в исходное состояние"
+      ],
+      "i": []
+    },
+    "Вы получили награды!": {
+      "s": [
+        "Вы получили награды!"
+      ],
+      "i": []
+    },
+    "Ваш баланс": {
+      "s": [
+        "Ваш баланс"
+      ],
+      "i": []
+    },
+    "Подтверждение перед покупкой": {
+      "s": [
+        "Подтверждение перед покупкой"
+      ],
+      "i": []
+    },
+    "Сразу открывать меню покупки": {
+      "s": [
+        "Сразу открывать меню покупки"
+      ],
+      "i": []
+    },
+    "Продаваемые предметы": {
+      "s": [
+        "Продаваемые предметы"
+      ],
+      "i": []
+    },
+    "Показывать ли счет в меню (монеты, листья)": {
+      "s": [
+        "Показывать ли счет в меню (монеты, листья)"
+      ],
+      "i": []
+    },
+    "Показывать счет": {
+      "s": [
+        "Показывать счет"
+      ],
+      "i": []
+    },
+    "Определяет, включено ли подтверждение перед покупкой.": {
+      "s": [
+        "Определяет, включено ли подтверждение перед покупкой."
+      ],
+      "i": []
+    },
+    "Подтверждение покупки": {
+      "s": [
+        "Подтверждение покупки"
+      ],
+      "i": []
+    },
+    "Магазин\n§7Внутриигровой магазин": {
+      "s": [
+        "Магазин\n§7Внутриигровой магазин"
+      ],
+      "i": []
+    },
+    "Нет места в инвентаре (нужно еще \u0000)": {
+      "s": [
+        "Нет места в инвентаре (нужно еще ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Продажа невозможна": {
+      "s": [
+        "Продажа невозможна"
+      ],
+      "i": []
+    },
+    "Покупка невозможна": {
+      "s": [
+        "Покупка невозможна"
+      ],
+      "i": []
+    },
+    "При покупке произошла ошибка. \u0000": {
+      "s": [
+        "При покупке произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Успешная покупка \u0000 за \u0000!": {
+      "s": [
+        "Успешная покупка ",
+        " за ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Успешная продажа \u0000 за \u0000!": {
+      "s": [
+        "Успешная продажа ",
+        " за ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Покупка отменена": {
+      "s": [
+        "Покупка отменена"
+      ],
+      "i": []
+    },
+    "Продажа отменена": {
+      "s": [
+        "Продажа отменена"
+      ],
+      "i": []
+    },
+    "Купить!": {
+      "s": [
+        "Купить!"
+      ],
+      "i": []
+    },
+    "Продать!": {
+      "s": [
+        "Продать!"
+      ],
+      "i": []
+    },
+    "Купить \u0000 за \u0000?": {
+      "s": [
+        "Купить ",
+        " за ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Продать \u0000 за \u0000?": {
+      "s": [
+        "Продать ",
+        " за ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Подтверждение": {
+      "s": [
+        "Подтверждение"
+      ],
+      "i": []
+    },
+    "Покупка невозможна:\u0000\u0000": {
+      "s": [
+        "Покупка невозможна:",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Магазин": {
+      "s": [
+        "Магазин"
+      ],
+      "i": []
+    },
+    "Цена динамическая": {
+      "s": [
+        "Цена динамическая"
+      ],
+      "i": []
+    },
+    "Нужно уровней опыта: \u0000, \u0000/\u0000": {
+      "s": [
+        "Нужно уровней опыта: ",
+        ", ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Недостаточно средств.": {
+      "s": [
+        "Недостаточно средств."
+      ],
+      "i": []
+    },
+    "Нет предмета": {
+      "s": [
+        "Нет предмета"
+      ],
+      "i": []
+    },
+    "В инвентаре нет \u0000": {
+      "s": [
+        "В инвентаре нет ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Товар закончился": {
+      "s": [
+        "Товар закончился"
+      ],
+      "i": []
+    },
+    "Склад переполнен": {
+      "s": [
+        "Склад переполнен"
+      ],
+      "i": []
+    },
+    "Купить": {
+      "s": [
+        "Купить"
+      ],
+      "i": []
+    },
+    "Продать": {
+      "s": [
+        "Продать"
+      ],
+      "i": []
+    },
+    "Товара на складе: \u0000/\u0000, \u0000%%": {
+      "s": [
+        "Товара на складе: ",
+        "/",
+        ", ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "§dНастройки": {
+      "s": [
+        "§dНастройки"
+      ],
+      "i": []
+    },
+    "Переключатель": {
+      "s": [
+        "Переключатель"
+      ],
+      "i": []
+    },
+    "JSON-Объект": {
+      "s": [
+        "JSON-Объект"
+      ],
+      "i": []
+    },
+    "Число": {
+      "s": [
+        "Число"
+      ],
+      "i": []
+    },
+    "Строка": {
+      "s": [
+        "Строка"
+      ],
+      "i": []
+    },
+    "Сохранено!": {
+      "s": [
+        "Сохранено!"
+      ],
+      "i": []
+    },
+    "Введите число!": {
+      "s": [
+        "Введите число!"
+      ],
+      "i": []
+    },
+    "Настройка не изменится": {
+      "s": [
+        "Настройка не изменится"
+      ],
+      "i": []
+    },
+    "\n§7§lТип: §r§f\u0000": {
+      "s": [
+        "\n§7§lТип: §r§f",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n§7§lЗначение:§r \u0000": {
+      "s": [
+        "\n§7§lЗначение:§r ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§8(По умолчанию)\n": {
+      "s": [
+        "§8(По умолчанию)\n"
+      ],
+      "i": []
+    },
+    "§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n": {
+      "s": [
+        "§cКУПИТЕ ЧТОБЫ ИСПОЛЬЗОВАТЬ\n"
+      ],
+      "i": []
+    },
+    "Общие настройки мира\n§7Чат, спавн и тд": {
+      "s": [
+        "Общие настройки мира\n§7Чат, спавн и тд"
+      ],
+      "i": []
+    },
+    "Выбранный предмет: \u0000\nНажмите, чтобы сменить": {
+      "s": [
+        "Выбранный предмет: ",
+        "\nНажмите, чтобы сменить"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Зачарования:\n\u0000": {
+      "s": [
+        "Зачарования:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Настройки мира": {
+      "s": [
+        "Настройки мира"
+      ],
+      "i": []
+    },
+    "Настройки": {
+      "s": [
+        "Настройки"
+      ],
+      "i": []
+    },
+    "Доберитесь до точки": {
+      "s": [
+        "Доберитесь до точки"
+      ],
+      "i": []
+    },
+    "Следуйте компасу": {
+      "s": [
+        "Следуйте компасу"
+      ],
+      "i": []
+    },
+    "Доберитесь до: \u0000": {
+      "s": [
+        "Доберитесь до: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Монеты": {
+      "s": [
+        "Монеты"
+      ],
+      "i": []
+    },
+    "Опыт": {
+      "s": [
+        "Опыт"
+      ],
+      "i": []
+    },
+    "Общие": {
+      "s": [
+        "Общие"
+      ],
+      "i": []
+    },
+    "Внешнее пространство": {
+      "s": [
+        "Внешнее пространство"
+      ],
+      "i": []
+    },
+    "Не удалось открыть диалог. \u0000": {
+      "s": [
+        "Не удалось открыть диалог. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Я не могу с вами говорить. Приходите позже.": {
+      "s": [
+        "Я не могу с вами говорить. Приходите позже."
+      ],
+      "i": []
+    },
+    "Вводит в режим новичка": {
+      "s": [
+        "Вводит в режим новичка"
+      ],
+      "i": []
+    },
+    "Вы не находитесь в режиме новичка.": {
+      "s": [
+        "Вы не находитесь в режиме новичка."
+      ],
+      "i": []
+    },
+    "использовали команду": {
+      "s": [
+        "использовали команду"
+      ],
+      "i": []
+    },
+    "Используйте, чтобы выйти из режима новичка": {
+      "s": [
+        "Используйте, чтобы выйти из режима новичка"
+      ],
+      "i": []
+    },
+    "НЕТ, НАЗАД": {
+      "s": [
+        "НЕТ, НАЗАД"
+      ],
+      "i": []
+    },
+    "Я больше не новичок": {
+      "s": [
+        "Я больше не новичок"
+      ],
+      "i": []
+    },
+    "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти": {
+      "s": [
+        "Если вы совершите это действие, вы потеряете статус новичка:\r\n - Другие игроки смогут наносить вам урон\r\n - Другие игроки смогут забирать ваш лут после смерти"
+      ],
+      "i": []
+    },
+    "Успешно отменено": {
+      "s": [
+        "Успешно отменено"
+      ],
+      "i": []
+    },
+    "Вы \u0000, поэтому вышли из режима новичка.": {
+      "s": [
+        "Вы ",
+        ", поэтому вышли из режима новичка."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выдает или убирает \u0000 из инвентаря": {
+      "s": [
+        "Выдает или убирает ",
+        " из инвентаря"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Используйте \u0000 чтобы убрать этот предмет из инвентаря или получить его снова": {
+      "s": [
+        "Используйте ",
+        " чтобы убрать этот предмет из инвентаря или получить его снова"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "меню": {
+      "s": [
+        "меню"
+      ],
+      "i": []
+    },
+    "§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu": {
+      "s": [
+        "§r§7Возьми в руку и используй предмет\n§r§7Чтобы убрать из инвентаря, напиши в чат: §f.menu"
+      ],
+      "i": []
+    },
+    "Меню\n§7Разные настройки интерфейсов и меню в игре": {
+      "s": [
+        "Меню\n§7Разные настройки интерфейсов и меню в игре"
+      ],
+      "i": []
+    },
+    "Шанс: \u0000%%, Кол-во: \u0000...\u0000": {
+      "s": [
+        "Шанс: ",
+        "%%, Кол-во: ",
+        "...",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "трлн": {
+      "s": [
+        "трлн"
+      ],
+      "i": []
+    },
+    "млрд": {
+      "s": [
+        "млрд"
+      ],
+      "i": []
+    },
+    "млн": {
+      "s": [
+        "млн"
+      ],
+      "i": []
+    },
+    "к": {
+      "s": [
+        "к"
+      ],
+      "i": []
+    },
+    "Просмотр содержимого таблиц лута": {
+      "s": [
+        "Просмотр содержимого таблиц лута"
+      ],
+      "i": []
+    },
+    "Содержимое": {
+      "s": [
+        "Содержимое"
+      ],
+      "i": []
+    },
+    "Я готов принять риск": {
+      "s": [
+        "Я готов принять риск"
+      ],
+      "i": []
+    },
+    "Вернуться назад": {
+      "s": [
+        "Вернуться назад"
+      ],
+      "i": []
+    },
+    "Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне": {
+      "s": [
+        "Другие игроки смогут забрать ваши ресурсы после смерти в этой зоне"
+      ],
+      "i": []
+    },
+    "Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне.": {
+      "s": [
+        "Другие игроки не смогут забрать ваши ресурсы после смерти в этой зоне."
+      ],
+      "i": []
+    },
+    "у вас вообще экипировки нет": {
+      "s": [
+        "у вас вообще экипировки нет"
+      ],
+      "i": []
+    },
+    "Ваш уровень": {
+      "s": [
+        "Ваш уровень"
+      ],
+      "i": []
+    },
+    "Требуемый уровень": {
+      "s": [
+        "Требуемый уровень"
+      ],
+      "i": []
+    },
+    "Зона": {
+      "s": [
+        "Зона"
+      ],
+      "i": []
+    },
+    "Опасно!": {
+      "s": [
+        "Опасно!"
+      ],
+      "i": []
+    },
+    "С помощью него вы можете сделать предмет у инженера": {
+      "s": [
+        "С помощью него вы можете сделать предмет у инженера"
+      ],
+      "i": []
+    },
+    "§fЧертеж предмета \u0000": {
+      "s": [
+        "§fЧертеж предмета ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Убит босс \u0000!": {
+      "s": [
+        "Убит босс ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000\nДо появления\nосталось \u0000": {
+      "s": [
+        "",
+        "\nДо появления\nосталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§9Тестер": {
+      "s": [
+        "§9Тестер"
+      ],
+      "i": []
+    },
+    "§9Наблюдатель": {
+      "s": [
+        "§9Наблюдатель"
+      ],
+      "i": []
+    },
+    "§fУчастник": {
+      "s": [
+        "§fУчастник"
+      ],
+      "i": []
+    },
+    "§3Строитель": {
+      "s": [
+        "§3Строитель"
+      ],
+      "i": []
+    },
+    "§bГл. Строитель": {
+      "s": [
+        "§bГл. Строитель"
+      ],
+      "i": []
+    },
+    "§eПомошник": {
+      "s": [
+        "§eПомошник"
+      ],
+      "i": []
+    },
+    "§6Модератор": {
+      "s": [
+        "§6Модератор"
+      ],
+      "i": []
+    },
+    "§5Админ": {
+      "s": [
+        "§5Админ"
+      ],
+      "i": []
+    },
+    "§dГл. Админ": {
+      "s": [
+        "§dГл. Админ"
+      ],
+      "i": []
+    },
+    "§cТех. Админ": {
+      "s": [
+        "§cТех. Админ"
+      ],
+      "i": []
+    },
+    "§6Куратор": {
+      "s": [
+        "§6Куратор"
+      ],
+      "i": []
+    },
+    "§aРуководство": {
+      "s": [
+        "§aРуководство"
+      ],
+      "i": []
+    },
+    "Роль сменена успешно": {
+      "s": [
+        "Роль сменена успешно"
+      ],
+      "i": []
+    },
+    "Роль игрока \u0000 сменена успешно": {
+      "s": [
+        "Роль игрока ",
+        " сменена успешно"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nПричина: \u0000": {
+      "s": [
+        "\nПричина: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    " игроком \u0000": {
+      "s": [
+        " игроком ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваша роль сменена c \u0000 на \u0000\u0000\u0000": {
+      "s": [
+        "Ваша роль сменена c ",
+        " на ",
+        "",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Например, \"чел дурной, пол технограда снес\"": {
+      "s": [
+        "Например, \"чел дурной, пол технограда снес\""
+      ],
+      "i": []
+    },
+    "Причина смены роли": {
+      "s": [
+        "Причина смены роли"
+      ],
+      "i": []
+    },
+    "Роль": {
+      "s": [
+        "Роль"
+      ],
+      "i": []
+    },
+    "Показать Ваш ник в уведомлении": {
+      "s": [
+        "Показать Ваш ник в уведомлении"
+      ],
+      "i": []
+    },
+    "Уведомлять": {
+      "s": [
+        "Уведомлять"
+      ],
+      "i": []
+    },
+    "У игрока \u0000 роль выше или такая же как у вас, вы не можете ее сменить.": {
+      "s": [
+        "У игрока ",
+        " роль выше или такая же как у вас, вы не можете ее сменить."
+      ],
+      "i": [
+        0
+      ]
+    },
+    " §4Не сменить": {
+      "s": [
+        " §4Не сменить"
+      ],
+      "i": []
+    },
+    "Без имени": {
+      "s": [
+        "Без имени"
+      ],
+      "i": []
+    },
+    "§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)": {
+      "s": [
+        "§3Сменить мою роль\n§7(Восстановить потом: §f/rolerestore§7)"
+      ],
+      "i": []
+    },
+    "§6дате входа": {
+      "s": [
+        "§6дате входа"
+      ],
+      "i": []
+    },
+    "§aролям": {
+      "s": [
+        "§aролям"
+      ],
+      "i": []
+    },
+    "§bонлайну": {
+      "s": [
+        "§bонлайну"
+      ],
+      "i": []
+    },
+    "§3Ваша роль: \u0000": {
+      "s": [
+        "§3Ваша роль: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n\n§3Восстановить прошлую роль: §f.role restore": {
+      "s": [
+        "\n\n§3Восстановить прошлую роль: §f.role restore"
+      ],
+      "i": []
+    },
+    "Ваша роль: \u0000\u0000": {
+      "s": [
+        "Ваша роль: ",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы вернули роль §r\u0000": {
+      "s": [
+        "Вы вернули роль §r",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Восстанавливает вашу роль": {
+      "s": [
+        "Восстанавливает вашу роль"
+      ],
+      "i": []
+    },
+    "Показывает вашу роль": {
+      "s": [
+        "Показывает вашу роль"
+      ],
+      "i": []
+    },
+    "Безопасная зона \u0000": {
+      "s": [
+        "Безопасная зона ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Дорога": {
+      "s": [
+        "Дорога"
+      ],
+      "i": []
+    },
+    "Регион создается. \u0000%%": {
+      "s": [
+        "Регион создается. ",
+        "%%"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Регион сохраняется": {
+      "s": [
+        "Регион сохраняется"
+      ],
+      "i": []
+    },
+    "Вы не можете добывать блоки в зоне добычи новичков": {
+      "s": [
+        "Вы не можете добывать блоки в зоне добычи новичков"
+      ],
+      "i": []
+    },
+    "Индексировать для вики": {
+      "s": [
+        "Индексировать для вики"
+      ],
+      "i": []
+    },
+    "Применить": {
+      "s": [
+        "Применить"
+      ],
+      "i": []
+    },
+    "Будут изменены следующие регионы:\n\u0000": {
+      "s": [
+        "Будут изменены следующие регионы:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "В этом месте не должно быть региона шахты, подвинуть все": {
+      "s": [
+        "В этом месте не должно быть региона шахты, подвинуть все"
+      ],
+      "i": []
+    },
+    "Макс кол-во: \u0000": {
+      "s": [
+        "Макс кол-во: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§7Зона добычи": {
+      "s": [
+        "§7Зона добычи"
+      ],
+      "i": []
+    },
+    "§bЗона добычи новичков": {
+      "s": [
+        "§bЗона добычи новичков"
+      ],
+      "i": []
+    },
+    "§cБосс §6\u0000": {
+      "s": [
+        "§cБосс §6",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите удалить участника из региона?": {
+      "s": [
+        "Вы уверены что хотите удалить участника из региона?"
+      ],
+      "i": []
+    },
+    "Удалить участника": {
+      "s": [
+        "Удалить участника"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите назначить владельцем региона игрока \u0000?": {
+      "s": [
+        "Вы уверены что хотите назначить владельцем региона игрока ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите передать права владельца региона игроку \u0000?": {
+      "s": [
+        "Вы уверены что хотите передать права владельца региона игроку ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Передать права": {
+      "s": [
+        "Передать права"
+      ],
+      "i": []
+    },
+    "Управление участником региона": {
+      "s": [
+        "Управление участником региона"
+      ],
+      "i": []
+    },
+    "Владелец > \u0000": {
+      "s": [
+        "Владелец > ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Добавить участника": {
+      "s": [
+        "Добавить участника"
+      ],
+      "i": []
+    },
+    "Добавить!": {
+      "s": [
+        "Добавить!"
+      ],
+      "i": []
+    },
+    "Вы можете только посмотреть их": {
+      "s": [
+        "Вы можете только посмотреть их"
+      ],
+      "i": []
+    },
+    "Для управления участником нажмите на кнопку с его ником": {
+      "s": [
+        "Для управления участником нажмите на кнопку с его ником"
+      ],
+      "i": []
+    },
+    "Участники региона": {
+      "s": [
+        "Участники региона"
+      ],
+      "i": []
+    },
+    "Центр региона": {
+      "s": [
+        "Центр региона"
+      ],
+      "i": []
+    },
+    "Радиус\n§7Определяет радиус региона": {
+      "s": [
+        "Радиус\n§7Определяет радиус региона"
+      ],
+      "i": []
+    },
+    "Нет": {
+      "s": [
+        "Нет"
+      ],
+      "i": []
+    },
+    "Только с сущностями (pve)": {
+      "s": [
+        "Только с сущностями (pve)"
+      ],
+      "i": []
+    },
+    "Да": {
+      "s": [
+        "Да"
+      ],
+      "i": []
+    },
+    "Сражение\n§7Определяет, смогут ли игроки сражаться в регионе": {
+      "s": [
+        "Сражение\n§7Определяет, смогут ли игроки сражаться в регионе"
+      ],
+      "i": []
+    },
+    "Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки.": {
+      "s": [
+        "Калитки\n§7Определяет, смогут ли не добавленные в регион игроки использовать калитки."
+      ],
+      "i": []
+    },
+    "Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)": {
+      "s": [
+        "Контейнеры\n§7Определяет, смогут ли не добавленные в регион игроки открывать контейнеры (сундуки, шалкеры и тд)"
+      ],
+      "i": []
+    },
+    "Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки.": {
+      "s": [
+        "Люки\n§7Определяет, смогут ли не добавленные в регион игроки использовать люки."
+      ],
+      "i": []
+    },
+    "Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки.": {
+      "s": [
+        "Рычаг и кнопки\n§7Определяет, смогут ли не добавленные в регион игроки использовать рычаг и кнопки."
+      ],
+      "i": []
+    },
+    "Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери.": {
+      "s": [
+        "Двери\n§7Определяет, смогут ли не добавленные в регион игроки использовать двери."
+      ],
+      "i": []
+    },
+    "Разрешения региона": {
+      "s": [
+        "Разрешения региона"
+      ],
+      "i": []
+    },
+    "Структура": {
+      "s": [
+        "Структура"
+      ],
+      "i": []
+    },
+    "Разрешения": {
+      "s": [
+        "Разрешения"
+      ],
+      "i": []
+    },
+    "Тип зоны": {
+      "s": [
+        "Тип зоны"
+      ],
+      "i": []
+    },
+    "Тип региона": {
+      "s": [
+        "Тип региона"
+      ],
+      "i": []
+    },
+    "Не удалось сохранить структуру: \u0000": {
+      "s": [
+        "Не удалось сохранить структуру: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сохранить": {
+      "s": [
+        "Сохранить"
+      ],
+      "i": []
+    },
+    "Пересохранить": {
+      "s": [
+        "Пересохранить"
+      ],
+      "i": []
+    },
+    "Нельзя создать регион, область которого ниже -64 (y: \u0000 radius: \u0000 result: \u0000)": {
+      "s": [
+        "Нельзя создать регион, область которого ниже -64 (y: ",
+        " radius: ",
+        " result: ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Выключено": {
+      "s": [
+        "Выключено"
+      ],
+      "i": []
+    },
+    "Входит в режим телепортации по группе регионов. Полезно для поиска данжа": {
+      "s": [
+        "Входит в режим телепортации по группе регионов. Полезно для поиска данжа"
+      ],
+      "i": []
+    },
+    "Управляет регионами": {
+      "s": [
+        "Управляет регионами"
+      ],
+      "i": []
+    },
+    "Вас ждет \u0000": {
+      "s": [
+        "Вас ждет ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000\n§aЗавершено! §6Заберите награду.": {
+      "s": [
+        "",
+        "\n§aЗавершено! §6Заберите награду."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Заберите награду": {
+      "s": [
+        "Заберите награду"
+      ],
+      "i": []
+    },
+    "Задание \u0000 сломалось: \u0000": {
+      "s": [
+        "Задание ",
+        " сломалось: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "При активации шага произошла ошибка. \u0000": {
+      "s": [
+        "При активации шага произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Отправлять ли сообщение в чат при каждом новом разделе задания": {
+      "s": [
+        "Отправлять ли сообщение в чат при каждом новом разделе задания"
+      ],
+      "i": []
+    },
+    "Сообщение в чат при каждом шаге": {
+      "s": [
+        "Сообщение в чат при каждом шаге"
+      ],
+      "i": []
+    },
+    "Задания\r\n§7Настройки игровых заданий": {
+      "s": [
+        "Задания\r\n§7Настройки игровых заданий"
+      ],
+      "i": []
+    },
+    "Завершите задание \u0000": {
+      "s": [
+        "Завершите задание ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Возьмите задание \u0000": {
+      "s": [
+        "Возьмите задание ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Отказаться от задания?": {
+      "s": [
+        "Отказаться от задания?"
+      ],
+      "i": []
+    },
+    "Отказаться": {
+      "s": [
+        "Отказаться"
+      ],
+      "i": []
+    },
+    "Сделать приоритетным": {
+      "s": [
+        "Сделать приоритетным"
+      ],
+      "i": []
+    },
+    "Задание завершено!": {
+      "s": [
+        "Задание завершено!"
+      ],
+      "i": []
+    },
+    "Измерение": {
+      "s": [
+        "Измерение"
+      ],
+      "i": []
+    },
+    "Локация": {
+      "s": [
+        "Локация"
+      ],
+      "i": []
+    },
+    "Описание:": {
+      "s": [
+        "Описание:"
+      ],
+      "i": []
+    },
+    "Текущее действие": {
+      "s": [
+        "Текущее действие"
+      ],
+      "i": []
+    },
+    "Описание": {
+      "s": [
+        "Описание"
+      ],
+      "i": []
+    },
+    "Список завершенных заданий": {
+      "s": [
+        "Список завершенных заданий"
+      ],
+      "i": []
+    },
+    "Завершенные задания": {
+      "s": [
+        "Завершенные задания"
+      ],
+      "i": []
+    },
+    "Нет активных заданий.": {
+      "s": [
+        "Нет активных заданий."
+      ],
+      "i": []
+    },
+    "Нет заданий": {
+      "s": [
+        "Нет заданий"
+      ],
+      "i": []
+    },
+    "Задания": {
+      "s": [
+        "Задания"
+      ],
+      "i": []
+    },
+    "У вас нет активных заданий!": {
+      "s": [
+        "У вас нет активных заданий!"
+      ],
+      "i": []
+    },
+    "Выйти": {
+      "s": [
+        "Выйти"
+      ],
+      "i": []
+    },
+    "Меню заданий": {
+      "s": [
+        "Меню заданий"
+      ],
+      "i": []
+    },
+    "Взять задание": {
+      "s": [
+        "Взять задание"
+      ],
+      "i": []
+    },
+    "Задание\n\u0000": {
+      "s": [
+        "Задание\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000\nЗавершен!": {
+      "s": [
+        "",
+        "\nЗавершен!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§2Перемещение...": {
+      "s": [
+        "§2Перемещение..."
+      ],
+      "i": []
+    },
+    "при входе игроков": {
+      "s": [
+        "при входе игроков"
+      ],
+      "i": []
+    },
+    "о входе других игроков": {
+      "s": [
+        "о входе других игроков"
+      ],
+      "i": []
+    },
+    "Сообщение": {
+      "s": [
+        "Сообщение"
+      ],
+      "i": []
+    },
+    "§8Проснулся": {
+      "s": [
+        "§8Проснулся"
+      ],
+      "i": []
+    },
+    "§8Очнулся в воздухе": {
+      "s": [
+        "§8Очнулся в воздухе"
+      ],
+      "i": []
+    },
+    "Добро пожаловать!": {
+      "s": [
+        "Добро пожаловать!"
+      ],
+      "i": []
+    },
+    "§3Добрый вечер": {
+      "s": [
+        "§3Добрый вечер"
+      ],
+      "i": []
+    },
+    "§bДобрый день": {
+      "s": [
+        "§bДобрый день"
+      ],
+      "i": []
+    },
+    "§6Доброе утро": {
+      "s": [
+        "§6Доброе утро"
+      ],
+      "i": []
+    },
+    "§9Доброй ночи": {
+      "s": [
+        "§9Доброй ночи"
+      ],
+      "i": []
+    },
+    "\u0000, \u0000!\n§r§3Время §b• §3\u0000": {
+      "s": [
+        "",
+        ", ",
+        "!\n§r§3Время §b• §3",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "при входе": {
+      "s": [
+        "при входе"
+      ],
+      "i": []
+    },
+    "Время": {
+      "s": [
+        "Время"
+      ],
+      "i": []
+    },
+    "Вход\n§7Все действия, связанные со входом": {
+      "s": [
+        "Вход\n§7Все действия, связанные со входом"
+      ],
+      "i": []
+    },
+    "Имитирует первый вход": {
+      "s": [
+        "Имитирует первый вход"
+      ],
+      "i": []
+    },
+    "\u0000: \u0000, просмотреть: /mail": {
+      "s": [
+        "",
+        ": ",
+        ", просмотреть: /mail"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Удалить": {
+      "s": [
+        "Удалить"
+      ],
+      "i": []
+    },
+    "Удалить письмо": {
+      "s": [
+        "Удалить письмо"
+      ],
+      "i": []
+    },
+    "\u0000 Вы потеряете все награды, прикрепленные к письму!": {
+      "s": [
+        "",
+        " Вы потеряете все награды, прикрепленные к письму!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 Все награды будут собраны автоматически": {
+      "s": [
+        "",
+        " Все награды будут собраны автоматически"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Удалить письмо?": {
+      "s": [
+        "Удалить письмо?"
+      ],
+      "i": []
+    },
+    "Предыдущее письмо\n\u0000": {
+      "s": [
+        "Предыдущее письмо\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Следующее письмо\n\u0000": {
+      "s": [
+        "Следующее письмо\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Награда успешно забрана!\n\n": {
+      "s": [
+        "Награда успешно забрана!\n\n"
+      ],
+      "i": []
+    },
+    "Вы не можете забрать награды не находясь на анархии": {
+      "s": [
+        "Вы не можете забрать награды не находясь на анархии"
+      ],
+      "i": []
+    },
+    "Забрать награду": {
+      "s": [
+        "Забрать награду"
+      ],
+      "i": []
+    },
+    "Награды": {
+      "s": [
+        "Награды"
+      ],
+      "i": []
+    },
+    "Алмазов за прочтение": {
+      "s": [
+        "Алмазов за прочтение"
+      ],
+      "i": []
+    },
+    "вот.": {
+      "s": [
+        "вот."
+      ],
+      "i": []
+    },
+    "Строка5": {
+      "s": [
+        "Строка5"
+      ],
+      "i": []
+    },
+    "да": {
+      "s": [
+        "да"
+      ],
+      "i": []
+    },
+    "Строка 4": {
+      "s": [
+        "Строка 4"
+      ],
+      "i": []
+    },
+    "читать все сообщения в почте": {
+      "s": [
+        "читать все сообщения в почте"
+      ],
+      "i": []
+    },
+    "Строка3": {
+      "s": [
+        "Строка3"
+      ],
+      "i": []
+    },
+    "вы теперь можете": {
+      "s": [
+        "вы теперь можете"
+      ],
+      "i": []
+    },
+    "Строка2": {
+      "s": [
+        "Строка2"
+      ],
+      "i": []
+    },
+    "мы вас поздравляем": {
+      "s": [
+        "мы вас поздравляем"
+      ],
+      "i": []
+    },
+    "Строка 1": {
+      "s": [
+        "Строка 1"
+      ],
+      "i": []
+    },
+    "вы крутые там д0а": {
+      "s": [
+        "вы крутые там д0а"
+      ],
+      "i": []
+    },
+    "Заголовок": {
+      "s": [
+        "Заголовок"
+      ],
+      "i": []
+    },
+    "Объявление для всего сервера": {
+      "s": [
+        "Объявление для всего сервера"
+      ],
+      "i": []
+    },
+    "Объявление": {
+      "s": [
+        "Объявление"
+      ],
+      "i": []
+    },
+    "Все прочитано": {
+      "s": [
+        "Все прочитано"
+      ],
+      "i": []
+    },
+    "Прочитать все\n§7(и собрать награды если есть)": {
+      "s": [
+        "Прочитать все\n§7(и собрать награды если есть)"
+      ],
+      "i": []
+    },
+    "Имени": {
+      "s": [
+        "Имени"
+      ],
+      "i": []
+    },
+    "Дате": {
+      "s": [
+        "Дате"
+      ],
+      "i": []
+    },
+    "У письма есть несобранные награды": {
+      "s": [
+        "У письма есть несобранные награды"
+      ],
+      "i": []
+    },
+    "Несобранные награды": {
+      "s": [
+        "Несобранные награды"
+      ],
+      "i": []
+    },
+    "Показывать только непрочитанные сообщения": {
+      "s": [
+        "Показывать только непрочитанные сообщения"
+      ],
+      "i": []
+    },
+    "Непрочитанные": {
+      "s": [
+        "Непрочитанные"
+      ],
+      "i": []
+    },
+    "У вас \u0000 непрочитанных сообщений!": {
+      "s": [
+        "У вас ",
+        " непрочитанных сообщений!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Почта:": {
+      "s": [
+        "Почта:"
+      ],
+      "i": []
+    },
+    "Показывать ли при входе сообщение с кол-вом непрочитанных": {
+      "s": [
+        "Показывать ли при входе сообщение с кол-вом непрочитанных"
+      ],
+      "i": []
+    },
+    "Почта": {
+      "s": [
+        "Почта"
+      ],
+      "i": []
+    },
+    "Собирать ли награды при удалении письма": {
+      "s": [
+        "Собирать ли награды при удалении письма"
+      ],
+      "i": []
+    },
+    "Собирать награды при удалении": {
+      "s": [
+        "Собирать награды при удалении"
+      ],
+      "i": []
+    },
+    "Почта\n§7Прочтение сообщения, инфо при входе": {
+      "s": [
+        "Почта\n§7Прочтение сообщения, инфо при входе"
+      ],
+      "i": []
+    },
+    "Посмотреть входящие сообщения почты": {
+      "s": [
+        "Посмотреть входящие сообщения почты"
+      ],
+      "i": []
+    },
+    "§cНет": {
+      "s": [
+        "§cНет"
+      ],
+      "i": []
+    },
+    "§fДа": {
+      "s": [
+        "§fДа"
+      ],
+      "i": []
+    },
+    "\u0000 д. \u0000": {
+      "s": [
+        "",
+        " д. ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§bНовичок": {
+      "s": [
+        "§bНовичок"
+      ],
+      "i": []
+    },
+    "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова": {
+      "s": [
+        "Не удалось открыть форму. Закрой чат или другое меню и попробуй снова"
+      ],
+      "i": []
+    },
+    "Закрой чат!": {
+      "s": [
+        "Закрой чат!"
+      ],
+      "i": []
+    },
+    "Закрыть": {
+      "s": [
+        "Закрыть"
+      ],
+      "i": []
+    },
+    "Назад": {
+      "s": [
+        "Назад"
+      ],
+      "i": []
+    },
+    "Дате входа": {
+      "s": [
+        "Дате входа"
+      ],
+      "i": []
+    },
+    "Онлайну": {
+      "s": [
+        "Онлайну"
+      ],
+      "i": []
+    },
+    "Сортировать по": {
+      "s": [
+        "Сортировать по"
+      ],
+      "i": []
+    },
+    "§3Выберите игрока чтобы \u0000": {
+      "s": [
+        "§3Выберите игрока чтобы ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбрать всех": {
+      "s": [
+        "Выбрать всех"
+      ],
+      "i": []
+    },
+    "Убрать выделение": {
+      "s": [
+        "Убрать выделение"
+      ],
+      "i": []
+    },
+    "Вы уверены?": {
+      "s": [
+        "Вы уверены?"
+      ],
+      "i": []
+    },
+    "Никакой": {
+      "s": [
+        "Никакой"
+      ],
+      "i": []
+    },
+    "История": {
+      "s": [
+        "История"
+      ],
+      "i": []
+    },
+    "Хорошо, назад": {
+      "s": [
+        "Хорошо, назад"
+      ],
+      "i": []
+    },
+    "Ничего не произойдет": {
+      "s": [
+        "Ничего не произойдет"
+      ],
+      "i": []
+    },
+    "Запрос": {
+      "s": [
+        "Запрос"
+      ],
+      "i": []
+    },
+    "Результаты поиска по запросу\n\u0000": {
+      "s": [
+        "Результаты поиска по запросу\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Поиск": {
+      "s": [
+        "Поиск"
+      ],
+      "i": []
+    },
+    "Следующая": {
+      "s": [
+        "Следующая"
+      ],
+      "i": []
+    },
+    "Предыдущая": {
+      "s": [
+        "Предыдущая"
+      ],
+      "i": []
+    },
+    "Фильтры": {
+      "s": [
+        "Фильтры"
+      ],
+      "i": []
+    },
+    "§cВы уверены, что хотите \u0000?": {
+      "s": [
+        "§cВы уверены, что хотите ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Отмена": {
+      "s": [
+        "Отмена"
+      ],
+      "i": []
+    },
+    "§r§3Назад": {
+      "s": [
+        "§r§3Назад"
+      ],
+      "i": []
+    },
+    "§l§b< §r§3Назад": {
+      "s": [
+        "§l§b< §r§3Назад"
+      ],
+      "i": []
+    },
+    "Успешно": {
+      "s": [
+        "Успешно"
+      ],
+      "i": []
+    },
+    "Последний раз онлайн": {
+      "s": [
+        "Последний раз онлайн"
+      ],
+      "i": []
+    },
+    "Последний раз онлайн на анархии": {
+      "s": [
+        "Последний раз онлайн на анархии"
+      ],
+      "i": []
+    },
+    "Время первого входа на анархию": {
+      "s": [
+        "Время первого входа на анархию"
+      ],
+      "i": []
+    },
+    "Онлайн на анархии": {
+      "s": [
+        "Онлайн на анархии"
+      ],
+      "i": []
+    },
+    "Время первого входа": {
+      "s": [
+        "Время первого входа"
+      ],
+      "i": []
+    },
+    "Всего входов на сервер": {
+      "s": [
+        "Всего входов на сервер"
+      ],
+      "i": []
+    },
+    "Урона нанесено": {
+      "s": [
+        "Урона нанесено"
+      ],
+      "i": []
+    },
+    "Урона получено": {
+      "s": [
+        "Урона получено"
+      ],
+      "i": []
+    },
+    "Фейрверков взорвано": {
+      "s": [
+        "Фейрверков взорвано"
+      ],
+      "i": []
+    },
+    "Фейрверков запущено": {
+      "s": [
+        "Фейрверков запущено"
+      ],
+      "i": []
+    },
+    "Блоков сломано": {
+      "s": [
+        "Блоков сломано"
+      ],
+      "i": []
+    },
+    "Блоков поставлено": {
+      "s": [
+        "Блоков поставлено"
+      ],
+      "i": []
+    },
+    "Онлайн всего": {
+      "s": [
+        "Онлайн всего"
+      ],
+      "i": []
+    },
+    "Рейд-блок": {
+      "s": [
+        "Рейд-блок"
+      ],
+      "i": []
+    },
+    "Смертей": {
+      "s": [
+        "Смертей"
+      ],
+      "i": []
+    },
+    "Убийств": {
+      "s": [
+        "Убийств"
+      ],
+      "i": []
+    },
+    "§6Монеты": {
+      "s": [
+        "§6Монеты"
+      ],
+      "i": []
+    },
+    "§aЛистья": {
+      "s": [
+        "§aЛистья"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 сменил ник на \u0000": {
+      "s": [
+        "Игрок ",
+        " сменил ник на ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Катсцена": {
+      "s": [
+        "Катсцена"
+      ],
+      "i": []
+    },
+    "Вы получили свою награду!": {
+      "s": [
+        "Вы получили свою награду!"
+      ],
+      "i": []
+    },
+    "Используйте этот ключ, чтобы открыть ящик с лутом!": {
+      "s": [
+        "Используйте этот ключ, чтобы открыть ящик с лутом!"
+      ],
+      "i": []
+    },
+    "Ключ для ящика \u0000": {
+      "s": [
+        "Ключ для ящика ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000 > Содержимое": {
+      "s": [
+        "",
+        " > Содержимое"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Посмотреть содержимое": {
+      "s": [
+        "Посмотреть содержимое"
+      ],
+      "i": []
+    },
+    "Купить ключ": {
+      "s": [
+        "Купить ключ"
+      ],
+      "i": []
+    },
+    "Чтобы открыть этот сундук, возьмите в руки ключ": {
+      "s": [
+        "Чтобы открыть этот сундук, возьмите в руки ключ"
+      ],
+      "i": []
+    },
+    "Открыт ящик \u0000!": {
+      "s": [
+        "Открыт ящик ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ключ для \u0000 не подходит к ящику \u0000": {
+      "s": [
+        "Ключ для ",
+        " не подходит к ящику ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "\u0000 ящик": {
+      "s": [
+        "",
+        " ящик"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Команда недоступна": {
+      "s": [
+        "Команда недоступна"
+      ],
+      "i": []
+    },
+    "Команда доступна только начиная с роли \u0000. Ваша роль: \u0000": {
+      "s": [
+        "Команда доступна только начиная с роли ",
+        ". Ваша роль: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Команда не готова": {
+      "s": [
+        "Команда не готова"
+      ],
+      "i": []
+    },
+    "При выполнении команды произошла ошибка. \u0000": {
+      "s": [
+        "При выполнении команды произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "У вас нет разрешения для использования команды \u0000\u0000\nСписок всех доступных вам команд: §f.help": {
+      "s": [
+        "У вас нет разрешения для использования команды ",
+        "",
+        "\nСписок всех доступных вам команд: §f.help"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "\nКоманда доступна начиная с роли \u0000": {
+      "s": [
+        "\nКоманда доступна начиная с роли ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы имели ввиду \u0000?": {
+      "s": [
+        "Вы имели ввиду ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Список всех доступных вам команд: §f.help": {
+      "s": [
+        "Список всех доступных вам команд: §f.help"
+      ],
+      "i": []
+    },
+    "Не так быстро! Попробуй через \u0000": {
+      "s": [
+        "Не так быстро! Попробуй через ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сменить роль \u0000": {
+      "s": [
+        "Сменить роль ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Причина не была указана, участник остался в клане": {
+      "s": [
+        "Причина не была указана, участник остался в клане"
+      ],
+      "i": []
+    },
+    "Участник \u0000 успешно выгнан из клана \u0000": {
+      "s": [
+        "Участник ",
+        " успешно выгнан из клана ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы были выгнаны из клана игроком '\u0000'. Причина: \u0000": {
+      "s": [
+        "Вы были выгнаны из клана игроком '",
+        "'. Причина: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы выгнаны из клана '\u0000'": {
+      "s": [
+        "Вы выгнаны из клана '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Причина обязательна": {
+      "s": [
+        "Причина обязательна"
+      ],
+      "i": []
+    },
+    "Причина": {
+      "s": [
+        "Причина"
+      ],
+      "i": []
+    },
+    "Выгнать участника '\u0000'": {
+      "s": [
+        "Выгнать участника '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выгнать": {
+      "s": [
+        "Выгнать"
+      ],
+      "i": []
+    },
+    "В клане '\u0000', сменена игроком \u0000": {
+      "s": [
+        "В клане '",
+        "', сменена игроком ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Роль в клане \u0000": {
+      "s": [
+        "Роль в клане ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Роль участника клана \u0000 сменена успешно: \u0000.": {
+      "s": [
+        "Роль участника клана ",
+        " сменена успешно: ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Сменить роль": {
+      "s": [
+        "Сменить роль"
+      ],
+      "i": []
+    },
+    "Вы единственный владелец. Кнопка удаления клана находится в меню клана снизу": {
+      "s": [
+        "Вы единственный владелец. Кнопка удаления клана находится в меню клана снизу"
+      ],
+      "i": []
+    },
+    "Вы не можете отказаться от владения клана являясь единственным его владельцем": {
+      "s": [
+        "Вы не можете отказаться от владения клана являясь единственным его владельцем"
+      ],
+      "i": []
+    },
+    "Вы уверены что хотите сбросить свою роль в клане до участника?": {
+      "s": [
+        "Вы уверены что хотите сбросить свою роль в клане до участника?"
+      ],
+      "i": []
+    },
+    "Отказаться от владения": {
+      "s": [
+        "Отказаться от владения"
+      ],
+      "i": []
+    },
+    "Участники клана": {
+      "s": [
+        "Участники клана"
+      ],
+      "i": []
+    },
+    "Не удалось пригласить в клан": {
+      "s": [
+        "Не удалось пригласить в клан"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 успешно приглашен в клан!": {
+      "s": [
+        "Игрок ",
+        " успешно приглашен в клан!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы были приглашены в клан! Чтобы вступить, используйте /clan или раздел кланов из основого меню": {
+      "s": [
+        "Вы были приглашены в клан! Чтобы вступить, используйте /clan или раздел кланов из основого меню"
+      ],
+      "i": []
+    },
+    "Приглашение в клан '\u0000'": {
+      "s": [
+        "Приглашение в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок \u0000 уже состоит в клане \u0000!": {
+      "s": [
+        "Игрок ",
+        " уже состоит в клане ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Игрок \u0000 уже состоит в вашем клане!": {
+      "s": [
+        "Игрок ",
+        " уже состоит в вашем клане!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "пригласить в клан": {
+      "s": [
+        "пригласить в клан"
+      ],
+      "i": []
+    },
+    "Да, отозать": {
+      "s": [
+        "Да, отозать"
+      ],
+      "i": []
+    },
+    "отозвать приглашение?": {
+      "s": [
+        "отозвать приглашение?"
+      ],
+      "i": []
+    },
+    "Новое приглашение": {
+      "s": [
+        "Новое приглашение"
+      ],
+      "i": []
+    },
+    "Приглашения в клан '\u0000'": {
+      "s": [
+        "Приглашения в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Онет": {
+      "s": [
+        "Онет"
+      ],
+      "i": []
+    },
+    "Вы НЕ приняты в клан \u0000": {
+      "s": [
+        "Вы НЕ приняты в клан ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нет, не заслужил": {
+      "s": [
+        "Нет, не заслужил"
+      ],
+      "i": []
+    },
+    "Откройте меню клана с помощью .clan": {
+      "s": [
+        "Откройте меню клана с помощью .clan"
+      ],
+      "i": []
+    },
+    "Вы приняты в клан \u0000": {
+      "s": [
+        "Вы приняты в клан ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Принять!": {
+      "s": [
+        "Принять!"
+      ],
+      "i": []
+    },
+    "Принять игрока '\u0000' в клан?": {
+      "s": [
+        "Принять игрока '",
+        "' в клан?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбор": {
+      "s": [
+        "Выбор"
+      ],
+      "i": []
+    },
+    "Короткое имя: \u0000": {
+      "s": [
+        "Короткое имя: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Другие кланы\n§7Посмотреть": {
+      "s": [
+        "Другие кланы\n§7Посмотреть"
+      ],
+      "i": []
+    },
+    "Клан '\u0000' покинут успешно": {
+      "s": [
+        "Клан '",
+        "' покинут успешно"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Хз почему": {
+      "s": [
+        "Хз почему"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 покинул ваш клан": {
+      "s": [
+        "Игрок ",
+        " покинул ваш клан"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку.": {
+      "s": [
+        "Вы уверены, что хотите покинуть клан? Если вы передумаете, вам придется заново подавать заявку."
+      ],
+      "i": []
+    },
+    "Покинуть клан": {
+      "s": [
+        "Покинуть клан"
+      ],
+      "i": []
+    },
+    "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз.": {
+      "s": [
+        "К сожалению, клан был распущен. Хз че создателю не понравилось, найдите клан получше или создайте новый, печалиться смысла нет. Ну базы еще можете залутать, врятли создатель успел вас удалить из всех клановых баз."
+      ],
+      "i": []
+    },
+    "Клан '\u0000' распущен": {
+      "s": [
+        "Клан '",
+        "' распущен"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Удалить клан без возможности восстановления?": {
+      "s": [
+        "Удалить клан без возможности восстановления?"
+      ],
+      "i": []
+    },
+    "Удалить клан": {
+      "s": [
+        "Удалить клан"
+      ],
+      "i": []
+    },
+    "Изменить": {
+      "s": [
+        "Изменить"
+      ],
+      "i": []
+    },
+    "Изменить название или тэг клана": {
+      "s": [
+        "Изменить название или тэг клана"
+      ],
+      "i": []
+    },
+    "Заявки на вступление": {
+      "s": [
+        "Заявки на вступление"
+      ],
+      "i": []
+    },
+    "Участники": {
+      "s": [
+        "Участники"
+      ],
+      "i": []
+    },
+    "Дата создания": {
+      "s": [
+        "Дата создания"
+      ],
+      "i": []
+    },
+    "Имя клана": {
+      "s": [
+        "Имя клана"
+      ],
+      "i": []
+    },
+    "Меню клана": {
+      "s": [
+        "Меню клана"
+      ],
+      "i": []
+    },
+    "Кланы": {
+      "s": [
+        "Кланы"
+      ],
+      "i": []
+    },
+    "Ваш клан": {
+      "s": [
+        "Ваш клан"
+      ],
+      "i": []
+    },
+    "Выводит справку о команде": {
+      "s": [
+        "Выводит справку о команде"
+      ],
+      "i": []
+    },
+    "   §fКоманда §6.\u0000\u0000§7§o - \u0000": {
+      "s": [
+        "   §fКоманда §6.",
+        "",
+        "§7§o - ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    " (также \u0000)": {
+      "s": [
+        " (также ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\u0000─═─═─═§f Доступно: \u0000/\u0000 \u0000═─═─═─═─": {
+      "s": [
+        "",
+        "─═─═─═§f Доступно: ",
+        "/",
+        " ",
+        "═─═─═─═─"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Пусто": {
+      "s": [
+        "Пусто"
+      ],
+      "i": []
+    },
+    "Справка по скриптовым командам": {
+      "s": [
+        "Справка по скриптовым командам"
+      ],
+      "i": []
+    },
+    "Неизвестный аргумент: \u0000.\nДоступные командлеты: \n\u0000\n ": {
+      "s": [
+        "Неизвестный аргумент: ",
+        ".\nДоступные командлеты: \n",
+        "\n "
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Короткое имя '\u0000' уже занято.": {
+      "s": [
+        "Короткое имя '",
+        "' уже занято."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Клан с именем '\u0000' уже существует.": {
+      "s": [
+        "Клан с именем '",
+        "' уже существует."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '\u0000' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '\u0000'": {
+      "s": [
+        "Короткое имя '",
+        "' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '",
+        "'"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Короткое имя '\u0000' должно быть КОРОТКИМ, меньше 5 символов": {
+      "s": [
+        "Короткое имя '",
+        "' должно быть КОРОТКИМ, меньше 5 символов"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '\u0000' не может содержать параграф": {
+      "s": [
+        "Короткое имя '",
+        "' не может содержать параграф"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Имя '\u0000' не может содержать параграф": {
+      "s": [
+        "Имя '",
+        "' не может содержать параграф"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Та ну не надоело": {
+      "s": [
+        "Та ну не надоело"
+      ],
+      "i": []
+    },
+    "Щас исправлю": {
+      "s": [
+        "Щас исправлю"
+      ],
+      "i": []
+    },
+    "Ошибка": {
+      "s": [
+        "Ошибка"
+      ],
+      "i": []
+    },
+    "Чтобы блатными в чате выглядеть": {
+      "s": [
+        "Чтобы блатными в чате выглядеть"
+      ],
+      "i": []
+    },
+    "Тэг клана": {
+      "s": [
+        "Тэг клана"
+      ],
+      "i": []
+    },
+    "Ну, давай, придумай чета оригинальное": {
+      "s": [
+        "Ну, давай, придумай чета оригинальное"
+      ],
+      "i": []
+    },
+    "Название клана": {
+      "s": [
+        "Название клана"
+      ],
+      "i": []
+    },
+    "[\u0000] \u0000\nУчастники: \u0000 \u0000": {
+      "s": [
+        "[",
+        "] ",
+        "\nУчастники: ",
+        " ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов": {
+      "s": [
+        "Игрок хочет вступить в ваш клан, вы можете принять или отклонить его через меню кланов"
+      ],
+      "i": []
+    },
+    "Запрос на вступление в клан от '\u0000'": {
+      "s": [
+        "Запрос на вступление в клан от '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Заявка на вступление в клан '\u0000' отправлена!": {
+      "s": [
+        "Заявка на вступление в клан '",
+        "' отправлена!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже отправили заявку в клан '\u0000'!": {
+      "s": [
+        "Вы уже отправили заявку в клан '",
+        "'!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Создать клан": {
+      "s": [
+        "Создать клан"
+      ],
+      "i": []
+    },
+    "Создать свой клан": {
+      "s": [
+        "Создать свой клан"
+      ],
+      "i": []
+    },
+    "Вы приняли приглашение в клан '\u0000'": {
+      "s": [
+        "Вы приняли приглашение в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Приглашения": {
+      "s": [
+        "Приглашения"
+      ],
+      "i": []
+    },
+    "Выберите клан, чтобы отправить заявку или создайте свой клан!": {
+      "s": [
+        "Выберите клан, чтобы отправить заявку или создайте свой клан!"
+      ],
+      "i": []
+    },
+    "Выбор клана": {
+      "s": [
+        "Выбор клана"
+      ],
+      "i": []
+    },
+    "Клан": {
+      "s": [
+        "Клан"
+      ],
+      "i": []
+    },
+    "Размутить": {
+      "s": [
+        "Размутить"
+      ],
+      "i": []
+    },
+    "Причина: \u0000\n\u0000": {
+      "s": [
+        "Причина: ",
+        "\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вернуть обратно": {
+      "s": [
+        "Вернуть обратно"
+      ],
+      "i": []
+    },
+    "Неизвестный тип времени": {
+      "s": [
+        "Неизвестный тип времени"
+      ],
+      "i": []
+    },
+    "Заглушить игрока в чате": {
+      "s": [
+        "Заглушить игрока в чате"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 не найден": {
+      "s": [
+        "Игрок ",
+        " не найден"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Размьючен игрок \u0000 который был замьючен по причине \u0000, до конца оставалось \u0000": {
+      "s": [
+        "Размьючен игрок ",
+        " который был замьючен по причине ",
+        ", до конца оставалось ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Не был замьючен": {
+      "s": [
+        "Не был замьючен"
+      ],
+      "i": []
+    },
+    "Игрок \u0000 был замьючен на \u0000 по причине: \u0000": {
+      "s": [
+        "Игрок ",
+        " был замьючен на ",
+        " по причине: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Владелец": {
+      "s": [
+        "Владелец"
+      ],
+      "i": []
+    },
+    "Помошник": {
+      "s": [
+        "Помошник"
+      ],
+      "i": []
+    },
+    "Участник": {
+      "s": [
+        "Участник"
+      ],
+      "i": []
+    },
+    "Звука сообщений от игроков поблизости": {
+      "s": [
+        "Звука сообщений от игроков поблизости"
+      ],
+      "i": []
+    },
+    "Звук": {
+      "s": [
+        "Звук"
+      ],
+      "i": []
+    },
+    "Чат\n§7Звуки и внешний вид чата": {
+      "s": [
+        "Чат\n§7Звуки и внешний вид чата"
+      ],
+      "i": []
+    },
+    "Забрать награды": {
+      "s": [
+        "Забрать награды"
+      ],
+      "i": []
+    },
+    "Награды забраны": {
+      "s": [
+        "Награды забраны"
+      ],
+      "i": []
+    },
+    "Награда: \u0000": {
+      "s": [
+        "Награда: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "?\nНеизвестно": {
+      "s": [
+        "?\nНеизвестно"
+      ],
+      "i": []
+    },
+    "\u0000§c*\n§aЗаберите награды!": {
+      "s": [
+        "",
+        "§c*\n§aЗаберите награды!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Несобранные вверху": {
+      "s": [
+        "Несобранные вверху"
+      ],
+      "i": []
+    },
+    "Скрыть неизвестные": {
+      "s": [
+        "Скрыть неизвестные"
+      ],
+      "i": []
+    },
+    "По алфавиту": {
+      "s": [
+        "По алфавиту"
+      ],
+      "i": []
+    },
+    "По дате получения": {
+      "s": [
+        "По дате получения"
+      ],
+      "i": []
+    },
+    "Режим сортировки": {
+      "s": [
+        "Режим сортировки"
+      ],
+      "i": []
+    },
+    "Достижения": {
+      "s": [
+        "Достижения"
+      ],
+      "i": []
+    },
+    "Достижение получено: \u0000! Заберите награды, используя \u0000": {
+      "s": [
+        "Достижение получено: ",
+        "! Заберите награды, используя ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_item_name}§c*\n§aЗаберите награды!": {
+      "s": [
+        "",
+        "§c*\n§aЗаберите награды!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Награда: {0_achiv_reward_toString_player_}": {
+      "s": [
+        "Награда: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": {
+      "s": [
+        "Достижение получено: ",
+        "! Заберите награды, используя ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": {
+      "s": [
+        "Игрок ",
+        " был замьючен на ",
+        " по причине: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": {
+      "s": [
+        "Размьючен игрок ",
+        " который был замьючен по причине ",
+        ", до конца оставалось ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Игрок {0_nameArg} не найден": {
+      "s": [
+        "Игрок ",
+        " не найден"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Причина: {0_info_mutedUntil}\n{1_until}": {
+      "s": [
+        "Причина: ",
+        "\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы приняли приглашение в клан '{0_clan_name}'": {
+      "s": [
+        "Вы приняли приглашение в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": {
+      "s": [
+        "Вы уже отправили заявку в клан '",
+        "'!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Заявка на вступление в клан '{0_clan_name}' отправлена!": {
+      "s": [
+        "Заявка на вступление в клан '",
+        "' отправлена!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Запрос на вступление в клан от '{0_player_name}'": {
+      "s": [
+        "Запрос на вступление в клан от '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}": {
+      "s": [
+        "[",
+        "] ",
+        "\nУчастники: ",
+        " ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Имя '{0_name}' не может содержать параграф": {
+      "s": [
+        "Имя '",
+        "' не может содержать параграф"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' не может содержать параграф": {
+      "s": [
+        "Короткое имя '",
+        "' не может содержать параграф"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": {
+      "s": [
+        "Короткое имя '",
+        "' должно быть КОРОТКИМ, меньше 5 символов"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": {
+      "s": [
+        "Короткое имя '",
+        "' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '",
+        "'"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Клан с именем '{0_name}' уже существует.": {
+      "s": [
+        "Клан с именем '",
+        "' уже существует."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя '{0_shortname}' уже занято.": {
+      "s": [
+        "Короткое имя '",
+        "' уже занято."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Клан '{0_clan_name}' распущен": {
+      "s": [
+        "Клан '",
+        "' распущен"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_player_name} покинул ваш клан": {
+      "s": [
+        "Игрок ",
+        " покинул ваш клан"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Клан '{0_clan_name}' покинут успешно": {
+      "s": [
+        "Клан '",
+        "' покинут успешно"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Короткое имя: {0_clan_shortname}": {
+      "s": [
+        "Короткое имя: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Принять игрока '{0_name}' в клан?": {
+      "s": [
+        "Принять игрока '",
+        "' в клан?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы приняты в клан {0_clan_name}": {
+      "s": [
+        "Вы приняты в клан ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы НЕ приняты в клан {0_clan_name}": {
+      "s": [
+        "Вы НЕ приняты в клан ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Приглашения в клан '{0_clan_name}'": {
+      "s": [
+        "Приглашения в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_name} уже состоит в вашем клане!": {
+      "s": [
+        "Игрок ",
+        " уже состоит в вашем клане!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": {
+      "s": [
+        "Игрок ",
+        " уже состоит в клане ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Приглашение в клан '{0_clan_name}'": {
+      "s": [
+        "Приглашение в клан '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_name} успешно приглашен в клан!": {
+      "s": [
+        "Игрок ",
+        " успешно приглашен в клан!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": {
+      "s": [
+        "Роль участника клана ",
+        " сменена успешно: ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Роль в клане {0_changeString}": {
+      "s": [
+        "Роль в клане ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": {
+      "s": [
+        "В клане '",
+        "', сменена игроком ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Выгнать участника '{0_memberName}'": {
+      "s": [
+        "Выгнать участника '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы выгнаны из клана '{0_clan_name}'": {
+      "s": [
+        "Вы выгнаны из клана '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": {
+      "s": [
+        "Вы были выгнаны из клана игроком '",
+        "'. Причина: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": {
+      "s": [
+        "Участник ",
+        " успешно выгнан из клана ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Сменить роль {0_Player_nameOrUnknown_member_id_}": {
+      "s": [
+        "Сменить роль ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": {
+      "s": [
+        "Неизвестный аргумент: ",
+        ".\nДоступные командлеты: \n",
+        "\n "
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": {
+      "s": [
+        "",
+        "─═─═─═§f Доступно: ",
+        "/",
+        " ",
+        "═─═─═─═─"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    " (также {0_d_aliases_join______})": {
+      "s": [
+        " (также ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": {
+      "s": [
+        "   §fКоманда §6.",
+        "",
+        "§7§o - ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Не так быстро! Попробуй через {0_i18n_time_after_}": {
+      "s": [
+        "Не так быстро! Попробуй через ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": {
+      "s": [
+        "Вы имели ввиду ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": {
+      "s": [
+        "\nКоманда доступна начиная с роли ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": {
+      "s": [
+        "У вас нет разрешения для использования команды ",
+        "",
+        "\nСписок всех доступных вам команд: §f.help"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "При выполнении команды произошла ошибка. {0_developersAreWarned}": {
+      "s": [
+        "При выполнении команды произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": {
+      "s": [
+        "Команда доступна только начиная с роли ",
+        ". Ваша роль: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_this_place_name} ящик": {
+      "s": [
+        "",
+        " ящик"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": {
+      "s": [
+        "Ключ для ",
+        " не подходит к ящику ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Открыт ящик {0_this_name}!": {
+      "s": [
+        "Открыт ящик ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_i18n___this_name_______} > Содержимое": {
+      "s": [
+        "",
+        " > Содержимое"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_this_name} ящик": {
+      "s": [
+        "",
+        " ящик"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ключ для ящика {0_Crate_getName_storage_crate_}": {
+      "s": [
+        "Ключ для ящика ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Игрок {0_player_database_name} сменил ник на {1_player_name}": {
+      "s": [
+        "Игрок ",
+        " сменил ник на ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§cВы уверены, что хотите {0_text}?": {
+      "s": [
+        "§cВы уверены, что хотите ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Результаты поиска по запросу\n{0_searchQuery}": {
+      "s": [
+        "Результаты поиска по запросу\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§3Выберите игрока чтобы {0_reason}": {
+      "s": [
+        "§3Выберите игрока чтобы ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_days} д. {1_hhmmss}": {
+      "s": [
+        "",
+        " д. ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У вас {0_unreadCount} непрочитанных сообщений!": {
+      "s": [
+        "У вас ",
+        " непрочитанных сообщений!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Следующее письмо\n{0_letterOneLineName_next_letter_}": {
+      "s": [
+        "Следующее письмо\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": {
+      "s": [
+        "Предыдущее письмо\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_deleteDescription} Все награды будут собраны автоматически": {
+      "s": [
+        "",
+        " Все награды будут собраны автоматически"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": {
+      "s": [
+        "",
+        " Вы потеряете все награды, прикрепленные к письму!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_i18n_header_______}: {1_title}, просмотреть: /mail": {
+      "s": [
+        "",
+        ": ",
+        ", просмотреть: /mail"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}": {
+      "s": [
+        "",
+        ", ",
+        "!\n§r§3Время §b• §3",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_this_quest_name}\nЗавершен!": {
+      "s": [
+        "",
+        "\nЗавершен!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Задание\n{0_this_quest_name}": {
+      "s": [
+        "Задание\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Возьмите задание {0_target_name}": {
+      "s": [
+        "Возьмите задание ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Завершите задание {0_target_name}": {
+      "s": [
+        "Завершите задание ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "При активации шага произошла ошибка. {0_developersAreWarned}": {
+      "s": [
+        "При активации шага произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Задание {0_this_quest_name} сломалось: {1_text}": {
+      "s": [
+        "Задание ",
+        " сломалось: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_step_text__}\n§aЗавершено! §6Заберите награду.": {
+      "s": [
+        "",
+        "\n§aЗавершено! §6Заберите награду."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вас ждет {0_i18n_accent___npc_name__}": {
+      "s": [
+        "Вас ждет ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": {
+      "s": [
+        "Нельзя создать регион, область которого ниже -64 (y: ",
+        " radius: ",
+        " result: ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Не удалось сохранить структуру: {0_e}": {
+      "s": [
+        "Не удалось сохранить структуру: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Владелец > {0_name}": {
+      "s": [
+        "Владелец > ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите передать права владельца региона игроку {0_name}?": {
+      "s": [
+        "Вы уверены что хотите передать права владельца региона игроку ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": {
+      "s": [
+        "Вы уверены что хотите назначить владельцем региона игрока ",
+        "?"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§cБосс §6{0_this_bossName}": {
+      "s": [
+        "§cБосс §6",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Макс кол-во: {0_resource_amount}": {
+      "s": [
+        "Макс кол-во: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": {
+      "s": [
+        "Будут изменены следующие регионы:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Регион создается. {0___region_restoringStructurePercent}%%": {
+      "s": [
+        "Регион создается. ",
+        "%%"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Безопасная зона {0_this_safeAreaName}": {
+      "s": [
+        "Безопасная зона ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы вернули роль §r{0_ROLES_prevRole_}": {
+      "s": [
+        "Вы вернули роль §r",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": {
+      "s": [
+        "Ваша роль: ",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§3Ваша роль: {0_ROLES_prole_}": {
+      "s": [
+        "§3Ваша роль: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": {
+      "s": [
+        "У игрока ",
+        " роль выше или такая же как у вас, вы не можете ее сменить."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": {
+      "s": [
+        "Ваша роль сменена c ",
+        " на ",
+        "",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    " игроком {0_player_name}": {
+      "s": [
+        " игроком ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\nПричина: {0_message}": {
+      "s": [
+        "\nПричина: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Роль игрока {0_target_name} сменена успешно": {
+      "s": [
+        "Роль игрока ",
+        " сменена успешно"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": {
+      "s": [
+        "",
+        "\nДо появления\nосталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Убит босс {0_this_options_place_name}!": {
+      "s": [
+        "Убит босс ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": {
+      "s": [
+        "§fЧертеж предмета ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": {
+      "s": [
+        "Используйте ",
+        " чтобы убрать этот предмет из инвентаря или получить его снова"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выдает или убирает {0_itemNameTag} из инвентаря": {
+      "s": [
+        "Выдает или убирает ",
+        " из инвентаря"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": {
+      "s": [
+        "Шанс: ",
+        "%%, Кол-во: ",
+        "...",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы {0_reason}, поэтому вышли из режима новичка.": {
+      "s": [
+        "Вы ",
+        ", поэтому вышли из режима новичка."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не удалось открыть диалог. {0_developersAreWarned}": {
+      "s": [
+        "Не удалось открыть диалог. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до: {0_this_place_name}": {
+      "s": [
+        "Доберитесь до: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n§7§lЗначение:§r {0_stringify_value_}": {
+      "s": [
+        "\n§7§lЗначение:§r ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": {
+      "s": [
+        "\n§7§lТип: §r§f",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": {
+      "s": [
+        "Зачарования:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": {
+      "s": [
+        "Выбранный предмет: ",
+        "\nНажмите, чтобы сменить"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": {
+      "s": [
+        "Товара на складе: ",
+        "/",
+        ", ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "В инвентаре нет {0_this_text}": {
+      "s": [
+        "В инвентаре нет ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": {
+      "s": [
+        "Нужно уровней опыта: ",
+        ", ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": {
+      "s": [
+        "Покупка невозможна:",
+        "",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Продать {0_costString} за {1_name}?": {
+      "s": [
+        "Продать ",
+        " за ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Купить {0_name} за {1_costString}?": {
+      "s": [
+        "Купить ",
+        " за ",
+        "?"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Успешная продажа {0_name} за {1_costString}!": {
+      "s": [
+        "Успешная продажа ",
+        " за ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Успешная покупка {0_name} за {1_costString}!": {
+      "s": [
+        "Успешная покупка ",
+        " за ",
+        "!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "При покупке произошла ошибка. {0_developersAreWarned}": {
+      "s": [
+        "При покупке произошла ошибка. ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Нет места в инвентаре (нужно еще {0_amount})": {
+      "s": [
+        "Нет места в инвентаре (нужно еще ",
+        ")"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Изменено на {0_newname}": {
+      "s": [
+        "Изменено на ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": {
+      "s": [
+        "TPS сервера ",
+        "§f: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": {
+      "s": [
+        "Достижения ",
+        "/",
+        " (",
+        "%%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Порталы {0_portals__length____0}/{1_Portal_portals_size}": {
+      "s": [
+        "Порталы ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Статистика игрока {0_Player_nameOrUnknown_targetId_}": {
+      "s": [
+        "Статистика игрока ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Анархия {0_n}": {
+      "s": [
+        "Анархия ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": {
+      "s": [
+        "Инструмент скоро сломается! ",
+        "/",
+        " (",
+        "%)"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Усиленный аирдроп скоро упадет на {0_location}!": {
+      "s": [
+        "Усиленный аирдроп скоро упадет на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Обычный аирдроп скоро упадет на {0_location}!": {
+      "s": [
+        "Обычный аирдроп скоро упадет на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Радиус границы анархии сейчас: {0_this_zone__radius}": {
+      "s": [
+        "Радиус границы анархии сейчас: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": {
+      "s": [
+        "Вы уже находитесь на анархии! Если это не так, используйте ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": {
+      "s": [
+        "Успех! Теперь вы можете использовать ",
+        " для перемещения на случайную позицию."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вода. Попытка {0_maxTries___i}/{1_maxTries}": {
+      "s": [
+        "Вода. Попытка ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Нельзя создать базу на высоте ниже {0_underLimit}!": {
+      "s": [
+        "Нельзя создать базу на высоте ниже ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": {
+      "s": [
+        "§cВы уже ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "состоите в базе игрока '{0_region_ownerName}'": {
+      "s": [
+        "состоите в базе игрока '",
+        "'"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": {
+      "s": [
+        "База успешно создана! Чтобы открыть меню базы используйте команду ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": {
+      "s": [
+        "Всех материалов хватает!\nБаза защищена от гниения на ",
+        "§r\n"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": {
+      "s": [
+        "Не хватает ресурсов:\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": {
+      "s": [
+        "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n",
+        "\nМатериалы в бочке:\n",
+        "\n",
+        "\nДо следующего сбора ресурсов: ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": {
+      "s": [
+        "§cБаза разрушена!\n§4Срочно поставьте блок базы на ",
+        "!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "База с владельцем {0_base_ownerName} {1_messageAction}.": {
+      "s": [
+        "База с владельцем ",
+        " ",
+        "."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Максимальный уровень\n{0_levelText}": {
+      "s": [
+        "Максимальный уровень\n",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": {
+      "s": [
+        "",
+        " (радиус ",
+        " -> ",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Улучшить базу: {0_levelText}": {
+      "s": [
+        "Улучшить базу: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "База игрока {0_base_ownerName}": {
+      "s": [
+        "База игрока ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": {
+      "s": [
+        "\n\nКоординаты: ",
+        "\nРадиус: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "§6Ваша база {0_text}": {
+      "s": [
+        "§6Ваша база ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_this_city_name}: задание исследования не настроено!": {
+      "s": [
+        "",
+        ": задание исследования не настроено!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": {
+      "s": [
+        "Эта печка уже занята. Печка освободится через ",
+        ", ключ: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы уже заняли {0_personalKeys_length}/3 печек.": {
+      "s": [
+        "Вы уже заняли ",
+        "/3 печек."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": {
+      "s": [
+        "Ваш клан уже занял ",
+        "/3 печек."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Использован ключ из слота {0_index}": {
+      "s": [
+        "Использован ключ из слота ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": {
+      "s": [
+        "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ",
+        ", ключ: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": {
+      "s": [
+        "Зачарование ",
+        " не удалось перенести."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": {
+      "s": [
+        "Онет, кажется, зачарование ",
+        " уровнем ",
+        " потерялось..."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У {0_i18n_accent_________} можно купить ключ доступа к печам": {
+      "s": [
+        "У ",
+        " можно купить ключ доступа к печам"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Купите у {0_i18n_accent_________} ключ доступа к печам": {
+      "s": [
+        "Купите у ",
+        " ключ доступа к печам"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до {0_i18n_accent________________________} по дороге": {
+      "s": [
+        "Доберитесь до ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": {
+      "s": [
+        "Идите к ",
+        ", он расскажет вам что такое ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "...мы изобрели {0_i18n_accent______}": {
+      "s": [
+        "...мы изобрели ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": {
+      "s": [
+        "Выбранная книга: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": {
+      "s": [
+        "§r§fМеч со способностью §7",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": {
+      "s": [
+        "Здесь есть шахта, ведущая к ",
+        " и ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У {0_i18n_accent______} можно зачаровать предметы": {
+      "s": [
+        "У ",
+        " можно зачаровать предметы"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до {0_i18n_accent____________} по дороге": {
+      "s": [
+        "Доберитесь до ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
+      "s": [
+        "Копать нужно на высоте ",
+        "..",
+        ". Ваш y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": {
+      "s": [
+        "",
+        " Осталось ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": {
+      "s": [
+        "Вы вошли в режим рейдблока, потому что ",
+        ". Некоторые функции могут быть недоступны"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Дровосек: нарубите {0_v} дерева": {
+      "s": [
+        "Дровосек: нарубите ",
+        " дерева"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шахтер: накопайте {0_v} камня": {
+      "s": [
+        "Шахтер: накопайте ",
+        " камня"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Угольный шахтер: накопайте {0_v} угля": {
+      "s": [
+        "Угольный шахтер: накопайте ",
+        " угля"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Железный шахтер: накопайте {0_v} железа": {
+      "s": [
+        "Железный шахтер: накопайте ",
+        " железа"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": {
+      "s": [
+        "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": {
+      "s": [
+        "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ",
+        " заданий вам дают награду. За выполнение всех ежедневных заданий ",
+        " дня подряд вместо обычного ключа выдается донатный\n\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": {
+      "s": [
+        "",
+        "/",
+        " Награда: ключ от сундука\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": {
+      "s": [
+        "Вы не можете покинуть зону добычи, пока не завершили задания ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Добыто дерева: {0_current}/{1_end}": {
+      "s": [
+        "Добыто дерева: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": {
+      "s": [
+        "Спуститесь в шахту и добудьте камня: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Добыто железной руды: {0_i}/{1_end}": {
+      "s": [
+        "Добыто железной руды: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Отправляйтесь за ними в {0_i18n_accent_____________}": {
+      "s": [
+        "Отправляйтесь за ними в ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Идите в {0_i18n_accent_____________} по дороге": {
+      "s": [
+        "Идите в ",
+        " по дороге"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": {
+      "s": [
+        "Верните свои вещи",
+        ", они ждут вас на ",
+        "§6!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_extra___extra_to_player_lang____________}§8Вы тут": {
+      "s": [
+        "",
+        "§8Вы тут"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": {
+      "s": [
+        "Не умею этим пользоваться, но знаю кто точно поможет: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": {
+      "s": [
+        "Событие! ",
+        " силой ",
+        " на ",
+        " минут"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Время: {0_new_Date___toHHMMSS__}": {
+      "s": [
+        "Время: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": {
+      "s": [
+        "",
+        " ",
+        "\nЧерез ",
+        " (",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": {
+      "s": [
+        "Ваш первый рекорд ",
+        " поставлен! Это заняло ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+      "s": [
+        "Вы побили ваш предыдущий рекорд ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+      "s": [
+        "Вы не смогли побить ваш предыдущий рекорд ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": {
+      "s": [
+        "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": {
+      "s": [
+        "Спидран '",
+        "' начат. Для сброса времени воспользуйтесь .wipe"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": {
+      "s": [
+        "Вы можете взять это задание чтобы отслеживать направления источника ресурса (",
+        ") с помощью компаса"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": {
+      "s": [
+        "Руды на y: ",
+        ":\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": {
+      "s": [
+        "",
+        ", ",
+        ", Группа: ",
+        "%%"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Добыть: {0___rawtext_____translate__langToken_itemType______}": {
+      "s": [
+        "Добыть: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": {
+      "s": [
+        "Копать нужно на высоте от ",
+        " до ",
+        ". Ваш y = ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Руды на {0_y}": {
+      "s": [
+        "Руды на ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    }
   }
 }
 
-export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Record<string, string>>> = {
+/**
+ * Preprocessed plural messages.
+ * Structure: Record<PluralRule, { s: string[], i: number[] }>
+ */
+export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Record<string, { s: string[], i: number[] }>>> = {
   "en_US": {
     "У вас \u0000 непрочитанных сообщений!": {
-      "one": [
-        "You have ",
-        " unread message!"
-      ],
-      "other": [
-        "You have ",
-        " unread messages!"
-      ]
-    },
-    "\u0000 игроков": {
-      "one": [
-        "",
-        " player"
-      ],
-      "other": [
-        "",
-        " players"
-      ]
+      "one": {
+        "s": [
+          "You have ",
+          " unread message!"
+        ],
+        "i": [
+          0
+        ]
+      },
+      "other": {
+        "s": [
+          "You have ",
+          " unread messages!"
+        ],
+        "i": [
+          0
+        ]
+      }
     }
   },
   "ru_RU": {}

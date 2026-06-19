@@ -72,10 +72,6 @@ class LangWriter {
     return `LangWriter(${this.base}/*.${this.ext})`
   }
 
-  /**
-   * @param {string} lang
-   * @returns {Promise<Record<string, T>>}
-   */
   async read(lang) {
     /** @type {Record<string, T>} */
     let parsed = {}
@@ -84,6 +80,35 @@ class LangWriter {
       parsed = this.parse(await fs.readFile(this.#path(lang), 'utf-8'))
     } catch (e) {
       console.warn('Unable to read lang', lang, 'with base', this.base, e)
+    }
+
+    // 1. Migrate old keys that contain \x00 (the old template separator)
+    const migrated = {}
+    for (const key in parsed) {
+      if (key.includes('\x00')) {
+        const newKey = oldKeyToPlaceholderKey(key)
+        console.log(`Migrating old key: ${key.replace(/\x00/g, '\\0')}  ->  ${newKey}`)
+        migrated[newKey] = parsed[key]
+        delete parsed[key] // remove old key
+      }
+    }
+    // Merge migrated keys into parsed (after deletion, so no overlap)
+    Object.assign(parsed, migrated)
+
+    // 2. Convert old array values to placeholder strings
+    for (const key in parsed) {
+      const val = parsed[key]
+      if (Array.isArray(val)) {
+        parsed[key] = arrayToPlaceholderString(val)
+        console.log(`Migrated array to string for ${lang}: ${key}`)
+      } else if (typeof val === 'object' && val !== null) {
+        // Plural object with possible array values
+        for (const rule in val) {
+          if (Array.isArray(val[rule])) {
+            val[rule] = arrayToPlaceholderString(val[rule])
+          }
+        }
+      }
     }
 
     if (lang === sourceCodeLang) {
@@ -101,6 +126,29 @@ class LangWriter {
   }
 }
 
+/** Convert an old key like "Событие! \x00 силой \x00 на \x00 минут" into "Событие! {0} силой {1} на {2} минут" */
+function oldKeyToPlaceholderKey(key) {
+  const parts = key.split('\x00')
+  let result = ''
+  for (let i = 0; i < parts.length; i++) {
+    result += parts[i]
+    if (i < parts.length - 1) {
+      result += `{${i}}`
+    }
+  }
+  return result
+}
+
+/** Convert old array value ["part1", "part2", ""] to "part1{0}part2{1}" */
+function arrayToPlaceholderString(arr) {
+  let result = ''
+  for (let i = 0; i < arr.length; i++) {
+    result += arr[i]
+    if (i < arr.length - 1) result += `{${i}}`
+  }
+  return result
+}
+
 /** @typedef {string | Record<string, string>} Message */
 /** @type {LangWriter<Message>} */
 export const messagesJson = new LangWriter('lang')
@@ -113,52 +161,77 @@ sharedMessages.stringify = data => {
   for (const k in data) t += `${k}=${data[k].replaceAll('\\n', '~LINEBREAK~')}\n`
   return t
 }
-sharedMessages.parse = () => ({}) // .lang files are output only, source of truth is JSON
+sharedMessages.parse = () => ({})
 
 export async function readMessages() {
   await sharedMessages.readAll()
   await messagesJson.readAll()
 }
 
-/**
- * @template {Record<string, unknown>} T
- * @template {string} K2
- * @template V2
- * @param {T} object
- * @param {(key: keyof T, value: Required<T>[keyof T], object: NoInfer<T>) => [K2, V2] | false} mapper
- * @returns {NoInfer<Record<K2, V2>>}
- */
-function map(object, mapper) {
-  /** @type {Record<string, unknown>} */
-  const result = {}
-  for (const key of Object.getOwnPropertyNames(object)) {
-    // @ts-expect-error
-    const mapped = mapper(key, object[key], object)
-    if (mapped) result[mapped[0]] = mapped[1]
+/** Clean unused translations when CLEAN=1 is set. Removes any key not present in the source language. */
+function cleanTranslations() {
+  const source = messagesJson.storage[sourceCodeLang]
+  for (const lang of supportedLanguages) {
+    if (lang === sourceCodeLang) continue
+    const target = messagesJson.storage[lang]
+    for (const key in target) {
+      if (!(key in source)) {
+        delete target[key]
+        console.log(`Removed unused key ${key} from ${lang}`)
+      }
+    }
   }
-  // @ts-expect-error
-  return result
+}
+
+/** Pre‑process a placeholder string into { s: string[], i: number[] } */
+function preprocessPlaceholderString(str) {
+  const segments = []
+  const indices = []
+  const regex = /\{(\d+)(?:_\w+)?\}/g
+  let lastIndex = 0
+  let match
+  while ((match = regex.exec(str)) !== null) {
+    segments.push(str.slice(lastIndex, match.index))
+    indices.push(parseInt(match[1], 10))
+    lastIndex = match.index + match[0].length
+  }
+  segments.push(str.slice(lastIndex))
+  return { s: segments, i: indices }
 }
 
 export async function writeMessages() {
+  if (process.env.CLEAN === '1') {
+    cleanTranslations()
+  }
+
   await sharedMessages.writeAll()
   await messagesJson.writeAll()
 
-  const transformedMessages = map(messagesJson.storage, (lang, messages) => [
-    lang,
-    map(messages, (id, value) => {
-      if (typeof value === 'string') return [id, value]
-      return false
-    }),
-  ])
+  // Build pre‑processed output for simple messages and plurals
+  const messagesOut = {}
+  const pluralsOut = {}
 
-  const transformedPlurals = map(messagesJson.storage, (lang, messages) => [
-    lang,
-    map(messages, (id, value) => {
-      if (typeof value === 'object' && !Array.isArray(value)) return [id, value]
-      return false
-    }),
-  ])
+  for (const lang of supportedLanguages) {
+    const langData = messagesJson.storage[lang]
+    const simple = {}
+    const plural = {}
+
+    for (const id in langData) {
+      const value = langData[id]
+      if (typeof value === 'string') {
+        simple[id] = preprocessPlaceholderString(value)
+      } else if (typeof value === 'object' && !Array.isArray(value)) {
+        const forms = {}
+        for (const rule in value) {
+          forms[rule] = preprocessPlaceholderString(value[rule])
+        }
+        plural[id] = forms
+      }
+    }
+
+    messagesOut[lang] = simple
+    pluralsOut[lang] = plural
+  }
 
   const sharedIds = Object.fromEntries(
     Object.entries(sharedMessages.storage[sourceCodeLang]).map(([id, token]) => [id, templateToSharedId(id)]),
@@ -176,14 +249,22 @@ type MessageId = string
 
 export const extractedSharedMessagesIds: Record<MessageId, string> = ${JSON.stringify(sharedIds, null, 2)}
 
-export const extractedTranslatedMessages: Record<Language, Record<MessageId, string>> = ${JSON.stringify(transformedMessages, null, 2)}
+/**
+ * Preprocessed simple messages.
+ * Structure: { s: string[], i: number[] }
+ */
+export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s: string[], i: number[] }>> = ${JSON.stringify(messagesOut, null, 2)}
 
-export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Record<string, string>>> = ${JSON.stringify(transformedPlurals, null, 2)}
+/**
+ * Preprocessed plural messages.
+ * Structure: Record<PluralRule, { s: string[], i: number[] }>
+ */
+export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Record<string, { s: string[], i: number[] }>>> = ${JSON.stringify(pluralsOut, null, 2)}
 `.replaceAll('\\\\n', '\\n'),
   )
 }
 
-/** @param {string} id - The placeholder-based message ID, e.g. "Выше {0_y} и ниже {1_x}" */
+/** @param {string} id */
 function templateToSharedId(id) {
   return (
     'script.shared.' +
@@ -205,8 +286,8 @@ const plurals = Object.fromEntries(
  * Adds or updates a translation entry.
  *
  * @param {string} id - The message ID with placeholders, e.g. "Вы добыли {0_amount} из {1_needed}"
- * @param {boolean} shared - Whether the message is an i18nShared tagged template
- * @param {boolean} plural - Whether the message is an i18nPlural tagged template
+ * @param {boolean} shared
+ * @param {boolean} plural
  */
 export function addTranslation(id, shared, plural) {
   const sourcePrev = messagesJson.storage[sourceCodeLang][id]

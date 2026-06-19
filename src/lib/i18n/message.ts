@@ -11,6 +11,11 @@ import { textUnitColorize } from './text'
 
 export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
 
+interface Preprocessed {
+  s: string[]
+  i: number[]
+}
+
 export class Message {
   readonly id: string
 
@@ -60,21 +65,36 @@ export class Message {
 
   // Name is not toString to avoid unexpected behavior related to js builtin toString
   to(language: Language): string {
-    const translated = this.getTranslatedTemplate(language)
-    return this.interpolate(language, translated, this.args, this.colors, this.postfixes)
+    const preprocessed = extractedTranslatedMessages[language]?.[this.id]
+    if (preprocessed) {
+      return this.interpolatePreprocessed(language, preprocessed, this.args, this.colors, this.postfixes)
+    }
+    // Fallback to raw template joined with \x00 (should not happen)
+    return this.interpolateRaw(language, this.template.join('\x00'), this.args, this.colors, this.postfixes)
   }
 
-  protected getTranslatedTemplate(language: Language): string {
-    const stored = extractedTranslatedMessages[language]?.[this.id]
-    if (typeof stored === 'string') return stored
-    return this.template.join('\x00')
+  protected interpolatePreprocessed(
+    language: Language,
+    data: Preprocessed,
+    args: readonly unknown[],
+    colors: Text.Colors,
+    postfixes: string[] = [],
+  ): string {
+    let result = ''
+    for (const [i, v] of data.s.entries()) {
+      result += colors.text + v
+      if (i < data.i.length) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        result += textUnitColorize(args[data.i[i]!], colors, language)
+      }
+    }
+    for (const postfix of postfixes) {
+      result += postfix
+    }
+    return result
   }
 
-  /**
-   * Interpolates a template string that may contain placeholders like `{0_label}`. Only the numeric index is used; the
-   * label is for translator context.
-   */
-  protected interpolate(
+  protected interpolateRaw(
     language: Language,
     template: string,
     args: readonly unknown[],
@@ -98,7 +118,7 @@ export class Message {
     result += colors.text + template.slice(lastIndex)
 
     for (const postfix of postfixes) {
-      result += postfix // postfix already includes its own color codes
+      result += postfix
     }
 
     return result
@@ -120,12 +140,8 @@ String.prototype.to = function () {
 }
 
 export class NoI18nMessage extends Message {
-  protected getTranslatedTemplate(): string {
-    return this.template.join('\x00')
-  }
-
   to(): string {
-    return this.interpolate(defaultLang, this.getTranslatedTemplate(), this.args, this.colors, this.postfixes)
+    return this.interpolateRaw(defaultLang, this.template.join('\x00'), this.args, this.colors, this.postfixes)
   }
 }
 
@@ -147,10 +163,6 @@ export class SharedI18nMessage extends Message {
     return order.map(index => this.argToRawtext(this.args[index]))
   }
 
-  /**
-   * Returns the order of argument indices as they appear in the source message ID. This order must match the `%s` order
-   * in the .lang file translation.
-   */
   private getPlaceholderOrder(): number[] {
     const order: number[] = []
     const regex = /\{(\d+)(?:_\w+)?\}/g
@@ -175,9 +187,19 @@ export class SharedI18nMessage extends Message {
   }
 
   to(language: Language) {
-    return this.interpolate(
+    const preprocessed = extractedTranslatedMessages[language]?.[this.id]
+    if (preprocessed) {
+      return this.interpolatePreprocessed(
+        language,
+        preprocessed,
+        this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
+        this.colors,
+        this.postfixes,
+      )
+    }
+    return this.interpolateRaw(
       language,
-      this.getTranslatedTemplate(language),
+      this.template.join('\x00'),
       this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
       this.colors,
       this.postfixes,
@@ -238,11 +260,12 @@ export class PluralMessage extends Message {
     const plurals = extractedTranslatedPlurals[l]?.[this.id]
     if (plurals) {
       const rule = intlPlural(l, n)
-      const translated = plurals[rule] ?? this.template.join('\x00')
-      return this.interpolate(l, translated, [n], this.colors, this.postfixes)
+      const form = plurals[rule]
+      if (form) {
+        return this.interpolatePreprocessed(l, form, [n], this.colors, this.postfixes)
+      }
     }
-
-    // Fallback to raw template (untranslated)
-    return super.to(l)
+    // Fallback: raw template with regex
+    return this.interpolateRaw(l, this.template.join('\x00'), [n], this.colors, this.postfixes)
   }
 }
