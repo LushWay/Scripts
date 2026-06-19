@@ -162,7 +162,7 @@ export const noI18nShared = createStatic(undefined, undefined, colors => {
 export const i18nPlural = createStatic(undefined, undefined, colors => {
   return function i18nPlural(template, n) {
     return new PluralMessage(colors, template, n)
-  } as Text.Chained<(template: TemplateStringsArray, n: number) => ServerSideI18nMessage>
+  } as Text.Chained<(template: TemplateStringsArray, n: number) => PluralMessage>
 })
 
 function defaultColors(colors: Partial<Text.Colors> = {}): Required<Text.Colors> {

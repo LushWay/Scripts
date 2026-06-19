@@ -61,32 +61,47 @@ export class Message {
   // Name is not toString to avoid unexpected behavior related to js builtin toString
   to(language: Language): string {
     const translated = this.getTranslatedTemplate(language)
-    return this.concatTemplateStringsArray(language, translated, this.args, this.colors, this.postfixes)
+    return this.interpolate(language, translated, this.args, this.colors, this.postfixes)
   }
 
-  protected getTranslatedTemplate(language: Language) {
-    return extractedTranslatedMessages[language]?.[this.id] ?? this.template
+  protected getTranslatedTemplate(language: Language): string {
+    const stored = extractedTranslatedMessages[language]?.[this.id]
+    if (typeof stored === 'string') return stored
+    return this.template.join('\x00')
   }
 
-  protected concatTemplateStringsArray(
+  /**
+   * Interpolates a template string that may contain placeholders like `{0_label}`. Only the numeric index is used; the
+   * label is for translator context.
+   */
+  protected interpolate(
     language: Language,
-    template: readonly string[],
+    template: string,
     args: readonly unknown[],
     colors: Text.Colors,
     postfixes: string[] = [],
-  ) {
+  ): string {
     if (typeof language !== 'string')
-      throw new TypeError(`Message.string ${template.join('$')} must be called with language`)
+      throw new TypeError(`Message.string must be called with language, got ${typeof language}`)
 
-    if (template.length === 1 && template[0] && args.length === 0 && postfixes.length === 0 && colors.text === '§7')
-      return template[0] // Return as is, without any colors if string has no args nor postfixes
+    let result = ''
+    let lastIndex = 0
+    const regex = /\{(\d+)(?:_\w+)?\}/g
+    let match
 
-    let v = ''
-    for (const [i, t] of [...template, ...postfixes].entries()) {
-      v += colors.text + t
-      if (i in args) v += textUnitColorize(args[i], colors, language)
+    while ((match = regex.exec(template)) !== null) {
+      const index = parseInt(match[1] ?? '0', 10)
+      result += colors.text + template.slice(lastIndex, match.index)
+      result += textUnitColorize(args[index], colors, language)
+      lastIndex = match.index + match[0].length
     }
-    return v
+    result += colors.text + template.slice(lastIndex)
+
+    for (const postfix of postfixes) {
+      result += postfix // postfix already includes its own color codes
+    }
+
+    return result
   }
 
   protected toJSON() {
@@ -105,12 +120,12 @@ String.prototype.to = function () {
 }
 
 export class NoI18nMessage extends Message {
-  protected getTranslatedTemplate(): readonly string[] {
-    return this.template
+  protected getTranslatedTemplate(): string {
+    return this.template.join('\x00')
   }
 
   to(): string {
-    return this.concatTemplateStringsArray(defaultLang, this.template, this.args, this.colors, this.postfixes)
+    return this.interpolate(defaultLang, this.getTranslatedTemplate(), this.args, this.colors, this.postfixes)
   }
 }
 
@@ -118,10 +133,7 @@ export class SharedI18nMessage extends Message {
   toRawText(): RawText {
     const token = extractedSharedMessagesIds[this.id]
     if (!token) {
-      console.warn(
-        `RawText is not supported for '${this.id.replaceAll('\x00', '\\u0000').replaceAll('\n', '\\n')}'. Please run i18n:extract`,
-      )
-
+      console.warn(`RawText token missing for '${this.id}'. Run i18n extraction.`)
       return { rawtext: [{ text: '§cTRANSLATION BROKEN, REPORT' }] }
     }
 
@@ -130,32 +142,40 @@ export class SharedI18nMessage extends Message {
     return { rawtext: [{ translate: token, with: { rawtext: this.argsToRawText() } }] }
   }
 
-  protected argsToRawText() {
-    const argsRawtext: RawText[] = []
-    const args = this.args as RawTextArg[]
-    for (const [i, arg] of args.entries()) {
-      if (arg === '' || arg === undefined || arg === null) {
-        argsRawtext.push({ rawtext: [{ text: '' }] })
-        continue
-      }
+  protected argsToRawText(): RawText[] {
+    const order = this.getPlaceholderOrder()
+    return order.map(index => this.argToRawtext(this.args[index]))
+  }
 
-      let messages: RawMessage[] = []
-      if (arg instanceof SharedI18nMessage) {
-        messages = arg.toRawText().rawtext ?? []
-      } else if (isRawText(arg)) {
-        messages.push({ text: this.colors.unit }, arg)
-      } else messages.push({ text: textUnitColorize(arg, this.colors, false) })
-
-      const textNext = this.template[i + 1]
-      if (textNext) messages.push({ text: this.colors.text })
-
-      argsRawtext.push({ rawtext: messages })
+  /**
+   * Returns the order of argument indices as they appear in the source message ID. This order must match the `%s` order
+   * in the .lang file translation.
+   */
+  private getPlaceholderOrder(): number[] {
+    const order: number[] = []
+    const regex = /\{(\d+)(?:_\w+)?\}/g
+    let match
+    while (typeof (match = regex.exec(this.id)) === 'string') {
+      order.push(parseInt(match[1], 10))
     }
-    return argsRawtext
+    return order
+  }
+
+  private argToRawtext(arg: unknown): RawText {
+    if (arg === undefined || arg === null || arg === '') {
+      return { rawtext: [{ text: '' }] }
+    }
+    if (arg instanceof SharedI18nMessage) {
+      return arg.toRawText()
+    }
+    if (isRawText(arg)) {
+      return arg
+    }
+    return { rawtext: [{ text: textUnitColorize(arg, this.colors, false) }] }
   }
 
   to(language: Language) {
-    return this.concatTemplateStringsArray(
+    return this.interpolate(
       language,
       this.getTranslatedTemplate(language),
       this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
@@ -204,11 +224,25 @@ export class ServerSideI18nMessage extends Message {
   }
 }
 
-export class PluralMessage extends ServerSideI18nMessage {
-  constructor(colors: Text.Colors, template: TemplateStringsArray, n: number) {
-    super(colors, l => {
-      const translated = extractedTranslatedPlurals[l]?.[this.id]?.[intlPlural(l, n)] ?? template
-      return this.concatTemplateStringsArray(l, translated, [n], colors, [])
-    })
+export class PluralMessage extends Message {
+  constructor(
+    colors: Text.Colors,
+    template: TemplateStringsArray,
+    protected n: number,
+  ) {
+    super(template, [], colors)
+  }
+
+  to(l: Language): string {
+    const n = this.n
+    const plurals = extractedTranslatedPlurals[l]?.[this.id]
+    if (plurals) {
+      const rule = intlPlural(l, n)
+      const translated = plurals[rule] ?? this.template.join('\x00')
+      return this.interpolate(l, translated, [n], this.colors, this.postfixes)
+    }
+
+    // Fallback to raw template (untranslated)
+    return super.to(l)
   }
 }

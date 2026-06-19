@@ -1,9 +1,5 @@
 
 
-file:///.//src/lib/achievements/achievement.ts
-Достижение получено: {0}! Заберите награды, используя {0}
-
-
 file:///.//src/lib/achievements/command.ts
 Достижения
 Достижения
@@ -20,16 +16,14 @@ file:///.//src/lib/achievements/command.ts
 Забрать награды
 
 
+file:///.//src/lib/achievements/achievement.ts
+Достижение получено: {0}! Заберите награды, используя {0}
+
+
 file:///.//src/lib/chat/chat.ts
 Чат\n§7Звуки и внешний вид чата
 Звук
 Звука сообщений от игроков поблизости
-
-
-file:///.//src/lib/clan/clan.ts
-Участник
-Помошник
-Владелец
 
 
 file:///.//src/lib/chat/mute.ts
@@ -46,6 +40,12 @@ file:///.//src/lib/chat/mute.ts
 
 file:///.//src/lib/clan/command.ts
 Клан
+
+
+file:///.//src/lib/clan/clan.ts
+Участник
+Помошник
+Владелец
 
 
 file:///.//src/lib/clan/create.ts
@@ -74,19 +74,6 @@ file:///.//src/lib/clan/create.ts
 Короткое имя '{0}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{0}'
 Клан с именем '{0}' уже существует.
 Короткое имя '{0}' уже занято.
-
-
-file:///.//src/lib/command/cmdlet.ts
-Неизвестный аргумент: {0}.\nДоступные командлеты: \n{0}\n 
-
-
-file:///.//src/lib/command/help.ts
-Справка по скриптовым командам
-Пусто
-{0}─═─═─═§f Доступно: {0}/{0} {0}═─═─═─═─
- (также {0})
-   §fКоманда §6.{0}{0}§7§o - {0}
-Выводит справку о команде
 
 
 file:///.//src/lib/clan/menu.ts
@@ -154,6 +141,19 @@ file:///.//src/lib/clan/menu.ts
 Сменить роль {0}
 
 
+file:///.//src/lib/command/cmdlet.ts
+Неизвестный аргумент: {0}.\nДоступные командлеты: \n{0}\n 
+
+
+file:///.//src/lib/command/help.ts
+Справка по скриптовым командам
+Пусто
+{0}─═─═─═§f Доступно: {0}/{0} {0}═─═─═─═─
+ (также {0})
+   §fКоманда §6.{0}{0}§7§o - {0}
+Выводит справку о команде
+
+
 file:///.//src/lib/cooldown.ts
 Не так быстро! Попробуй через {0}
 
@@ -172,6 +172,10 @@ file:///.//src/lib/command/index.ts
 Команда недоступна
 
 
+file:///.//src/lib/crates/animation.ts
+Вы получили свою награду!
+
+
 file:///.//src/lib/crates/crate.ts
 {0} ящик
 Ключ для {0} не подходит к ящику {0}
@@ -183,10 +187,6 @@ file:///.//src/lib/crates/crate.ts
 {0} ящик
 Ключ для ящика {0}
 Используйте этот ключ, чтобы открыть ящик с лутом!
-
-
-file:///.//src/lib/crates/animation.ts
-Вы получили свою награду!
 
 
 file:///.//src/lib/cutscene/menu.ts
@@ -237,18 +237,6 @@ file:///.//src/lib/form/action.ts
 §cВы уверены, что хотите {0}?
 
 
-file:///.//src/lib/form/array-new.ts
-Фильтры
-Предыдущая
-Следующая
-Поиск
-Результаты поиска по запросу\n{0}
-Поиск
-Запрос
-Ничего не произойдет
-Фильтры
-
-
 file:///.//src/lib/form/array.ts
 Фильтры
 Предыдущая
@@ -261,13 +249,16 @@ file:///.//src/lib/form/array.ts
 Фильтры
 
 
-file:///.//src/lib/form/lore.ts
-Хорошо, назад
-История
-
-
-file:///.//src/lib/form/modal.ts
-Никакой
+file:///.//src/lib/form/array-new.ts
+Фильтры
+Предыдущая
+Следующая
+Поиск
+Результаты поиска по запросу\n{0}
+Поиск
+Запрос
+Ничего не произойдет
+Фильтры
 
 
 file:///.//src/lib/form/message.ts
@@ -275,10 +266,27 @@ file:///.//src/lib/form/message.ts
 Вы уверены?
 
 
+file:///.//src/lib/form/lore.ts
+Хорошо, назад
+История
+
+
 file:///.//src/lib/form/new.ts
 Отмена
 Отмена
 Вы уверены?
+
+
+file:///.//src/lib/form/modal.ts
+Никакой
+
+
+file:///.//src/lib/form/utils.ts
+Ошибка
+Назад
+Закрыть
+Закрой чат!
+Не удалось открыть форму. Закрой чат или другое меню и попробуй снова
 
 
 file:///.//src/lib/form/select-player.ts
@@ -288,14 +296,6 @@ file:///.//src/lib/form/select-player.ts
 Сортировать по
 Онлайну
 Дате входа
-
-
-file:///.//src/lib/form/utils.ts
-Ошибка
-Назад
-Закрыть
-Закрой чат!
-Не удалось открыть форму. Закрой чат или другое меню и попробуй снова
 
 
 file:///.//src/lib/get-fullname.ts
@@ -488,6 +488,10 @@ file:///.//src/lib/region/kinds/boss-arena.ts
 §cБосс §6{0}
 
 
+file:///.//src/lib/region/kinds/road.ts
+Дорога
+
+
 file:///.//src/lib/region/kinds/minearea.ts
 §bЗона добычи новичков
 §7Зона добычи
@@ -499,10 +503,6 @@ file:///.//src/lib/region/kinds/minearea.ts
 Вы не можете добывать блоки в зоне добычи новичков
 Регион сохраняется
 Регион создается. {0}%%
-
-
-file:///.//src/lib/region/kinds/road.ts
-Дорога
 
 
 file:///.//src/lib/region/kinds/safe-area.ts
@@ -573,11 +573,6 @@ file:///.//src/lib/rpg/equipment-level-region.ts
 Я готов принять риск
 
 
-file:///.//src/lib/rpg/loot-table-preview.ts
-Содержимое
-Просмотр содержимого таблиц лута
-
-
 file:///.//src/lib/rpg/leaderboard/index.ts
 к
 млн
@@ -585,8 +580,9 @@ file:///.//src/lib/rpg/leaderboard/index.ts
 трлн
 
 
-file:///.//src/lib/rpg/loot-table.ts
-Шанс: {0}%%, Кол-во: {0}...{0}
+file:///.//src/lib/rpg/loot-table-preview.ts
+Содержимое
+Просмотр содержимого таблиц лута
 
 
 file:///.//src/lib/rpg/menu.ts
@@ -595,6 +591,10 @@ file:///.//src/lib/rpg/menu.ts
 меню
 Используйте {0} чтобы убрать этот предмет из инвентаря или получить его снова
 Выдает или убирает {0} из инвентаря
+
+
+file:///.//src/lib/rpg/loot-table.ts
+Шанс: {0}%%, Кол-во: {0}...{0}
 
 
 file:///.//src/lib/rpg/newbie.ts
@@ -611,14 +611,14 @@ file:///.//src/lib/rpg/newbie.ts
 Вводит в режим новичка
 
 
-file:///.//src/lib/rpg/npc.ts
-Я не могу с вами говорить. Приходите позже.
-Не удалось открыть диалог. {0}
-
-
 file:///.//src/lib/rpg/place.ts
 Внешнее пространство
 Пусто
+
+
+file:///.//src/lib/rpg/npc.ts
+Я не могу с вами говорить. Приходите позже.
+Не удалось открыть диалог. {0}
 
 
 file:///.//src/lib/rpg/resource-source.ts
@@ -633,11 +633,6 @@ file:///.//src/lib/rpg/resource-source.ts
 file:///.//src/lib/settings/command.ts
 Настройки
 Настройки мира
-
-
-file:///.//src/lib/shop/buttons/item-modifier.ts
-Зачарования:\n{0}
-Выбранный предмет: {0}\nНажмите, чтобы сменить
 
 
 file:///.//src/lib/settings/index.ts
@@ -657,6 +652,11 @@ JSON-Объект
 §dНастройки
 
 
+file:///.//src/lib/shop/buttons/item-modifier.ts
+Зачарования:\n{0}
+Выбранный предмет: {0}\nНажмите, чтобы сменить
+
+
 file:///.//src/lib/shop/buttons/sellable-item.ts
 Товара на складе: {0}/{0}, {0}%%
 Продать
@@ -674,14 +674,14 @@ file:///.//src/lib/shop/cost/multi-cost.ts
 Недостаточно средств.
 
 
-file:///.//src/lib/shop/cost/xp.ts
-Нужно уровней опыта: {0}, {0}/{0}
-
-
 file:///.//src/lib/shop/form.ts
 Цена динамическая
 Магазин
 Магазин
+
+
+file:///.//src/lib/shop/cost/xp.ts
+Нужно уровней опыта: {0}, {0}/{0}
 
 
 file:///.//src/lib/shop/product.ts
@@ -722,10 +722,6 @@ file:///.//src/lib/utils/rewards.ts
 Вы получили награды!
 
 
-file:///.//src/modules/commands/camera.ts
-Возвращает камеру в исходное состояние
-
-
 file:///.//src/modules/commands/help.ts
 Выводит список команд
 Пусто
@@ -739,13 +735,34 @@ file:///.//src/modules/commands/kill.ts
 Убивает вас. Используйте, если застряли где-то
 
 
+file:///.//src/modules/commands/pid.ts
+Выдает ваш айди
+
+
 file:///.//src/modules/commands/name.ts
 Меняет имя
 Изменено на {0}
 
 
-file:///.//src/modules/commands/pid.ts
-Выдает ваш айди
+file:///.//src/modules/commands/camera.ts
+Возвращает камеру в исходное состояние
+
+
+file:///.//src/modules/commands/ping.ts
+Показывает пинг сервера
+Понг! Проверяем...
+TPS сервера {0}§f: {0}
+§aхороший
+§gнормальный
+§cплохой
+
+
+file:///.//src/modules/commands/rtp.ts
+Вы телепортируетесь!
+Вы не телепортируетесь!
+Телепортация в случайное место на анархии
+Недоступно
+Отменяет телепортацию
 
 
 file:///.//src/modules/commands/player.ts
@@ -757,23 +774,6 @@ file:///.//src/modules/commands/player.ts
 Достижения {0}/{0} ({0}%%)
 Порталы {0}/{0}
 Лор прочитан
-
-
-file:///.//src/modules/commands/rtp.ts
-Вы телепортируетесь!
-Вы не телепортируетесь!
-Телепортация в случайное место на анархии
-Недоступно
-Отменяет телепортацию
-
-
-file:///.//src/modules/commands/ping.ts
-Показывает пинг сервера
-Понг! Проверяем...
-TPS сервера {0}§f: {0}
-§aхороший
-§gнормальный
-§cплохой
 
 
 file:///.//src/modules/commands/sit.ts
@@ -796,14 +796,6 @@ file:///.//src/modules/commands/version.ts
 Версия сервера
 
 
-file:///.//src/modules/features/break-item-durability-notify.ts
-Уведомлять о ломающемся предмете
-Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран
-Не давать ломать предмет
-Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.
-Инструмент скоро сломается! {0}/{0} ({0}%)
-
-
 file:///.//src/modules/commands/wipe.ts
 Вы не можете создать точку восстановления не находясь на анархии
 Вы не можете создать точку восстановления не находясь в выживании или приключении
@@ -822,6 +814,14 @@ file:///.//src/modules/commands/wipe.ts
 Вы уверены что хотите загрузиться в точку восстановления? Ваше текущее состояние будет удалено
 Удалить
 Вы уверены что хотите удалить точку восстановления?
+
+
+file:///.//src/modules/features/break-item-durability-notify.ts
+Уведомлять о ломающемся предмете
+Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 90%% прочности, показывать уведомление на весь экран
+Не давать ломать предмет
+Если включено, то когда вы взаимодействуете с блоком предметом, у которого остается менее 99%% прочности, взаимодействие будет отменено, а предмет - спасен.
+Инструмент скоро сломается! {0}/{0} ({0}%)
 
 
 file:///.//src/modules/indicator/pvp.ts
@@ -857,21 +857,15 @@ file:///.//src/modules/places/anarchy/quartz.ts
 Кварцевое озеро
 
 
-file:///.//src/modules/places/anarchy/random-location-in-anarchy.ts
-Поиск случайной локации без воды...
-Найдено!
-Вода. Попытка {0}/{0}
-
-
 file:///.//src/modules/places/anarchy/radioactive-zone.ts
 Высокая радиация!
 Очень высокая радиация!
 
 
-file:///.//src/modules/places/base/actions/upgrade.ts
-Максимальный уровень\n{0}
-{0} (радиус {0} -> {0})
-Улучшить базу: {0}
+file:///.//src/modules/places/anarchy/random-location-in-anarchy.ts
+Поиск случайной локации без воды...
+Найдено!
+Вода. Попытка {0}/{0}
 
 
 file:///.//src/modules/places/base/actions/create.ts
@@ -902,6 +896,12 @@ file:///.//src/modules/places/base/actions/rotting.ts
 База гниет! Положите материалы из .base -> Гниение в бочку
 
 
+file:///.//src/modules/places/base/actions/upgrade.ts
+Максимальный уровень\n{0}
+{0} (радиус {0} -> {0})
+Улучшить базу: {0}
+
+
 file:///.//src/modules/places/base/base-menu.ts
 Меню базы
 У вас нет базы! Вступите в существующую или создайте свою.
@@ -914,8 +914,9 @@ file:///.//src/modules/places/base/base-menu.ts
 Меню базы
 
 
-file:///.//src/modules/places/dungeons/custom-dungeon.ts
-Данж
+file:///.//src/modules/places/base/base.ts
+§6База
+Поставьте эту бочку и она станет базой.
 
 
 file:///.//src/modules/places/base/region.ts
@@ -924,9 +925,8 @@ file:///.//src/modules/places/base/region.ts
 §6Ваша база {0}
 
 
-file:///.//src/modules/places/base/base.ts
-§6База
-Поставьте эту бочку и она станет базой.
+file:///.//src/modules/places/dungeons/custom-dungeon.ts
+Данж
 
 
 file:///.//src/modules/places/dungeons/dungeon.ts
@@ -989,13 +989,13 @@ file:///.//src/modules/places/lib/npc/stoner.ts
 А камень я тебе дам.\n\n
 
 
-file:///.//src/modules/places/lib/outside-group.ts
-Внешнее пространство
-
-
 file:///.//src/modules/places/lib/npc/woodman.ts
 Дровосек
 Я рублю топором только дерево, не пытайтесь заказать у меня убийство.\n\n
+
+
+file:///.//src/modules/places/lib/outside-group.ts
+Внешнее пространство
 
 
 file:///.//src/modules/places/lib/safe-place.ts
@@ -1010,17 +1010,27 @@ file:///.//src/modules/places/mineshaft/mineshaft-region.ts
 §7Шахта
 
 
-file:///.//src/modules/places/stone-quarry/aunt-zina.ts
-Тетя Зина
-Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n
-
-
 file:///.//src/modules/places/spawn.ts
 Общее
 Вход
 Телепорт на спавн
 Определяет, будете ли вы телепортироваться на спавн при входе
 §r§bПеремещает на спавн
+
+
+file:///.//src/modules/places/stone-quarry/aunt-zina.ts
+Тетя Зина
+Заходиии, располагайся. Вся еда свежая, только из печи! Яблоко тоже.\n\n
+
+
+file:///.//src/modules/places/stone-quarry/barman.ts
+Бармен
+Ну что, устал от жизни? Пришел попить?\n\n
+Квас
+Пиво
+Сидр
+Настойка из шпината
+Вино
 
 
 file:///.//src/modules/places/stone-quarry/furnacer.ts
@@ -1048,23 +1058,6 @@ file:///.//src/modules/places/stone-quarry/furnacer.ts
 Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0}, ключ: {0}
 
 
-file:///.//src/modules/places/stone-quarry/barman.ts
-Бармен
-Ну что, устал от жизни? Пришел попить?\n\n
-Квас
-Пиво
-Сидр
-Настойка из шпината
-Вино
-
-
-file:///.//src/modules/places/stone-quarry/horseman.ts
-Кучер
-Wtf ой то есть мне пока нечего тебе предложить
-
-
-
-
 file:///.//src/modules/places/stone-quarry/gunsmith.ts
 Оружейник
 Кую оружие. Если делать нечего, иди отсюда, не отвлекай дяденьку от работы.
@@ -1079,15 +1072,11 @@ file:///.//src/modules/places/stone-quarry/gunsmith.ts
 Онет, кажется, зачарование {0} уровнем {0} потерялось...
 
 
-file:///.//src/modules/places/stone-quarry/stone-quarry.ts
-Каменоломня
-Печкин
-У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n
-Баба Валя
-У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n
-Ломщик
-А что за город
-Ну типа крутой камни ломаем вот да
+file:///.//src/modules/places/stone-quarry/horseman.ts
+Кучер
+Wtf ой то есть мне пока нечего тебе предложить
+
+
 
 
 file:///.//src/modules/places/stone-quarry/quests/investigating.ts
@@ -1109,6 +1098,21 @@ file:///.//src/modules/places/stone-quarry/quests/investigating.ts
 Деревни исследователей
 
 
+file:///.//src/modules/places/stone-quarry/stone-quarry.ts
+Каменоломня
+Печкин
+У меня ты можешь купить ключ доступа к плавильням для плавки руды\n\n
+Баба Валя
+У меня ты можешь купить ключ доступа к коптильням для жарки еды\n\n
+Ломщик
+А что за город
+Ну типа крутой камни ломаем вот да
+
+
+file:///.//src/modules/places/stone-quarry/wither.boss.ts
+§b§lКамнедробилка
+
+
 file:///.//src/modules/places/tech-city/engineer.ts
 Используется для создания базы у Инжинера в Технограде\n\nМожно получить из усиленного сундука и робота
 Используется для создания платы у Инжинера в Технограде
@@ -1121,10 +1125,6 @@ file:///.//src/modules/places/tech-city/engineer.ts
 
 file:///.//src/modules/places/tech-city/golem.boss.ts
 §6§lРобот
-
-
-file:///.//src/modules/places/stone-quarry/wither.boss.ts
-§b§lКамнедробилка
 
 
 file:///.//src/modules/places/tech-city/quests/investigating.ts
@@ -1143,11 +1143,6 @@ file:///.//src/modules/places/tech-city/quests/investigating.ts
 Тут он скажет типа возьми задание на сбор ресов для базы. После этого задания пошлет к самому инжику мол купи базу
 
 
-file:///.//src/modules/places/village-of-explorers/items.ts
-§aМагическая слизь
-Используется у Инженера
-
-
 file:///.//src/modules/places/tech-city/tech-city.ts
 Техноград
 Техник
@@ -1155,19 +1150,9 @@ file:///.//src/modules/places/tech-city/tech-city.ts
 Ну крутой техно типо не понял что ли
 
 
-file:///.//src/modules/places/village-of-explorers/quests/investigating.ts
-Приветствуем в нашей деревне!
-Здесь есть шахта, ведущая к {0} и {0}
-Вардену
-Магическому слайму
-У {0} можно зачаровать предметы
-Мага
-Посетите Мага
-Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание
-Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание
-Зачаруйте любой предмет у Мага
-Доберитесь до {0} по дороге
-Технограда
+file:///.//src/modules/places/village-of-explorers/items.ts
+§aМагическая слизь
+Используется у Инженера
 
 
 file:///.//src/modules/places/village-of-explorers/mage.ts
@@ -1201,6 +1186,21 @@ file:///.//src/modules/places/village-of-explorers/mage.ts
 §8Зачарование несовместимо
 
 
+file:///.//src/modules/places/village-of-explorers/quests/investigating.ts
+Приветствуем в нашей деревне!
+Здесь есть шахта, ведущая к {0} и {0}
+Вардену
+Магическому слайму
+У {0} можно зачаровать предметы
+Мага
+Посетите Мага
+Откройте Меню -> Вики -> Ресурсы -> Опыт -> Магический слайм -> Взять задание
+Откройте Меню -> Вики -> Руды -> Лазурит -> Взять задание
+Зачаруйте любой предмет у Мага
+Доберитесь до {0} по дороге
+Технограда
+
+
 file:///.//src/modules/places/village-of-explorers/slime.boss.ts
 §a§lМагический слайм
 
@@ -1219,6 +1219,12 @@ file:///.//src/modules/places/village-of-miners/quests/mine-x-blocks.ts
 Добыть железо
 Добыть уголь
 Добыть алмазы
+
+
+file:///.//src/modules/pvp/cannon.ts
+Используй этот предмет, чтобы установить пушку
+Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.
+Используй этот предмет сидя на пушке
 
 
 file:///.//src/modules/places/village-of-miners/village-of-miners.ts
@@ -1242,12 +1248,6 @@ file:///.//src/modules/places/village-of-miners/village-of-miners.ts
 Они есть... просто они сидят дома и смотрят стрим @shp1natqp
 Как мне переплавить руду?
 Возьми у меня задание и отправляйся в другое поселение следуя компасу.
-
-
-file:///.//src/modules/pvp/cannon.ts
-Используй этот предмет, чтобы установить пушку
-Используй этот предмет на пушке, чтобы она выстрелила. Сидя на пушке стрелять нельзя.
-Используй этот предмет сидя на пушке
 
 
 file:///.//src/modules/pvp/fireball.ts
@@ -1286,6 +1286,20 @@ file:///.//src/modules/quests/achievements/common.ts
 Сделал себя сам: Получи первые 10.000 монет
 Гробовщик: открой 10 могил разных игроков
 Гробовщику посвящается
+
+
+file:///.//src/modules/quests/daily/index.ts
+Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0}
+Ежедневные задания
+Ежедневные задания
+Ежедневные задания
+Ежедневные задания
+Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0} заданий вам дают награду. За выполнение всех ежедневных заданий {0} дня подряд вместо обычного ключа выдается донатный\n\n{0}
+Выполнено подряд
+{0}/{0} Награда: ключ от сундука\n{0}
+Сначала выполните все ежедневные задания!
+Вы уже забрали награды сегодня! Заходите завтра
+Вы получили ключ!
 
 
 file:///.//src/modules/quests/learning/learning.ts
@@ -1350,24 +1364,6 @@ file:///.//src/modules/survival/death-quest-and-gravestone.ts
 Поздравляем! В будущем постарайтесь быть осторожнее.
 
 
-file:///.//src/modules/survival/locked-blocks.ts
-Не умею этим пользоваться, но знаю кто точно поможет: {0}
-
-
-file:///.//src/modules/quests/daily/index.ts
-Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0}
-Ежедневные задания
-Ежедневные задания
-Ежедневные задания
-Ежедневные задания
-Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0} заданий вам дают награду. За выполнение всех ежедневных заданий {0} дня подряд вместо обычного ключа выдается донатный\n\n{0}
-Выполнено подряд
-{0}/{0} Награда: ключ от сундука\n{0}
-Сначала выполните все ежедневные задания!
-Вы уже забрали награды сегодня! Заходите завтра
-Вы получили ключ!
-
-
 file:///.//src/modules/survival/menu.ts
 Спавн
 {0}§8Вы тут
@@ -1388,18 +1384,8 @@ file:///.//src/modules/survival/menu.ts
 Статистика
 
 
-file:///.//src/modules/survival/sidebar.ts
-Использовать меню
-Определяет, включено ли внутриигровое меню
-Максимальный размер бокового меню
-Максимально допустимое кол-во символов, при достижении которого слова будут переноситься
-Режим отображения
-Определяет, где будет меню
-Разделенные подсказки
-Боковое меню
-Анархия
-Миниигра
-Спавн
+file:///.//src/modules/survival/locked-blocks.ts
+Не умею этим пользоваться, но знаю кто точно поможет: {0}
 
 
 file:///.//src/modules/survival/recurring-events.ts
@@ -1421,6 +1407,20 @@ file:///.//src/modules/survival/speedrun/target.ts
 Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0}
 \nВыбрано
 Спидран '{0}' начат. Для сброса времени воспользуйтесь .wipe
+
+
+file:///.//src/modules/survival/sidebar.ts
+Использовать меню
+Определяет, включено ли внутриигровое меню
+Максимальный размер бокового меню
+Максимально допустимое кол-во символов, при достижении которого слова будут переноситься
+Режим отображения
+Определяет, где будет меню
+Разделенные подсказки
+Боковое меню
+Анархия
+Миниигра
+Спавн
 
 
 file:///.//src/modules/wiki/wiki.ts
