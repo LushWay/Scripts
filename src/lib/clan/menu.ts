@@ -6,7 +6,7 @@ import { form, FormContext, FormCreator } from 'lib/form/new'
 import { selectPlayer } from 'lib/form/select-player'
 import { BUTTON } from 'lib/form/utils'
 import { getFullname } from 'lib/get-fullname'
-import { i18n, textTable } from 'lib/i18n/text'
+import { i18n, noI18n, textTable } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { is } from 'lib/roles'
 import { Clan, ClanMember, ClanRole } from './clan'
@@ -120,8 +120,8 @@ export const inClanMenu = form.params<{ clan: Clan }>((f, formContext) => {
   })
 
   if (is(player.id, 'techAdmin')) {
-    f.button(i18n`Админ: добавить игрока`, () =>
-      selectPlayer(player, i18n`добавить в клан`, self).then(e => {
+    f.button(noI18n`Админ: добавить игрока`, () =>
+      selectPlayer(player, noI18n`добавить в клан`, self).then(e => {
         clan.addMember(e.id)
         player.success()
       }),

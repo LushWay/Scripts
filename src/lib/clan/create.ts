@@ -4,7 +4,7 @@ import { registerResettableCooldown } from 'lib/cooldownreset'
 import { ArrayForm } from 'lib/form/array'
 import { MessageForm } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { onLoad } from 'lib/utils/load-ref'
 import { ms } from 'lib/utils/ms'
@@ -68,7 +68,7 @@ export function getClanButtonName(clan: Clan, style: Text.Fn<Text, unknown> = i1
 
 const cooldown = onLoad(() => {
   const cd = new Cooldown(ms.from('day', 1), true, Cooldown.defaultDb.get('clan'))
-  registerResettableCooldown(i18n`Создание/изменение названия клана`, cd)
+  registerResettableCooldown(noI18n`Создание/изменение названия клана`, cd)
   return cd
 })
 

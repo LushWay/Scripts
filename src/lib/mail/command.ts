@@ -68,26 +68,25 @@ export function mailMenu(player: Player, back?: VoidFunction) {
     })
     .addCustomButtonBeforeArray((f, _, back) => {
       if (letters.length) {
-        f.button(i18n`Прочитать все
-§7(и собрать награды если есть)`, () => {
+        f.button(i18n`Прочитать все\n§7(и собрать награды если есть)`.to(player.lang), () => {
           Mail.readAllAndClaimRewards(player)
           player.success()
           mailMenu(player)
         })
       } else {
-        f.button(i18n`Все прочитано`, back)
+        f.button(i18n`Все прочитано`.to(player.lang), back)
       }
 
       if (is(player.id, 'moderator')) {
-        f.button(i18n`Объявление`, BUTTON['+'], () => {
-          new ModalForm(i18n`Объявление для всего сервера`)
-            .addTextField(i18n`Заголовок`, i18n`вы крутые там д0а`)
-            .addTextField(i18n`Строка 1`, i18n`мы вас поздравляем`)
-            .addTextField(i18n`Строка2`, i18n`вы теперь можете`)
-            .addTextField(i18n`Строка3`, i18n`читать все сообщения в почте`)
-            .addTextField(i18n`Строка 4`, i18n`да`)
-            .addTextField(i18n`Строка5`, i18n`вот.`)
-            .addSlider(i18n`Алмазов за прочтение`, 0, 100, 1, 5)
+        f.button(i18n`Объявление`.to(player.lang), BUTTON['+'], () => {
+          new ModalForm(i18n`Объявление для всего сервера`.to(player.lang))
+            .addTextField(i18n`Заголовок`.to(player.lang), i18n`вы крутые там д0а`.to(player.lang))
+            .addTextField(i18n`Строка 1`.to(player.lang), i18n`мы вас поздравляем`.to(player.lang))
+            .addTextField(i18n`Строка2`.to(player.lang), i18n`вы теперь можете`.to(player.lang))
+            .addTextField(i18n`Строка3`.to(player.lang), i18n`читать все сообщения в почте`.to(player.lang))
+            .addTextField(i18n`Строка 4`.to(player.lang), i18n`да`.to(player.lang))
+            .addTextField(i18n`Строка5`.to(player.lang), i18n`вот.`.to(player.lang))
+            .addSlider(i18n`Алмазов за прочтение`.to(player.lang), 0, 100, 1, 5)
             .show(player, (ctx, ...args) => {
               const diamonds = args.pop() as number
               const rewards = new Rewards()
