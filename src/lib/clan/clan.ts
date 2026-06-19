@@ -1,6 +1,6 @@
 import { Player, system } from '@minecraft/server'
 import { table } from 'lib/database/abstract'
-import { I18nMessage } from 'lib/i18n/message'
+import { Message } from 'lib/i18n/message'
 import { i18n } from 'lib/i18n/text'
 import { onLoad } from 'lib/utils/load-ref'
 import './command'
@@ -15,7 +15,7 @@ export enum ClanRole {
   Owner = 'owner',
 }
 
-const roleNames: Record<ClanRole, I18nMessage> = {
+const roleNames: Record<ClanRole, Message> = {
   [ClanRole.Member]: i18n`Участник`,
   [ClanRole.Helper]: i18n`Помошник`,
   [ClanRole.Owner]: i18n`Владелец`,

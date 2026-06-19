@@ -1,0 +1,1265 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files and files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: tools/eslint-plugin, src/lib/i18n
+- Files matching these patterns are excluded: **/export-boundaries.js, src/lib/i18n/sprintf.ts
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/lib/i18n/intl.test.ts
+src/lib/i18n/intl.ts
+src/lib/i18n/lang.ts
+src/lib/i18n/message.ts
+src/lib/i18n/text.test.ts
+src/lib/i18n/text.ts
+tools/eslint-plugin/asset-lang.js
+tools/eslint-plugin/helpers.js
+tools/eslint-plugin/index.js
+tools/eslint-plugin/lang.js
+tools/eslint-plugin/rules/translate.js
+tools/eslint-plugin/utils.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/lib/i18n/intl.test.ts">
+import { Language, supportedLanguages } from 'lib/assets/lang'
+import { intlListFormat, intlRemaining } from './intl'
+import { i18n } from './text'
+import { ms } from 'lib/utils/ms'
+
+describe('intlListFormat', () => {
+  it('should translate', () => {
+    expect(intlListFormat(i18n.style, Language.ru_RU, 'and', ['Abc', 'bbc', 'ddc'])).toMatchInlineSnapshot(
+      `"§fAbc§7, §fbbc§7 и §fddc§7"`,
+    )
+    expect(intlListFormat(i18n.style, Language.ru_RU, 'or', ['Abc', 'bbc', 'ddc'])).toMatchInlineSnapshot(
+      `"§fAbc§7, §fbbc§7 или §fddc§7"`,
+    )
+    expect(intlListFormat(i18n.style, Language.en_US, 'and', ['Abc', 'bbc', 'ddc'])).toMatchInlineSnapshot(
+      `"§fAbc§7, §fbbc§7, and §fddc§7"`,
+    )
+    expect(intlListFormat(i18n.style, Language.en_US, 'or', ['Abc', 'bbc', 'ddc'])).toMatchInlineSnapshot(
+      `"§fAbc§7, §fbbc§7, or §fddc§7"`,
+    )
+
+    const list = ['Abc', 'bbc', 'ddc']
+    const nocolors = i18n.nocolor.style
+    expect(intlListFormat(nocolors, Language.ru_RU, 'and', list)).toMatchInlineSnapshot(`"Abc, bbc и ddc"`)
+    expect(intlListFormat(nocolors, Language.ru_RU, 'or', list)).toMatchInlineSnapshot(`"Abc, bbc или ddc"`)
+    expect(intlListFormat(nocolors, Language.en_US, 'and', list)).toMatchInlineSnapshot(`"Abc, bbc, and ddc"`)
+    expect(intlListFormat(nocolors, Language.en_US, 'or', list)).toMatchInlineSnapshot(`"Abc, bbc, or ddc"`)
+  })
+
+  it('should include all elements', () => {
+    const values = ['ab1', 'ab2', 'ab3', 'ab4', 'ab5']
+    for (const lang of supportedLanguages) {
+      for (const a of ['and', 'or'] as const) {
+        const formatted = intlListFormat(i18n.style, lang, a, values)
+        for (const value of values) {
+          expect(formatted.includes(value)).toBe(true)
+        }
+      }
+    }
+  })
+})
+
+describe('intlRemaining', () => {
+  it('should get remaining time', () => {
+    expect(intlRemaining(Language.ru_RU, ms.from('day', 1000))).toMatchInlineSnapshot(`"1.000 дней"`)
+
+    expect(
+      intlRemaining(Language.ru_RU, ms.from('day', 32) + ms.from('hour', 3), [ms.converters.day]),
+    ).toMatchInlineSnapshot(`"32 дня"`)
+
+    expect(
+      intlRemaining(
+        Language.ru_RU,
+        ms.from('day', 1000) + ms.from('min', 4) + ms.from('hour', 30) + ms.from('ms', 334),
+      ),
+    ).toMatchInlineSnapshot(`"1.001 день 6 часов 4 минуты"`)
+
+    expect(
+      intlRemaining(
+        Language.en_US,
+        ms.from('day', 1000) + ms.from('min', 4) + ms.from('hour', 30) + ms.from('ms', 334),
+      ),
+    ).toMatchInlineSnapshot(`"1,001 days, 6 hours, 4 minutes"`)
+  })
+})
+</file>
+
+<file path="tools/eslint-plugin/asset-lang.js">
+// prettier-ignore
+/* eslint-disable */
+// This file is autogenerated by script.
+// Do not modify manually.
+    
+export const sourceCodeLang = 'ru_RU'
+
+export const supportedLanguages = ["en_US","ru_RU"]
+</file>
+
+<file path="tools/eslint-plugin/helpers.js">
+/**
+ * @param {string | undefined | boolean} env
+ * @param {import('@typescript-eslint/utils').TSESLint.FlatConfig.Config} config
+ */
+export function eslintConfigForEnv(env, config) {
+  if (env) return config
+  return {}
+}
+</file>
+
+<file path="tools/eslint-plugin/index.js">
+import exportBoundaries from './rules/export-boundaries.js'
+import translate from './rules/translate.js'
+
+export default { rules: { 'tr': translate, 'export-boundaries': exportBoundaries } }
+</file>
+
+<file path="tools/eslint-plugin/lang.js">
+import fs from 'fs/promises'
+import path from 'path'
+import { sourceCodeLang, supportedLanguages } from './asset-lang.js'
+
+/** @template T */
+class LangWriter {
+  /** @type {string} */
+  base
+
+  /** @type {(data: Record<string, T>) => string} */
+  stringify = data => JSON.stringify(data, null, 2)
+
+  parse = JSON.parse
+
+  /** @type {Record<string, Record<string, T>>} */
+  storage = {}
+
+  constructor(base = 'lang') {
+    this.base = base
+  }
+
+  ext = '.json'
+
+  /** @param {string} lang */
+  #path(lang) {
+    return path.join(this.base, lang + this.ext)
+  }
+
+  readAll() {
+    return Promise.all(supportedLanguages.map(e => this.read(e)))
+  }
+
+  writeAll() {
+    return Promise.all(supportedLanguages.map(e => this.write(e)))
+  }
+
+  unusedWarn = new Set()
+
+  /**
+   * @param {string} lang
+   * @param {Record<string, T>} data
+   */
+  write(lang, data = { ...this.storage[sourceCodeLang], ...this.storage[lang] }) {
+    for (const key in data) {
+      const value = data[key]
+      if (!(key in this.storage[sourceCodeLang])) {
+        if (!this.unusedWarn.has(key)) {
+          this.unusedWarn.add(key)
+          console.warn(this.prefix, lang, 'Unused key', key)
+        }
+      } else {
+        const expected = this.storage[sourceCodeLang][key]
+        if (
+          !(
+            (typeof value === 'string' && typeof expected === 'string') ||
+            (Array.isArray(value) && Array.isArray(expected)) ||
+            (typeof value === 'object' && typeof expected === 'object')
+          )
+        ) {
+          console.warn(
+            `${this.prefix}: Unexpected type of message with id ${key} for lang ${lang}`,
+            value,
+            'expected:',
+            expected,
+          )
+        }
+      }
+    }
+    return fs.writeFile(this.#path(lang), (this.stringify(data) + '\n').replaceAll('\n', '\r\n'), 'utf-8')
+  }
+
+  get prefix() {
+    return `LangWriter(${this.base}/*.${this.ext})`
+  }
+
+  /**
+   * @param {string} lang
+   * @returns {Promise<Record<string, T>>}
+   */
+  async read(lang) {
+    /** @type {Record<string, T>} */
+    let parsed = {}
+
+    try {
+      parsed = this.parse(await fs.readFile(this.#path(lang), 'utf-8'))
+    } catch (e) {
+      console.warn('Unable to read lang', lang, 'with base', this.base, e)
+    }
+
+    if (lang === sourceCodeLang) {
+      this.storage[lang] = parsed
+    } else {
+      this.storage[lang] = {
+        ...parsed,
+        ...(this.storage[lang] ?? {}),
+      }
+    }
+
+    console.log(`${this.prefix}:`, 'Read', lang, 'with keys', Object.keys(parsed).length)
+
+    return parsed
+  }
+}
+/** @typedef {string | string[] | Record<string, string | string[]>} Message */
+
+/** @type {LangWriter<Message>} */
+export const messagesJson = new LangWriter('lang')
+
+/** @type {LangWriter<string>} */
+export const sharedMessages = new LangWriter('texts')
+sharedMessages.ext = '.lang'
+sharedMessages.stringify = data => {
+  let t = '### This file is autogenerated, do not edit\n\n'
+  for (const k in data)
+    t += `${templateToSharedId(k.split('\x00'))}=${data[k].replaceAll('\x00', '%s').replaceAll('\\n', '~LINEBREAK~')}\n`
+  return t
+}
+sharedMessages.parse = () => ({})
+
+export async function readMessages() {
+  await sharedMessages.readAll()
+  await messagesJson.readAll()
+}
+
+/**
+ * @template {Record<string, unknown>} T
+ * @template {string} K2
+ * @template V2
+ * @param {T} object
+ * @param {(key: keyof T, value: Required<T>[keyof T], object: NoInfer<T>) => [K2, V2] | false} mapper
+ * @returns {NoInfer<Record<K2, V2>>}
+ */
+function map(object, mapper) {
+  /** @type {Record<string, unknown>} */
+  const result = {}
+
+  for (const key of Object.getOwnPropertyNames(object)) {
+    // @ts-expect-error ahahah
+    const mapped = mapper(key, object[key], object)
+    if (mapped) result[mapped[0]] = mapped[1]
+  }
+  // @ts-expect-error ahahah
+  return result
+}
+
+export async function writeMessages() {
+  await sharedMessages.writeAll()
+  await messagesJson.writeAll()
+
+  await fs.writeFile(
+    path.join('src/lib/assets', 'lang-messages.ts'),
+    `
+/* eslint-ignore */
+/* i18n-ignore */
+// Autogenerated by translate plugin
+
+type Language = string
+type MessageId = string
+
+export const extractedSharedMessagesIds: Record<MessageId, string> = ${JSON.stringify(Object.fromEntries(Object.entries(sharedMessages.storage[sourceCodeLang]).map(e => [e[1], templateToSharedId(e[0].split('\x00'))])), null, 2)}
+
+export const extractedTranslatedMessages: Record<Language, Record<MessageId, readonly string[]>> = ${JSON.stringify(
+      map(messagesJson.storage, (k, v) => [
+        k,
+        map(
+          v,
+          (k, v) =>
+            (typeof v === 'string' || (typeof v === 'object' && Array.isArray(v))) && [k, Array.isArray(v) ? v : [v]],
+        ),
+      ]),
+      null,
+      2,
+    )}
+
+export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Readonly<Partial<Record<Intl.LDMLPluralRule, readonly string[]>>>>> = ${JSON.stringify(
+      map(messagesJson.storage, (k, v) => [k, map(v, (k, v) => typeof v === 'object' && !Array.isArray(v) && [k, v])]),
+      null,
+      2,
+    )}`.replaceAll('\\\\n', '\\n'),
+  )
+}
+
+/** @param {string[]} template */
+function templateToSharedId(template) {
+  return `script.shared.${template.join('$')}`
+    .toLowerCase()
+    .replace(/§./g, '')
+    .replaceAll('\\n', '_')
+    .replace(/\s/g, '_')
+    .replace(/[^a-zA-Zа-яА-Я.$_0-9]/g, '__')
+    .replace(/\.+/g, '.')
+}
+
+/**
+ * @param {string} id
+ * @param {string[]} template
+ * @param {boolean} shared
+ * @param {boolean} plural
+ */
+export function addTranslation(id, template, shared, plural) {
+  const templ = template.length === 1 ? template[0] : template
+  const prev = messagesJson.storage[sourceCodeLang][id]
+
+  const defaultTranslation = insertTranslation(plural, templ, prev, id, sourceCodeLang)
+
+  // Special case handling to add all needed forms of plural to each lang
+  if (plural) {
+    for (const lang of supportedLanguages) {
+      const prev = messagesJson.storage[lang][id]
+      if (prev === undefined || (typeof prev === 'object' && !Array.isArray(prev))) {
+        insertTranslation(true, template, prev, id, lang)
+      } else throw new Error(`Failed to extract plural ${template}: Non plural key already exists`)
+    }
+  }
+
+  // Add to shared messages
+  if (shared || plural) {
+    for (const lang of supportedLanguages) {
+      const translation = messagesJson.storage[lang][id] ?? defaultTranslation
+
+      /** @param {string[] | string} t */
+      function toStr(t) {
+        return typeof t === 'string' ? t : t.join('\x00')
+      }
+
+      if (typeof translation === 'string') {
+        // Simple
+        sharedMessages.storage[lang][id] = toStr(translation)
+      } else if (Array.isArray(translation)) {
+        // Args
+        sharedMessages.storage[lang][id] = toStr(translation)
+      } else {
+        // Plural
+        for (const key in translation) sharedMessages.storage[lang][`${id}.${key}`] = toStr(translation[key])
+      }
+    }
+  }
+}
+
+const plurals = Object.fromEntries(
+  supportedLanguages.map(e => [e, new Intl.PluralRules(e.replace('_', '-')).resolvedOptions().pluralCategories]),
+)
+/**
+ * @param {boolean} plural
+ * @param {string[] | string} template
+ * @param {Message | undefined} prev
+ * @param {string} id
+ * @param {string} lang
+ * @returns {Message}
+ */
+function insertTranslation(plural, template, prev, id, lang = sourceCodeLang) {
+  /** @type {Message} */
+  let t
+  if (!plural) t = template
+  else {
+    const p = Object.fromEntries(plurals[lang].map(e => [e, template]))
+    t = { ...p, ...(typeof prev === 'object' && !Array.isArray(prev) ? prev : {}) }
+  }
+
+  if (!prev) {
+    // Insert at the start
+    messagesJson.storage[lang] = { [id]: t, ...messagesJson.storage[lang] }
+  } else messagesJson.storage[lang][id] = t
+  return t
+}
+</file>
+
+<file path="tools/eslint-plugin/utils.js">
+import { ESLintUtils } from '@typescript-eslint/utils'
+import path from 'path'
+
+export const createRule = ESLintUtils.RuleCreator(name => `https://example.com/rule/${name}`)
+
+/** @typedef {{ cwd: string; filename: string }} Context */
+
+/**
+ * @param {Context} context
+ * @param {string | null | undefined} [filename]
+ */
+export function toRelative(context, filename = context.filename) {
+  if (!filename) return ''
+
+  return filename.replace(context.cwd, '').replaceAll(path.sep, '/')
+}
+
+/** @param {Context} context */
+export function isScriptsDirectory(context) {
+  return toRelative(context).startsWith('/src')
+}
+
+/** @param {Context} context */
+export function isLibDirectory(context) {
+  return toRelative(context).startsWith('/src/lib')
+}
+
+/**
+ * @param {Context} context
+ * @param {string | null | undefined} [filename]
+ */
+export function isModulesDirectory(context, filename = context.filename) {
+  return toRelative(context, filename).startsWith('/src/modules')
+}
+</file>
+
+<file path="src/lib/i18n/intl.ts">
+/* i18n-ignore */
+import 'lib/assets/intl'
+
+import { defaultLang, IntlLanguage, Language, supportedLanguages } from 'lib/assets/lang'
+import { ms } from 'lib/utils/ms'
+import { textUnitColorize } from './text'
+
+function intlCreate<T>(creator: (intlLocale: string) => T) {
+  const locales = Object.fromEntries(supportedLanguages.map(e => [e, creator(IntlLanguage[e])]))
+  return (locale: Language) => (locales[locale] as T | undefined) ?? locales[defaultLang]
+}
+
+const conjunction = intlCreate(e => new Intl.ListFormat(e, { type: 'conjunction', localeMatcher: 'lookup' }))
+const disjunction = intlCreate(e => new Intl.ListFormat(e, { type: 'disjunction', localeMatcher: 'lookup' }))
+
+export function intlListFormat(colors: Text.Colors, language: Language, type: 'or' | 'and', list: Text[]) {
+  const getFormatterFor = type === 'or' ? disjunction : conjunction
+  const parts = getFormatterFor(language).formatToParts(list.map(e => textUnitColorize(e, colors, language)))
+  const { text } = colors
+  return parts.map(e => (e.type === 'element' ? e.value : text + e.value)).join('') + text
+}
+
+const plural = intlCreate(e => new Intl.PluralRules(e, { type: 'cardinal', localeMatcher: 'lookup' }))
+
+export function intlPlural(language: Language, n: number) {
+  return plural(language).select(n)
+}
+
+declare global {
+  namespace Intl {
+    type Duration = Partial<Record<DurationFormatUnit, number>>
+  }
+}
+
+const durations = intlCreate(e => new Intl.DurationFormat(e, { style: 'long', localeMatcher: 'lookup' }))
+
+/**
+ * Parses the remaining time in milliseconds into a more human-readable format
+ *
+ * @example
+ *   intlRemaining(1000)  // 1 секунда
+ *   intlRemaining(1000 * 60 * 2) // 2 минуты
+ *   intlRemaining(1000 * 60 * 2, [ms.converters.sec]) // 120 секунд
+ *
+ * @param ms - Milliseconds to parse from
+ * @param converters - List of types to convert to. If some time was not specified, e.g. ms, the most closest type will
+ *   be used
+ */
+export function intlRemaining(
+  locale: Language,
+  n: number,
+  converters = [ms.converters.day, ms.converters.hour, ms.converters.min, ms.converters.sec],
+): string {
+  const duration: Intl.Duration = {}
+  for (const converter of converters) {
+    const amount = ~~(n / converter.time)
+    duration[converter.name] = amount
+    n = n - amount * converter.time
+  }
+  return durations(locale).format(duration).replaceAll('\u00a0', '.')
+}
+</file>
+
+<file path="tools/eslint-plugin/rules/translate.js">
+import fs from 'fs/promises'
+import path from 'path'
+import { sourceCodeLang } from '../asset-lang.js'
+import { addTranslation, messagesJson, readMessages, writeMessages } from '../lang.js'
+import { createRule, toRelative } from '../utils.js'
+
+/** @import {TSESTree} from "@typescript-eslint/utils" */
+let text = ''
+let i = 0
+
+const translateRule = createRule({
+  name: 'translate',
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Detect string literals and template literals containing Russian letters and log them.',
+    },
+    schema: [],
+    messages: {
+      dontUseLiterals: "Don't use literals. Use i18n, noI18n or other subtypes instead",
+    },
+    fixable: 'code',
+  },
+  defaultOptions: [],
+  create(context) {
+    const file = toRelative(context)
+    const ignore = ['.test.ts', '.spec.ts', 'world-edit', 'minigames']
+
+    if (ignore.some(e => file.includes(e)) || context.sourceCode.text.includes('/* i18n-ignore */')) return {}
+
+    return {
+      Literal(node) {
+        if (typeof node.value === 'string' && /[а-яА-Я]/.test(node.value) && !isInsideWorldSettings(node)) {
+          context.report({
+            node,
+            messageId: 'dontUseLiterals',
+            fix: fixer => fixer.replaceText(node, `i18n\`${node.value}\``),
+          })
+        }
+      },
+      TemplateLiteral(node) {
+        const templateStrings = node.quasis.map(e => e.value.raw)
+        const id = templateStrings.join('\x00')
+
+        if (/[а-яА-Я]/.test(id)) {
+          const template = node.parent
+          if (template.type === 'TaggedTemplateExpression') {
+            const tag =
+              template.tag.type === 'Identifier'
+                ? { name: template.tag.name }
+                : template.tag.type === 'MemberExpression' && template.tag.object.type === 'Identifier'
+                  ? { name: template.tag.object.name, property: template.tag.property }
+                  : undefined
+
+            const name = tag?.name
+            const subname = tag?.property?.type === 'Identifier' ? tag.property.name : undefined
+
+            if (name === 'noI18n' || name == 'noI18nShared') return
+
+            if (subname === 'join') return
+
+            const filelink = `file:///./${file}`.replaceAll(path.sep, '/')
+            if (!text.includes(filelink)) text += '\n\n' + filelink + '\n'
+            text += id.replaceAll('\x00', '{0}') + '\n'
+            i++
+
+            const shared = name === 'i18nShared'
+            const plural = name === 'i18nPlural'
+
+            addTranslation(id, templateStrings, shared, plural)
+          } else if (!isInsideWorldSettings(node)) {
+            context.report({
+              node,
+              messageId: 'dontUseLiterals',
+              fix: fixer => fixer.replaceText(node, `i18n${context.sourceCode.getText(node)}`),
+            })
+          }
+        }
+      },
+    }
+  },
+})
+
+/** @param {TSESTree.Literal | TSESTree.TemplateLiteral} node */
+function isInsideWorldSettings(node) {
+  // Ignore Settings.world({ setting: { name: 'Do not translate this', desc: 'too' }})
+  if (
+    node.parent.type == 'Property' &&
+    node.parent.parent.type === 'ObjectExpression' &&
+    node.parent.parent.parent.type === 'Property' &&
+    node.parent.parent.parent.parent.type === 'ObjectExpression' &&
+    node.parent.parent.parent.parent.parent.type === 'CallExpression' &&
+    node.parent.parent.parent.parent.parent.callee.type === 'MemberExpression' &&
+    node.parent.parent.parent.parent.parent.callee.object.type === 'Identifier' &&
+    node.parent.parent.parent.parent.parent.callee.object.name === 'Settings' &&
+    node.parent.parent.parent.parent.parent.callee.property.type === 'Identifier' &&
+    node.parent.parent.parent.parent.parent.callee.property.name === 'world'
+  )
+    return true
+
+  return false
+}
+
+if (process.env.I18N) {
+  await readMessages()
+
+  // There is no other way to check if eslint is done
+  process.once('beforeExit', async () => {
+    console.log('Total messages: ', i)
+    console.log('Duplicated:', i - Object.keys(messagesJson.storage[sourceCodeLang]).length)
+    console.log('\n\n')
+
+    await fs.writeFile('lang/source.txt', text)
+    await writeMessages()
+  })
+}
+
+export default translateRule
+</file>
+
+<file path="src/lib/i18n/lang.ts">
+import { Enchantment, ItemStack, RawMessage, RawText, world } from '@minecraft/server'
+import { MinecraftEnchantmentTypes } from '@minecraft/vanilla-data'
+import { blockItemsLangJson, langs } from 'lib/assets/lang-big'
+import { addNamespace, inspect } from 'lib/util'
+import { Language } from '../assets/lang'
+import { sprintf } from './sprintf'
+
+/**
+ * Gets lang token of type id and translates it server side based on providen language
+ *
+ * @example
+ *   translateTypeId('minecraft:chorus_fruit', Language.en_US) // Chorus fruit
+ *
+ * @example
+ *   translateTypeId('minecraft:cobblestone', Language.en_US) // Cobblestone
+ *
+ * @param typeId - Type id of block or item
+ */
+
+export function translateTypeId(typeId: string, lang: Language) {
+  return translateToken(langToken(typeId), lang)
+}
+
+const langTokenCache = new Map<string, string>()
+
+/**
+ * Gets localization name of the ItemStack or Block
+ *
+ * @example
+ *   const apple = new ItemStack(MinecraftItemTypes.Apple)
+ *   langToken(apple) // %item.apple.name
+ *
+ * @example
+ *   langToken(MinecraftEnchantmentTypes.Sharpness) // %enchantment.sharnpess.name
+ */
+export function langToken(typeId: string): string {
+  if (blockItemsLangJson[typeId]) return blockItemsLangJson[typeId]
+
+  try {
+    const item = new ItemStack(typeId)
+    langTokenCache.set(typeId, item.localizationKey)
+    return item.localizationKey
+  } catch {}
+
+  try {
+    const block = world.overworld.getBlock({ x: 0, y: world.overworld.heightRange.max - 1, z: 0 })
+    if (block) {
+      block.setType(typeId)
+      langTokenCache.set(typeId, block.localizationKey)
+      return block.localizationKey
+    } else {
+      console.log('no block')
+    }
+  } catch (e) {
+    console.error(e)
+  }
+
+  return typeId
+}
+
+/**
+ * Returns translated string representation of an Enchantment or Enchantment Type. If Enchanment is provided, also
+ * returns its as another translated RawMessage
+ */
+export function translateEnchantment(e: MinecraftEnchantmentTypes | Enchantment, language: Language): string {
+  let result = translateTypeId(addNamespace(typeof e === 'string' ? e : e.type.id), language)
+
+  if (typeof e === 'object' && e.level > 0) {
+    // const level =
+    // e.level < 10 ? translateTypeId(`enchantment.level.${e.level.toString()}`, language) : e.level.toString()
+    const level = e.level.toString()
+    result += ' ' + level
+  }
+
+  return result
+}
+
+/**
+ * Translates a language token like `item.apple.name` to target language value like `Apple`
+ *
+ * If translation in target lang does not exists, it searches across all langs, and lastly it returns token as is
+ *
+ * @example
+ *   translateToken(langToken(MinecraftItemTypes.Apple), 'en_US') // Apple
+ *   translateToken(langToken(MinecraftItemTypes.Apple), 'ru_RU') // Яблоко
+ *   translateToken('item.apple.name', 'ru_RU') // Яблоко
+ *   translateToken('item.apple.name', player.lang) // Apple in player's lang
+ *
+ * @param lang
+ * @param token
+ * @returns
+ */
+export function translateToken(token: string | undefined, lang: Language): string {
+  if (!token) return ''
+
+  const langMap = langs[lang]
+
+  if (!(lang in langs) || !langMap[token]) {
+    for (const langMap of Object.values(langs)) {
+      if (langMap[token]) return langMap[token]
+    }
+
+    return token
+  } else return langMap[token]
+}
+
+export function rawTextToString(rawText: RawText, lang: Language) {
+  return rawText.rawtext?.map(e => rawMessageToString(e, lang)).join('') ?? ''
+}
+
+export function rawMessageToString(rawMessage: RawMessage, lang: Language) {
+  let result = ''
+  if (rawMessage.text) return rawMessage.text
+  if (rawMessage.translate) {
+    const tr = translateToken(rawMessage.translate, lang)
+    if (!rawMessage.with) {
+      return tr
+    } else {
+      const args = []
+      if (Array.isArray(rawMessage.with)) {
+        for (const a of rawMessage.with) {
+          args.push(a)
+        }
+      } else {
+        if (!rawMessage.with.rawtext)
+          throw new TypeError('RawMessage.with MUST contain .rawtext, got ' + inspect(rawMessage.with))
+        for (const a of rawMessage.with.rawtext) {
+          args.push(rawMessageToString(a, lang))
+        }
+      }
+      sprintf(tr, ...args)
+    }
+  }
+
+  if (rawMessage.rawtext) {
+    for (const m of rawMessage.rawtext) {
+      result += rawMessageToString(m, lang)
+    }
+  }
+
+  return result
+}
+</file>
+
+<file path="src/lib/i18n/text.ts">
+import { Player, RawText } from '@minecraft/server'
+import { defaultLang, Language } from 'lib/assets/lang'
+import { extractedTranslatedPlurals } from 'lib/assets/lang-messages'
+import { Vec } from 'lib/vector'
+import { separateNumberWithDots } from '../util'
+import { stringify } from '../utils/inspect'
+import { ms } from '../utils/ms'
+import { intlPlural, intlRemaining } from './intl'
+import {
+  I18nMessage,
+  Message,
+  RawTextArg,
+  ServerSideI18nMessage,
+  SharedI18nMessage,
+  SharedI18nMessageJoin,
+  SharedNoI18nMessage,
+} from './message'
+export type MaybeRawText = string | RawText
+
+declare global {
+  /** Text that can be displayed on player screen and should support translation */
+  type Text = string | Message
+
+  type SharedText = import('lib/i18n/message').SharedI18nMessage
+
+  namespace Text {
+    export interface Colors {
+      /** Color of strings, objects and other messages */
+      unit: string
+      /** Color of numbers and bigints */
+      num: string
+      /** Color of regular template text i18n`Like this one` */
+      text: string
+    }
+
+    export interface Static<T> {
+      /**
+       * @example
+       *   t.time(3000) -> "3 секунды"
+       */
+      time(time: number): Message
+
+      /**
+       * @example
+       *   t.time(3000) -> "00:00:03"
+       *   t.time(ms.from('min', 32) + 1000) -> "00:32:01"
+       *   t.time(ms.from('day', 1) +  ms.from('min', 32) + 1000) -> "1 д. 00:32:01"
+       *   t.time(ms.from('day', 10000) +  ms.from('min', 32) + 1000) -> "10000 д. 00:32:01"
+       */
+      hhmmss(time: number): SharedI18nMessage | string
+
+      restyle: (colors: Partial<Text.Colors>) => T
+
+      style: Text.Colors
+    }
+
+    /** "§7Some long text §fwith substring§7 and number §64§7" */
+    export type Fn<T, Arg> = (text: TemplateStringsArray, ...args: Arg[]) => T
+
+    export type FnWithJoin<T, Arg> = Fn<T, Arg> & { join: Fn<T, Arg> }
+
+    interface Modifiers<T> {
+      /** "§cSome long text §fwith substring§c and number §74§c" */
+      error: T
+
+      /** "§eSome long text §fwith substring§e and number §64§e" */
+      warn: T
+
+      /** "§aSome long text §fwith substring§a and number §64§a" */
+      success: T
+
+      /** "§3Some long text §fwith substring§3 and number §64§3" */
+      accent: T
+
+      /** "§8Some long text §7with substring§8 and number §74§8" */
+      disabled: T
+
+      /** "§r§6Some long text §f§lwith substring§r§6 and number §f4§r§6" */
+      header: T
+
+      /** "Some long text with substring and number 4" */
+      nocolor: T
+    }
+    export type Chained<T extends Fn<any, any>> = T & Static<Chained<T>> & Modifiers<T & Static<Chained<T>>>
+
+    export type Table = (Text | readonly [Text, unknown])[]
+  }
+}
+
+export function textTable(table: Text.Table, colored = table.length > 5): Message {
+  return new ServerSideI18nMessage(defaultColors(), lang => {
+    return table
+      .map((v, i) => {
+        if (typeof v === 'string') return v
+        if (v instanceof Message) return v.to(lang)
+
+        const [key, value] = v
+        return `${i % 2 === 0 && colored ? '§f' : '§7'}${key.to(lang)}: ${textUnitColorize(value, undefined, lang)}`
+      })
+      .join('\n')
+  })
+}
+
+function createStyle(colors: Text.Colors) {
+  return Object.freeze(colors)
+}
+
+const styles = {
+  nocolor: createStyle({ text: '', unit: '', num: '' }),
+  header: createStyle({ text: '§r§6', num: '§f', unit: '§f§l' }),
+  error: createStyle({ num: '§7', text: '§c', unit: '§f' }),
+  warn: createStyle({ num: '§6', text: '§e', unit: '§f' }),
+  accent: createStyle({ num: '§6', text: '§3', unit: '§f' }),
+  success: createStyle({ num: '§6', text: '§a', unit: '§f' }),
+  disabled: createStyle({ num: '§7', text: '§8', unit: '§7' }),
+}
+
+/** Used for text only developers or testers will see. */
+export const noI18n = createStatic(undefined, undefined, colors => {
+  return function simpleStr(template, ...args) {
+    return Message.concatTemplateStringsArray(defaultLang, template, args, colors)
+  } as Text.Chained<Text.Fn<string, unknown>>
+})
+
+/** Used for any regular text on the screen */
+export const i18n = createStatic(undefined, undefined, colors => {
+  const i18n = ((template, ...args) => new I18nMessage(template, args, colors)) as Text.FnWithJoin<I18nMessage, unknown>
+
+  i18n.join = (template, ...args) => new Message(template, args, colors)
+
+  return i18n as Text.Chained<Text.FnWithJoin<I18nMessage, unknown>>
+})
+
+/**
+ * Used for places that only accept RawText and require .lang tokens to be present on client side (entity names). This
+ * is mostly for future and those places where you can't conditionally check for player language and need to provide
+ * same value for every player, thus requiring translation on client side
+ */
+export const i18nShared = createStatic(undefined, undefined, colors => {
+  const i18n = ((template, ...args) => new SharedI18nMessage(template, args, colors)) as Text.FnWithJoin<
+    SharedI18nMessage,
+    RawTextArg
+  >
+
+  i18n.join = (template, ...args) => new SharedI18nMessageJoin(template, args, colors)
+
+  return i18n as Text.Chained<Text.FnWithJoin<SharedI18nMessage, RawTextArg>>
+})
+
+/** Used for points names that only developers will see. */
+export const noI18nShared = createStatic(undefined, undefined, colors => {
+  const i18n = ((template, ...args) => new SharedNoI18nMessage(template, args, colors)) as Text.FnWithJoin<
+    SharedNoI18nMessage,
+    RawTextArg
+  > as Text.FnWithJoin<SharedI18nMessage, unknown>
+
+  i18n.join = (template, ...args) => new SharedI18nMessageJoin(template, args, colors)
+
+  return i18n as Text.Chained<Text.FnWithJoin<SharedI18nMessage, unknown>>
+})
+
+export const i18nPlural = createStatic(undefined, undefined, colors => {
+  return function i18nPlural(template, n) {
+    const id = ServerSideI18nMessage.templateToId(template)
+    return new ServerSideI18nMessage(colors, l => {
+      const translated = extractedTranslatedPlurals[l]?.[id]?.[intlPlural(l, n)] ?? template
+      return ServerSideI18nMessage.concatTemplateStringsArray(l, translated, [n], colors, [])
+    })
+  } as Text.Chained<(template: TemplateStringsArray, n: number) => ServerSideI18nMessage>
+})
+
+function defaultColors(colors: Partial<Text.Colors> = {}): Required<Text.Colors> {
+  return {
+    unit: colors.unit ?? '§f',
+    text: colors.text ?? '§7',
+    num: colors.num ?? '§6',
+  }
+}
+
+function createStatic<T extends Text.Chained<Text.Fn<any, any>>>(
+  colors: Partial<Text.Colors> = {},
+  modifier = false,
+  createFn: (colors: Text.Colors) => T,
+): T {
+  const dcolors = defaultColors(colors)
+  const fn = createFn(dcolors)
+  fn.style = dcolors
+  fn.time = createTime(dcolors)
+  fn.hhmmss = createTimeHHMMSS(dcolors)
+  fn.restyle = colors => createStatic<T>(colors, false, createFn)
+
+  if (!modifier) {
+    fn.nocolor = createStatic(styles.nocolor, true, createFn)
+    fn.header = createStatic(styles.header, true, createFn)
+    fn.error = createStatic(styles.error, true, createFn)
+    fn.warn = createStatic(styles.warn, true, createFn)
+    fn.accent = createStatic(styles.accent, true, createFn)
+    fn.success = createStatic(styles.success, true, createFn)
+    fn.disabled = createStatic(styles.disabled, true, createFn)
+  }
+  return fn
+}
+
+const dayMs = ms.from('day', 1)
+function createTimeHHMMSS(colors: Text.Colors): Text.Static<never>['hhmmss'] {
+  return n => {
+    const hhmmss = new Date(n).toHHMMSS()
+    if (n <= dayMs) return hhmmss
+
+    const days = ~~(n / dayMs)
+    return i18nShared.restyle(colors)`${days} д. ${hhmmss}`
+  }
+}
+
+function createTime(colors: Text.Colors): Text.Static<never>['time'] {
+  return ms => new ServerSideI18nMessage(colors, l => intlRemaining(l, ms))
+}
+
+export function textUnitColorize(
+  v: unknown,
+  { unit, num }: Text.Colors = defaultColors(),
+  lang: Language | false,
+): string {
+  switch (typeof v) {
+    case 'string':
+      if (v.includes('§l')) return unit + v + '§r'
+      return unit + v
+    case 'undefined':
+      return ''
+    case 'object':
+      if (v instanceof Message) {
+        if (!lang) {
+          throw new TypeError(`Text unit colorize cannot translate Message '${v.id}' if no locale was given!`)
+        }
+
+        const vstring = v.to(lang)
+        return vstring.startsWith('§') ? vstring : unit + vstring
+      }
+      if (v instanceof Player) {
+        return unit + v.name
+      } else if (Vec.isVec(v)) {
+        return Vec.string(v, true)
+      } else return stringify(v)
+
+    case 'number':
+      return `${num}${separateNumberWithDots(v)}`
+    case 'symbol':
+    case 'function':
+    case 'bigint':
+      return '§c<>'
+    case 'boolean':
+      return (v ? i18n.nocolor`§fДа` : i18n.nocolor`§cНет`).to(lang || defaultLang)
+  }
+}
+</file>
+
+<file path="src/lib/i18n/message.ts">
+import { RawMessage, RawText } from '@minecraft/server'
+import { defaultLang, Language } from 'lib/assets/lang'
+import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
+import { rawTextToString, translateToken } from './lang'
+import { textUnitColorize } from './text'
+
+export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
+
+export class Message {
+  static concatTemplateStringsArray(
+    language: Language,
+    template: readonly string[],
+    args: readonly unknown[],
+    colors: Text.Colors,
+    postfixes: string[] = [],
+  ) {
+    if (typeof language !== 'string')
+      throw new TypeError(`Message.string ${template.join('$')} must be called with language`)
+
+    if (template.length === 1 && template[0] && args.length === 0 && postfixes.length === 0 && colors.text === '§7')
+      return template[0] // Return as is, without any colors if string has no args nor postfixes
+
+    let v = ''
+    for (const [i, t] of [...template, ...postfixes].entries()) {
+      v += colors.text + t
+      if (i in args) v += textUnitColorize(args[i], colors, language)
+    }
+    return v
+  }
+
+  static templateToId(template: readonly string[]) {
+    return template.join('\x00')
+  }
+
+  readonly id: string
+
+  constructor(
+    protected readonly template: readonly string[],
+    protected readonly args: readonly unknown[],
+    protected colors: Text.Colors,
+  ) {
+    this.id = Message.templateToId(template)
+  }
+
+  color(c: Text.Colors | Pick<Text.Static<never>, 'style'>, children = true) {
+    const were = this.colors
+
+    this.colors = 'style' in c ? c.style : c
+    for (const arg of this.args) {
+      if (arg instanceof Message) {
+        // Recolor children only if they had the same colors parent had
+        // Or if force recoloring is enabled
+        if (arg.colors === were || children) arg.color(c)
+      }
+    }
+    return this
+  }
+
+  protected postfixes: string[] = []
+
+  /**
+   * @example
+   *   `Text`.badge(3) -> 'Text (3)' // §r
+   *   `Text`.badge(0) -> 'Text'
+   */
+  size(n: number | undefined, text = this.colors.text, num = this.colors.num) {
+    if (!n) return this
+    this.postfixes.push(` ${text}(${num}${n}${text})`)
+    return this
+  }
+
+  /**
+   * @example
+   *   `Text`.badge(3) -> 'Text §4(§c3§4)' // §r
+   *   `Text`.badge(0) -> 'Text'
+   */
+  badge(n: number | undefined) {
+    return this.size(n, '§4', '§c')
+  }
+
+  // Name is not toString to avoid unexpected behavior related to js builtin toString
+  to(language: Language) {
+    return Message.concatTemplateStringsArray(language, this.template, this.args, this.colors, this.postfixes)
+  }
+
+  protected toJSON() {
+    return this.to(defaultLang)
+  }
+}
+
+declare global {
+  interface String {
+    to(): string
+  }
+}
+
+export class I18nMessage extends Message {
+  to(language: Language): string {
+    const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
+    return Message.concatTemplateStringsArray(language, translated, this.args, this.colors, this.postfixes)
+  }
+}
+
+export class SharedI18nMessage extends I18nMessage {
+  toRawText(): RawText {
+    const token = extractedSharedMessagesIds[this.id]
+    if (!token) {
+      console.warn(
+        `RawText is not supported for '${this.id.replaceAll('\x00', '\\u0000').replaceAll('\n', '\\n')}'. Please run i18n:extract`,
+      )
+
+      return { rawtext: [{ text: '§cTRANSLATION BROKEN, REPORT' }] }
+    }
+
+    if (!this.args.length) return { rawtext: [{ translate: token }] }
+
+    return { rawtext: [{ translate: token, with: { rawtext: this.argsToRawText() } }] }
+  }
+
+  protected argsToRawText() {
+    const argsRawtext: RawText[] = []
+    const args = this.args as RawTextArg[]
+    for (const [i, arg] of args.entries()) {
+      if (arg === '' || arg === undefined || arg === null) {
+        argsRawtext.push({ rawtext: [{ text: '' }] })
+        continue
+      }
+
+      let messages: RawMessage[] = []
+      if (arg instanceof SharedI18nMessage) {
+        messages = arg.toRawText().rawtext ?? []
+      } else if (isRawText(arg)) {
+        messages.push({ text: this.colors.unit }, arg)
+      } else messages.push({ text: textUnitColorize(arg, this.colors, false) })
+
+      const textNext = this.template[i + 1]
+      if (textNext) messages.push({ text: this.colors.text })
+
+      argsRawtext.push({ rawtext: messages })
+    }
+    return argsRawtext
+  }
+
+  to(language: Language) {
+    const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
+    return Message.concatTemplateStringsArray(
+      language,
+      translated,
+      this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
+      this.colors,
+      this.postfixes,
+    )
+  }
+}
+
+function isRawText(arg: unknown): arg is RawText {
+  return typeof arg === 'object' && arg !== null && 'rawtext' in arg
+}
+
+export class SharedI18nMessageJoin extends SharedI18nMessage {
+  toRawText(): RawText {
+    const rawtext: RawMessage[] = []
+    const args = this.argsToRawText()
+    for (const [i, text] of this.template.entries()) {
+      rawtext.push({ text })
+      if (args[i]) rawtext.push(args[i])
+    }
+    return { rawtext }
+  }
+}
+
+export class SharedNoI18nMessage extends SharedI18nMessage {
+  toRawText(): RawText {
+    return { rawtext: [{ text: this.to(defaultLang) }] }
+  }
+
+  protected argsToRawText() {
+    return []
+  }
+}
+
+export class ServerSideI18nMessage extends I18nMessage {
+  constructor(
+    colors: Text.Colors,
+    protected readonly generate: (language: Language) => string,
+  ) {
+    super([], [], colors)
+  }
+
+  to(language: Language): string {
+    return this.generate(language)
+  }
+}
+
+export class MinecraftI18nMessage extends SharedI18nMessage {
+  constructor(
+    protected readonly token: string,
+    colors: Text.Colors = { num: '', text: '', unit: '' },
+  ) {
+    super([], [], colors)
+  }
+
+  toRawText(): RawText {
+    return { rawtext: [{ translate: this.token }] }
+  }
+
+  to(language: Language): string {
+    const text = translateToken(this.token, language)
+    if (text.includes('§')) return '§r' + text + '§r'
+    return text
+  }
+}
+</file>
+
+</files>

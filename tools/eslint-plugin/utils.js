@@ -21,7 +21,7 @@ export function isScriptsDirectory(context) {
 }
 
 /** @param {Context} context */
-export function isLibDirectory(context, filename = context.filename) {
+export function isLibDirectory(context) {
   return toRelative(context).startsWith('/src/lib')
 }
 

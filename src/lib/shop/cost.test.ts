@@ -79,7 +79,9 @@ describe('MultiCost', () => {
     const player = TEST_createPlayer()
     const cost = new MultiCost().money(1000).item(MinecraftItemTypes.Apple).item(MinecraftItemTypes.NetheriteAxe).xp(10)
 
-    expect(cost.toString(player)).toMatchInlineSnapshot(`"§61.000, §7Яблоко §r§f§7x1, §7Незеритовый топор §r§f§7x1, §7§a10§7lvl"`)
+    expect(cost.toString(player)).toMatchInlineSnapshot(
+      `"§61.000, §7Яблоко §r§f§7x1, §7Незеритовый топор §r§f§7x1, §7§a10§7lvl"`,
+    )
 
     expect(cost.toString(player, false)).toMatchInlineSnapshot(
       `"§c1.000, §cЯблоко §r§f§cx1, §cНезеритовый топор §r§f§cx1, §4§c10§4lvl"`,
@@ -121,7 +123,6 @@ describe('MultiCost', () => {
 
     // @ts-expect-error
     expectTypeOf(multicost[4]).toBeString()
-    // @ts-expect-error
     expectTypeOf(multicost[2]).toBeString()
   })
 

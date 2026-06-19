@@ -3,13 +3,13 @@ import { ArrayForm } from 'lib/form/array'
 import { getAuxOrTexture } from 'lib/form/chest'
 import { form } from 'lib/form/new'
 import { translateEnchantment } from 'lib/i18n/lang'
-import { I18nMessage } from 'lib/i18n/message'
+import { Message } from 'lib/i18n/message'
 import { i18n } from 'lib/i18n/text'
 import { itemNameXCount } from 'lib/utils/item-name-x-count'
 import { LootTable } from './loot-table'
 
 // TODO Fix colors
-export const lootTablePreview = form.params<{ lootTable: LootTable; name?: I18nMessage; one?: boolean }>(
+export const lootTablePreview = form.params<{ lootTable: LootTable; name?: Message; one?: boolean }>(
   (f, { player, params: { lootTable, name = i18n.header`Содержимое`, one = false } }) => {
     f.title(name)
 

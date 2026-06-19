@@ -1,8 +1,7 @@
 import { world } from '@minecraft/server'
 import { MinecraftEffectTypes, MinecraftEntityTypes } from '@minecraft/vanilla-data'
 
-import { CustomEntityTypes } from 'lib/assets/custom-entity-types'
-import { MinecraftI18nMessage } from 'lib/i18n/message'
+import { i18nShared } from 'lib/i18n/text'
 import { Boss } from 'lib/rpg/boss'
 import { EquippmentLevel } from 'lib/rpg/equipment-level'
 import { Loot } from 'lib/rpg/loot-table'
@@ -10,7 +9,6 @@ import { Group } from 'lib/rpg/place'
 import { ms } from 'lib/utils/ms'
 import { Vec } from 'lib/vector'
 import { Chip } from './engineer'
-import { i18nShared } from 'lib/i18n/text'
 
 export function createBossGolem(group: Group) {
   const boss = Boss.create()

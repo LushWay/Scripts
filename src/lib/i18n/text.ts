@@ -1,14 +1,14 @@
 import { Player, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
-import { extractedTranslatedPlurals } from 'lib/assets/lang-messages'
 import { Vec } from 'lib/vector'
 import { separateNumberWithDots } from '../util'
 import { stringify } from '../utils/inspect'
 import { ms } from '../utils/ms'
-import { intlPlural, intlRemaining } from './intl'
+import { intlRemaining } from './intl'
 import {
-  I18nMessage,
   Message,
+  NoI18nMessage,
+  PluralMessage,
   RawTextArg,
   ServerSideI18nMessage,
   SharedI18nMessage,
@@ -118,17 +118,17 @@ const styles = {
 /** Used for text only developers or testers will see. */
 export const noI18n = createStatic(undefined, undefined, colors => {
   return function simpleStr(template, ...args) {
-    return Message.concatTemplateStringsArray(defaultLang, template, args, colors)
+    return new NoI18nMessage(template, args, colors).to()
   } as Text.Chained<Text.Fn<string, unknown>>
 })
 
 /** Used for any regular text on the screen */
 export const i18n = createStatic(undefined, undefined, colors => {
-  const i18n = ((template, ...args) => new I18nMessage(template, args, colors)) as Text.FnWithJoin<I18nMessage, unknown>
+  const i18n = ((template, ...args) => new Message(template, args, colors)) as Text.FnWithJoin<Message, unknown>
 
   i18n.join = (template, ...args) => new Message(template, args, colors)
 
-  return i18n as Text.Chained<Text.FnWithJoin<I18nMessage, unknown>>
+  return i18n as Text.Chained<Text.FnWithJoin<Message, unknown>>
 })
 
 /**
@@ -161,11 +161,7 @@ export const noI18nShared = createStatic(undefined, undefined, colors => {
 
 export const i18nPlural = createStatic(undefined, undefined, colors => {
   return function i18nPlural(template, n) {
-    const id = ServerSideI18nMessage.templateToId(template)
-    return new ServerSideI18nMessage(colors, l => {
-      const translated = extractedTranslatedPlurals[l]?.[id]?.[intlPlural(l, n)] ?? template
-      return ServerSideI18nMessage.concatTemplateStringsArray(l, translated, [n], colors, [])
-    })
+    return new PluralMessage(colors, template, n)
   } as Text.Chained<(template: TemplateStringsArray, n: number) => ServerSideI18nMessage>
 })
 

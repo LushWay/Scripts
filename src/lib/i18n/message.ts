@@ -1,37 +1,17 @@
 import { RawMessage, RawText } from '@minecraft/server'
 import { defaultLang, Language } from 'lib/assets/lang'
-import { extractedSharedMessagesIds, extractedTranslatedMessages } from 'lib/assets/lang-messages'
-import { rawTextToString, translateToken } from './lang'
+import {
+  extractedSharedMessagesIds,
+  extractedTranslatedMessages,
+  extractedTranslatedPlurals,
+} from 'lib/assets/lang-messages'
+import { intlPlural } from 'lib/i18n/intl'
+import { rawTextToString } from './lang'
 import { textUnitColorize } from './text'
 
 export type RawTextArg = number | boolean | string | RawText | SharedI18nMessage | undefined | null
 
 export class Message {
-  static concatTemplateStringsArray(
-    language: Language,
-    template: readonly string[],
-    args: readonly unknown[],
-    colors: Text.Colors,
-    postfixes: string[] = [],
-  ) {
-    if (typeof language !== 'string')
-      throw new TypeError(`Message.string ${template.join('$')} must be called with language`)
-
-    if (template.length === 1 && template[0] && args.length === 0 && postfixes.length === 0 && colors.text === '§7')
-      return template[0] // Return as is, without any colors if string has no args nor postfixes
-
-    let v = ''
-    for (const [i, t] of [...template, ...postfixes].entries()) {
-      v += colors.text + t
-      if (i in args) v += textUnitColorize(args[i], colors, language)
-    }
-    return v
-  }
-
-  static templateToId(template: readonly string[]) {
-    return template.join('\x00')
-  }
-
   readonly id: string
 
   constructor(
@@ -39,7 +19,7 @@ export class Message {
     protected readonly args: readonly unknown[],
     protected colors: Text.Colors,
   ) {
-    this.id = Message.templateToId(template)
+    this.id = template.join('\x00')
   }
 
   color(c: Text.Colors | Pick<Text.Static<never>, 'style'>, children = true) {
@@ -79,8 +59,34 @@ export class Message {
   }
 
   // Name is not toString to avoid unexpected behavior related to js builtin toString
-  to(language: Language) {
-    return Message.concatTemplateStringsArray(language, this.template, this.args, this.colors, this.postfixes)
+  to(language: Language): string {
+    const translated = this.getTranslatedTemplate(language)
+    return this.concatTemplateStringsArray(language, translated, this.args, this.colors, this.postfixes)
+  }
+
+  protected getTranslatedTemplate(language: Language) {
+    return extractedTranslatedMessages[language]?.[this.id] ?? this.template
+  }
+
+  protected concatTemplateStringsArray(
+    language: Language,
+    template: readonly string[],
+    args: readonly unknown[],
+    colors: Text.Colors,
+    postfixes: string[] = [],
+  ) {
+    if (typeof language !== 'string')
+      throw new TypeError(`Message.string ${template.join('$')} must be called with language`)
+
+    if (template.length === 1 && template[0] && args.length === 0 && postfixes.length === 0 && colors.text === '§7')
+      return template[0] // Return as is, without any colors if string has no args nor postfixes
+
+    let v = ''
+    for (const [i, t] of [...template, ...postfixes].entries()) {
+      v += colors.text + t
+      if (i in args) v += textUnitColorize(args[i], colors, language)
+    }
+    return v
   }
 
   protected toJSON() {
@@ -94,14 +100,21 @@ declare global {
   }
 }
 
-export class I18nMessage extends Message {
-  to(language: Language): string {
-    const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
-    return Message.concatTemplateStringsArray(language, translated, this.args, this.colors, this.postfixes)
+String.prototype.to = function () {
+  return this as string
+}
+
+export class NoI18nMessage extends Message {
+  protected getTranslatedTemplate(): readonly string[] {
+    return this.template
+  }
+
+  to(): string {
+    return this.concatTemplateStringsArray(defaultLang, this.template, this.args, this.colors, this.postfixes)
   }
 }
 
-export class SharedI18nMessage extends I18nMessage {
+export class SharedI18nMessage extends Message {
   toRawText(): RawText {
     const token = extractedSharedMessagesIds[this.id]
     if (!token) {
@@ -142,10 +155,9 @@ export class SharedI18nMessage extends I18nMessage {
   }
 
   to(language: Language) {
-    const translated = extractedTranslatedMessages[language]?.[this.id] ?? this.template
-    return Message.concatTemplateStringsArray(
+    return this.concatTemplateStringsArray(
       language,
-      translated,
+      this.getTranslatedTemplate(language),
       this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
       this.colors,
       this.postfixes,
@@ -179,7 +191,7 @@ export class SharedNoI18nMessage extends SharedI18nMessage {
   }
 }
 
-export class ServerSideI18nMessage extends I18nMessage {
+export class ServerSideI18nMessage extends Message {
   constructor(
     colors: Text.Colors,
     protected readonly generate: (language: Language) => string,
@@ -192,21 +204,11 @@ export class ServerSideI18nMessage extends I18nMessage {
   }
 }
 
-export class MinecraftI18nMessage extends SharedI18nMessage {
-  constructor(
-    protected readonly token: string,
-    colors: Text.Colors = { num: '', text: '', unit: '' },
-  ) {
-    super([], [], colors)
-  }
-
-  toRawText(): RawText {
-    return { rawtext: [{ translate: this.token }] }
-  }
-
-  to(language: Language): string {
-    const text = translateToken(this.token, language)
-    if (text.includes('§')) return '§r' + text + '§r'
-    return text
+export class PluralMessage extends ServerSideI18nMessage {
+  constructor(colors: Text.Colors, template: TemplateStringsArray, n: number) {
+    super(colors, l => {
+      const translated = extractedTranslatedPlurals[l]?.[this.id]?.[intlPlural(l, n)] ?? template
+      return this.concatTemplateStringsArray(l, translated, [n], colors, [])
+    })
   }
 }

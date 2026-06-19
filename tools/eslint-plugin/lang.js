@@ -34,7 +34,7 @@ class LangWriter {
     return Promise.all(supportedLanguages.map(e => this.write(e)))
   }
 
-  unsedWarn = new Set()
+  unusedWarn = new Set()
 
   /**
    * @param {string} lang
@@ -44,8 +44,8 @@ class LangWriter {
     for (const key in data) {
       const value = data[key]
       if (!(key in this.storage[sourceCodeLang])) {
-        if (!this.unsedWarn.has(key)) {
-          this.unsedWarn.add(key)
+        if (!this.unusedWarn.has(key)) {
+          this.unusedWarn.add(key)
           console.warn(this.prefix, lang, 'Unused key', key)
         }
       } else {
