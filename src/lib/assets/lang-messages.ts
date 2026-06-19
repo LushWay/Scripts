@@ -26,20 +26,24 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Время первого входа на анархию": "script.shared.время_первого_входа_на_анархию",
   "Последний раз онлайн на анархии": "script.shared.последний_раз_онлайн_на_анархии",
   "Последний раз онлайн": "script.shared.последний_раз_онлайн",
+  "У вас {0_unreadCount} непрочитанных сообщений!.one": "script.shared.у_вас_0_непрочитанных_сообщений_.one",
+  "У вас {0_unreadCount} непрочитанных сообщений!.few": "script.shared.у_вас_0_непрочитанных_сообщений_.few",
+  "У вас {0_unreadCount} непрочитанных сообщений!.many": "script.shared.у_вас_0_непрочитанных_сообщений_.many",
+  "У вас {0_unreadCount} непрочитанных сообщений!.other": "script.shared.у_вас_0_непрочитанных_сообщений_.other",
   "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": "script.shared._0_nдо_появления_nосталось_1_",
   "к": "script.shared.к",
   "млн": "script.shared.млн",
   "млрд": "script.shared.млрд",
   "трлн": "script.shared.трлн",
-  "Доберитесь до: {0_this_place_name}": "script.shared.доберитесь_до_0_",
   "Внешнее пространство": "script.shared.внешнее_пространство",
   "Пусто": "script.shared.пусто",
+  "Доберитесь до: {0_this_place_name}": "script.shared.доберитесь_до_0_",
   "§5Варден": "script.shared.варден",
+  "Мясник": "script.shared.мясник",
   "§7Обычный": "script.shared.обычный",
   "§bУсиленный": "script.shared.усиленный",
   "§9Хранилище": "script.shared.хранилище",
   "Посети город": "script.shared.посети_город",
-  "Мясник": "script.shared.мясник",
   "Ювелир": "script.shared.ювелир",
   "Мусорщик": "script.shared.мусорщик",
   "Каменщик": "script.shared.каменщик",
@@ -47,17 +51,17 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Тетя Зина": "script.shared.тетя_зина",
   "Общее": "script.shared.общее",
   "Бармен": "script.shared.бармен",
-  "Кучер": "script.shared.кучер",
   "Оружейник": "script.shared.оружейник",
   "Улучшить": "script.shared.улучшить",
   "Починить": "script.shared.починить",
+  "Кучер": "script.shared.кучер",
+  "§b§lКамнедробилка": "script.shared.камнедробилка",
   "Каменоломня": "script.shared.каменоломня",
   "Печкин": "script.shared.печкин",
   "Баба Валя": "script.shared.баба_валя",
   "Ломщик": "script.shared.ломщик",
-  "§b§lКамнедробилка": "script.shared.камнедробилка",
-  "Инженер": "script.shared.инженер",
   "§6§lРобот": "script.shared.робот",
+  "Инженер": "script.shared.инженер",
   "Техноград": "script.shared.техноград",
   "Техник": "script.shared.техник",
   "Маг": "script.shared.маг",
@@ -85,8 +89,8 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Активированный уголь": "script.shared.активированный_уголь",
   "Сделал себя сам: Получи первые 10.000 монет": "script.shared.сделал_себя_сам_получи_первые_10.000_монет",
   "Гробовщик: открой 10 могил разных игроков": "script.shared.гробовщик_открой_10_могил_разных_игроков",
-  "Вернуть вещи": "script.shared.вернуть_вещи",
   "Обучение": "script.shared.обучение",
+  "Вернуть вещи": "script.shared.вернуть_вещи",
   "Все достижения": "script.shared.все_достижения",
   "Получить базу": "script.shared.получить_базу",
   "Все задания": "script.shared.все_задания",
@@ -4424,7 +4428,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_item_name}§c*\n§aЗаберите награды!": {
       "s": [
         "",
-        "§c*\n§aЗаберите награды!"
+        "§c*\n§aClaim your rewards!"
       ],
       "i": [
         0
@@ -4432,7 +4436,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Награда: {0_achiv_reward_toString_player_}": {
       "s": [
-        "Награда: ",
+        "Reward: ",
         ""
       ],
       "i": [
@@ -4441,8 +4445,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": {
       "s": [
-        "Достижение получено: ",
-        "! Заберите награды, используя ",
+        "Achievement unlocked: ",
+        "! Claim your rewards using ",
         ""
       ],
       "i": [
@@ -4452,9 +4456,9 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": {
       "s": [
-        "Игрок ",
-        " был замьючен на ",
-        " по причине: ",
+        "Player ",
+        " has been muted for ",
+        " for: ",
         ""
       ],
       "i": [
@@ -4465,9 +4469,9 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": {
       "s": [
-        "Размьючен игрок ",
-        " который был замьючен по причине ",
-        ", до конца оставалось ",
+        "Unmuted player ",
+        " who was muted for ",
+        ", time remaining was ",
         ""
       ],
       "i": [
@@ -4478,8 +4482,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_nameArg} не найден": {
       "s": [
-        "Игрок ",
-        " не найден"
+        "Player ",
+        " not found"
       ],
       "i": [
         0
@@ -4487,7 +4491,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Причина: {0_info_mutedUntil}\n{1_until}": {
       "s": [
-        "Причина: ",
+        "Reason: ",
         "\n",
         ""
       ],
@@ -4498,7 +4502,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы приняли приглашение в клан '{0_clan_name}'": {
       "s": [
-        "Вы приняли приглашение в клан '",
+        "You accepted the invitation to clan '",
         "'"
       ],
       "i": [
@@ -4507,7 +4511,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": {
       "s": [
-        "Вы уже отправили заявку в клан '",
+        "You have already sent a request to clan '",
         "'!"
       ],
       "i": [
@@ -4516,8 +4520,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Заявка на вступление в клан '{0_clan_name}' отправлена!": {
       "s": [
-        "Заявка на вступление в клан '",
-        "' отправлена!"
+        "Join request to clan '",
+        "' sent!"
       ],
       "i": [
         0
@@ -4525,7 +4529,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Запрос на вступление в клан от '{0_player_name}'": {
       "s": [
-        "Запрос на вступление в клан от '",
+        "Request to join clan from '",
         "'"
       ],
       "i": [
@@ -4536,7 +4540,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       "s": [
         "[",
         "] ",
-        "\nУчастники: ",
+        "\nMembers: ",
         " ",
         ""
       ],
@@ -4549,8 +4553,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Имя '{0_name}' не может содержать параграф": {
       "s": [
-        "Имя '",
-        "' не может содержать параграф"
+        "Name '",
+        "' cannot contain the paragraph symbol"
       ],
       "i": [
         0
@@ -4558,8 +4562,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Короткое имя '{0_shortname}' не может содержать параграф": {
       "s": [
-        "Короткое имя '",
-        "' не может содержать параграф"
+        "Short name '",
+        "' cannot contain the paragraph symbol"
       ],
       "i": [
         0
@@ -4567,8 +4571,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": {
       "s": [
-        "Короткое имя '",
-        "' должно быть КОРОТКИМ, меньше 5 символов"
+        "Short name '",
+        "' must be SHORT, less than 5 characters"
       ],
       "i": [
         0
@@ -4576,8 +4580,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": {
       "s": [
-        "Короткое имя '",
-        "' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '",
+        "Short name '",
+        "' cannot be TOO short, minimum 2 characters. Otherwise how to understand what clan is '",
         "'"
       ],
       "i": [
@@ -4587,8 +4591,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Клан с именем '{0_name}' уже существует.": {
       "s": [
-        "Клан с именем '",
-        "' уже существует."
+        "Clan with name '",
+        "' already exists."
       ],
       "i": [
         0
@@ -4596,8 +4600,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Короткое имя '{0_shortname}' уже занято.": {
       "s": [
-        "Короткое имя '",
-        "' уже занято."
+        "Short name '",
+        "' is already taken."
       ],
       "i": [
         0
@@ -4605,8 +4609,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Клан '{0_clan_name}' распущен": {
       "s": [
-        "Клан '",
-        "' распущен"
+        "Clan '",
+        "' disbanded"
       ],
       "i": [
         0
@@ -4614,8 +4618,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_player_name} покинул ваш клан": {
       "s": [
-        "Игрок ",
-        " покинул ваш клан"
+        "Player ",
+        " left your clan"
       ],
       "i": [
         0
@@ -4623,8 +4627,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Клан '{0_clan_name}' покинут успешно": {
       "s": [
-        "Клан '",
-        "' покинут успешно"
+        "Clan '",
+        "' left successfully"
       ],
       "i": [
         0
@@ -4632,7 +4636,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Короткое имя: {0_clan_shortname}": {
       "s": [
-        "Короткое имя: ",
+        "Short name: ",
         ""
       ],
       "i": [
@@ -4641,8 +4645,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Принять игрока '{0_name}' в клан?": {
       "s": [
-        "Принять игрока '",
-        "' в клан?"
+        "Accept player '",
+        "' into clan?"
       ],
       "i": [
         0
@@ -4650,7 +4654,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы приняты в клан {0_clan_name}": {
       "s": [
-        "Вы приняты в клан ",
+        "You have been accepted into clan ",
         ""
       ],
       "i": [
@@ -4659,7 +4663,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы НЕ приняты в клан {0_clan_name}": {
       "s": [
-        "Вы НЕ приняты в клан ",
+        "You were NOT accepted into clan ",
         ""
       ],
       "i": [
@@ -4668,7 +4672,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Приглашения в клан '{0_clan_name}'": {
       "s": [
-        "Приглашения в клан '",
+        "Invitations to clan '",
         "'"
       ],
       "i": [
@@ -4677,8 +4681,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_name} уже состоит в вашем клане!": {
       "s": [
-        "Игрок ",
-        " уже состоит в вашем клане!"
+        "Player ",
+        " is already in your clan!"
       ],
       "i": [
         0
@@ -4686,8 +4690,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": {
       "s": [
-        "Игрок ",
-        " уже состоит в клане ",
+        "Player ",
+        " is already in clan ",
         "!"
       ],
       "i": [
@@ -4697,7 +4701,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Приглашение в клан '{0_clan_name}'": {
       "s": [
-        "Приглашение в клан '",
+        "Clan invitation to '",
         "'"
       ],
       "i": [
@@ -4706,8 +4710,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_name} успешно приглашен в клан!": {
       "s": [
-        "Игрок ",
-        " успешно приглашен в клан!"
+        "Player ",
+        " successfully invited to the clan!"
       ],
       "i": [
         0
@@ -4715,8 +4719,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": {
       "s": [
-        "Роль участника клана ",
-        " сменена успешно: ",
+        "Clan member ",
+        "'s role changed successfully: ",
         "."
       ],
       "i": [
@@ -4726,7 +4730,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Роль в клане {0_changeString}": {
       "s": [
-        "Роль в клане ",
+        "Role in clan ",
         ""
       ],
       "i": [
@@ -4735,8 +4739,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": {
       "s": [
-        "В клане '",
-        "', сменена игроком ",
+        "In clan '",
+        "', changed by player ",
         ""
       ],
       "i": [
@@ -4746,7 +4750,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Выгнать участника '{0_memberName}'": {
       "s": [
-        "Выгнать участника '",
+        "Kick member '",
         "'"
       ],
       "i": [
@@ -4755,7 +4759,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы выгнаны из клана '{0_clan_name}'": {
       "s": [
-        "Вы выгнаны из клана '",
+        "You have been kicked from the clan '",
         "'"
       ],
       "i": [
@@ -4764,8 +4768,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": {
       "s": [
-        "Вы были выгнаны из клана игроком '",
-        "'. Причина: ",
+        "You were kicked from the clan by player '",
+        "'. Reason: ",
         ""
       ],
       "i": [
@@ -4775,8 +4779,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": {
       "s": [
-        "Участник ",
-        " успешно выгнан из клана ",
+        "Member ",
+        " successfully kicked from clan ",
         ""
       ],
       "i": [
@@ -4786,7 +4790,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Сменить роль {0_Player_nameOrUnknown_member_id_}": {
       "s": [
-        "Сменить роль ",
+        "Change role ",
         ""
       ],
       "i": [
@@ -4795,8 +4799,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": {
       "s": [
-        "Неизвестный аргумент: ",
-        ".\nДоступные командлеты: \n",
+        "Unknown argument: ",
+        ".\nAvailable subcommands: \n",
         "\n "
       ],
       "i": [
@@ -4807,7 +4811,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": {
       "s": [
         "",
-        "─═─═─═§f Доступно: ",
+        "─═─═─═§f Available: ",
         "/",
         " ",
         "═─═─═─═─"
@@ -4821,7 +4825,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     " (также {0_d_aliases_join______})": {
       "s": [
-        " (также ",
+        " (also ",
         ")"
       ],
       "i": [
@@ -4830,7 +4834,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": {
       "s": [
-        "   §fКоманда §6.",
+        "   §fCommand §6.",
         "",
         "§7§o - ",
         ""
@@ -4843,7 +4847,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Не так быстро! Попробуй через {0_i18n_time_after_}": {
       "s": [
-        "Не так быстро! Попробуй через ",
+        "Not so fast! Try again in ",
         ""
       ],
       "i": [
@@ -4852,7 +4856,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": {
       "s": [
-        "Вы имели ввиду ",
+        "Did you mean ",
         "?"
       ],
       "i": [
@@ -4861,7 +4865,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": {
       "s": [
-        "\nКоманда доступна начиная с роли ",
+        "\nCommand available from role ",
         ""
       ],
       "i": [
@@ -4870,9 +4874,9 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": {
       "s": [
-        "У вас нет разрешения для использования команды ",
+        "You do not have permission to use command ",
         "",
-        "\nСписок всех доступных вам команд: §f.help"
+        "\nList of all commands available to you: §f.help"
       ],
       "i": [
         0,
@@ -4881,7 +4885,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "При выполнении команды произошла ошибка. {0_developersAreWarned}": {
       "s": [
-        "При выполнении команды произошла ошибка. ",
+        "An error occurred while executing the command. ",
         ""
       ],
       "i": [
@@ -4890,8 +4894,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": {
       "s": [
-        "Команда доступна только начиная с роли ",
-        ". Ваша роль: ",
+        "Command available only starting from role ",
+        ". Your role: ",
         ""
       ],
       "i": [
@@ -4902,7 +4906,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_this_place_name} ящик": {
       "s": [
         "",
-        " ящик"
+        " crate"
       ],
       "i": [
         0
@@ -4910,8 +4914,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": {
       "s": [
-        "Ключ для ",
-        " не подходит к ящику ",
+        "Key for ",
+        " is not suitable for crate ",
         ""
       ],
       "i": [
@@ -4921,8 +4925,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Открыт ящик {0_this_name}!": {
       "s": [
-        "Открыт ящик ",
-        "!"
+        "Crate ",
+        " opened!"
       ],
       "i": [
         0
@@ -4931,16 +4935,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_i18n___this_name_______} > Содержимое": {
       "s": [
         "",
-        " > Содержимое"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0_this_name} ящик": {
-      "s": [
-        "",
-        " ящик"
+        " > Contents"
       ],
       "i": [
         0
@@ -4948,7 +4943,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Ключ для ящика {0_Crate_getName_storage_crate_}": {
       "s": [
-        "Ключ для ящика ",
+        "Key for crate ",
         ""
       ],
       "i": [
@@ -4957,8 +4952,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Игрок {0_player_database_name} сменил ник на {1_player_name}": {
       "s": [
-        "Игрок ",
-        " сменил ник на ",
+        "Player ",
+        " changed nickname to ",
         ""
       ],
       "i": [
@@ -4968,7 +4963,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "§cВы уверены, что хотите {0_text}?": {
       "s": [
-        "§cВы уверены, что хотите ",
+        "§cAre you sure you want to ",
         "?"
       ],
       "i": [
@@ -4977,7 +4972,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Результаты поиска по запросу\n{0_searchQuery}": {
       "s": [
-        "Результаты поиска по запросу\n",
+        "Search results for\n",
         ""
       ],
       "i": [
@@ -4986,7 +4981,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "§3Выберите игрока чтобы {0_reason}": {
       "s": [
-        "§3Выберите игрока чтобы ",
+        "§3Select a player to ",
         ""
       ],
       "i": [
@@ -4996,7 +4991,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_days} д. {1_hhmmss}": {
       "s": [
         "",
-        " д. ",
+        "d ",
         ""
       ],
       "i": [
@@ -5004,18 +4999,9 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "У вас {0_unreadCount} непрочитанных сообщений!": {
-      "s": [
-        "У вас ",
-        " непрочитанных сообщений!"
-      ],
-      "i": [
-        0
-      ]
-    },
     "Следующее письмо\n{0_letterOneLineName_next_letter_}": {
       "s": [
-        "Следующее письмо\n",
+        "Next letter\n",
         ""
       ],
       "i": [
@@ -5024,7 +5010,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": {
       "s": [
-        "Предыдущее письмо\n",
+        "Previous letter\n",
         ""
       ],
       "i": [
@@ -5034,7 +5020,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_deleteDescription} Все награды будут собраны автоматически": {
       "s": [
         "",
-        " Все награды будут собраны автоматически"
+        " All rewards will be collected automatically"
       ],
       "i": [
         0
@@ -5043,7 +5029,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": {
       "s": [
         "",
-        " Вы потеряете все награды, прикрепленные к письму!"
+        " You will lose all rewards attached to the letter!"
       ],
       "i": [
         0
@@ -5053,7 +5039,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       "s": [
         "",
         ": ",
-        ", просмотреть: /mail"
+        ", view: /mail"
       ],
       "i": [
         0,
@@ -5064,7 +5050,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       "s": [
         "",
         ", ",
-        "!\n§r§3Время §b• §3",
+        "!\n§r§3Time §b• §3",
         ""
       ],
       "i": [
@@ -5076,7 +5062,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_this_quest_name}\nЗавершен!": {
       "s": [
         "",
-        "\nЗавершен!"
+        "\nCompleted!"
       ],
       "i": [
         0
@@ -5084,7 +5070,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Задание\n{0_this_quest_name}": {
       "s": [
-        "Задание\n",
+        "Quest\n",
         ""
       ],
       "i": [
@@ -5093,7 +5079,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Возьмите задание {0_target_name}": {
       "s": [
-        "Возьмите задание ",
+        "Take the quest ",
         ""
       ],
       "i": [
@@ -5102,7 +5088,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Завершите задание {0_target_name}": {
       "s": [
-        "Завершите задание ",
+        "Complete the quest ",
         ""
       ],
       "i": [
@@ -5111,7 +5097,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "При активации шага произошла ошибка. {0_developersAreWarned}": {
       "s": [
-        "При активации шага произошла ошибка. ",
+        "An error occurred while activating the step. ",
         ""
       ],
       "i": [
@@ -5120,8 +5106,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Задание {0_this_quest_name} сломалось: {1_text}": {
       "s": [
-        "Задание ",
-        " сломалось: ",
+        "Quest ",
+        " broke: ",
         ""
       ],
       "i": [
@@ -5132,7 +5118,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     "{0_step_text__}\n§aЗавершено! §6Заберите награду.": {
       "s": [
         "",
-        "\n§aЗавершено! §6Заберите награду."
+        "\n§aCompleted! §6Claim your reward."
       ],
       "i": [
         0
@@ -5140,7 +5126,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вас ждет {0_i18n_accent___npc_name__}": {
       "s": [
-        "Вас ждет ",
+        "You are awaited by ",
         ""
       ],
       "i": [
@@ -5149,7 +5135,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": {
       "s": [
-        "Нельзя создать регион, область которого ниже -64 (y: ",
+        "Cannot create a region with area below -64 (y: ",
         " radius: ",
         " result: ",
         ")"
@@ -5162,7 +5148,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Не удалось сохранить структуру: {0_e}": {
       "s": [
-        "Не удалось сохранить структуру: ",
+        "Failed to save structure: ",
         ""
       ],
       "i": [
@@ -5171,7 +5157,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Владелец > {0_name}": {
       "s": [
-        "Владелец > ",
+        "Owner > ",
         ""
       ],
       "i": [
@@ -5180,7 +5166,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы уверены что хотите передать права владельца региона игроку {0_name}?": {
       "s": [
-        "Вы уверены что хотите передать права владельца региона игроку ",
+        "Are you sure you want to transfer region ownership rights to player ",
         "?"
       ],
       "i": [
@@ -5189,8 +5175,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": {
       "s": [
-        "Вы уверены что хотите назначить владельцем региона игрока ",
-        "?"
+        "Are you sure you want to appoint player ",
+        " as the region owner?"
       ],
       "i": [
         0
@@ -5198,7 +5184,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "§cБосс §6{0_this_bossName}": {
       "s": [
-        "§cБосс §6",
+        "§cBoss §6",
         ""
       ],
       "i": [
@@ -5207,7 +5193,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Макс кол-во: {0_resource_amount}": {
       "s": [
-        "Макс кол-во: ",
+        "Max amount: ",
         ""
       ],
       "i": [
@@ -5216,7 +5202,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": {
       "s": [
-        "Будут изменены следующие регионы:\n",
+        "The following regions will be modified:\n",
         ""
       ],
       "i": [
@@ -5225,7 +5211,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Регион создается. {0___region_restoringStructurePercent}%%": {
       "s": [
-        "Регион создается. ",
+        "Region is being created. ",
         "%%"
       ],
       "i": [
@@ -5234,7 +5220,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Безопасная зона {0_this_safeAreaName}": {
       "s": [
-        "Безопасная зона ",
+        "Safe ",
         ""
       ],
       "i": [
@@ -5243,7 +5229,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы вернули роль §r{0_ROLES_prevRole_}": {
       "s": [
-        "Вы вернули роль §r",
+        "You restored role §r",
         ""
       ],
       "i": [
@@ -5252,7 +5238,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": {
       "s": [
-        "Ваша роль: ",
+        "Your role: ",
         "",
         ""
       ],
@@ -5263,7 +5249,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "§3Ваша роль: {0_ROLES_prole_}": {
       "s": [
-        "§3Ваша роль: ",
+        "§3Your role: ",
         ""
       ],
       "i": [
@@ -5272,8 +5258,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": {
       "s": [
-        "У игрока ",
-        " роль выше или такая же как у вас, вы не можете ее сменить."
+        "Player ",
+        " has a role higher or equal to yours, you cannot change it."
       ],
       "i": [
         0
@@ -5281,8 +5267,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": {
       "s": [
-        "Ваша роль сменена c ",
-        " на ",
+        "Your role has been changed from ",
+        " to ",
         "",
         "",
         ""
@@ -5296,7 +5282,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     " игроком {0_player_name}": {
       "s": [
-        " игроком ",
+        " by player ",
         ""
       ],
       "i": [
@@ -5305,7 +5291,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "\nПричина: {0_message}": {
       "s": [
-        "\nПричина: ",
+        "\nReason: ",
         ""
       ],
       "i": [
@@ -5314,8 +5300,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Роль игрока {0_target_name} сменена успешно": {
       "s": [
-        "Роль игрока ",
-        " сменена успешно"
+        "Role of player ",
+        " changed successfully"
       ],
       "i": [
         0
@@ -5334,8 +5320,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Убит босс {0_this_options_place_name}!": {
       "s": [
-        "Убит босс ",
-        "!"
+        "Boss ",
+        " defeated!"
       ],
       "i": [
         0
@@ -5343,7 +5329,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": {
       "s": [
-        "§fЧертеж предмета ",
+        "§fItem blueprint ",
         ""
       ],
       "i": [
@@ -5352,8 +5338,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": {
       "s": [
-        "Используйте ",
-        " чтобы убрать этот предмет из инвентаря или получить его снова"
+        "Use ",
+        " to remove this item from inventory and to get it back"
       ],
       "i": [
         0
@@ -5361,8 +5347,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Выдает или убирает {0_itemNameTag} из инвентаря": {
       "s": [
-        "Выдает или убирает ",
-        " из инвентаря"
+        "Gives or removes ",
+        " from inventory"
       ],
       "i": [
         0
@@ -5370,8 +5356,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": {
       "s": [
-        "Шанс: ",
-        "%%, Кол-во: ",
+        "Chance: ",
+        "%%, Amount: ",
         "...",
         ""
       ],
@@ -5383,8 +5369,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы {0_reason}, поэтому вышли из режима новичка.": {
       "s": [
-        "Вы ",
-        ", поэтому вышли из режима новичка."
+        "You are ",
+        ", so you left newbie mode."
       ],
       "i": [
         0
@@ -5392,7 +5378,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Не удалось открыть диалог. {0_developersAreWarned}": {
       "s": [
-        "Не удалось открыть диалог. ",
+        "Failed to open dialog. ",
         ""
       ],
       "i": [
@@ -5401,7 +5387,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Доберитесь до: {0_this_place_name}": {
       "s": [
-        "Доберитесь до: ",
+        "Reach: ",
         ""
       ],
       "i": [
@@ -5410,7 +5396,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "\n§7§lЗначение:§r {0_stringify_value_}": {
       "s": [
-        "\n§7§lЗначение:§r ",
+        "\n§7§lValue:§r ",
         ""
       ],
       "i": [
@@ -5419,7 +5405,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": {
       "s": [
-        "\n§7§lТип: §r§f",
+        "\n§7§lType: §r§f",
         ""
       ],
       "i": [
@@ -5428,7 +5414,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": {
       "s": [
-        "Зачарования:\n",
+        "Enchantments:\n",
         ""
       ],
       "i": [
@@ -5437,8 +5423,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": {
       "s": [
-        "Выбранный предмет: ",
-        "\nНажмите, чтобы сменить"
+        "Selected item: ",
+        "\nClick to change"
       ],
       "i": [
         0
@@ -5446,7 +5432,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": {
       "s": [
-        "Товара на складе: ",
+        "Items in stock: ",
         "/",
         ", ",
         "%%"
@@ -5459,8 +5445,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "В инвентаре нет {0_this_text}": {
       "s": [
-        "В инвентаре нет ",
-        ""
+        "No ",
+        " in inventory"
       ],
       "i": [
         0
@@ -5468,7 +5454,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": {
       "s": [
-        "Нужно уровней опыта: ",
+        "Required experience levels: ",
         ", ",
         "/",
         ""
@@ -5481,7 +5467,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": {
       "s": [
-        "Покупка невозможна:",
+        "Purchase not possible:",
         "",
         ""
       ],
@@ -5492,8 +5478,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Продать {0_costString} за {1_name}?": {
       "s": [
-        "Продать ",
-        " за ",
+        "Sell ",
+        " for ",
         "?"
       ],
       "i": [
@@ -5503,8 +5489,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Купить {0_name} за {1_costString}?": {
       "s": [
-        "Купить ",
-        " за ",
+        "Buy ",
+        " for ",
         "?"
       ],
       "i": [
@@ -5514,8 +5500,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Успешная продажа {0_name} за {1_costString}!": {
       "s": [
-        "Успешная продажа ",
-        " за ",
+        "Successfully sold ",
+        " for ",
         "!"
       ],
       "i": [
@@ -5525,8 +5511,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Успешная покупка {0_name} за {1_costString}!": {
       "s": [
-        "Успешная покупка ",
-        " за ",
+        "Successfully bought ",
+        " for ",
         "!"
       ],
       "i": [
@@ -5536,7 +5522,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "При покупке произошла ошибка. {0_developersAreWarned}": {
       "s": [
-        "При покупке произошла ошибка. ",
+        "An error occurred during purchase. ",
         ""
       ],
       "i": [
@@ -5545,8 +5531,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Нет места в инвентаре (нужно еще {0_amount})": {
       "s": [
-        "Нет места в инвентаре (нужно еще ",
-        ")"
+        "No space in inventory (need ",
+        " more)"
       ],
       "i": [
         0
@@ -5554,7 +5540,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Изменено на {0_newname}": {
       "s": [
-        "Изменено на ",
+        "Changed to ",
         ""
       ],
       "i": [
@@ -5563,7 +5549,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": {
       "s": [
-        "TPS сервера ",
+        "Server TPS ",
         "§f: ",
         ""
       ],
@@ -5574,7 +5560,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": {
       "s": [
-        "Достижения ",
+        "Achievements ",
         "/",
         " (",
         "%%)"
@@ -5587,7 +5573,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Порталы {0_portals__length____0}/{1_Portal_portals_size}": {
       "s": [
-        "Порталы ",
+        "Portals ",
         "/",
         ""
       ],
@@ -5598,7 +5584,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Статистика игрока {0_Player_nameOrUnknown_targetId_}": {
       "s": [
-        "Статистика игрока ",
+        "Player statistics ",
         ""
       ],
       "i": [
@@ -5607,7 +5593,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Анархия {0_n}": {
       "s": [
-        "Анархия ",
+        "Anarchy ",
         ""
       ],
       "i": [
@@ -5616,7 +5602,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": {
       "s": [
-        "Инструмент скоро сломается! ",
+        "Tool will break soon! ",
         "/",
         " (",
         "%)"
@@ -5629,7 +5615,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Усиленный аирдроп скоро упадет на {0_location}!": {
       "s": [
-        "Усиленный аирдроп скоро упадет на ",
+        "Reinforced airdrop will soon fall at ",
         "!"
       ],
       "i": [
@@ -5638,7 +5624,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Обычный аирдроп скоро упадет на {0_location}!": {
       "s": [
-        "Обычный аирдроп скоро упадет на ",
+        "Regular airdrop will soon fall at ",
         "!"
       ],
       "i": [
@@ -5647,7 +5633,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Радиус границы анархии сейчас: {0_this_zone__radius}": {
       "s": [
-        "Радиус границы анархии сейчас: ",
+        "Anarchy border radius now: ",
         ""
       ],
       "i": [
@@ -5656,7 +5642,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": {
       "s": [
-        "Вы уже находитесь на анархии! Если это не так, используйте ",
+        "You are already in anarchy! If not, use ",
         ""
       ],
       "i": [
@@ -5665,8 +5651,8 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": {
       "s": [
-        "Успех! Теперь вы можете использовать ",
-        " для перемещения на случайную позицию."
+        "Success! Now you can use ",
+        " to teleport to a random position."
       ],
       "i": [
         0
@@ -5674,7 +5660,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Вода. Попытка {0_maxTries___i}/{1_maxTries}": {
       "s": [
-        "Вода. Попытка ",
+        "Water. Attempt ",
         "/",
         ""
       ],
@@ -5685,7 +5671,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Нельзя создать базу на высоте ниже {0_underLimit}!": {
       "s": [
-        "Нельзя создать базу на высоте ниже ",
+        "Cannot create a base below height ",
         "!"
       ],
       "i": [
@@ -5694,7 +5680,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": {
       "s": [
-        "§cВы уже ",
+        "§cYou are already ",
         "!"
       ],
       "i": [
@@ -5703,7 +5689,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "состоите в базе игрока '{0_region_ownerName}'": {
       "s": [
-        "состоите в базе игрока '",
+        "are in the base of player '",
         "'"
       ],
       "i": [
@@ -5712,7 +5698,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": {
       "s": [
-        "База успешно создана! Чтобы открыть меню базы используйте команду ",
+        "Base successfully created! To open the base menu, use command ",
         ""
       ],
       "i": [
@@ -5721,7 +5707,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": {
       "s": [
-        "Всех материалов хватает!\nБаза защищена от гниения на ",
+        "All materials are sufficient!\nBase protected from decay for ",
         "§r\n"
       ],
       "i": [
@@ -5730,7 +5716,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
     },
     "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": {
       "s": [
-        "Не хватает ресурсов:\n",
+        "Not enough resources:\n",
         ""
       ],
       "i": [
@@ -5738,1187 +5724,6 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       ]
     },
     "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": {
-      "s": [
-        "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n",
-        "\nМатериалы в бочке:\n",
-        "\n",
-        "\nДо следующего сбора ресурсов: ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": {
-      "s": [
-        "§cБаза разрушена!\n§4Срочно поставьте блок базы на ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "База с владельцем {0_base_ownerName} {1_messageAction}.": {
-      "s": [
-        "База с владельцем ",
-        " ",
-        "."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Максимальный уровень\n{0_levelText}": {
-      "s": [
-        "Максимальный уровень\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": {
-      "s": [
-        "",
-        " (радиус ",
-        " -> ",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Улучшить базу: {0_levelText}": {
-      "s": [
-        "Улучшить базу: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "База игрока {0_base_ownerName}": {
-      "s": [
-        "База игрока ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": {
-      "s": [
-        "\n\nКоординаты: ",
-        "\nРадиус: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "§6Ваша база {0_text}": {
-      "s": [
-        "§6Ваша база ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0_this_city_name}: задание исследования не настроено!": {
-      "s": [
-        "",
-        ": задание исследования не настроено!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": {
-      "s": [
-        "Эта печка уже занята. Печка освободится через ",
-        ", ключ: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы уже заняли {0_personalKeys_length}/3 печек.": {
-      "s": [
-        "Вы уже заняли ",
-        "/3 печек."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": {
-      "s": [
-        "Ваш клан уже занял ",
-        "/3 печек."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Использован ключ из слота {0_index}": {
-      "s": [
-        "Использован ключ из слота ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": {
-      "s": [
-        "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ",
-        ", ключ: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": {
-      "s": [
-        "Зачарование ",
-        " не удалось перенести."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": {
-      "s": [
-        "Онет, кажется, зачарование ",
-        " уровнем ",
-        " потерялось..."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "У {0_i18n_accent_________} можно купить ключ доступа к печам": {
-      "s": [
-        "У ",
-        " можно купить ключ доступа к печам"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Купите у {0_i18n_accent_________} ключ доступа к печам": {
-      "s": [
-        "Купите у ",
-        " ключ доступа к печам"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Доберитесь до {0_i18n_accent________________________} по дороге": {
-      "s": [
-        "Доберитесь до ",
-        " по дороге"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": {
-      "s": [
-        "Идите к ",
-        ", он расскажет вам что такое ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "...мы изобрели {0_i18n_accent______}": {
-      "s": [
-        "...мы изобрели ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": {
-      "s": [
-        "Выбранная книга: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": {
-      "s": [
-        "§r§fМеч со способностью §7",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": {
-      "s": [
-        "Здесь есть шахта, ведущая к ",
-        " и ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "У {0_i18n_accent______} можно зачаровать предметы": {
-      "s": [
-        "У ",
-        " можно зачаровать предметы"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Доберитесь до {0_i18n_accent____________} по дороге": {
-      "s": [
-        "Доберитесь до ",
-        " по дороге"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
-      "s": [
-        "Копать нужно на высоте ",
-        "..",
-        ". Ваш y = ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": {
-      "s": [
-        "",
-        " Осталось ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": {
-      "s": [
-        "Вы вошли в режим рейдблока, потому что ",
-        ". Некоторые функции могут быть недоступны"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Дровосек: нарубите {0_v} дерева": {
-      "s": [
-        "Дровосек: нарубите ",
-        " дерева"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Шахтер: накопайте {0_v} камня": {
-      "s": [
-        "Шахтер: накопайте ",
-        " камня"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Угольный шахтер: накопайте {0_v} угля": {
-      "s": [
-        "Угольный шахтер: накопайте ",
-        " угля"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Железный шахтер: накопайте {0_v} железа": {
-      "s": [
-        "Железный шахтер: накопайте ",
-        " железа"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": {
-      "s": [
-        "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": {
-      "s": [
-        "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ",
-        " заданий вам дают награду. За выполнение всех ежедневных заданий ",
-        " дня подряд вместо обычного ключа выдается донатный\n\n",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": {
-      "s": [
-        "",
-        "/",
-        " Награда: ключ от сундука\n",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": {
-      "s": [
-        "Вы не можете покинуть зону добычи, пока не завершили задания ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Добыто дерева: {0_current}/{1_end}": {
-      "s": [
-        "Добыто дерева: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": {
-      "s": [
-        "Спуститесь в шахту и добудьте камня: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Добыто железной руды: {0_i}/{1_end}": {
-      "s": [
-        "Добыто железной руды: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Отправляйтесь за ними в {0_i18n_accent_____________}": {
-      "s": [
-        "Отправляйтесь за ними в ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Идите в {0_i18n_accent_____________} по дороге": {
-      "s": [
-        "Идите в ",
-        " по дороге"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": {
-      "s": [
-        "Верните свои вещи",
-        ", они ждут вас на ",
-        "§6!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0_extra___extra_to_player_lang____________}§8Вы тут": {
-      "s": [
-        "",
-        "§8Вы тут"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": {
-      "s": [
-        "Не умею этим пользоваться, но знаю кто точно поможет: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": {
-      "s": [
-        "Событие! ",
-        " силой ",
-        " на ",
-        " минут"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Время: {0_new_Date___toHHMMSS__}": {
-      "s": [
-        "Время: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": {
-      "s": [
-        "",
-        " ",
-        "\nЧерез ",
-        " (",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": {
-      "s": [
-        "Ваш первый рекорд ",
-        " поставлен! Это заняло ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
-      "s": [
-        "Вы побили ваш предыдущий рекорд ",
-        "! ",
-        " -> ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
-      "s": [
-        "Вы не смогли побить ваш предыдущий рекорд ",
-        "! ",
-        " -> ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": {
-      "s": [
-        "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": {
-      "s": [
-        "Спидран '",
-        "' начат. Для сброса времени воспользуйтесь .wipe"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": {
-      "s": [
-        "Вы можете взять это задание чтобы отслеживать направления источника ресурса (",
-        ") с помощью компаса"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": {
-      "s": [
-        "Руды на y: ",
-        ":\n",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": {
-      "s": [
-        "",
-        ", ",
-        ", Группа: ",
-        "%%"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Добыть: {0___rawtext_____translate__langToken_itemType______}": {
-      "s": [
-        "Добыть: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": {
-      "s": [
-        "Копать нужно на высоте от ",
-        " до ",
-        ". Ваш y = ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Руды на {0_y}": {
-      "s": [
-        "Руды на ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Руды на {0}": {
-      "s": [
-        "Ores at ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Копать нужно на высоте от {0} до {1}. Ваш y = {2}": {
-      "s": [
-        "You need to mine at height from ",
-        " to ",
-        ". Your y = ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Добыть: {0}": {
-      "s": [
-        "Mine: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}, {1}, Группа: {2}%%": {
-      "s": [
-        "",
-        ", ",
-        ", Group: ",
-        "%%"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Руды на y: {0}:\n{1}": {
-      "s": [
-        "Ores at y: ",
-        ":\n",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0}) с помощью компаса": {
-      "s": [
-        "You can take this quest to track the direction of the resource source (",
-        ") using a compass"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Спидран '{0}' начат. Для сброса времени воспользуйтесь .wipe": {
-      "s": [
-        "Speedrun '",
-        "' started. Use .wipe to reset the time"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0}": {
-      "s": [
-        "You can choose one of the categories below for speedrun. Time is counted only when you are in anarchy, i.e. when you are offline or standing at spawn, time is not counted. Your anarchy time now: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы не смогли побить ваш предыдущий рекорд {0}! {1} -> {2}": {
-      "s": [
-        "You couldn't beat your previous record ",
-        "! ",
-        " -> ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вы побили ваш предыдущий рекорд {0}! {1} -> {2}": {
-      "s": [
-        "You beat your previous record ",
-        "! ",
-        " -> ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Ваш первый рекорд {0} поставлен! Это заняло {1}": {
-      "s": [
-        "Your first record ",
-        " is set! It took ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0} {1}\nЧерез {2} ({3})": {
-      "s": [
-        "",
-        " ",
-        "\nin ",
-        " (",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Время: {0}": {
-      "s": [
-        "Time: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Событие! {0} силой {1} на {2} минут": {
-      "s": [
-        "Event! ",
-        " with strength ",
-        " for ",
-        " minutes"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "{0}§8Вы тут": {
-      "s": [
-        "",
-        "§8You are here"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}/{1} Награда: ключ от сундука\n{2}": {
-      "s": [
-        "",
-        "/",
-        " Reward: chest key\n",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0} заданий вам дают награду. За выполнение всех ежедневных заданий {1} дня подряд вместо обычного ключа выдается донатный\n\n{2}": {
-      "s": [
-        "Every day at 00:00, daily quests are updated. They are the same for all players. For completing all ",
-        " quests you get a reward. For completing all daily quests ",
-        " days in a row, instead of a regular key you get a donor key\n\n",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0}": {
-      "s": [
-        "Visit all settlements to unlock daily quests. You haven't visited: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0}": {
-      "s": [
-        "I don't know how to use this, but I know someone who can definitely help: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Верните свои вещи{0}, они ждут вас на {1}§6!": {
-      "s": [
-        "Return your items",
-        ", they are waiting for you at ",
-        "§6!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Идите в {0} по дороге": {
-      "s": [
-        "Go to ",
-        " along the road"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Отправляйтесь за ними в {0}": {
-      "s": [
-        "Follow them to ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Добыто железной руды: {0}/{1}": {
-      "s": [
-        "Iron ore mined: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Спуститесь в шахту и добудьте камня: {0}/{1}": {
-      "s": [
-        "Go down the mineshaft and collect stone: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Добыто дерева: {0}/{1}": {
-      "s": [
-        "Wood collected: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0}/{1}": {
-      "s": [
-        "You cannot leave the mining zone until you complete the quests ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Железный шахтер: накопайте {0} железа": {
-      "s": [
-        "Iron miner: mine ",
-        " iron"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Угольный шахтер: накопайте {0} угля": {
-      "s": [
-        "Coal miner: mine ",
-        " coal"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Шахтер: накопайте {0} камня": {
-      "s": [
-        "Miner: mine ",
-        " stone"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Дровосек: нарубите {0} дерева": {
-      "s": [
-        "Lumberjack: chop ",
-        " wood"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы вошли в режим рейдблока, потому что {0}. Некоторые функции могут быть недоступны": {
-      "s": [
-        "You entered raid block mode because ",
-        ". Some features may be unavailable"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} Осталось {1}": {
-      "s": [
-        "",
-        " Left ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Копать нужно на высоте {0}..{1}. Ваш y = {2}": {
-      "s": [
-        "You need to mine at height ",
-        "..",
-        ". Your y = ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "§r§fМеч со способностью §7{0}": {
-      "s": [
-        "§r§fSword with ability §7",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выбранная книга: {0}": {
-      "s": [
-        "Selected book: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У {0} можно зачаровать предметы": {
-      "s": [
-        "At ",
-        " you can enchant items"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Здесь есть шахта, ведущая к {0} и {1}": {
-      "s": [
-        "There is a mineshaft leading to ",
-        " and ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "...мы изобрели {0}": {
-      "s": [
-        "...we invented ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Идите к {0}, он расскажет вам что такое {1}": {
-      "s": [
-        "Go to ",
-        ", he will tell you what ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Доберитесь до {0} по дороге": {
-      "s": [
-        "Get to ",
-        " along the road"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Купите у {0} ключ доступа к печам": {
-      "s": [
-        "Buy from ",
-        " a key to the furnaces"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У {0} можно купить ключ доступа к печам": {
-      "s": [
-        "From ",
-        " you can buy a key to the furnaces"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Онет, кажется, зачарование {0} уровнем {1} потерялось...": {
-      "s": [
-        "Oh no, it seems the enchantment ",
-        " level ",
-        " was lost..."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Зачарование {0} не удалось перенести.": {
-      "s": [
-        "Enchantment ",
-        " could not be transferred."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0}, ключ: {1}": {
-      "s": [
-        "In 5 minutes, resources in your furnace will no longer be private! Furnace is at ",
-        ", key: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Использован ключ из слота {0}": {
-      "s": [
-        "Key used from slot ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваш клан уже занял {0}/3 печек.": {
-      "s": [
-        "Your clan has already occupied ",
-        "/3 furnaces."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уже заняли {0}/3 печек.": {
-      "s": [
-        "You have already occupied ",
-        "/3 furnaces."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Эта печка уже занята. Печка освободится через {0}, ключ: {1}": {
-      "s": [
-        "This furnace is already occupied. It will be free in ",
-        ", key: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0}: задание исследования не настроено!": {
-      "s": [
-        "",
-        ": exploration quest not set up!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§6Ваша база {0}": {
-      "s": [
-        "§6Your base ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "\n\nКоординаты: {0}\nРадиус: {1}": {
-      "s": [
-        "\n\nCoordinates: ",
-        "\nRadius: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "База игрока {0}": {
-      "s": [
-        "Base of player ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "База с владельцем {0} {1}.": {
-      "s": [
-        "Base with owner ",
-        " ",
-        "."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0}!": {
-      "s": [
-        "§cBase destroyed!\n§4Urgently place the base block at ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0}\nМатериалы в бочке:\n{1}\n{2}\nДо следующего сбора ресурсов: {3}": {
       "s": [
         "To prevent base decay, the barrel must contain the following resources daily:\n",
         "\nMaterials in barrel:\n",
@@ -6933,70 +5738,36 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "Не хватает ресурсов:\n{0}": {
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": {
       "s": [
-        "Not enough resources:\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Всех материалов хватает!\nБаза защищена от гниения на {0}§r\n": {
-      "s": [
-        "All materials are sufficient!\nBase protected from decay for ",
-        "§r\n"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "База успешно создана! Чтобы открыть меню базы используйте команду {0}": {
-      "s": [
-        "Base successfully created! To open the base menu, use command ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "состоите в базе игрока '{0}'": {
-      "s": [
-        "are in the base of player '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§cВы уже {0}!": {
-      "s": [
-        "§cYou are already ",
+        "§cBase destroyed!\n§4Urgently place the base block at ",
         "!"
       ],
       "i": [
         0
       ]
     },
-    "Нельзя создать базу на высоте ниже {0}!": {
+    "База с владельцем {0_base_ownerName} {1_messageAction}.": {
       "s": [
-        "Cannot create a base below height ",
-        "!"
+        "Base with owner ",
+        " ",
+        "."
       ],
       "i": [
-        0
+        0,
+        1
       ]
     },
-    "Улучшить базу: {0}": {
+    "Максимальный уровень\n{0_levelText}": {
       "s": [
-        "Upgrade base: ",
+        "Maximum level\n",
         ""
       ],
       "i": [
         0
       ]
     },
-    "{0} (радиус {1} -> {2})": {
+    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": {
       "s": [
         "",
         " (radius ",
@@ -7009,106 +5780,28 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Максимальный уровень\n{0}": {
+    "Улучшить базу: {0_levelText}": {
       "s": [
-        "Maximum level\n",
+        "Upgrade base: ",
         ""
       ],
       "i": [
         0
       ]
     },
-    "Вода. Попытка {0}/{1}": {
+    "База игрока {0_base_ownerName}": {
       "s": [
-        "Water. Attempt ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Успех! Теперь вы можете использовать {0} для перемещения на случайную позицию.": {
-      "s": [
-        "Success! Now you can use ",
-        " to teleport to a random position."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уже находитесь на анархии! Если это не так, используйте {0}": {
-      "s": [
-        "You are already in anarchy! If not, use ",
+        "Base of player ",
         ""
       ],
       "i": [
         0
       ]
     },
-    "Радиус границы анархии сейчас: {0}": {
+    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": {
       "s": [
-        "Anarchy border radius now: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Обычный аирдроп скоро упадет на {0}!": {
-      "s": [
-        "Regular airdrop will soon fall at ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Усиленный аирдроп скоро упадет на {0}!": {
-      "s": [
-        "Reinforced airdrop will soon fall at ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Инструмент скоро сломается! {0}/{1} ({2}%)": {
-      "s": [
-        "Tool will break soon! ",
-        "/",
-        " (",
-        "%)"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Анархия {0}": {
-      "s": [
-        "Anarchy ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Статистика игрока {0}": {
-      "s": [
-        "Player statistics ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "TPS сервера {0}§f: {1}": {
-      "s": [
-        "Server TPS ",
-        "§f: ",
+        "\n\nCoordinates: ",
+        "\nRadius: ",
         ""
       ],
       "i": [
@@ -7116,105 +5809,28 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Порталы {0}/{1}": {
+    "§6Ваша база {0_text}": {
       "s": [
-        "Portals ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Достижения {0}/{1} ({2}%%)": {
-      "s": [
-        "Achievements ",
-        "/",
-        " (",
-        "%%)"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Изменено на {0}": {
-      "s": [
-        "Changed to ",
+        "§6Your base ",
         ""
       ],
       "i": [
         0
       ]
     },
-    "Нет места в инвентаре (нужно еще {0})": {
+    "{0_this_city_name}: задание исследования не настроено!": {
       "s": [
-        "No space in inventory (need ",
-        " more)"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "При покупке произошла ошибка. {0}": {
-      "s": [
-        "An error occurred during purchase. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Успешная покупка {0} за {1}!": {
-      "s": [
-        "Successfully bought ",
-        " for ",
-        "!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Успешная продажа {0} за {1}!": {
-      "s": [
-        "Successfully sold ",
-        " for ",
-        "!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Купить {0} за {1}?": {
-      "s": [
-        "Buy ",
-        " for ",
-        "?"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Продать {0} за {1}?": {
-      "s": [
-        "Sell ",
-        " for ",
-        "?"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Покупка невозможна:{0}{1}": {
-      "s": [
-        "Purchase not possible:",
         "",
+        ": exploration quest not set up!"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": {
+      "s": [
+        "This furnace is already occupied. It will be free in ",
+        ", key: ",
         ""
       ],
       "i": [
@@ -7222,11 +5838,154 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Нужно уровней опыта: {0}, {1}/{2}": {
+    "Вы уже заняли {0_personalKeys_length}/3 печек.": {
       "s": [
-        "Required experience levels: ",
-        ", ",
-        "/",
+        "You have already occupied ",
+        "/3 furnaces."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": {
+      "s": [
+        "Your clan has already occupied ",
+        "/3 furnaces."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Использован ключ из слота {0_index}": {
+      "s": [
+        "Key used from slot ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": {
+      "s": [
+        "In 5 minutes, resources in your furnace will no longer be private! Furnace is at ",
+        ", key: ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": {
+      "s": [
+        "Enchantment ",
+        " could not be transferred."
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": {
+      "s": [
+        "Oh no, it seems the enchantment ",
+        " level ",
+        " was lost..."
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У {0_i18n_accent_________} можно купить ключ доступа к печам": {
+      "s": [
+        "From ",
+        " you can buy a key to the furnaces"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Купите у {0_i18n_accent_________} ключ доступа к печам": {
+      "s": [
+        "Buy from ",
+        " a key to the furnaces"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Доберитесь до {0_i18n_accent________________________} по дороге": {
+      "s": [
+        "Get to ",
+        " along the road"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": {
+      "s": [
+        "Go to ",
+        ", he will tell you what ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "...мы изобрели {0_i18n_accent______}": {
+      "s": [
+        "...we invented ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": {
+      "s": [
+        "Selected book: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": {
+      "s": [
+        "§r§fSword with ability §7",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": {
+      "s": [
+        "There is a mineshaft leading to ",
+        " and ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "У {0_i18n_accent______} можно зачаровать предметы": {
+      "s": [
+        "At ",
+        " you can enchant items"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
+      "s": [
+        "You need to mine at height ",
+        "..",
+        ". Your y = ",
         ""
       ],
       "i": [
@@ -7235,20 +5994,305 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "В инвентаре нет {0}": {
+    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": {
       "s": [
-        "No ",
-        " in inventory"
+        "",
+        " Left ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": {
+      "s": [
+        "You entered raid block mode because ",
+        ". Some features may be unavailable"
       ],
       "i": [
         0
       ]
     },
-    "Товара на складе: {0}/{1}, {2}%%": {
+    "Дровосек: нарубите {0_v} дерева": {
       "s": [
-        "Items in stock: ",
+        "Lumberjack: chop ",
+        " wood"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Шахтер: накопайте {0_v} камня": {
+      "s": [
+        "Miner: mine ",
+        " stone"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Угольный шахтер: накопайте {0_v} угля": {
+      "s": [
+        "Coal miner: mine ",
+        " coal"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Железный шахтер: накопайте {0_v} железа": {
+      "s": [
+        "Iron miner: mine ",
+        " iron"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": {
+      "s": [
+        "Visit all settlements to unlock daily quests. You haven't visited: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": {
+      "s": [
+        "Every day at 00:00, daily quests are updated. They are the same for all players. For completing all ",
+        " quests you get a reward. For completing all daily quests ",
+        " days in a row, instead of a regular key you get a donor key\n\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": {
+      "s": [
+        "",
         "/",
+        " Reward: chest key\n",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": {
+      "s": [
+        "You cannot leave the mining zone until you complete the quests ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Добыто дерева: {0_current}/{1_end}": {
+      "s": [
+        "Wood collected: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": {
+      "s": [
+        "Go down the mineshaft and collect stone: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Добыто железной руды: {0_i}/{1_end}": {
+      "s": [
+        "Iron ore mined: ",
+        "/",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Отправляйтесь за ними в {0_i18n_accent_____________}": {
+      "s": [
+        "Follow them to ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Идите в {0_i18n_accent_____________} по дороге": {
+      "s": [
+        "Go to ",
+        " along the road"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": {
+      "s": [
+        "Return your items",
+        ", they are waiting for you at ",
+        "§6!"
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_extra___extra_to_player_lang____________}§8Вы тут": {
+      "s": [
+        "",
+        "§8You are here"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": {
+      "s": [
+        "I don't know how to use this, but I know someone who can definitely help: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": {
+      "s": [
+        "Event! ",
+        " with strength ",
+        " for ",
+        " minutes"
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Время: {0_new_Date___toHHMMSS__}": {
+      "s": [
+        "Time: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": {
+      "s": [
+        "",
+        " ",
+        "\nin ",
+        " (",
+        ")"
+      ],
+      "i": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": {
+      "s": [
+        "Your first record ",
+        " is set! It took ",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+      "s": [
+        "You beat your previous record ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+      "s": [
+        "You couldn't beat your previous record ",
+        "! ",
+        " -> ",
+        ""
+      ],
+      "i": [
+        0,
+        1,
+        2
+      ]
+    },
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": {
+      "s": [
+        "You can choose one of the categories below for speedrun. Time is counted only when you are in anarchy, i.e. when you are offline or standing at spawn, time is not counted. Your anarchy time now: ",
+        ""
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": {
+      "s": [
+        "Speedrun '",
+        "' started. Use .wipe to reset the time"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": {
+      "s": [
+        "You can take this quest to track the direction of the resource source (",
+        ") using a compass"
+      ],
+      "i": [
+        0
+      ]
+    },
+    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": {
+      "s": [
+        "Ores at y: ",
+        ":\n",
+        ""
+      ],
+      "i": [
+        0,
+        1
+      ]
+    },
+    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": {
+      "s": [
+        "",
         ", ",
+        ", Group: ",
         "%%"
       ],
       "i": [
@@ -7257,382 +6301,20 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "\n§7§lТип: §r§f{0}": {
+    "Добыть: {0___rawtext_____translate__langToken_itemType______}": {
       "s": [
-        "\n§7§lType: §r§f",
+        "Mine: ",
         ""
       ],
       "i": [
         0
       ]
     },
-    "\n§7§lЗначение:§r {0}": {
+    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": {
       "s": [
-        "\n§7§lValue:§r ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выбранный предмет: {0}\nНажмите, чтобы сменить": {
-      "s": [
-        "Selected item: ",
-        "\nClick to change"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Зачарования:\n{0}": {
-      "s": [
-        "Enchantments:\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Доберитесь до: {0}": {
-      "s": [
-        "Reach: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не удалось открыть диалог. {0}": {
-      "s": [
-        "Failed to open dialog. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы {0}, поэтому вышли из режима новичка.": {
-      "s": [
-        "You are ",
-        ", so you left newbie mode."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выдает или убирает {0} из инвентаря": {
-      "s": [
-        "Gives or removes ",
-        " from inventory"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Используйте {0} чтобы убрать этот предмет из инвентаря или получить его снова": {
-      "s": [
-        "Use ",
-        " to remove this item from inventory and to get it back"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Шанс: {0}%%, Кол-во: {1}...{2}": {
-      "s": [
-        "Chance: ",
-        "%%, Amount: ",
-        "...",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "§fЧертеж предмета {0}": {
-      "s": [
-        "§fItem blueprint ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Убит босс {0}!": {
-      "s": [
-        "Boss ",
-        " defeated!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}\nДо появления\nосталось {1}": {
-      "s": [
-        "",
-        "\nДо появления\nосталось ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Роль игрока {0} сменена успешно": {
-      "s": [
-        "Role of player ",
-        " changed successfully"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "\nПричина: {0}": {
-      "s": [
-        "\nReason: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    " игроком {0}": {
-      "s": [
-        " by player ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваша роль сменена c {0} на {1}{2}{3}": {
-      "s": [
-        "Your role has been changed from ",
+        "You need to mine at height from ",
         " to ",
-        "",
-        "",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "У игрока {0} роль выше или такая же как у вас, вы не можете ее сменить.": {
-      "s": [
-        "Player ",
-        " has a role higher or equal to yours, you cannot change it."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§3Ваша роль: {0}": {
-      "s": [
-        "§3Your role: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваша роль: {0}{1}": {
-      "s": [
-        "Your role: ",
-        "",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы вернули роль §r{0}": {
-      "s": [
-        "You restored role §r",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Безопасная зона {0}": {
-      "s": [
-        "Safe ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Регион создается. {0}%%": {
-      "s": [
-        "Region is being created. ",
-        "%%"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Будут изменены следующие регионы:\n{0}": {
-      "s": [
-        "The following regions will be modified:\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Макс кол-во: {0}": {
-      "s": [
-        "Max amount: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§cБосс §6{0}": {
-      "s": [
-        "§cBoss §6",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уверены что хотите назначить владельцем региона игрока {0}?": {
-      "s": [
-        "Are you sure you want to appoint player ",
-        " as the region owner?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уверены что хотите передать права владельца региона игроку {0}?": {
-      "s": [
-        "Are you sure you want to transfer region ownership rights to player ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Владелец > {0}": {
-      "s": [
-        "Owner > ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не удалось сохранить структуру: {0}": {
-      "s": [
-        "Failed to save structure: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Нельзя создать регион, область которого ниже -64 (y: {0} radius: {1} result: {2})": {
-      "s": [
-        "Cannot create a region with area below -64 (y: ",
-        " radius: ",
-        " result: ",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вас ждет {0}": {
-      "s": [
-        "You are awaited by ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}\n§aЗавершено! §6Заберите награду.": {
-      "s": [
-        "",
-        "\n§aCompleted! §6Claim your reward."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Задание {0} сломалось: {1}": {
-      "s": [
-        "Quest ",
-        " broke: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "При активации шага произошла ошибка. {0}": {
-      "s": [
-        "An error occurred while activating the step. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Завершите задание {0}": {
-      "s": [
-        "Complete the quest ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Возьмите задание {0}": {
-      "s": [
-        "Take the quest ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Задание\n{0}": {
-      "s": [
-        "Quest\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}\nЗавершен!": {
-      "s": [
-        "",
-        "\nCompleted!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}, {1}!\n§r§3Время §b• §3{2}": {
-      "s": [
-        "",
-        ", ",
-        "!\n§r§3Time §b• §3",
+        ". Your y = ",
         ""
       ],
       "i": [
@@ -7641,625 +6323,13 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0}: {1}, просмотреть: /mail": {
+    "Руды на {0_y}": {
       "s": [
-        "",
-        ": ",
-        ", view: /mail"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0} Вы потеряете все награды, прикрепленные к письму!": {
-      "s": [
-        "",
-        " You will lose all rewards attached to the letter!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} Все награды будут собраны автоматически": {
-      "s": [
-        "",
-        " All rewards will be collected automatically"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Предыдущее письмо\n{0}": {
-      "s": [
-        "Previous letter\n",
+        "Ores at ",
         ""
       ],
       "i": [
         0
-      ]
-    },
-    "Следующее письмо\n{0}": {
-      "s": [
-        "Next letter\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} д. {1}": {
-      "s": [
-        "",
-        "d ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "§3Выберите игрока чтобы {0}": {
-      "s": [
-        "§3Select a player to ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Результаты поиска по запросу\n{0}": {
-      "s": [
-        "Search results for\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§cВы уверены, что хотите {0}?": {
-      "s": [
-        "§cAre you sure you want to ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Игрок {0} сменил ник на {1}": {
-      "s": [
-        "Player ",
-        " changed nickname to ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Ключ для ящика {0}": {
-      "s": [
-        "Key for crate ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} > Содержимое": {
-      "s": [
-        "",
-        " > Contents"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Открыт ящик {0}!": {
-      "s": [
-        "Crate ",
-        " opened!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ключ для {0} не подходит к ящику {1}": {
-      "s": [
-        "Key for ",
-        " is not suitable for crate ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0} ящик": {
-      "s": [
-        "",
-        " crate"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Команда доступна только начиная с роли {0}. Ваша роль: {1}": {
-      "s": [
-        "Command available only starting from role ",
-        ". Your role: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "При выполнении команды произошла ошибка. {0}": {
-      "s": [
-        "An error occurred while executing the command. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У вас нет разрешения для использования команды {0}{1}\nСписок всех доступных вам команд: §f.help": {
-      "s": [
-        "You do not have permission to use command ",
-        "",
-        "\nList of all commands available to you: §f.help"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "\nКоманда доступна начиная с роли {0}": {
-      "s": [
-        "\nCommand available from role ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы имели ввиду {0}?": {
-      "s": [
-        "Did you mean ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не так быстро! Попробуй через {0}": {
-      "s": [
-        "Not so fast! Try again in ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Сменить роль {0}": {
-      "s": [
-        "Change role ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Участник {0} успешно выгнан из клана {1}": {
-      "s": [
-        "Member ",
-        " successfully kicked from clan ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы были выгнаны из клана игроком '{0}'. Причина: {1}": {
-      "s": [
-        "You were kicked from the clan by player '",
-        "'. Reason: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы выгнаны из клана '{0}'": {
-      "s": [
-        "You have been kicked from the clan '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выгнать участника '{0}'": {
-      "s": [
-        "Kick member '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "В клане '{0}', сменена игроком {1}": {
-      "s": [
-        "In clan '",
-        "', changed by player ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Роль в клане {0}": {
-      "s": [
-        "Role in clan ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Роль участника клана {0} сменена успешно: {1}.": {
-      "s": [
-        "Clan member ",
-        "'s role changed successfully: ",
-        "."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Игрок {0} успешно приглашен в клан!": {
-      "s": [
-        "Player ",
-        " successfully invited to the clan!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Приглашение в клан '{0}'": {
-      "s": [
-        "Clan invitation to '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Игрок {0} уже состоит в клане {1}!": {
-      "s": [
-        "Player ",
-        " is already in clan ",
-        "!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Игрок {0} уже состоит в вашем клане!": {
-      "s": [
-        "Player ",
-        " is already in your clan!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Приглашения в клан '{0}'": {
-      "s": [
-        "Invitations to clan '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы НЕ приняты в клан {0}": {
-      "s": [
-        "You were NOT accepted into clan ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы приняты в клан {0}": {
-      "s": [
-        "You have been accepted into clan ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Принять игрока '{0}' в клан?": {
-      "s": [
-        "Accept player '",
-        "' into clan?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Короткое имя: {0}": {
-      "s": [
-        "Short name: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Клан '{0}' покинут успешно": {
-      "s": [
-        "Clan '",
-        "' left successfully"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Игрок {0} покинул ваш клан": {
-      "s": [
-        "Player ",
-        " left your clan"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Клан '{0}' распущен": {
-      "s": [
-        "Clan '",
-        "' disbanded"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "   §fКоманда §6.{0}{1}§7§o - {2}": {
-      "s": [
-        "   §fCommand §6.",
-        "",
-        "§7§o - ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    " (также {0})": {
-      "s": [
-        " (also ",
-        ")"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}─═─═─═§f Доступно: {1}/{2} {3}═─═─═─═─": {
-      "s": [
-        "",
-        "─═─═─═§f Available: ",
-        "/",
-        " ",
-        "═─═─═─═─"
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Неизвестный аргумент: {0}.\nДоступные командлеты: \n{1}\n ": {
-      "s": [
-        "Unknown argument: ",
-        ".\nAvailable subcommands: \n",
-        "\n "
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Короткое имя '{0}' уже занято.": {
-      "s": [
-        "Short name '",
-        "' is already taken."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Клан с именем '{0}' уже существует.": {
-      "s": [
-        "Clan with name '",
-        "' already exists."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Короткое имя '{0}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1}'": {
-      "s": [
-        "Short name '",
-        "' cannot be TOO short, minimum 2 characters. Otherwise how to understand what clan is '",
-        "'"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Короткое имя '{0}' должно быть КОРОТКИМ, меньше 5 символов": {
-      "s": [
-        "Short name '",
-        "' must be SHORT, less than 5 characters"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Короткое имя '{0}' не может содержать параграф": {
-      "s": [
-        "Short name '",
-        "' cannot contain the paragraph symbol"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Имя '{0}' не может содержать параграф": {
-      "s": [
-        "Name '",
-        "' cannot contain the paragraph symbol"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "[{0}] {1}\nУчастники: {2} {3}": {
-      "s": [
-        "[",
-        "] ",
-        "\nMembers: ",
-        " ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Запрос на вступление в клан от '{0}'": {
-      "s": [
-        "Request to join clan from '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Заявка на вступление в клан '{0}' отправлена!": {
-      "s": [
-        "Join request to clan '",
-        "' sent!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уже отправили заявку в клан '{0}'!": {
-      "s": [
-        "You have already sent a request to clan '",
-        "'!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы приняли приглашение в клан '{0}'": {
-      "s": [
-        "You accepted the invitation to clan '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Причина: {0}\n{1}": {
-      "s": [
-        "Reason: ",
-        "\n",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Игрок {0} не найден": {
-      "s": [
-        "Player ",
-        " not found"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Размьючен игрок {0} который был замьючен по причине {1}, до конца оставалось {2}": {
-      "s": [
-        "Unmuted player ",
-        " who was muted for ",
-        ", time remaining was ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Игрок {0} был замьючен на {1} по причине: {2}": {
-      "s": [
-        "Player ",
-        " has been muted for ",
-        " for: ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Награда: {0}": {
-      "s": [
-        "Reward: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}§c*\n§aЗаберите награды!": {
-      "s": [
-        "",
-        "§c*\n§aClaim your rewards!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Достижение получено: {0}! Заберите награды, используя {1}": {
-      "s": [
-        "Achievement unlocked: ",
-        "! Claim your rewards using ",
-        ""
-      ],
-      "i": [
-        0,
-        1
       ]
     }
   },
@@ -13100,15 +11170,6 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_this_name} ящик": {
-      "s": [
-        "",
-        " ящик"
-      ],
-      "i": [
-        0
-      ]
-    },
     "Ключ для ящика {0_Crate_getName_storage_crate_}": {
       "s": [
         "Ключ для ящика ",
@@ -13165,15 +11226,6 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       "i": [
         0,
         1
-      ]
-    },
-    "У вас {0_unreadCount} непрочитанных сообщений!": {
-      "s": [
-        "У вас ",
-        " непрочитанных сообщений!"
-      ],
-      "i": [
-        0
       ]
     },
     "Следующее письмо\n{0_letterOneLineName_next_letter_}": {
@@ -14158,15 +12210,6 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Доберитесь до {0_i18n_accent____________} по дороге": {
-      "s": [
-        "Доберитесь до ",
-        " по дороге"
-      ],
-      "i": [
-        0
-      ]
-    },
     "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
       "s": [
         "Копать нужно на высоте ",
@@ -14517,1922 +12560,6 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       "i": [
         0
       ]
-    },
-    "Руды на {0}": {
-      "s": [
-        "Руды на ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Копать нужно на высоте от {0} до {1}. Ваш y = {2}": {
-      "s": [
-        "Копать нужно на высоте от ",
-        " до ",
-        ". Ваш y = ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Добыть: {0}": {
-      "s": [
-        "Добыть: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}, {1}, Группа: {2}%%": {
-      "s": [
-        "",
-        ", ",
-        ", Группа: ",
-        "%%"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Руды на y: {0}:\n{1}": {
-      "s": [
-        "Руды на y: ",
-        ":\n",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0}) с помощью компаса": {
-      "s": [
-        "Вы можете взять это задание чтобы отслеживать направления источника ресурса (",
-        ") с помощью компаса"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Спидран '{0}' начат. Для сброса времени воспользуйтесь .wipe": {
-      "s": [
-        "Спидран '",
-        "' начат. Для сброса времени воспользуйтесь .wipe"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0}": {
-      "s": [
-        "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы не смогли побить ваш предыдущий рекорд {0}! {1} -> {2}": {
-      "s": [
-        "Вы не смогли побить ваш предыдущий рекорд ",
-        "! ",
-        " -> ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вы побили ваш предыдущий рекорд {0}! {1} -> {2}": {
-      "s": [
-        "Вы побили ваш предыдущий рекорд ",
-        "! ",
-        " -> ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Ваш первый рекорд {0} поставлен! Это заняло {1}": {
-      "s": [
-        "Ваш первый рекорд ",
-        " поставлен! Это заняло ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0} {1}\nЧерез {2} ({3})": {
-      "s": [
-        "",
-        " ",
-        "\nЧерез ",
-        " (",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Время: {0}": {
-      "s": [
-        "Время: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Событие! {0} силой {1} на {2} минут": {
-      "s": [
-        "Событие! ",
-        " силой ",
-        " на ",
-        " минут"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "{0}§8Вы тут": {
-      "s": [
-        "",
-        "§8Вы тут"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}/{1} Награда: ключ от сундука\n{2}": {
-      "s": [
-        "",
-        "/",
-        " Награда: ключ от сундука\n",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0} заданий вам дают награду. За выполнение всех ежедневных заданий {1} дня подряд вместо обычного ключа выдается донатный\n\n{2}": {
-      "s": [
-        "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ",
-        " заданий вам дают награду. За выполнение всех ежедневных заданий ",
-        " дня подряд вместо обычного ключа выдается донатный\n\n",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0}": {
-      "s": [
-        "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0}": {
-      "s": [
-        "Не умею этим пользоваться, но знаю кто точно поможет: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Верните свои вещи{0}, они ждут вас на {1}§6!": {
-      "s": [
-        "Верните свои вещи",
-        ", они ждут вас на ",
-        "§6!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Идите в {0} по дороге": {
-      "s": [
-        "Идите в ",
-        " по дороге"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Отправляйтесь за ними в {0}": {
-      "s": [
-        "Отправляйтесь за ними в ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Добыто железной руды: {0}/{1}": {
-      "s": [
-        "Добыто железной руды: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Спуститесь в шахту и добудьте камня: {0}/{1}": {
-      "s": [
-        "Спуститесь в шахту и добудьте камня: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Добыто дерева: {0}/{1}": {
-      "s": [
-        "Добыто дерева: ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0}/{1}": {
-      "s": [
-        "Вы не можете покинуть зону добычи, пока не завершили задания ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Железный шахтер: накопайте {0} железа": {
-      "s": [
-        "Железный шахтер: накопайте ",
-        " железа"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Угольный шахтер: накопайте {0} угля": {
-      "s": [
-        "Угольный шахтер: накопайте ",
-        " угля"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Шахтер: накопайте {0} камня": {
-      "s": [
-        "Шахтер: накопайте ",
-        " камня"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Дровосек: нарубите {0} дерева": {
-      "s": [
-        "Дровосек: нарубите ",
-        " дерева"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы вошли в режим рейдблока, потому что {0}. Некоторые функции могут быть недоступны": {
-      "s": [
-        "Вы вошли в режим рейдблока, потому что ",
-        ". Некоторые функции могут быть недоступны"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} Осталось {1}": {
-      "s": [
-        "",
-        " Осталось ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Копать нужно на высоте {0}..{1}. Ваш y = {2}": {
-      "s": [
-        "Копать нужно на высоте ",
-        "..",
-        ". Ваш y = ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "§r§fМеч со способностью §7{0}": {
-      "s": [
-        "§r§fМеч со способностью §7",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выбранная книга: {0}": {
-      "s": [
-        "Выбранная книга: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У {0} можно зачаровать предметы": {
-      "s": [
-        "У ",
-        " можно зачаровать предметы"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Здесь есть шахта, ведущая к {0} и {1}": {
-      "s": [
-        "Здесь есть шахта, ведущая к ",
-        " и ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "...мы изобрели {0}": {
-      "s": [
-        "...мы изобрели ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Идите к {0}, он расскажет вам что такое {1}": {
-      "s": [
-        "Идите к ",
-        ", он расскажет вам что такое ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Доберитесь до {0} по дороге": {
-      "s": [
-        "Доберитесь до ",
-        " по дороге"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Купите у {0} ключ доступа к печам": {
-      "s": [
-        "Купите у ",
-        " ключ доступа к печам"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У {0} можно купить ключ доступа к печам": {
-      "s": [
-        "У ",
-        " можно купить ключ доступа к печам"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Онет, кажется, зачарование {0} уровнем {1} потерялось...": {
-      "s": [
-        "Онет, кажется, зачарование ",
-        " уровнем ",
-        " потерялось..."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Зачарование {0} не удалось перенести.": {
-      "s": [
-        "Зачарование ",
-        " не удалось перенести."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0}, ключ: {1}": {
-      "s": [
-        "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ",
-        ", ключ: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Использован ключ из слота {0}": {
-      "s": [
-        "Использован ключ из слота ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваш клан уже занял {0}/3 печек.": {
-      "s": [
-        "Ваш клан уже занял ",
-        "/3 печек."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уже заняли {0}/3 печек.": {
-      "s": [
-        "Вы уже заняли ",
-        "/3 печек."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Эта печка уже занята. Печка освободится через {0}, ключ: {1}": {
-      "s": [
-        "Эта печка уже занята. Печка освободится через ",
-        ", ключ: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0}: задание исследования не настроено!": {
-      "s": [
-        "",
-        ": задание исследования не настроено!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§6Ваша база {0}": {
-      "s": [
-        "§6Ваша база ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "\n\nКоординаты: {0}\nРадиус: {1}": {
-      "s": [
-        "\n\nКоординаты: ",
-        "\nРадиус: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "База игрока {0}": {
-      "s": [
-        "База игрока ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "База с владельцем {0} {1}.": {
-      "s": [
-        "База с владельцем ",
-        " ",
-        "."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0}!": {
-      "s": [
-        "§cБаза разрушена!\n§4Срочно поставьте блок базы на ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0}\nМатериалы в бочке:\n{1}\n{2}\nДо следующего сбора ресурсов: {3}": {
-      "s": [
-        "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n",
-        "\nМатериалы в бочке:\n",
-        "\n",
-        "\nДо следующего сбора ресурсов: ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Не хватает ресурсов:\n{0}": {
-      "s": [
-        "Не хватает ресурсов:\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Всех материалов хватает!\nБаза защищена от гниения на {0}§r\n": {
-      "s": [
-        "Всех материалов хватает!\nБаза защищена от гниения на ",
-        "§r\n"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "База успешно создана! Чтобы открыть меню базы используйте команду {0}": {
-      "s": [
-        "База успешно создана! Чтобы открыть меню базы используйте команду ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "состоите в базе игрока '{0}'": {
-      "s": [
-        "состоите в базе игрока '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§cВы уже {0}!": {
-      "s": [
-        "§cВы уже ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Нельзя создать базу на высоте ниже {0}!": {
-      "s": [
-        "Нельзя создать базу на высоте ниже ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Улучшить базу: {0}": {
-      "s": [
-        "Улучшить базу: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} (радиус {1} -> {2})": {
-      "s": [
-        "",
-        " (радиус ",
-        " -> ",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Максимальный уровень\n{0}": {
-      "s": [
-        "Максимальный уровень\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вода. Попытка {0}/{1}": {
-      "s": [
-        "Вода. Попытка ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Успех! Теперь вы можете использовать {0} для перемещения на случайную позицию.": {
-      "s": [
-        "Успех! Теперь вы можете использовать ",
-        " для перемещения на случайную позицию."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уже находитесь на анархии! Если это не так, используйте {0}": {
-      "s": [
-        "Вы уже находитесь на анархии! Если это не так, используйте ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Радиус границы анархии сейчас: {0}": {
-      "s": [
-        "Радиус границы анархии сейчас: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Обычный аирдроп скоро упадет на {0}!": {
-      "s": [
-        "Обычный аирдроп скоро упадет на ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Усиленный аирдроп скоро упадет на {0}!": {
-      "s": [
-        "Усиленный аирдроп скоро упадет на ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Инструмент скоро сломается! {0}/{1} ({2}%)": {
-      "s": [
-        "Инструмент скоро сломается! ",
-        "/",
-        " (",
-        "%)"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Анархия {0}": {
-      "s": [
-        "Анархия ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Статистика игрока {0}": {
-      "s": [
-        "Статистика игрока ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "TPS сервера {0}§f: {1}": {
-      "s": [
-        "TPS сервера ",
-        "§f: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Порталы {0}/{1}": {
-      "s": [
-        "Порталы ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Достижения {0}/{1} ({2}%%)": {
-      "s": [
-        "Достижения ",
-        "/",
-        " (",
-        "%%)"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Изменено на {0}": {
-      "s": [
-        "Изменено на ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Нет места в инвентаре (нужно еще {0})": {
-      "s": [
-        "Нет места в инвентаре (нужно еще ",
-        ")"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "При покупке произошла ошибка. {0}": {
-      "s": [
-        "При покупке произошла ошибка. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Успешная покупка {0} за {1}!": {
-      "s": [
-        "Успешная покупка ",
-        " за ",
-        "!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Успешная продажа {0} за {1}!": {
-      "s": [
-        "Успешная продажа ",
-        " за ",
-        "!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Купить {0} за {1}?": {
-      "s": [
-        "Купить ",
-        " за ",
-        "?"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Продать {0} за {1}?": {
-      "s": [
-        "Продать ",
-        " за ",
-        "?"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Покупка невозможна:{0}{1}": {
-      "s": [
-        "Покупка невозможна:",
-        "",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Нужно уровней опыта: {0}, {1}/{2}": {
-      "s": [
-        "Нужно уровней опыта: ",
-        ", ",
-        "/",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "В инвентаре нет {0}": {
-      "s": [
-        "В инвентаре нет ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Товара на складе: {0}/{1}, {2}%%": {
-      "s": [
-        "Товара на складе: ",
-        "/",
-        ", ",
-        "%%"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "\n§7§lТип: §r§f{0}": {
-      "s": [
-        "\n§7§lТип: §r§f",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "\n§7§lЗначение:§r {0}": {
-      "s": [
-        "\n§7§lЗначение:§r ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выбранный предмет: {0}\nНажмите, чтобы сменить": {
-      "s": [
-        "Выбранный предмет: ",
-        "\nНажмите, чтобы сменить"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Зачарования:\n{0}": {
-      "s": [
-        "Зачарования:\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Доберитесь до: {0}": {
-      "s": [
-        "Доберитесь до: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не удалось открыть диалог. {0}": {
-      "s": [
-        "Не удалось открыть диалог. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы {0}, поэтому вышли из режима новичка.": {
-      "s": [
-        "Вы ",
-        ", поэтому вышли из режима новичка."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выдает или убирает {0} из инвентаря": {
-      "s": [
-        "Выдает или убирает ",
-        " из инвентаря"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Используйте {0} чтобы убрать этот предмет из инвентаря или получить его снова": {
-      "s": [
-        "Используйте ",
-        " чтобы убрать этот предмет из инвентаря или получить его снова"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Шанс: {0}%%, Кол-во: {1}...{2}": {
-      "s": [
-        "Шанс: ",
-        "%%, Кол-во: ",
-        "...",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "§fЧертеж предмета {0}": {
-      "s": [
-        "§fЧертеж предмета ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Убит босс {0}!": {
-      "s": [
-        "Убит босс ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}\nДо появления\nосталось {1}": {
-      "s": [
-        "",
-        "\nДо появления\nосталось ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Роль игрока {0} сменена успешно": {
-      "s": [
-        "Роль игрока ",
-        " сменена успешно"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "\nПричина: {0}": {
-      "s": [
-        "\nПричина: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    " игроком {0}": {
-      "s": [
-        " игроком ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваша роль сменена c {0} на {1}{2}{3}": {
-      "s": [
-        "Ваша роль сменена c ",
-        " на ",
-        "",
-        "",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "У игрока {0} роль выше или такая же как у вас, вы не можете ее сменить.": {
-      "s": [
-        "У игрока ",
-        " роль выше или такая же как у вас, вы не можете ее сменить."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§3Ваша роль: {0}": {
-      "s": [
-        "§3Ваша роль: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ваша роль: {0}{1}": {
-      "s": [
-        "Ваша роль: ",
-        "",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы вернули роль §r{0}": {
-      "s": [
-        "Вы вернули роль §r",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Безопасная зона {0}": {
-      "s": [
-        "Безопасная зона ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Регион создается. {0}%%": {
-      "s": [
-        "Регион создается. ",
-        "%%"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Будут изменены следующие регионы:\n{0}": {
-      "s": [
-        "Будут изменены следующие регионы:\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Макс кол-во: {0}": {
-      "s": [
-        "Макс кол-во: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§cБосс §6{0}": {
-      "s": [
-        "§cБосс §6",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уверены что хотите назначить владельцем региона игрока {0}?": {
-      "s": [
-        "Вы уверены что хотите назначить владельцем региона игрока ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уверены что хотите передать права владельца региона игроку {0}?": {
-      "s": [
-        "Вы уверены что хотите передать права владельца региона игроку ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Владелец > {0}": {
-      "s": [
-        "Владелец > ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не удалось сохранить структуру: {0}": {
-      "s": [
-        "Не удалось сохранить структуру: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Нельзя создать регион, область которого ниже -64 (y: {0} radius: {1} result: {2})": {
-      "s": [
-        "Нельзя создать регион, область которого ниже -64 (y: ",
-        " radius: ",
-        " result: ",
-        ")"
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Вас ждет {0}": {
-      "s": [
-        "Вас ждет ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}\n§aЗавершено! §6Заберите награду.": {
-      "s": [
-        "",
-        "\n§aЗавершено! §6Заберите награду."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Задание {0} сломалось: {1}": {
-      "s": [
-        "Задание ",
-        " сломалось: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "При активации шага произошла ошибка. {0}": {
-      "s": [
-        "При активации шага произошла ошибка. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Завершите задание {0}": {
-      "s": [
-        "Завершите задание ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Возьмите задание {0}": {
-      "s": [
-        "Возьмите задание ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Задание\n{0}": {
-      "s": [
-        "Задание\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}\nЗавершен!": {
-      "s": [
-        "",
-        "\nЗавершен!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}, {1}!\n§r§3Время §b• §3{2}": {
-      "s": [
-        "",
-        ", ",
-        "!\n§r§3Время §b• §3",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "{0}: {1}, просмотреть: /mail": {
-      "s": [
-        "",
-        ": ",
-        ", просмотреть: /mail"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0} Вы потеряете все награды, прикрепленные к письму!": {
-      "s": [
-        "",
-        " Вы потеряете все награды, прикрепленные к письму!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} Все награды будут собраны автоматически": {
-      "s": [
-        "",
-        " Все награды будут собраны автоматически"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Предыдущее письмо\n{0}": {
-      "s": [
-        "Предыдущее письмо\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Следующее письмо\n{0}": {
-      "s": [
-        "Следующее письмо\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У вас {0} непрочитанных сообщений!": {
-      "s": [
-        "У вас ",
-        " непрочитанных сообщений!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} д. {1}": {
-      "s": [
-        "",
-        " д. ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "§3Выберите игрока чтобы {0}": {
-      "s": [
-        "§3Выберите игрока чтобы ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Результаты поиска по запросу\n{0}": {
-      "s": [
-        "Результаты поиска по запросу\n",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "§cВы уверены, что хотите {0}?": {
-      "s": [
-        "§cВы уверены, что хотите ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Игрок {0} сменил ник на {1}": {
-      "s": [
-        "Игрок ",
-        " сменил ник на ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Ключ для ящика {0}": {
-      "s": [
-        "Ключ для ящика ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0} > Содержимое": {
-      "s": [
-        "",
-        " > Содержимое"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Открыт ящик {0}!": {
-      "s": [
-        "Открыт ящик ",
-        "!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Ключ для {0} не подходит к ящику {1}": {
-      "s": [
-        "Ключ для ",
-        " не подходит к ящику ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "{0} ящик": {
-      "s": [
-        "",
-        " ящик"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Команда доступна только начиная с роли {0}. Ваша роль: {1}": {
-      "s": [
-        "Команда доступна только начиная с роли ",
-        ". Ваша роль: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "При выполнении команды произошла ошибка. {0}": {
-      "s": [
-        "При выполнении команды произошла ошибка. ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "У вас нет разрешения для использования команды {0}{1}\nСписок всех доступных вам команд: §f.help": {
-      "s": [
-        "У вас нет разрешения для использования команды ",
-        "",
-        "\nСписок всех доступных вам команд: §f.help"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "\nКоманда доступна начиная с роли {0}": {
-      "s": [
-        "\nКоманда доступна начиная с роли ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы имели ввиду {0}?": {
-      "s": [
-        "Вы имели ввиду ",
-        "?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Не так быстро! Попробуй через {0}": {
-      "s": [
-        "Не так быстро! Попробуй через ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Сменить роль {0}": {
-      "s": [
-        "Сменить роль ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Участник {0} успешно выгнан из клана {1}": {
-      "s": [
-        "Участник ",
-        " успешно выгнан из клана ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы были выгнаны из клана игроком '{0}'. Причина: {1}": {
-      "s": [
-        "Вы были выгнаны из клана игроком '",
-        "'. Причина: ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Вы выгнаны из клана '{0}'": {
-      "s": [
-        "Вы выгнаны из клана '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Выгнать участника '{0}'": {
-      "s": [
-        "Выгнать участника '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "В клане '{0}', сменена игроком {1}": {
-      "s": [
-        "В клане '",
-        "', сменена игроком ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Роль в клане {0}": {
-      "s": [
-        "Роль в клане ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Роль участника клана {0} сменена успешно: {1}.": {
-      "s": [
-        "Роль участника клана ",
-        " сменена успешно: ",
-        "."
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Игрок {0} успешно приглашен в клан!": {
-      "s": [
-        "Игрок ",
-        " успешно приглашен в клан!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Приглашение в клан '{0}'": {
-      "s": [
-        "Приглашение в клан '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Игрок {0} уже состоит в клане {1}!": {
-      "s": [
-        "Игрок ",
-        " уже состоит в клане ",
-        "!"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Игрок {0} уже состоит в вашем клане!": {
-      "s": [
-        "Игрок ",
-        " уже состоит в вашем клане!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Приглашения в клан '{0}'": {
-      "s": [
-        "Приглашения в клан '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы НЕ приняты в клан {0}": {
-      "s": [
-        "Вы НЕ приняты в клан ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы приняты в клан {0}": {
-      "s": [
-        "Вы приняты в клан ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Принять игрока '{0}' в клан?": {
-      "s": [
-        "Принять игрока '",
-        "' в клан?"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Короткое имя: {0}": {
-      "s": [
-        "Короткое имя: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Клан '{0}' покинут успешно": {
-      "s": [
-        "Клан '",
-        "' покинут успешно"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Игрок {0} покинул ваш клан": {
-      "s": [
-        "Игрок ",
-        " покинул ваш клан"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Клан '{0}' распущен": {
-      "s": [
-        "Клан '",
-        "' распущен"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "   §fКоманда §6.{0}{1}§7§o - {2}": {
-      "s": [
-        "   §fКоманда §6.",
-        "",
-        "§7§o - ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    " (также {0})": {
-      "s": [
-        " (также ",
-        ")"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}─═─═─═§f Доступно: {1}/{2} {3}═─═─═─═─": {
-      "s": [
-        "",
-        "─═─═─═§f Доступно: ",
-        "/",
-        " ",
-        "═─═─═─═─"
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Неизвестный аргумент: {0}.\nДоступные командлеты: \n{1}\n ": {
-      "s": [
-        "Неизвестный аргумент: ",
-        ".\nДоступные командлеты: \n",
-        "\n "
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Короткое имя '{0}' уже занято.": {
-      "s": [
-        "Короткое имя '",
-        "' уже занято."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Клан с именем '{0}' уже существует.": {
-      "s": [
-        "Клан с именем '",
-        "' уже существует."
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Короткое имя '{0}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1}'": {
-      "s": [
-        "Короткое имя '",
-        "' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '",
-        "'"
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Короткое имя '{0}' должно быть КОРОТКИМ, меньше 5 символов": {
-      "s": [
-        "Короткое имя '",
-        "' должно быть КОРОТКИМ, меньше 5 символов"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Короткое имя '{0}' не может содержать параграф": {
-      "s": [
-        "Короткое имя '",
-        "' не может содержать параграф"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Имя '{0}' не может содержать параграф": {
-      "s": [
-        "Имя '",
-        "' не может содержать параграф"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "[{0}] {1}\nУчастники: {2} {3}": {
-      "s": [
-        "[",
-        "] ",
-        "\nУчастники: ",
-        " ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "Запрос на вступление в клан от '{0}'": {
-      "s": [
-        "Запрос на вступление в клан от '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Заявка на вступление в клан '{0}' отправлена!": {
-      "s": [
-        "Заявка на вступление в клан '",
-        "' отправлена!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы уже отправили заявку в клан '{0}'!": {
-      "s": [
-        "Вы уже отправили заявку в клан '",
-        "'!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Вы приняли приглашение в клан '{0}'": {
-      "s": [
-        "Вы приняли приглашение в клан '",
-        "'"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Причина: {0}\n{1}": {
-      "s": [
-        "Причина: ",
-        "\n",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
-    },
-    "Игрок {0} не найден": {
-      "s": [
-        "Игрок ",
-        " не найден"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Размьючен игрок {0} который был замьючен по причине {1}, до конца оставалось {2}": {
-      "s": [
-        "Размьючен игрок ",
-        " который был замьючен по причине ",
-        ", до конца оставалось ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Игрок {0} был замьючен на {1} по причине: {2}": {
-      "s": [
-        "Игрок ",
-        " был замьючен на ",
-        " по причине: ",
-        ""
-      ],
-      "i": [
-        0,
-        1,
-        2
-      ]
-    },
-    "Награда: {0}": {
-      "s": [
-        "Награда: ",
-        ""
-      ],
-      "i": [
-        0
-      ]
-    },
-    "{0}§c*\n§aЗаберите награды!": {
-      "s": [
-        "",
-        "§c*\n§aЗаберите награды!"
-      ],
-      "i": [
-        0
-      ]
-    },
-    "Достижение получено: {0}! Заберите награды, используя {1}": {
-      "s": [
-        "Достижение получено: ",
-        "! Заберите награды, используя ",
-        ""
-      ],
-      "i": [
-        0,
-        1
-      ]
     }
   }
 }
@@ -16443,11 +12570,11 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
  */
 export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Record<string, { s: string[], i: number[] }>>> = {
   "en_US": {
-    "У вас {0} непрочитанных сообщений!": {
+    "У вас {0_unreadCount} непрочитанных сообщений!": {
       "one": {
         "s": [
-          "You have ",
-          " unread message!"
+          "У вас ",
+          " непрочитанных сообщений!"
         ],
         "i": [
           0
@@ -16455,8 +12582,8 @@ export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Reco
       },
       "other": {
         "s": [
-          "You have ",
-          " unread messages!"
+          "У вас ",
+          " непрочитанных сообщений!"
         ],
         "i": [
           0
@@ -16464,5 +12591,44 @@ export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Reco
       }
     }
   },
-  "ru_RU": {}
+  "ru_RU": {
+    "У вас {0_unreadCount} непрочитанных сообщений!": {
+      "one": {
+        "s": [
+          "У вас ",
+          " непрочитанных сообщений!"
+        ],
+        "i": [
+          0
+        ]
+      },
+      "few": {
+        "s": [
+          "У вас ",
+          " непрочитанных сообщений!"
+        ],
+        "i": [
+          0
+        ]
+      },
+      "many": {
+        "s": [
+          "У вас ",
+          " непрочитанных сообщений!"
+        ],
+        "i": [
+          0
+        ]
+      },
+      "other": {
+        "s": [
+          "У вас ",
+          " непрочитанных сообщений!"
+        ],
+        "i": [
+          0
+        ]
+      }
+    }
+  }
 }

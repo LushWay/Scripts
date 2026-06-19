@@ -5,7 +5,7 @@ import { ask } from 'lib/form/message'
 import { ModalForm } from 'lib/form/modal'
 import { form } from 'lib/form/new'
 import { BUTTON } from 'lib/form/utils'
-import { i18n, textTable } from 'lib/i18n/text'
+import { i18n, i18nPlural, textTable } from 'lib/i18n/text'
 import { Mail } from 'lib/mail'
 import { Join } from 'lib/player-join'
 import { is } from 'lib/roles'
@@ -41,7 +41,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => {
   const unreadCount = Mail.getUnreadMessagesCount(player.id)
   if (unreadCount === 0) return
 
-  player.info(i18n.join`${i18n.header`Почта:`} ${i18n`У вас ${unreadCount} непрочитанных сообщений!`} ${command}`)
+  player.info(i18n.join`${i18n.header`Почта:`} ${i18nPlural`У вас ${unreadCount} непрочитанных сообщений!`} ${command}`)
 })
 
 export function mailMenu(player: Player, back?: VoidFunction) {

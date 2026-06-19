@@ -72,6 +72,10 @@ class LangWriter {
     return `LangWriter(${this.base}/*.${this.ext})`
   }
 
+  /**
+   * @param {string} lang
+   * @returns {Promise<Record<string, T>>}
+   */
   async read(lang) {
     /** @type {Record<string, T>} */
     let parsed = {}
@@ -89,10 +93,9 @@ class LangWriter {
         const newKey = oldKeyToPlaceholderKey(key)
         console.log(`Migrating old key: ${key.replace(/\x00/g, '\\0')}  ->  ${newKey}`)
         migrated[newKey] = parsed[key]
-        delete parsed[key] // remove old key
+        delete parsed[key]
       }
     }
-    // Merge migrated keys into parsed (after deletion, so no overlap)
     Object.assign(parsed, migrated)
 
     // 2. Convert old array values to placeholder strings
@@ -168,8 +171,14 @@ export async function readMessages() {
   await messagesJson.readAll()
 }
 
-/** Clean unused translations when CLEAN=1 is set. Removes any key not present in the source language. */
+/**
+ * Clean unused translations when CLEAN=1. Merges translations from old unlabeled keys into the new labeled keys, then
+ * removes any key not present in the final source language.
+ */
 function cleanTranslations() {
+  // First, deduplicate and merge across all languages
+  deduplicateAndMergeAllLanguages()
+
   const source = messagesJson.storage[sourceCodeLang]
   for (const lang of supportedLanguages) {
     if (lang === sourceCodeLang) continue
@@ -183,9 +192,146 @@ function cleanTranslations() {
   }
 }
 
+/**
+ * For each group of keys that normalize to the same string (ignoring labels), select the canonical key (prefer labeled)
+ * for each language. In non‑source languages, if a canonical key still has the default value (its own key), copy the
+ * translation from an unlabeled key that has a real translation. Then remove all non‑canonical keys from all
+ * languages.
+ */
+function deduplicateAndMergeAllLanguages() {
+  const placeholderRegex = /\{(\d+)(?:_\w+)?\}/g
+  const normalize = key => key.replace(placeholderRegex, (_, index) => `{${index}}`)
+
+  /** @type {Record<string, string[]>} */ // normalized -> list of actual keys across all languages
+  const allGroups = {}
+
+  // Collect keys from all languages
+  for (const lang of supportedLanguages) {
+    const data = messagesJson.storage[lang]
+    for (const key in data) {
+      const norm = normalize(key)
+      if (!allGroups[norm]) allGroups[norm] = []
+      if (!allGroups[norm].includes(key)) allGroups[norm].push(key)
+    }
+  }
+
+  // For each group, decide the canonical key
+  /** @type {Record<string, string>} */ // normalized -> canonical key
+  const canonicalKeyMap = {}
+  /** @type {Record<string, Record<string, string>>} */ // normalized -> { lang: canonical key }
+  const languageCanonicalMap = {}
+
+  for (const norm in allGroups) {
+    const keys = allGroups[norm]
+
+    // Prefer labeled keys (contain '_' in any placeholder)
+    const labeled = keys.filter(k => /_\w+\}/.test(k))
+    const unlabeled = keys.filter(k => !/_\w+\}/.test(k))
+
+    let canonicalKey = null
+    if (labeled.length > 0) {
+      canonicalKey = labeled[0]
+    } else if (unlabeled.length > 0) {
+      canonicalKey = unlabeled[0]
+    }
+
+    if (!canonicalKey) continue
+
+    canonicalKeyMap[norm] = canonicalKey
+
+    // For each language, pick the canonical key that exists there, if any.
+    // If the language has the canonical key, use it; else, if it has another key from the group,
+    // we'll later rename that key to canonical? No, we'll just merge translations.
+    // We'll handle per language later.
+    languageCanonicalMap[norm] = {}
+    for (const lang of supportedLanguages) {
+      const langData = messagesJson.storage[lang]
+      const presentKeys = keys.filter(k => k in langData)
+      if (presentKeys.length === 0) {
+        languageCanonicalMap[norm][lang] = canonicalKey // will be absent, but keep reference
+      } else {
+        // Use the canonical key if present, else the first present key (prefer labeled)
+        const canonicalHere = presentKeys.find(k => k === canonicalKey) || presentKeys[0]
+        languageCanonicalMap[norm][lang] = canonicalHere
+      }
+    }
+  }
+
+  // Now merge translations: for each language and each group, if the canonical key
+  // exists and has the default value (equals its own key) and there is another key
+  // with a different value, copy that value to the canonical key.
+  for (const lang of supportedLanguages) {
+    const langData = messagesJson.storage[lang]
+    for (const norm in canonicalKeyMap) {
+      const canonical = languageCanonicalMap[norm][lang]
+      if (!(canonical in langData)) continue
+
+      const canonicalVal = langData[canonical]
+      const isDefault =
+        (typeof canonicalVal === 'string' && canonicalVal === canonical) ||
+        (typeof canonicalVal === 'object' &&
+          canonicalVal !== null &&
+          JSON.stringify(canonicalVal) === JSON.stringify(defaultPluralForCanonical(canonical)))
+
+      if (!isDefault) continue // already translated, don't overwrite
+
+      // Look for other keys in this language that belong to the group and have a non‑default translation
+      const otherKeys = allGroups[norm].filter(k => k in langData && k !== canonical)
+      for (const other of otherKeys) {
+        const otherVal = langData[other]
+        const otherIsDefault =
+          (typeof otherVal === 'string' && otherVal === other) ||
+          (typeof otherVal === 'object' &&
+            otherVal !== null &&
+            JSON.stringify(otherVal) === JSON.stringify(defaultPluralForCanonical(other)))
+
+        if (!otherIsDefault) {
+          // Copy translation
+          if (typeof otherVal === 'string') {
+            langData[canonical] = otherVal
+            console.log(`[${lang}] Copied translation from "${other}" to "${canonical}"`)
+          } else if (typeof otherVal === 'object' && otherVal !== null) {
+            // plural object
+            langData[canonical] = { ...otherVal }
+            console.log(`[${lang}] Copied plural translation from "${other}" to "${canonical}"`)
+          }
+          break // use the first non‑default we find
+        }
+      }
+    }
+  }
+
+  // Remove all non‑canonical keys from all languages
+  for (const lang of supportedLanguages) {
+    const langData = messagesJson.storage[lang]
+    for (const key in langData) {
+      const norm = normalize(key)
+      if (norm in canonicalKeyMap && key !== languageCanonicalMap[norm][lang]) {
+        delete langData[key]
+        console.log(`[${lang}] Removed duplicate key "${key}"`)
+      }
+    }
+  }
+}
+
+/**
+ * Returns the default plural object for a given canonical key. Since the default is simply the key itself repeated for
+ * each plural form, we can generate it from the plurals list.
+ */
+function defaultPluralForCanonical(key) {
+  const rules = plurals[sourceCodeLang] // use source plurals as template
+  const obj = {}
+  for (const rule of rules) {
+    obj[rule] = key
+  }
+  return obj
+}
+
 /** Pre‑process a placeholder string into { s: string[], i: number[] } */
 function preprocessPlaceholderString(str) {
+  /** @type {string[]} */
   const segments = []
+  /** @type {number[]} */
   const indices = []
   const regex = /\{(\d+)(?:_\w+)?\}/g
   let lastIndex = 0
@@ -208,12 +354,16 @@ export async function writeMessages() {
   await messagesJson.writeAll()
 
   // Build pre‑processed output for simple messages and plurals
+  /** @type {Record<string, Record<string, { s: string[]; i: number[] }>>} */
   const messagesOut = {}
+  /** @type {Record<string, Record<string, Record<string, { s: string[]; i: number[] }>>>} */
   const pluralsOut = {}
 
   for (const lang of supportedLanguages) {
     const langData = messagesJson.storage[lang]
+    /** @type {Record<string, { s: string[]; i: number[] }>} */
     const simple = {}
+    /** @type {Record<string, Record<string, { s: string[]; i: number[] }>>} */
     const plural = {}
 
     for (const id in langData) {
@@ -221,6 +371,7 @@ export async function writeMessages() {
       if (typeof value === 'string') {
         simple[id] = preprocessPlaceholderString(value)
       } else if (typeof value === 'object' && !Array.isArray(value)) {
+        /** @type {Record<string, { s: string[]; i: number[] }>} */
         const forms = {}
         for (const rule in value) {
           forms[rule] = preprocessPlaceholderString(value[rule])
@@ -278,6 +429,7 @@ function templateToSharedId(id) {
   )
 }
 
+/** @type {Record<string, string[]>} */
 const plurals = Object.fromEntries(
   supportedLanguages.map(e => [e, new Intl.PluralRules(e.replace('_', '-')).resolvedOptions().pluralCategories]),
 )
@@ -305,7 +457,6 @@ export function addTranslation(id, shared, plural) {
 
   for (const lang of supportedLanguages) {
     if (lang === sourceCodeLang) continue
-
     const prev = messagesJson.storage[lang][id]
     if (plural) {
       if (prev === undefined || (typeof prev === 'object' && !Array.isArray(prev))) {
