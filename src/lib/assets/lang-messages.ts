@@ -7,7 +7,7 @@ type Language = string
 type MessageId = string
 
 export const extractedSharedMessagesIds: Record<MessageId, string> = {
-  "{0_this_place_name} ящик": "script.shared._0_ящик",
+  "{0} ящик": "script.shared._0_ящик",
   "§aЛистья": "script.shared.листья",
   "§6Монеты": "script.shared.монеты",
   "Убийств": "script.shared.убийств",
@@ -26,18 +26,18 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Время первого входа на анархию": "script.shared.время_первого_входа_на_анархию",
   "Последний раз онлайн на анархии": "script.shared.последний_раз_онлайн_на_анархии",
   "Последний раз онлайн": "script.shared.последний_раз_онлайн",
-  "У вас {0_unreadCount} непрочитанных сообщений!.one": "script.shared.у_вас_0_непрочитанных_сообщений_.one",
-  "У вас {0_unreadCount} непрочитанных сообщений!.few": "script.shared.у_вас_0_непрочитанных_сообщений_.few",
-  "У вас {0_unreadCount} непрочитанных сообщений!.many": "script.shared.у_вас_0_непрочитанных_сообщений_.many",
-  "У вас {0_unreadCount} непрочитанных сообщений!.other": "script.shared.у_вас_0_непрочитанных_сообщений_.other",
-  "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": "script.shared._0_до_появления_осталось_1_",
+  "У вас {0} непрочитанных сообщений!.one": "script.shared.у_вас_0_непрочитанных_сообщений_.one",
+  "У вас {0} непрочитанных сообщений!.few": "script.shared.у_вас_0_непрочитанных_сообщений_.few",
+  "У вас {0} непрочитанных сообщений!.many": "script.shared.у_вас_0_непрочитанных_сообщений_.many",
+  "У вас {0} непрочитанных сообщений!.other": "script.shared.у_вас_0_непрочитанных_сообщений_.other",
+  "{0}\nДо появления\nосталось {1}": "script.shared._0_до_появления_осталось_1_",
   "к": "script.shared.к",
   "млн": "script.shared.млн",
   "млрд": "script.shared.млрд",
   "трлн": "script.shared.трлн",
   "Внешнее пространство": "script.shared.внешнее_пространство",
   "Пусто": "script.shared.пусто",
-  "Доберитесь до: {0_this_place_name}": "script.shared.доберитесь_до_0_",
+  "Доберитесь до: {0}": "script.shared.доберитесь_до_0_",
   "§5Варден": "script.shared.варден",
   "§7Обычный": "script.shared.обычный",
   "§bУсиленный": "script.shared.усиленный",
@@ -46,29 +46,29 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Мясник": "script.shared.мясник",
   "Ювелир": "script.shared.ювелир",
   "Мусорщик": "script.shared.мусорщик",
-  "Каменщик": "script.shared.каменщик",
   "Дровосек": "script.shared.дровосек",
-  "Общее": "script.shared.общее",
+  "Каменщик": "script.shared.каменщик",
   "Тетя Зина": "script.shared.тетя_зина",
+  "Общее": "script.shared.общее",
   "Бармен": "script.shared.бармен",
   "Оружейник": "script.shared.оружейник",
   "Улучшить": "script.shared.улучшить",
   "Починить": "script.shared.починить",
-  "Кучер": "script.shared.кучер",
   "Каменоломня": "script.shared.каменоломня",
   "Печкин": "script.shared.печкин",
   "Баба Валя": "script.shared.баба_валя",
   "Ломщик": "script.shared.ломщик",
+  "Кучер": "script.shared.кучер",
   "§b§lКамнедробилка": "script.shared.камнедробилка",
-  "Инженер": "script.shared.инженер",
   "§6§lРобот": "script.shared.робот",
+  "Инженер": "script.shared.инженер",
   "Техноград": "script.shared.техноград",
   "Техник": "script.shared.техник",
   "Маг": "script.shared.маг",
   "Нет зачарований": "script.shared.нет_зачарований",
-  "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": "script.shared.выбранная_книга_0_",
+  "Выбранная книга: {0}": "script.shared.выбранная_книга_0_",
   "Зачаровать": "script.shared.зачаровать",
-  "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": "script.shared.меч_со_способностью_0_",
+  "§r§fМеч со способностью §7{0}": "script.shared.меч_со_способностью_0_",
   "§a§lМагический слайм": "script.shared.магический_слайм",
   "Деревня исследователей": "script.shared.деревня_исследователей",
   "Исследователь": "script.shared.исследователь",
@@ -82,21 +82,21 @@ export const extractedSharedMessagesIds: Record<MessageId, string> = {
   "Неизвестная": "script.shared.неизвестная",
   "Восстанавливает вам половину наносимого этим мечом урона": "script.shared.восстанавливает_вам_половину_наносимого_этим_мечом_урона",
   "10% шанс сделать двойной урон": "script.shared.10_шанс_сделать_двойной_урон",
-  "Дровосек: нарубите {0_v} дерева": "script.shared.дровосек_нарубите_0_дерева",
-  "Шахтер: накопайте {0_v} камня": "script.shared.шахтер_накопайте_0_камня",
-  "Угольный шахтер: накопайте {0_v} угля": "script.shared.угольный_шахтер_накопайте_0_угля",
-  "Железный шахтер: накопайте {0_v} железа": "script.shared.железный_шахтер_накопайте_0_железа",
+  "Дровосек: нарубите {0} дерева": "script.shared.дровосек_нарубите_0_дерева",
+  "Шахтер: накопайте {0} камня": "script.shared.шахтер_накопайте_0_камня",
+  "Угольный шахтер: накопайте {0} угля": "script.shared.угольный_шахтер_накопайте_0_угля",
+  "Железный шахтер: накопайте {0} железа": "script.shared.железный_шахтер_накопайте_0_железа",
   "Активированный уголь": "script.shared.активированный_уголь",
   "Сделал себя сам: Получи первые 10.000 монет": "script.shared.сделал_себя_сам_получи_первые_10.000_монет",
   "Гробовщик: открой 10 могил разных игроков": "script.shared.гробовщик_открой_10_могил_разных_игроков",
-  "Обучение": "script.shared.обучение",
   "Вернуть вещи": "script.shared.вернуть_вещи",
+  "Обучение": "script.shared.обучение",
   "Все достижения": "script.shared.все_достижения",
   "Получить базу": "script.shared.получить_базу",
   "Все задания": "script.shared.все_задания",
   "1.000.000 монет": "script.shared.1.000.000_монет",
   "Полная незеритовая броня": "script.shared.полная_незеритовая_броня",
-  "Добыть: {0___rawtext_____translate__langToken_itemType______}": "script.shared.добыть_0_"
+  "Добыть: {0}": "script.shared.добыть_0_"
 }
 
 /**
@@ -4425,7 +4425,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       ],
       "i": []
     },
-    "{0_item_name}§c*\n§aЗаберите награды!": {
+    "{0}§c*\n§aЗаберите награды!": {
       "s": [
         "",
         "§c*\n§aClaim your rewards!"
@@ -4434,7 +4434,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Награда: {0_achiv_reward_toString_player_}": {
+    "Награда: {0}": {
       "s": [
         "Reward: ",
         ""
@@ -4443,7 +4443,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": {
+    "Достижение получено: {0}! Заберите награды, используя {1}": {
       "s": [
         "Achievement unlocked: ",
         "! Claim your rewards using ",
@@ -4454,7 +4454,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": {
+    "Игрок {0} был замьючен на {1} по причине: {2}": {
       "s": [
         "Player ",
         " has been muted for ",
@@ -4467,7 +4467,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": {
+    "Размьючен игрок {0} который был замьючен по причине {1}, до конца оставалось {2}": {
       "s": [
         "Unmuted player ",
         " who was muted for ",
@@ -4480,7 +4480,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Игрок {0_nameArg} не найден": {
+    "Игрок {0} не найден": {
       "s": [
         "Player ",
         " not found"
@@ -4489,7 +4489,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Причина: {0_info_mutedUntil}\n{1_until}": {
+    "Причина: {0}\n{1}": {
       "s": [
         "Reason: ",
         "\n",
@@ -4500,7 +4500,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы приняли приглашение в клан '{0_clan_name}'": {
+    "Вы приняли приглашение в клан '{0}'": {
       "s": [
         "You accepted the invitation to clan '",
         "'"
@@ -4509,7 +4509,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": {
+    "Вы уже отправили заявку в клан '{0}'!": {
       "s": [
         "You have already sent a request to clan '",
         "'!"
@@ -4518,7 +4518,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Заявка на вступление в клан '{0_clan_name}' отправлена!": {
+    "Заявка на вступление в клан '{0}' отправлена!": {
       "s": [
         "Join request to clan '",
         "' sent!"
@@ -4527,7 +4527,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Запрос на вступление в клан от '{0_player_name}'": {
+    "Запрос на вступление в клан от '{0}'": {
       "s": [
         "Request to join clan from '",
         "'"
@@ -4536,7 +4536,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}": {
+    "[{0}] {1}\nУчастники: {2} {3}": {
       "s": [
         "[",
         "] ",
@@ -4551,7 +4551,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "Имя '{0_name}' не может содержать параграф": {
+    "Имя '{0}' не может содержать параграф": {
       "s": [
         "Name '",
         "' cannot contain the paragraph symbol"
@@ -4560,7 +4560,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' не может содержать параграф": {
+    "Короткое имя '{0}' не может содержать параграф": {
       "s": [
         "Short name '",
         "' cannot contain the paragraph symbol"
@@ -4569,7 +4569,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": {
+    "Короткое имя '{0}' должно быть КОРОТКИМ, меньше 5 символов": {
       "s": [
         "Short name '",
         "' must be SHORT, less than 5 characters"
@@ -4578,7 +4578,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": {
+    "Короткое имя '{0}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1}'": {
       "s": [
         "Short name '",
         "' cannot be TOO short, minimum 2 characters. Otherwise how to understand what clan is '",
@@ -4589,7 +4589,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Клан с именем '{0_name}' уже существует.": {
+    "Клан с именем '{0}' уже существует.": {
       "s": [
         "Clan with name '",
         "' already exists."
@@ -4598,7 +4598,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' уже занято.": {
+    "Короткое имя '{0}' уже занято.": {
       "s": [
         "Short name '",
         "' is already taken."
@@ -4607,7 +4607,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Клан '{0_clan_name}' распущен": {
+    "Клан '{0}' распущен": {
       "s": [
         "Clan '",
         "' disbanded"
@@ -4616,7 +4616,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_player_name} покинул ваш клан": {
+    "Игрок {0} покинул ваш клан": {
       "s": [
         "Player ",
         " left your clan"
@@ -4625,7 +4625,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Клан '{0_clan_name}' покинут успешно": {
+    "Клан '{0}' покинут успешно": {
       "s": [
         "Clan '",
         "' left successfully"
@@ -4634,7 +4634,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя: {0_clan_shortname}": {
+    "Короткое имя: {0}": {
       "s": [
         "Short name: ",
         ""
@@ -4643,7 +4643,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Принять игрока '{0_name}' в клан?": {
+    "Принять игрока '{0}' в клан?": {
       "s": [
         "Accept player '",
         "' into clan?"
@@ -4652,7 +4652,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы приняты в клан {0_clan_name}": {
+    "Вы приняты в клан {0}": {
       "s": [
         "You have been accepted into clan ",
         ""
@@ -4661,7 +4661,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы НЕ приняты в клан {0_clan_name}": {
+    "Вы НЕ приняты в клан {0}": {
       "s": [
         "You were NOT accepted into clan ",
         ""
@@ -4670,7 +4670,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Приглашения в клан '{0_clan_name}'": {
+    "Приглашения в клан '{0}'": {
       "s": [
         "Invitations to clan '",
         "'"
@@ -4679,7 +4679,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_name} уже состоит в вашем клане!": {
+    "Игрок {0} уже состоит в вашем клане!": {
       "s": [
         "Player ",
         " is already in your clan!"
@@ -4688,7 +4688,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": {
+    "Игрок {0} уже состоит в клане {1}!": {
       "s": [
         "Player ",
         " is already in clan ",
@@ -4699,7 +4699,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Приглашение в клан '{0_clan_name}'": {
+    "Приглашение в клан '{0}'": {
       "s": [
         "Clan invitation to '",
         "'"
@@ -4708,7 +4708,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_name} успешно приглашен в клан!": {
+    "Игрок {0} успешно приглашен в клан!": {
       "s": [
         "Player ",
         " successfully invited to the clan!"
@@ -4717,7 +4717,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": {
+    "Роль участника клана {0} сменена успешно: {1}.": {
       "s": [
         "Clan member ",
         "'s role changed successfully: ",
@@ -4728,7 +4728,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Роль в клане {0_changeString}": {
+    "Роль в клане {0}": {
       "s": [
         "Role in clan ",
         ""
@@ -4737,7 +4737,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": {
+    "В клане '{0}', сменена игроком {1}": {
       "s": [
         "In clan '",
         "', changed by player ",
@@ -4748,7 +4748,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Выгнать участника '{0_memberName}'": {
+    "Выгнать участника '{0}'": {
       "s": [
         "Kick member '",
         "'"
@@ -4757,7 +4757,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы выгнаны из клана '{0_clan_name}'": {
+    "Вы выгнаны из клана '{0}'": {
       "s": [
         "You have been kicked from the clan '",
         "'"
@@ -4766,7 +4766,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": {
+    "Вы были выгнаны из клана игроком '{0}'. Причина: {1}": {
       "s": [
         "You were kicked from the clan by player '",
         "'. Reason: ",
@@ -4777,7 +4777,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": {
+    "Участник {0} успешно выгнан из клана {1}": {
       "s": [
         "Member ",
         " successfully kicked from clan ",
@@ -4788,7 +4788,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Сменить роль {0_Player_nameOrUnknown_member_id_}": {
+    "Сменить роль {0}": {
       "s": [
         "Change role ",
         ""
@@ -4797,7 +4797,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": {
+    "Неизвестный аргумент: {0}.\nДоступные командлеты: \n{1}\n ": {
       "s": [
         "Unknown argument: ",
         ".\nAvailable subcommands: \n",
@@ -4808,7 +4808,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": {
+    "{0}─═─═─═§f Доступно: {1}/{2} {3}═─═─═─═─": {
       "s": [
         "",
         "─═─═─═§f Available: ",
@@ -4823,7 +4823,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    " (также {0_d_aliases_join______})": {
+    " (также {0})": {
       "s": [
         " (also ",
         ")"
@@ -4832,7 +4832,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": {
+    "   §fКоманда §6.{0}{1}§7§o - {2}": {
       "s": [
         "   §fCommand §6.",
         "",
@@ -4845,7 +4845,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Не так быстро! Попробуй через {0_i18n_time_after_}": {
+    "Не так быстро! Попробуй через {0}": {
       "s": [
         "Not so fast! Try again in ",
         ""
@@ -4854,7 +4854,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": {
+    "Вы имели ввиду {0}?": {
       "s": [
         "Did you mean ",
         "?"
@@ -4863,7 +4863,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": {
+    "\nКоманда доступна начиная с роли {0}": {
       "s": [
         "\nCommand available from role ",
         ""
@@ -4872,7 +4872,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": {
+    "У вас нет разрешения для использования команды {0}{1}\nСписок всех доступных вам команд: §f.help": {
       "s": [
         "You do not have permission to use command ",
         "",
@@ -4883,7 +4883,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "При выполнении команды произошла ошибка. {0_developersAreWarned}": {
+    "При выполнении команды произошла ошибка. {0}": {
       "s": [
         "An error occurred while executing the command. ",
         ""
@@ -4892,7 +4892,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": {
+    "Команда доступна только начиная с роли {0}. Ваша роль: {1}": {
       "s": [
         "Command available only starting from role ",
         ". Your role: ",
@@ -4903,16 +4903,16 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_this_place_name} ящик": {
+    "{0} ящик": {
       "s": [
         "",
-        " crate"
+        " ящик"
       ],
       "i": [
         0
       ]
     },
-    "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": {
+    "Ключ для {0} не подходит к ящику {1}": {
       "s": [
         "Key for ",
         " is not suitable for crate ",
@@ -4923,7 +4923,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Открыт ящик {0_this_name}!": {
+    "Открыт ящик {0}!": {
       "s": [
         "Crate ",
         " opened!"
@@ -4932,7 +4932,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_i18n___this_name_______} > Содержимое": {
+    "{0} > Содержимое": {
       "s": [
         "",
         " > Contents"
@@ -4941,7 +4941,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ключ для ящика {0_Crate_getName_storage_crate_}": {
+    "Ключ для ящика {0}": {
       "s": [
         "Key for crate ",
         ""
@@ -4950,7 +4950,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_player_database_name} сменил ник на {1_player_name}": {
+    "Игрок {0} сменил ник на {1}": {
       "s": [
         "Player ",
         " changed nickname to ",
@@ -4961,7 +4961,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "§cВы уверены, что хотите {0_text}?": {
+    "§cВы уверены, что хотите {0}?": {
       "s": [
         "§cAre you sure you want to ",
         "?"
@@ -4970,7 +4970,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Результаты поиска по запросу\n{0_searchQuery}": {
+    "Результаты поиска по запросу\n{0}": {
       "s": [
         "Search results for\n",
         ""
@@ -4979,7 +4979,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§3Выберите игрока чтобы {0_reason}": {
+    "§3Выберите игрока чтобы {0}": {
       "s": [
         "§3Select a player to ",
         ""
@@ -4988,7 +4988,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_days} д. {1_hhmmss}": {
+    "{0} д. {1}": {
       "s": [
         "",
         "d ",
@@ -4999,7 +4999,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Следующее письмо\n{0_letterOneLineName_next_letter_}": {
+    "Следующее письмо\n{0}": {
       "s": [
         "Next letter\n",
         ""
@@ -5008,7 +5008,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": {
+    "Предыдущее письмо\n{0}": {
       "s": [
         "Previous letter\n",
         ""
@@ -5017,7 +5017,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_deleteDescription} Все награды будут собраны автоматически": {
+    "{0} Все награды будут собраны автоматически": {
       "s": [
         "",
         " All rewards will be collected automatically"
@@ -5026,7 +5026,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": {
+    "{0} Вы потеряете все награды, прикрепленные к письму!": {
       "s": [
         "",
         " You will lose all rewards attached to the letter!"
@@ -5035,7 +5035,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_i18n_header_______}: {1_title}, просмотреть: /mail": {
+    "{0}: {1}, просмотреть: /mail": {
       "s": [
         "",
         ": ",
@@ -5046,7 +5046,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}": {
+    "{0}, {1}!\n§r§3Время §b• §3{2}": {
       "s": [
         "",
         ", ",
@@ -5059,7 +5059,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0_this_quest_name}\nЗавершен!": {
+    "{0}\nЗавершен!": {
       "s": [
         "",
         "\nCompleted!"
@@ -5068,7 +5068,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Задание\n{0_this_quest_name}": {
+    "Задание\n{0}": {
       "s": [
         "Quest\n",
         ""
@@ -5077,7 +5077,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Возьмите задание {0_target_name}": {
+    "Возьмите задание {0}": {
       "s": [
         "Take the quest ",
         ""
@@ -5086,7 +5086,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Завершите задание {0_target_name}": {
+    "Завершите задание {0}": {
       "s": [
         "Complete the quest ",
         ""
@@ -5095,7 +5095,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "При активации шага произошла ошибка. {0_developersAreWarned}": {
+    "При активации шага произошла ошибка. {0}": {
       "s": [
         "An error occurred while activating the step. ",
         ""
@@ -5104,7 +5104,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Задание {0_this_quest_name} сломалось: {1_text}": {
+    "Задание {0} сломалось: {1}": {
       "s": [
         "Quest ",
         " broke: ",
@@ -5115,7 +5115,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_step_text__}\n§aЗавершено! §6Заберите награду.": {
+    "{0}\n§aЗавершено! §6Заберите награду.": {
       "s": [
         "",
         "\n§aCompleted! §6Claim your reward."
@@ -5124,7 +5124,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вас ждет {0_i18n_accent___npc_name__}": {
+    "Вас ждет {0}": {
       "s": [
         "You are awaited by ",
         ""
@@ -5133,7 +5133,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": {
+    "Нельзя создать регион, область которого ниже -64 (y: {0} radius: {1} result: {2})": {
       "s": [
         "Cannot create a region with area below -64 (y: ",
         " radius: ",
@@ -5146,7 +5146,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Не удалось сохранить структуру: {0_e}": {
+    "Не удалось сохранить структуру: {0}": {
       "s": [
         "Failed to save structure: ",
         ""
@@ -5155,7 +5155,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Владелец > {0_name}": {
+    "Владелец > {0}": {
       "s": [
         "Owner > ",
         ""
@@ -5164,7 +5164,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уверены что хотите передать права владельца региона игроку {0_name}?": {
+    "Вы уверены что хотите передать права владельца региона игроку {0}?": {
       "s": [
         "Are you sure you want to transfer region ownership rights to player ",
         "?"
@@ -5173,7 +5173,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": {
+    "Вы уверены что хотите назначить владельцем региона игрока {0}?": {
       "s": [
         "Are you sure you want to appoint player ",
         " as the region owner?"
@@ -5182,7 +5182,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§cБосс §6{0_this_bossName}": {
+    "§cБосс §6{0}": {
       "s": [
         "§cBoss §6",
         ""
@@ -5191,7 +5191,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Макс кол-во: {0_resource_amount}": {
+    "Макс кол-во: {0}": {
       "s": [
         "Max amount: ",
         ""
@@ -5200,7 +5200,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": {
+    "Будут изменены следующие регионы:\n{0}": {
       "s": [
         "The following regions will be modified:\n",
         ""
@@ -5209,7 +5209,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Регион создается. {0___region_restoringStructurePercent}%%": {
+    "Регион создается. {0}%%": {
       "s": [
         "Region is being created. ",
         "%%"
@@ -5218,7 +5218,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Безопасная зона {0_this_safeAreaName}": {
+    "Безопасная зона {0}": {
       "s": [
         "Safe ",
         ""
@@ -5227,7 +5227,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы вернули роль §r{0_ROLES_prevRole_}": {
+    "Вы вернули роль §r{0}": {
       "s": [
         "You restored role §r",
         ""
@@ -5236,7 +5236,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": {
+    "Ваша роль: {0}{1}": {
       "s": [
         "Your role: ",
         "",
@@ -5247,7 +5247,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "§3Ваша роль: {0_ROLES_prole_}": {
+    "§3Ваша роль: {0}": {
       "s": [
         "§3Your role: ",
         ""
@@ -5256,7 +5256,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": {
+    "У игрока {0} роль выше или такая же как у вас, вы не можете ее сменить.": {
       "s": [
         "Player ",
         " has a role higher or equal to yours, you cannot change it."
@@ -5265,7 +5265,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": {
+    "Ваша роль сменена c {0} на {1}{2}{3}": {
       "s": [
         "Your role has been changed from ",
         " to ",
@@ -5280,7 +5280,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    " игроком {0_player_name}": {
+    " игроком {0}": {
       "s": [
         " by player ",
         ""
@@ -5289,7 +5289,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\nПричина: {0_message}": {
+    "\nПричина: {0}": {
       "s": [
         "\nReason: ",
         ""
@@ -5298,7 +5298,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Роль игрока {0_target_name} сменена успешно": {
+    "Роль игрока {0} сменена успешно": {
       "s": [
         "Role of player ",
         " changed successfully"
@@ -5307,7 +5307,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": {
+    "{0}\nДо появления\nосталось {1}": {
       "s": [
         "",
         "\nДо появления\nосталось ",
@@ -5318,7 +5318,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Убит босс {0_this_options_place_name}!": {
+    "Убит босс {0}!": {
       "s": [
         "Boss ",
         " defeated!"
@@ -5327,7 +5327,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": {
+    "§fЧертеж предмета {0}": {
       "s": [
         "§fItem blueprint ",
         ""
@@ -5336,7 +5336,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": {
+    "Используйте {0} чтобы убрать этот предмет из инвентаря или получить его снова": {
       "s": [
         "Use ",
         " to remove this item from inventory and to get it back"
@@ -5345,7 +5345,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Выдает или убирает {0_itemNameTag} из инвентаря": {
+    "Выдает или убирает {0} из инвентаря": {
       "s": [
         "Gives or removes ",
         " from inventory"
@@ -5354,7 +5354,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": {
+    "Шанс: {0}%%, Кол-во: {1}...{2}": {
       "s": [
         "Chance: ",
         "%%, Amount: ",
@@ -5367,7 +5367,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы {0_reason}, поэтому вышли из режима новичка.": {
+    "Вы {0}, поэтому вышли из режима новичка.": {
       "s": [
         "You are ",
         ", so you left newbie mode."
@@ -5376,7 +5376,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Не удалось открыть диалог. {0_developersAreWarned}": {
+    "Не удалось открыть диалог. {0}": {
       "s": [
         "Failed to open dialog. ",
         ""
@@ -5385,7 +5385,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Доберитесь до: {0_this_place_name}": {
+    "Доберитесь до: {0}": {
       "s": [
         "Reach: ",
         ""
@@ -5394,7 +5394,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\n§7§lЗначение:§r {0_stringify_value_}": {
+    "\n§7§lЗначение:§r {0}": {
       "s": [
         "\n§7§lValue:§r ",
         ""
@@ -5403,7 +5403,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": {
+    "\n§7§lТип: §r§f{0}": {
       "s": [
         "\n§7§lType: §r§f",
         ""
@@ -5412,7 +5412,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": {
+    "Зачарования:\n{0}": {
       "s": [
         "Enchantments:\n",
         ""
@@ -5421,7 +5421,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": {
+    "Выбранный предмет: {0}\nНажмите, чтобы сменить": {
       "s": [
         "Selected item: ",
         "\nClick to change"
@@ -5430,7 +5430,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": {
+    "Товара на складе: {0}/{1}, {2}%%": {
       "s": [
         "Items in stock: ",
         "/",
@@ -5443,7 +5443,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "В инвентаре нет {0_this_text}": {
+    "В инвентаре нет {0}": {
       "s": [
         "No ",
         " in inventory"
@@ -5452,7 +5452,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": {
+    "Нужно уровней опыта: {0}, {1}/{2}": {
       "s": [
         "Required experience levels: ",
         ", ",
@@ -5465,7 +5465,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": {
+    "Покупка невозможна:{0}{1}": {
       "s": [
         "Purchase not possible:",
         "",
@@ -5476,7 +5476,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Продать {0_costString} за {1_name}?": {
+    "Продать {0} за {1}?": {
       "s": [
         "Sell ",
         " for ",
@@ -5487,7 +5487,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Купить {0_name} за {1_costString}?": {
+    "Купить {0} за {1}?": {
       "s": [
         "Buy ",
         " for ",
@@ -5498,7 +5498,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Успешная продажа {0_name} за {1_costString}!": {
+    "Успешная продажа {0} за {1}!": {
       "s": [
         "Successfully sold ",
         " for ",
@@ -5509,7 +5509,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Успешная покупка {0_name} за {1_costString}!": {
+    "Успешная покупка {0} за {1}!": {
       "s": [
         "Successfully bought ",
         " for ",
@@ -5520,7 +5520,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "При покупке произошла ошибка. {0_developersAreWarned}": {
+    "При покупке произошла ошибка. {0}": {
       "s": [
         "An error occurred during purchase. ",
         ""
@@ -5529,7 +5529,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Нет места в инвентаре (нужно еще {0_amount})": {
+    "Нет места в инвентаре (нужно еще {0})": {
       "s": [
         "No space in inventory (need ",
         " more)"
@@ -5538,7 +5538,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Изменено на {0_newname}": {
+    "Изменено на {0}": {
       "s": [
         "Changed to ",
         ""
@@ -5547,7 +5547,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": {
+    "TPS сервера {0}§f: {1}": {
       "s": [
         "Server TPS ",
         "§f: ",
@@ -5558,7 +5558,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": {
+    "Достижения {0}/{1} ({2}%%)": {
       "s": [
         "Achievements ",
         "/",
@@ -5571,7 +5571,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Порталы {0_portals__length____0}/{1_Portal_portals_size}": {
+    "Порталы {0}/{1}": {
       "s": [
         "Portals ",
         "/",
@@ -5582,7 +5582,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Статистика игрока {0_Player_nameOrUnknown_targetId_}": {
+    "Статистика игрока {0}": {
       "s": [
         "Player statistics ",
         ""
@@ -5591,7 +5591,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Анархия {0_n}": {
+    "Анархия {0}": {
       "s": [
         "Anarchy ",
         ""
@@ -5600,7 +5600,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": {
+    "Инструмент скоро сломается! {0}/{1} ({2}%)": {
       "s": [
         "Tool will break soon! ",
         "/",
@@ -5613,7 +5613,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Усиленный аирдроп скоро упадет на {0_location}!": {
+    "Усиленный аирдроп скоро упадет на {0}!": {
       "s": [
         "Reinforced airdrop will soon fall at ",
         "!"
@@ -5622,7 +5622,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Обычный аирдроп скоро упадет на {0_location}!": {
+    "Обычный аирдроп скоро упадет на {0}!": {
       "s": [
         "Regular airdrop will soon fall at ",
         "!"
@@ -5631,7 +5631,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Радиус границы анархии сейчас: {0_this_zone__radius}": {
+    "Радиус границы анархии сейчас: {0}": {
       "s": [
         "Anarchy border radius now: ",
         ""
@@ -5640,7 +5640,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": {
+    "Вы уже находитесь на анархии! Если это не так, используйте {0}": {
       "s": [
         "You are already in anarchy! If not, use ",
         ""
@@ -5649,7 +5649,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": {
+    "Успех! Теперь вы можете использовать {0} для перемещения на случайную позицию.": {
       "s": [
         "Success! Now you can use ",
         " to teleport to a random position."
@@ -5658,7 +5658,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вода. Попытка {0_maxTries___i}/{1_maxTries}": {
+    "Вода. Попытка {0}/{1}": {
       "s": [
         "Water. Attempt ",
         "/",
@@ -5669,7 +5669,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Нельзя создать базу на высоте ниже {0_underLimit}!": {
+    "Нельзя создать базу на высоте ниже {0}!": {
       "s": [
         "Cannot create a base below height ",
         "!"
@@ -5678,7 +5678,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": {
+    "§cВы уже {0}!": {
       "s": [
         "§cYou are already ",
         "!"
@@ -5687,7 +5687,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "состоите в базе игрока '{0_region_ownerName}'": {
+    "состоите в базе игрока '{0}'": {
       "s": [
         "are in the base of player '",
         "'"
@@ -5696,7 +5696,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": {
+    "База успешно создана! Чтобы открыть меню базы используйте команду {0}": {
       "s": [
         "Base successfully created! To open the base menu, use command ",
         ""
@@ -5705,7 +5705,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": {
+    "Всех материалов хватает!\nБаза защищена от гниения на {0}§r\n": {
       "s": [
         "All materials are sufficient!\nBase protected from decay for ",
         "§r\n"
@@ -5714,7 +5714,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": {
+    "Не хватает ресурсов:\n{0}": {
       "s": [
         "Not enough resources:\n",
         ""
@@ -5723,7 +5723,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": {
+    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0}\nМатериалы в бочке:\n{1}\n{2}\nДо следующего сбора ресурсов: {3}": {
       "s": [
         "To prevent base decay, the barrel must contain the following resources daily:\n",
         "\nMaterials in barrel:\n",
@@ -5738,7 +5738,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": {
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0}!": {
       "s": [
         "§cBase destroyed!\n§4Urgently place the base block at ",
         "!"
@@ -5747,7 +5747,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "База с владельцем {0_base_ownerName} {1_messageAction}.": {
+    "База с владельцем {0} {1}.": {
       "s": [
         "Base with owner ",
         " ",
@@ -5758,7 +5758,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Максимальный уровень\n{0_levelText}": {
+    "Максимальный уровень\n{0}": {
       "s": [
         "Maximum level\n",
         ""
@@ -5767,7 +5767,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": {
+    "{0} (радиус {1} -> {2})": {
       "s": [
         "",
         " (radius ",
@@ -5780,7 +5780,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Улучшить базу: {0_levelText}": {
+    "Улучшить базу: {0}": {
       "s": [
         "Upgrade base: ",
         ""
@@ -5789,7 +5789,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "База игрока {0_base_ownerName}": {
+    "База игрока {0}": {
       "s": [
         "Base of player ",
         ""
@@ -5798,7 +5798,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": {
+    "\n\nКоординаты: {0}\nРадиус: {1}": {
       "s": [
         "\n\nCoordinates: ",
         "\nRadius: ",
@@ -5809,7 +5809,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "§6Ваша база {0_text}": {
+    "§6Ваша база {0}": {
       "s": [
         "§6Your base ",
         ""
@@ -5818,7 +5818,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_this_city_name}: задание исследования не настроено!": {
+    "{0}: задание исследования не настроено!": {
       "s": [
         "",
         ": exploration quest not set up!"
@@ -5827,7 +5827,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": {
+    "Эта печка уже занята. Печка освободится через {0}, ключ: {1}": {
       "s": [
         "This furnace is already occupied. It will be free in ",
         ", key: ",
@@ -5838,7 +5838,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы уже заняли {0_personalKeys_length}/3 печек.": {
+    "Вы уже заняли {0}/3 печек.": {
       "s": [
         "You have already occupied ",
         "/3 furnaces."
@@ -5847,7 +5847,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": {
+    "Ваш клан уже занял {0}/3 печек.": {
       "s": [
         "Your clan has already occupied ",
         "/3 furnaces."
@@ -5856,7 +5856,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Использован ключ из слота {0_index}": {
+    "Использован ключ из слота {0}": {
       "s": [
         "Key used from slot ",
         ""
@@ -5865,7 +5865,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": {
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0}, ключ: {1}": {
       "s": [
         "In 5 minutes, resources in your furnace will no longer be private! Furnace is at ",
         ", key: ",
@@ -5876,7 +5876,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": {
+    "Зачарование {0} не удалось перенести.": {
       "s": [
         "Enchantment ",
         " could not be transferred."
@@ -5885,7 +5885,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": {
+    "Онет, кажется, зачарование {0} уровнем {1} потерялось...": {
       "s": [
         "Oh no, it seems the enchantment ",
         " level ",
@@ -5896,7 +5896,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "У {0_i18n_accent_________} можно купить ключ доступа к печам": {
+    "У {0} можно купить ключ доступа к печам": {
       "s": [
         "From ",
         " you can buy a key to the furnaces"
@@ -5905,7 +5905,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Купите у {0_i18n_accent_________} ключ доступа к печам": {
+    "Купите у {0} ключ доступа к печам": {
       "s": [
         "Buy from ",
         " a key to the furnaces"
@@ -5914,16 +5914,16 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Доберитесь до {0_i18n_accent________________________} по дороге": {
+    "Доберитесь до {0} по дороге": {
       "s": [
-        "Get to ",
-        " along the road"
+        "Доберитесь до ",
+        " по дороге"
       ],
       "i": [
         0
       ]
     },
-    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": {
+    "Идите к {0}, он расскажет вам что такое {1}": {
       "s": [
         "Go to ",
         ", he will tell you what ",
@@ -5934,7 +5934,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "...мы изобрели {0_i18n_accent______}": {
+    "...мы изобрели {0}": {
       "s": [
         "...we invented ",
         ""
@@ -5943,7 +5943,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": {
+    "Выбранная книга: {0}": {
       "s": [
         "Selected book: ",
         ""
@@ -5952,7 +5952,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": {
+    "§r§fМеч со способностью §7{0}": {
       "s": [
         "§r§fSword with ability §7",
         ""
@@ -5961,7 +5961,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": {
+    "Здесь есть шахта, ведущая к {0} и {1}": {
       "s": [
         "There is a mineshaft leading to ",
         " and ",
@@ -5972,7 +5972,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "У {0_i18n_accent______} можно зачаровать предметы": {
+    "У {0} можно зачаровать предметы": {
       "s": [
         "At ",
         " you can enchant items"
@@ -5981,7 +5981,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
+    "Копать нужно на высоте {0}..{1}. Ваш y = {2}": {
       "s": [
         "You need to mine at height ",
         "..",
@@ -5994,7 +5994,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": {
+    "{0} Осталось {1}": {
       "s": [
         "",
         " Left ",
@@ -6005,7 +6005,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": {
+    "Вы вошли в режим рейдблока, потому что {0}. Некоторые функции могут быть недоступны": {
       "s": [
         "You entered raid block mode because ",
         ". Some features may be unavailable"
@@ -6014,7 +6014,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Дровосек: нарубите {0_v} дерева": {
+    "Дровосек: нарубите {0} дерева": {
       "s": [
         "Lumberjack: chop ",
         " wood"
@@ -6023,7 +6023,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Шахтер: накопайте {0_v} камня": {
+    "Шахтер: накопайте {0} камня": {
       "s": [
         "Miner: mine ",
         " stone"
@@ -6032,7 +6032,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Угольный шахтер: накопайте {0_v} угля": {
+    "Угольный шахтер: накопайте {0} угля": {
       "s": [
         "Coal miner: mine ",
         " coal"
@@ -6041,7 +6041,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Железный шахтер: накопайте {0_v} железа": {
+    "Железный шахтер: накопайте {0} железа": {
       "s": [
         "Iron miner: mine ",
         " iron"
@@ -6050,7 +6050,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": {
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0}": {
       "s": [
         "Visit all settlements to unlock daily quests. You haven't visited: ",
         ""
@@ -6059,7 +6059,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": {
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0} заданий вам дают награду. За выполнение всех ежедневных заданий {1} дня подряд вместо обычного ключа выдается донатный\n\n{2}": {
       "s": [
         "Every day at 00:00, daily quests are updated. They are the same for all players. For completing all ",
         " quests you get a reward. For completing all daily quests ",
@@ -6072,7 +6072,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": {
+    "{0}/{1} Награда: ключ от сундука\n{2}": {
       "s": [
         "",
         "/",
@@ -6085,7 +6085,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": {
+    "Вы не можете покинуть зону добычи, пока не завершили задания {0}/{1}": {
       "s": [
         "You cannot leave the mining zone until you complete the quests ",
         "/",
@@ -6096,7 +6096,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Добыто дерева: {0_current}/{1_end}": {
+    "Добыто дерева: {0}/{1}": {
       "s": [
         "Wood collected: ",
         "/",
@@ -6107,7 +6107,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": {
+    "Спуститесь в шахту и добудьте камня: {0}/{1}": {
       "s": [
         "Go down the mineshaft and collect stone: ",
         "/",
@@ -6118,7 +6118,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Добыто железной руды: {0_i}/{1_end}": {
+    "Добыто железной руды: {0}/{1}": {
       "s": [
         "Iron ore mined: ",
         "/",
@@ -6129,7 +6129,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Отправляйтесь за ними в {0_i18n_accent_____________}": {
+    "Отправляйтесь за ними в {0}": {
       "s": [
         "Follow them to ",
         ""
@@ -6138,7 +6138,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Идите в {0_i18n_accent_____________} по дороге": {
+    "Идите в {0} по дороге": {
       "s": [
         "Go to ",
         " along the road"
@@ -6147,7 +6147,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": {
+    "Верните свои вещи{0}, они ждут вас на {1}§6!": {
       "s": [
         "Return your items",
         ", they are waiting for you at ",
@@ -6158,7 +6158,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_extra___extra_to_player_lang____________}§8Вы тут": {
+    "{0}§8Вы тут": {
       "s": [
         "",
         "§8You are here"
@@ -6167,7 +6167,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": {
+    "Не умею этим пользоваться, но знаю кто точно поможет: {0}": {
       "s": [
         "I don't know how to use this, but I know someone who can definitely help: ",
         ""
@@ -6176,7 +6176,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": {
+    "Событие! {0} силой {1} на {2} минут": {
       "s": [
         "Event! ",
         " with strength ",
@@ -6189,7 +6189,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Время: {0_new_Date___toHHMMSS__}": {
+    "Время: {0}": {
       "s": [
         "Time: ",
         ""
@@ -6198,7 +6198,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": {
+    "{0} {1}\nЧерез {2} ({3})": {
       "s": [
         "",
         " ",
@@ -6213,7 +6213,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": {
+    "Ваш первый рекорд {0} поставлен! Это заняло {1}": {
       "s": [
         "Your first record ",
         " is set! It took ",
@@ -6224,7 +6224,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+    "Вы побили ваш предыдущий рекорд {0}! {1} -> {2}": {
       "s": [
         "You beat your previous record ",
         "! ",
@@ -6237,7 +6237,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+    "Вы не смогли побить ваш предыдущий рекорд {0}! {1} -> {2}": {
       "s": [
         "You couldn't beat your previous record ",
         "! ",
@@ -6250,7 +6250,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": {
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0}": {
       "s": [
         "You can choose one of the categories below for speedrun. Time is counted only when you are in anarchy, i.e. when you are offline or standing at spawn, time is not counted. Your anarchy time now: ",
         ""
@@ -6259,7 +6259,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": {
+    "Спидран '{0}' начат. Для сброса времени воспользуйтесь .wipe": {
       "s": [
         "Speedrun '",
         "' started. Use .wipe to reset the time"
@@ -6268,7 +6268,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": {
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0}) с помощью компаса": {
       "s": [
         "You can take this quest to track the direction of the resource source (",
         ") using a compass"
@@ -6277,7 +6277,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": {
+    "Руды на y: {0}:\n{1}": {
       "s": [
         "Ores at y: ",
         ":\n",
@@ -6288,7 +6288,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": {
+    "{0}, {1}, Группа: {2}%%": {
       "s": [
         "",
         ", ",
@@ -6301,7 +6301,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Добыть: {0___rawtext_____translate__langToken_itemType______}": {
+    "Добыть: {0}": {
       "s": [
         "Mine: ",
         ""
@@ -6310,7 +6310,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": {
+    "Копать нужно на высоте от {0} до {1}. Ваш y = {2}": {
       "s": [
         "You need to mine at height from ",
         " to ",
@@ -6323,7 +6323,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Руды на {0_y}": {
+    "Руды на {0}": {
       "s": [
         "Ores at ",
         ""
@@ -10654,7 +10654,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
       ],
       "i": []
     },
-    "{0_item_name}§c*\n§aЗаберите награды!": {
+    "{0}§c*\n§aЗаберите награды!": {
       "s": [
         "",
         "§c*\n§aЗаберите награды!"
@@ -10663,7 +10663,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Награда: {0_achiv_reward_toString_player_}": {
+    "Награда: {0}": {
       "s": [
         "Награда: ",
         ""
@@ -10672,7 +10672,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Достижение получено: {0_this_name}! Заберите награды, используя {1_Achievement_command}": {
+    "Достижение получено: {0}! Заберите награды, используя {1}": {
       "s": [
         "Достижение получено: ",
         "! Заберите награды, используя ",
@@ -10683,7 +10683,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Игрок {0_player___getFullname_player____Player_nameOrUnknown_id_} был замьючен на {1_timeText} по причине: {2_reason}": {
+    "Игрок {0} был замьючен на {1} по причине: {2}": {
       "s": [
         "Игрок ",
         " был замьючен на ",
@@ -10696,7 +10696,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Размьючен игрок {0_fullname} который был замьючен по причине {1_info_reason}, до конца оставалось {2_timeText}": {
+    "Размьючен игрок {0} который был замьючен по причине {1}, до конца оставалось {2}": {
       "s": [
         "Размьючен игрок ",
         " который был замьючен по причине ",
@@ -10709,7 +10709,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Игрок {0_nameArg} не найден": {
+    "Игрок {0} не найден": {
       "s": [
         "Игрок ",
         " не найден"
@@ -10718,7 +10718,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Причина: {0_info_mutedUntil}\n{1_until}": {
+    "Причина: {0}\n{1}": {
       "s": [
         "Причина: ",
         "\n",
@@ -10729,7 +10729,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы приняли приглашение в клан '{0_clan_name}'": {
+    "Вы приняли приглашение в клан '{0}'": {
       "s": [
         "Вы приняли приглашение в клан '",
         "'"
@@ -10738,7 +10738,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уже отправили заявку в клан '{0_Clan_getPlayerClan_player_id___name____clan_name}'!": {
+    "Вы уже отправили заявку в клан '{0}'!": {
       "s": [
         "Вы уже отправили заявку в клан '",
         "'!"
@@ -10747,7 +10747,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Заявка на вступление в клан '{0_clan_name}' отправлена!": {
+    "Заявка на вступление в клан '{0}' отправлена!": {
       "s": [
         "Заявка на вступление в клан '",
         "' отправлена!"
@@ -10756,7 +10756,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Запрос на вступление в клан от '{0_player_name}'": {
+    "Запрос на вступление в клан от '{0}'": {
       "s": [
         "Запрос на вступление в клан от '",
         "'"
@@ -10765,7 +10765,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "[{0_clan_shortname}] {1_clan_name}\nУчастники: {2_clan_members_length} {3_clan_owners_map_id____Player_nameOrUnknown_id___join______}": {
+    "[{0}] {1}\nУчастники: {2} {3}": {
       "s": [
         "[",
         "] ",
@@ -10780,7 +10780,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "Имя '{0_name}' не может содержать параграф": {
+    "Имя '{0}' не может содержать параграф": {
       "s": [
         "Имя '",
         "' не может содержать параграф"
@@ -10789,7 +10789,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' не может содержать параграф": {
+    "Короткое имя '{0}' не может содержать параграф": {
       "s": [
         "Короткое имя '",
         "' не может содержать параграф"
@@ -10798,7 +10798,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' должно быть КОРОТКИМ, меньше 5 символов": {
+    "Короткое имя '{0}' должно быть КОРОТКИМ, меньше 5 символов": {
       "s": [
         "Короткое имя '",
         "' должно быть КОРОТКИМ, меньше 5 символов"
@@ -10807,7 +10807,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1_shortname}'": {
+    "Короткое имя '{0}' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '{1}'": {
       "s": [
         "Короткое имя '",
         "' не может быть СЛИШКОМ коротким, минимум 2 символа. А то как понять че это за клан '",
@@ -10818,7 +10818,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Клан с именем '{0_name}' уже существует.": {
+    "Клан с именем '{0}' уже существует.": {
       "s": [
         "Клан с именем '",
         "' уже существует."
@@ -10827,7 +10827,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя '{0_shortname}' уже занято.": {
+    "Короткое имя '{0}' уже занято.": {
       "s": [
         "Короткое имя '",
         "' уже занято."
@@ -10836,7 +10836,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Клан '{0_clan_name}' распущен": {
+    "Клан '{0}' распущен": {
       "s": [
         "Клан '",
         "' распущен"
@@ -10845,7 +10845,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_player_name} покинул ваш клан": {
+    "Игрок {0} покинул ваш клан": {
       "s": [
         "Игрок ",
         " покинул ваш клан"
@@ -10854,7 +10854,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Клан '{0_clan_name}' покинут успешно": {
+    "Клан '{0}' покинут успешно": {
       "s": [
         "Клан '",
         "' покинут успешно"
@@ -10863,7 +10863,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Короткое имя: {0_clan_shortname}": {
+    "Короткое имя: {0}": {
       "s": [
         "Короткое имя: ",
         ""
@@ -10872,7 +10872,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Принять игрока '{0_name}' в клан?": {
+    "Принять игрока '{0}' в клан?": {
       "s": [
         "Принять игрока '",
         "' в клан?"
@@ -10881,7 +10881,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы приняты в клан {0_clan_name}": {
+    "Вы приняты в клан {0}": {
       "s": [
         "Вы приняты в клан ",
         ""
@@ -10890,7 +10890,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы НЕ приняты в клан {0_clan_name}": {
+    "Вы НЕ приняты в клан {0}": {
       "s": [
         "Вы НЕ приняты в клан ",
         ""
@@ -10899,7 +10899,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Приглашения в клан '{0_clan_name}'": {
+    "Приглашения в клан '{0}'": {
       "s": [
         "Приглашения в клан '",
         "'"
@@ -10908,7 +10908,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_name} уже состоит в вашем клане!": {
+    "Игрок {0} уже состоит в вашем клане!": {
       "s": [
         "Игрок ",
         " уже состоит в вашем клане!"
@@ -10917,7 +10917,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_name} уже состоит в клане {1_playerClan_name}!": {
+    "Игрок {0} уже состоит в клане {1}!": {
       "s": [
         "Игрок ",
         " уже состоит в клане ",
@@ -10928,7 +10928,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Приглашение в клан '{0_clan_name}'": {
+    "Приглашение в клан '{0}'": {
       "s": [
         "Приглашение в клан '",
         "'"
@@ -10937,7 +10937,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_name} успешно приглашен в клан!": {
+    "Игрок {0} успешно приглашен в клан!": {
       "s": [
         "Игрок ",
         " успешно приглашен в клан!"
@@ -10946,7 +10946,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Роль участника клана {0_memberName} сменена успешно: {1_changeString}.": {
+    "Роль участника клана {0} сменена успешно: {1}.": {
       "s": [
         "Роль участника клана ",
         " сменена успешно: ",
@@ -10957,7 +10957,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Роль в клане {0_changeString}": {
+    "Роль в клане {0}": {
       "s": [
         "Роль в клане ",
         ""
@@ -10966,7 +10966,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "В клане '{0_clan_name}', сменена игроком {1_getFullname_player_}": {
+    "В клане '{0}', сменена игроком {1}": {
       "s": [
         "В клане '",
         "', сменена игроком ",
@@ -10977,7 +10977,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Выгнать участника '{0_memberName}'": {
+    "Выгнать участника '{0}'": {
       "s": [
         "Выгнать участника '",
         "'"
@@ -10986,7 +10986,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы выгнаны из клана '{0_clan_name}'": {
+    "Вы выгнаны из клана '{0}'": {
       "s": [
         "Вы выгнаны из клана '",
         "'"
@@ -10995,7 +10995,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы были выгнаны из клана игроком '{0_player_name}'. Причина: {1_reason}": {
+    "Вы были выгнаны из клана игроком '{0}'. Причина: {1}": {
       "s": [
         "Вы были выгнаны из клана игроком '",
         "'. Причина: ",
@@ -11006,7 +11006,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Участник {0_memberName} успешно выгнан из клана {1_clan_name}": {
+    "Участник {0} успешно выгнан из клана {1}": {
       "s": [
         "Участник ",
         " успешно выгнан из клана ",
@@ -11017,7 +11017,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Сменить роль {0_Player_nameOrUnknown_member_id_}": {
+    "Сменить роль {0}": {
       "s": [
         "Сменить роль ",
         ""
@@ -11026,7 +11026,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Неизвестный аргумент: {0_cmdlets_join_______________c___f_____________}.\nДоступные командлеты: \n{1_CmdLet_list_map_e____i18n_nocolor_join__n___f__e_name___7_o____e_description___to_event_sender_lang___join____}\n ": {
+    "Неизвестный аргумент: {0}.\nДоступные командлеты: \n{1}\n ": {
       "s": [
         "Неизвестный аргумент: ",
         ".\nДоступные командлеты: \n",
@@ -11037,7 +11037,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_cv}─═─═─═§f Доступно: {1_avaibleCommands_length}/{2_Command_commands_length} {3_cv}═─═─═─═─": {
+    "{0}─═─═─═§f Доступно: {1}/{2} {3}═─═─═─═─": {
       "s": [
         "",
         "─═─═─═§f Доступно: ",
@@ -11052,7 +11052,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    " (также {0_d_aliases_join______})": {
+    " (также {0})": {
       "s": [
         " (также ",
         ")"
@@ -11061,7 +11061,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "   §fКоманда §6.{0_d_name}{1_aliases}§7§o - {2_d_description}": {
+    "   §fКоманда §6.{0}{1}§7§o - {2}": {
       "s": [
         "   §fКоманда §6.",
         "",
@@ -11074,7 +11074,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Не так быстро! Попробуй через {0_i18n_time_after_}": {
+    "Не так быстро! Попробуй через {0}": {
       "s": [
         "Не так быстро! Попробуй через ",
         ""
@@ -11083,7 +11083,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы имели ввиду {0_intlListFormat_________i18n_error_style_________player_lang__________or__________search_slice_0__settings_maxSuggestionsCount__map_e____noI18n_nocolor___e_0_________e_1____100_______________}?": {
+    "Вы имели ввиду {0}?": {
       "s": [
         "Вы имели ввиду ",
         "?"
@@ -11092,7 +11092,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\nКоманда доступна начиная с роли {0_ROLES_command_sys_role_}": {
+    "\nКоманда доступна начиная с роли {0}": {
       "s": [
         "\nКоманда доступна начиная с роли ",
         ""
@@ -11101,7 +11101,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "У вас нет разрешения для использования команды {0_command_sys_name}{1_additional}\nСписок всех доступных вам команд: §f.help": {
+    "У вас нет разрешения для использования команды {0}{1}\nСписок всех доступных вам команд: §f.help": {
       "s": [
         "У вас нет разрешения для использования команды ",
         "",
@@ -11112,7 +11112,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "При выполнении команды произошла ошибка. {0_developersAreWarned}": {
+    "При выполнении команды произошла ошибка. {0}": {
       "s": [
         "При выполнении команды произошла ошибка. ",
         ""
@@ -11121,7 +11121,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Команда доступна только начиная с роли {0_ROLES_command_sys_role_}. Ваша роль: {1_ROLES_getRole_player_id__}": {
+    "Команда доступна только начиная с роли {0}. Ваша роль: {1}": {
       "s": [
         "Команда доступна только начиная с роли ",
         ". Ваша роль: ",
@@ -11132,7 +11132,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_this_place_name} ящик": {
+    "{0} ящик": {
       "s": [
         "",
         " ящик"
@@ -11141,7 +11141,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ключ для {0_Crate_getName_storage_crate_} не подходит к ящику {1_this_name}": {
+    "Ключ для {0} не подходит к ящику {1}": {
       "s": [
         "Ключ для ",
         " не подходит к ящику ",
@@ -11152,7 +11152,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Открыт ящик {0_this_name}!": {
+    "Открыт ящик {0}!": {
       "s": [
         "Открыт ящик ",
         "!"
@@ -11161,7 +11161,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_i18n___this_name_______} > Содержимое": {
+    "{0} > Содержимое": {
       "s": [
         "",
         " > Содержимое"
@@ -11170,7 +11170,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ключ для ящика {0_Crate_getName_storage_crate_}": {
+    "Ключ для ящика {0}": {
       "s": [
         "Ключ для ящика ",
         ""
@@ -11179,7 +11179,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Игрок {0_player_database_name} сменил ник на {1_player_name}": {
+    "Игрок {0} сменил ник на {1}": {
       "s": [
         "Игрок ",
         " сменил ник на ",
@@ -11190,7 +11190,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "§cВы уверены, что хотите {0_text}?": {
+    "§cВы уверены, что хотите {0}?": {
       "s": [
         "§cВы уверены, что хотите ",
         "?"
@@ -11199,7 +11199,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Результаты поиска по запросу\n{0_searchQuery}": {
+    "Результаты поиска по запросу\n{0}": {
       "s": [
         "Результаты поиска по запросу\n",
         ""
@@ -11208,7 +11208,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§3Выберите игрока чтобы {0_reason}": {
+    "§3Выберите игрока чтобы {0}": {
       "s": [
         "§3Выберите игрока чтобы ",
         ""
@@ -11217,7 +11217,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_days} д. {1_hhmmss}": {
+    "{0} д. {1}": {
       "s": [
         "",
         " д. ",
@@ -11228,7 +11228,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Следующее письмо\n{0_letterOneLineName_next_letter_}": {
+    "Следующее письмо\n{0}": {
       "s": [
         "Следующее письмо\n",
         ""
@@ -11237,7 +11237,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Предыдущее письмо\n{0_letterOneLineName_prev_letter_}": {
+    "Предыдущее письмо\n{0}": {
       "s": [
         "Предыдущее письмо\n",
         ""
@@ -11246,7 +11246,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_deleteDescription} Все награды будут собраны автоматически": {
+    "{0} Все награды будут собраны автоматически": {
       "s": [
         "",
         " Все награды будут собраны автоматически"
@@ -11255,7 +11255,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_deleteDescription} Вы потеряете все награды, прикрепленные к письму!": {
+    "{0} Вы потеряете все награды, прикрепленные к письму!": {
       "s": [
         "",
         " Вы потеряете все награды, прикрепленные к письму!"
@@ -11264,7 +11264,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_i18n_header_______}: {1_title}, просмотреть: /mail": {
+    "{0}: {1}, просмотреть: /mail": {
       "s": [
         "",
         ": ",
@@ -11275,7 +11275,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_this_timeNow__}, {1_player_name}!\n§r§3Время §b• §3{2_this_shortTime__}": {
+    "{0}, {1}!\n§r§3Время §b• §3{2}": {
       "s": [
         "",
         ", ",
@@ -11288,7 +11288,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0_this_quest_name}\nЗавершен!": {
+    "{0}\nЗавершен!": {
       "s": [
         "",
         "\nЗавершен!"
@@ -11297,7 +11297,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Задание\n{0_this_quest_name}": {
+    "Задание\n{0}": {
       "s": [
         "Задание\n",
         ""
@@ -11306,7 +11306,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Возьмите задание {0_target_name}": {
+    "Возьмите задание {0}": {
       "s": [
         "Возьмите задание ",
         ""
@@ -11315,7 +11315,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Завершите задание {0_target_name}": {
+    "Завершите задание {0}": {
       "s": [
         "Завершите задание ",
         ""
@@ -11324,7 +11324,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "При активации шага произошла ошибка. {0_developersAreWarned}": {
+    "При активации шага произошла ошибка. {0}": {
       "s": [
         "При активации шага произошла ошибка. ",
         ""
@@ -11333,7 +11333,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Задание {0_this_quest_name} сломалось: {1_text}": {
+    "Задание {0} сломалось: {1}": {
       "s": [
         "Задание ",
         " сломалось: ",
@@ -11344,7 +11344,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_step_text__}\n§aЗавершено! §6Заберите награду.": {
+    "{0}\n§aЗавершено! §6Заберите награду.": {
       "s": [
         "",
         "\n§aЗавершено! §6Заберите награду."
@@ -11353,7 +11353,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вас ждет {0_i18n_accent___npc_name__}": {
+    "Вас ждет {0}": {
       "s": [
         "Вас ждет ",
         ""
@@ -11362,7 +11362,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Нельзя создать регион, область которого ниже -64 (y: {0_center_y} radius: {1_radius} result: {2_center_y___radius})": {
+    "Нельзя создать регион, область которого ниже -64 (y: {0} radius: {1} result: {2})": {
       "s": [
         "Нельзя создать регион, область которого ниже -64 (y: ",
         " radius: ",
@@ -11375,7 +11375,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Не удалось сохранить структуру: {0_e}": {
+    "Не удалось сохранить структуру: {0}": {
       "s": [
         "Не удалось сохранить структуру: ",
         ""
@@ -11384,7 +11384,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Владелец > {0_name}": {
+    "Владелец > {0}": {
       "s": [
         "Владелец > ",
         ""
@@ -11393,7 +11393,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уверены что хотите передать права владельца региона игроку {0_name}?": {
+    "Вы уверены что хотите передать права владельца региона игроку {0}?": {
       "s": [
         "Вы уверены что хотите передать права владельца региона игроку ",
         "?"
@@ -11402,7 +11402,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уверены что хотите назначить владельцем региона игрока {0_name}?": {
+    "Вы уверены что хотите назначить владельцем региона игрока {0}?": {
       "s": [
         "Вы уверены что хотите назначить владельцем региона игрока ",
         "?"
@@ -11411,7 +11411,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§cБосс §6{0_this_bossName}": {
+    "§cБосс §6{0}": {
       "s": [
         "§cБосс §6",
         ""
@@ -11420,7 +11420,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Макс кол-во: {0_resource_amount}": {
+    "Макс кол-во: {0}": {
       "s": [
         "Макс кол-во: ",
         ""
@@ -11429,7 +11429,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Будут изменены следующие регионы:\n{0_newRegions_map_e____e_oldArea_toString______________e_newArea_toString____join___n__}": {
+    "Будут изменены следующие регионы:\n{0}": {
       "s": [
         "Будут изменены следующие регионы:\n",
         ""
@@ -11438,7 +11438,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Регион создается. {0___region_restoringStructurePercent}%%": {
+    "Регион создается. {0}%%": {
       "s": [
         "Регион создается. ",
         "%%"
@@ -11447,7 +11447,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Безопасная зона {0_this_safeAreaName}": {
+    "Безопасная зона {0}": {
       "s": [
         "Безопасная зона ",
         ""
@@ -11456,7 +11456,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы вернули роль §r{0_ROLES_prevRole_}": {
+    "Вы вернули роль §r{0}": {
       "s": [
         "Вы вернули роль §r",
         ""
@@ -11465,7 +11465,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ваша роль: {0_ROLES_prole_}{1_restoreRole_sys_requires_player____i18n__n_n_3____________________________f_role_restore______}": {
+    "Ваша роль: {0}{1}": {
       "s": [
         "Ваша роль: ",
         "",
@@ -11476,7 +11476,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "§3Ваша роль: {0_ROLES_prole_}": {
+    "§3Ваша роль: {0}": {
       "s": [
         "§3Ваша роль: ",
         ""
@@ -11485,7 +11485,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "У игрока {0_name} роль выше или такая же как у вас, вы не можете ее сменить.": {
+    "У игрока {0} роль выше или такая же как у вас, вы не можете ее сменить.": {
       "s": [
         "У игрока ",
         " роль выше или такая же как у вас, вы не можете ее сменить."
@@ -11494,7 +11494,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ваша роль сменена c {0_ROLES_role_} на {1_ROLES_newrole_}{2_showName___i18n_accent____________player_name_______}{3_message___i18n_accent__n___________message_______}": {
+    "Ваша роль сменена c {0} на {1}{2}{3}": {
       "s": [
         "Ваша роль сменена c ",
         " на ",
@@ -11509,7 +11509,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    " игроком {0_player_name}": {
+    " игроком {0}": {
       "s": [
         " игроком ",
         ""
@@ -11518,7 +11518,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\nПричина: {0_message}": {
+    "\nПричина: {0}": {
       "s": [
         "\nПричина: ",
         ""
@@ -11527,7 +11527,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Роль игрока {0_target_name} сменена успешно": {
+    "Роль игрока {0} сменена успешно": {
       "s": [
         "Роль игрока ",
         " сменена успешно"
@@ -11536,7 +11536,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_this_options_place_name}\nДо появления\nосталось {1_i18n_hhmmss_this_options_respawnTime____Date_now_____db_date__}": {
+    "{0}\nДо появления\nосталось {1}": {
       "s": [
         "",
         "\nДо появления\nосталось ",
@@ -11547,7 +11547,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Убит босс {0_this_options_place_name}!": {
+    "Убит босс {0}!": {
       "s": [
         "Убит босс ",
         "!"
@@ -11556,7 +11556,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§fЧертеж предмета {0_this__nameTag_____this__typeId___translateTypeId_this__typeId__defaultLang__replace___LINEBREAK____________this__bprintName_}": {
+    "§fЧертеж предмета {0}": {
       "s": [
         "§fЧертеж предмета ",
         ""
@@ -11565,7 +11565,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Используйте {0_______name} чтобы убрать этот предмет из инвентаря или получить его снова": {
+    "Используйте {0} чтобы убрать этот предмет из инвентаря или получить его снова": {
       "s": [
         "Используйте ",
         " чтобы убрать этот предмет из инвентаря или получить его снова"
@@ -11574,7 +11574,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Выдает или убирает {0_itemNameTag} из инвентаря": {
+    "Выдает или убирает {0} из инвентаря": {
       "s": [
         "Выдает или убирает ",
         " из инвентаря"
@@ -11583,7 +11583,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Шанс: {0_i_weight___totalWeight}%%, Кол-во: {1_item_amount_0_}...{2_item_amount_at__1_}": {
+    "Шанс: {0}%%, Кол-во: {1}...{2}": {
       "s": [
         "Шанс: ",
         "%%, Кол-во: ",
@@ -11596,7 +11596,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы {0_reason}, поэтому вышли из режима новичка.": {
+    "Вы {0}, поэтому вышли из режима новичка.": {
       "s": [
         "Вы ",
         ", поэтому вышли из режима новичка."
@@ -11605,7 +11605,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Не удалось открыть диалог. {0_developersAreWarned}": {
+    "Не удалось открыть диалог. {0}": {
       "s": [
         "Не удалось открыть диалог. ",
         ""
@@ -11614,7 +11614,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Доберитесь до: {0_this_place_name}": {
+    "Доберитесь до: {0}": {
       "s": [
         "Доберитесь до: ",
         ""
@@ -11623,7 +11623,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\n§7§lЗначение:§r {0_stringify_value_}": {
+    "\n§7§lЗначение:§r {0}": {
       "s": [
         "\n§7§lЗначение:§r ",
         ""
@@ -11632,7 +11632,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\n§7§lТип: §r§f{0_settingTypes_typeof_value_____typeof_value}": {
+    "\n§7§lТип: §r§f{0}": {
       "s": [
         "\n§7§lТип: §r§f",
         ""
@@ -11641,7 +11641,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Зачарования:\n{0_item_enchantable________________getEnchantments_________________map_e____translateEnchantment_e__player_lang_________________join___n__}": {
+    "Зачарования:\n{0}": {
       "s": [
         "Зачарования:\n",
         ""
@@ -11650,7 +11650,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Выбранный предмет: {0_translateTypeId_item_typeId__player_lang_}\nНажмите, чтобы сменить": {
+    "Выбранный предмет: {0}\nНажмите, чтобы сменить": {
       "s": [
         "Выбранный предмет: ",
         "\nНажмите, чтобы сменить"
@@ -11659,7 +11659,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Товара на складе: {0_count}/{1_maxCount}, {2___count___maxCount____100__toFixed_2_}%%": {
+    "Товара на складе: {0}/{1}, {2}%%": {
       "s": [
         "Товара на складе: ",
         "/",
@@ -11672,7 +11672,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "В инвентаре нет {0_this_text}": {
+    "В инвентаре нет {0}": {
       "s": [
         "В инвентаре нет ",
         ""
@@ -11681,7 +11681,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Нужно уровней опыта: {0_lvl___xp}, {1_xp}/{2_lvl}": {
+    "Нужно уровней опыта: {0}, {1}/{2}": {
       "s": [
         "Нужно уровней опыта: ",
         ", ",
@@ -11694,7 +11694,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Покупка невозможна:{0_this_cost_multiline_____n_______}{1_this_cost_failed_this_player_}": {
+    "Покупка невозможна:{0}{1}": {
       "s": [
         "Покупка невозможна:",
         "",
@@ -11705,7 +11705,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Продать {0_costString} за {1_name}?": {
+    "Продать {0} за {1}?": {
       "s": [
         "Продать ",
         " за ",
@@ -11716,7 +11716,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Купить {0_name} за {1_costString}?": {
+    "Купить {0} за {1}?": {
       "s": [
         "Купить ",
         " за ",
@@ -11727,7 +11727,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Успешная продажа {0_name} за {1_costString}!": {
+    "Успешная продажа {0} за {1}!": {
       "s": [
         "Успешная продажа ",
         " за ",
@@ -11738,7 +11738,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Успешная покупка {0_name} за {1_costString}!": {
+    "Успешная покупка {0} за {1}!": {
       "s": [
         "Успешная покупка ",
         " за ",
@@ -11749,7 +11749,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "При покупке произошла ошибка. {0_developersAreWarned}": {
+    "При покупке произошла ошибка. {0}": {
       "s": [
         "При покупке произошла ошибка. ",
         ""
@@ -11758,7 +11758,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Нет места в инвентаре (нужно еще {0_amount})": {
+    "Нет места в инвентаре (нужно еще {0})": {
       "s": [
         "Нет места в инвентаре (нужно еще ",
         ")"
@@ -11767,7 +11767,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Изменено на {0_newname}": {
+    "Изменено на {0}": {
       "s": [
         "Изменено на ",
         ""
@@ -11776,7 +11776,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "TPS сервера {0_ticks___18___i18n__a___________ticks___13___i18n__g______________i18n__c_______}§f: {1_ticks}": {
+    "TPS сервера {0}§f: {1}": {
       "s": [
         "TPS сервера ",
         "§f: ",
@@ -11787,7 +11787,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Достижения {0_completed}/{1_all} ({2___completed___all____100__toFixed_0_}%%)": {
+    "Достижения {0}/{1} ({2}%%)": {
       "s": [
         "Достижения ",
         "/",
@@ -11800,7 +11800,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Порталы {0_portals__length____0}/{1_Portal_portals_size}": {
+    "Порталы {0}/{1}": {
       "s": [
         "Порталы ",
         "/",
@@ -11811,7 +11811,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Статистика игрока {0_Player_nameOrUnknown_targetId_}": {
+    "Статистика игрока {0}": {
       "s": [
         "Статистика игрока ",
         ""
@@ -11820,7 +11820,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Анархия {0_n}": {
+    "Анархия {0}": {
       "s": [
         "Анархия ",
         ""
@@ -11829,7 +11829,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Инструмент скоро сломается! {0_maxDurability___damage}/{1_maxDurability} ({2_percent}%)": {
+    "Инструмент скоро сломается! {0}/{1} ({2}%)": {
       "s": [
         "Инструмент скоро сломается! ",
         "/",
@@ -11842,7 +11842,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Усиленный аирдроп скоро упадет на {0_location}!": {
+    "Усиленный аирдроп скоро упадет на {0}!": {
       "s": [
         "Усиленный аирдроп скоро упадет на ",
         "!"
@@ -11851,7 +11851,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Обычный аирдроп скоро упадет на {0_location}!": {
+    "Обычный аирдроп скоро упадет на {0}!": {
       "s": [
         "Обычный аирдроп скоро упадет на ",
         "!"
@@ -11860,7 +11860,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Радиус границы анархии сейчас: {0_this_zone__radius}": {
+    "Радиус границы анархии сейчас: {0}": {
       "s": [
         "Радиус границы анархии сейчас: ",
         ""
@@ -11869,7 +11869,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы уже находитесь на анархии! Если это не так, используйте {0_rtpCommand}": {
+    "Вы уже находитесь на анархии! Если это не так, используйте {0}": {
       "s": [
         "Вы уже находитесь на анархии! Если это не так, используйте ",
         ""
@@ -11878,7 +11878,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Успех! Теперь вы можете использовать {0_command} для перемещения на случайную позицию.": {
+    "Успех! Теперь вы можете использовать {0} для перемещения на случайную позицию.": {
       "s": [
         "Успех! Теперь вы можете использовать ",
         " для перемещения на случайную позицию."
@@ -11887,7 +11887,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вода. Попытка {0_maxTries___i}/{1_maxTries}": {
+    "Вода. Попытка {0}/{1}": {
       "s": [
         "Вода. Попытка ",
         "/",
@@ -11898,7 +11898,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Нельзя создать базу на высоте ниже {0_underLimit}!": {
+    "Нельзя создать базу на высоте ниже {0}!": {
       "s": [
         "Нельзя создать базу на высоте ниже ",
         "!"
@@ -11907,7 +11907,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§cВы уже {0_isOwner___i18n___________________i18n___________________________region_ownerName___}!": {
+    "§cВы уже {0}!": {
       "s": [
         "§cВы уже ",
         "!"
@@ -11916,7 +11916,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "состоите в базе игрока '{0_region_ownerName}'": {
+    "состоите в базе игрока '{0}'": {
       "s": [
         "состоите в базе игрока '",
         "'"
@@ -11925,7 +11925,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "База успешно создана! Чтобы открыть меню базы используйте команду {0_baseCommand}": {
+    "База успешно создана! Чтобы открыть меню базы используйте команду {0}": {
       "s": [
         "База успешно создана! Чтобы открыть меню базы используйте команду ",
         ""
@@ -11934,7 +11934,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Всех материалов хватает!\nБаза защищена от гниения на {0_getSafeFromRottingTime_base_}§r\n": {
+    "Всех материалов хватает!\nБаза защищена от гниения на {0}§r\n": {
       "s": [
         "Всех материалов хватает!\nБаза защищена от гниения на ",
         "§r\n"
@@ -11943,7 +11943,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Не хватает ресурсов:\n{0_materialsToRString_base_ldb_materialsMissing__player_}": {
+    "Не хватает ресурсов:\n{0}": {
       "s": [
         "Не хватает ресурсов:\n",
         ""
@@ -11952,7 +11952,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0_materials}\nМатериалы в бочке:\n{1_barrelMaterials}\n{2_missingMaterialsText}\nДо следующего сбора ресурсов: {3_i18n_hhmmss_takeMaterialsCooldown_value_getRemainingTime_base_id__}": {
+    "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n{0}\nМатериалы в бочке:\n{1}\n{2}\nДо следующего сбора ресурсов: {3}": {
       "s": [
         "Чтобы база не гнила, в бочке ежедневно должны быть следующие ресурсы:\n",
         "\nМатериалы в бочке:\n",
@@ -11967,7 +11967,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0_Vec_string_base_area_center__true_}!": {
+    "§cБаза разрушена!\n§4Срочно поставьте блок базы на {0}!": {
       "s": [
         "§cБаза разрушена!\n§4Срочно поставьте блок базы на ",
         "!"
@@ -11976,7 +11976,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "База с владельцем {0_base_ownerName} {1_messageAction}.": {
+    "База с владельцем {0} {1}.": {
       "s": [
         "База с владельцем ",
         " ",
@@ -11987,7 +11987,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Максимальный уровень\n{0_levelText}": {
+    "Максимальный уровень\n{0}": {
       "s": [
         "Максимальный уровень\n",
         ""
@@ -11996,7 +11996,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_levelText} (радиус {1_base_area_radius} -> {2_upgrade_radius})": {
+    "{0} (радиус {1} -> {2})": {
       "s": [
         "",
         " (радиус ",
@@ -12009,7 +12009,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Улучшить базу: {0_levelText}": {
+    "Улучшить базу: {0}": {
       "s": [
         "Улучшить базу: ",
         ""
@@ -12018,7 +12018,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "База игрока {0_base_ownerName}": {
+    "База игрока {0}": {
       "s": [
         "База игрока ",
         ""
@@ -12027,7 +12027,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "\n\nКоординаты: {0_base_area_center}\nРадиус: {1_base_area_radius}": {
+    "\n\nКоординаты: {0}\nРадиус: {1}": {
       "s": [
         "\n\nКоординаты: ",
         "\nРадиус: ",
@@ -12038,7 +12038,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "§6Ваша база {0_text}": {
+    "§6Ваша база {0}": {
       "s": [
         "§6Ваша база ",
         ""
@@ -12047,7 +12047,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_this_city_name}: задание исследования не настроено!": {
+    "{0}: задание исследования не настроено!": {
       "s": [
         "",
         ": задание исследования не настроено!"
@@ -12056,7 +12056,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Эта печка уже занята. Печка освободится через {0_i18n_error_time_furnace_expires___Date_now___}, ключ: {1_furnace_code}": {
+    "Эта печка уже занята. Печка освободится через {0}, ключ: {1}": {
       "s": [
         "Эта печка уже занята. Печка освободится через ",
         ", ключ: ",
@@ -12067,7 +12067,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы уже заняли {0_personalKeys_length}/3 печек.": {
+    "Вы уже заняли {0}/3 печек.": {
       "s": [
         "Вы уже заняли ",
         "/3 печек."
@@ -12076,7 +12076,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Ваш клан уже занял {0_clanKeys_length}/3 печек.": {
+    "Ваш клан уже занял {0}/3 печек.": {
       "s": [
         "Ваш клан уже занял ",
         "/3 печек."
@@ -12085,7 +12085,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Использован ключ из слота {0_index}": {
+    "Использован ключ из слота {0}": {
       "s": [
         "Использован ключ из слота ",
         ""
@@ -12094,7 +12094,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0_key}, ключ: {1_furnace_code}": {
+    "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на {0}, ключ: {1}": {
       "s": [
         "Через 5 минут ресурсы в вашей печке перестанут быть приватными! Печка находится на ",
         ", ключ: ",
@@ -12105,7 +12105,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Зачарование {0_translateEnchantment_aboveMaxLevel__player_lang_} не удалось перенести.": {
+    "Зачарование {0} не удалось перенести.": {
       "s": [
         "Зачарование ",
         " не удалось перенести."
@@ -12114,7 +12114,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Онет, кажется, зачарование {0_translateEnchantment_ench__player_lang_} уровнем {1_ench_level_toString__} потерялось...": {
+    "Онет, кажется, зачарование {0} уровнем {1} потерялось...": {
       "s": [
         "Онет, кажется, зачарование ",
         " уровнем ",
@@ -12125,7 +12125,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "У {0_i18n_accent_________} можно купить ключ доступа к печам": {
+    "У {0} можно купить ключ доступа к печам": {
       "s": [
         "У ",
         " можно купить ключ доступа к печам"
@@ -12134,7 +12134,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Купите у {0_i18n_accent_________} ключ доступа к печам": {
+    "Купите у {0} ключ доступа к печам": {
       "s": [
         "Купите у ",
         " ключ доступа к печам"
@@ -12143,7 +12143,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Доберитесь до {0_i18n_accent________________________} по дороге": {
+    "Доберитесь до {0} по дороге": {
       "s": [
         "Доберитесь до ",
         " по дороге"
@@ -12152,7 +12152,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Идите к {0_i18n_accent__________}, он расскажет вам что такое {1_i18n_accent______}": {
+    "Идите к {0}, он расскажет вам что такое {1}": {
       "s": [
         "Идите к ",
         ", он расскажет вам что такое ",
@@ -12163,7 +12163,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "...мы изобрели {0_i18n_accent______}": {
+    "...мы изобрели {0}": {
       "s": [
         "...мы изобрели ",
         ""
@@ -12172,7 +12172,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Выбранная книга: {0_translateEnchantment_bookEnch__player_lang_}": {
+    "Выбранная книга: {0}": {
       "s": [
         "Выбранная книга: ",
         ""
@@ -12181,7 +12181,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "§r§fМеч со способностью §7{0_ItemAbility_names_ItemAbility_Ability_Vampire_}": {
+    "§r§fМеч со способностью §7{0}": {
       "s": [
         "§r§fМеч со способностью §7",
         ""
@@ -12190,7 +12190,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Здесь есть шахта, ведущая к {0_i18n_accent_________} и {1_i18n_accent____________________}": {
+    "Здесь есть шахта, ведущая к {0} и {1}": {
       "s": [
         "Здесь есть шахта, ведущая к ",
         " и ",
@@ -12201,7 +12201,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "У {0_i18n_accent______} можно зачаровать предметы": {
+    "У {0} можно зачаровать предметы": {
       "s": [
         "У ",
         " можно зачаровать предметы"
@@ -12210,7 +12210,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Копать нужно на высоте {0_above}..{1_below}. Ваш y = {2_y}": {
+    "Копать нужно на высоте {0}..{1}. Ваш y = {2}": {
       "s": [
         "Копать нужно на высоте ",
         "..",
@@ -12223,7 +12223,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0_locktext} Осталось {1_i18n_error_hhmmss_raidLockTime_}": {
+    "{0} Осталось {1}": {
       "s": [
         "",
         " Осталось ",
@@ -12234,7 +12234,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы вошли в режим рейдблока, потому что {0_reason}. Некоторые функции могут быть недоступны": {
+    "Вы вошли в режим рейдблока, потому что {0}. Некоторые функции могут быть недоступны": {
       "s": [
         "Вы вошли в режим рейдблока, потому что ",
         ". Некоторые функции могут быть недоступны"
@@ -12243,7 +12243,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Дровосек: нарубите {0_v} дерева": {
+    "Дровосек: нарубите {0} дерева": {
       "s": [
         "Дровосек: нарубите ",
         " дерева"
@@ -12252,7 +12252,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Шахтер: накопайте {0_v} камня": {
+    "Шахтер: накопайте {0} камня": {
       "s": [
         "Шахтер: накопайте ",
         " камня"
@@ -12261,7 +12261,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Угольный шахтер: накопайте {0_v} угля": {
+    "Угольный шахтер: накопайте {0} угля": {
       "s": [
         "Угольный шахтер: накопайте ",
         " угля"
@@ -12270,7 +12270,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Железный шахтер: накопайте {0_v} железа": {
+    "Железный шахтер: накопайте {0} железа": {
       "s": [
         "Железный шахтер: накопайте ",
         " железа"
@@ -12279,7 +12279,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0_intlListFormat_i18n_error_style__player_lang___and___notVisited_}": {
+    "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: {0}": {
       "s": [
         "Сходите во все поселения, чтобы открыть ежедневные задания. Вы еще не посетили: ",
         ""
@@ -12288,7 +12288,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0_dailyQuests} заданий вам дают награду. За выполнение всех ежедневных заданий {1_questsStreakToGainDonutCrate} дня подряд вместо обычного ключа выдается донатный\n\n{2_textTable___i18n____________________playerDb_streak___}": {
+    "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех {0} заданий вам дают награду. За выполнение всех ежедневных заданий {1} дня подряд вместо обычного ключа выдается донатный\n\n{2}": {
       "s": [
         "Каждый день, в 00:00, обновляются ежедневные задания. Они одинаковы для всех игроков. За выполнение всех ",
         " заданий вам дают награду. За выполнение всех ежедневных заданий ",
@@ -12301,7 +12301,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "{0_playerDb_today}/{1_dailyQuests} Награда: ключ от сундука\n{2_name}": {
+    "{0}/{1} Награда: ключ от сундука\n{2}": {
       "s": [
         "",
         "/",
@@ -12314,7 +12314,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы не можете покинуть зону добычи, пока не завершили задания {0_step}/{1_maxReturnToAreaSteps}": {
+    "Вы не можете покинуть зону добычи, пока не завершили задания {0}/{1}": {
       "s": [
         "Вы не можете покинуть зону добычи, пока не завершили задания ",
         "/",
@@ -12325,7 +12325,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Добыто дерева: {0_current}/{1_end}": {
+    "Добыто дерева: {0}/{1}": {
       "s": [
         "Добыто дерева: ",
         "/",
@@ -12336,7 +12336,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Спуститесь в шахту и добудьте камня: {0_i}/{1_end}": {
+    "Спуститесь в шахту и добудьте камня: {0}/{1}": {
       "s": [
         "Спуститесь в шахту и добудьте камня: ",
         "/",
@@ -12347,7 +12347,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Добыто железной руды: {0_i}/{1_end}": {
+    "Добыто железной руды: {0}/{1}": {
       "s": [
         "Добыто железной руды: ",
         "/",
@@ -12358,7 +12358,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Отправляйтесь за ними в {0_i18n_accent_____________}": {
+    "Отправляйтесь за ними в {0}": {
       "s": [
         "Отправляйтесь за ними в ",
         ""
@@ -12367,7 +12367,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Идите в {0_i18n_accent_____________} по дороге": {
+    "Идите в {0} по дороге": {
       "s": [
         "Идите в ",
         " по дороге"
@@ -12376,7 +12376,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Верните свои вещи{0_player_database_survival_newbie___i18n____________________________________________}, они ждут вас на {1_Vec_string_deadAt2_location__true_}§6!": {
+    "Верните свои вещи{0}, они ждут вас на {1}§6!": {
       "s": [
         "Верните свои вещи",
         ", они ждут вас на ",
@@ -12387,7 +12387,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_extra___extra_to_player_lang____________}§8Вы тут": {
+    "{0}§8Вы тут": {
       "s": [
         "",
         "§8Вы тут"
@@ -12396,7 +12396,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Не умею этим пользоваться, но знаю кто точно поможет: {0_intlListFormat_i18n_error_style__player_lang___or___npcs_}": {
+    "Не умею этим пользоваться, но знаю кто точно поможет: {0}": {
       "s": [
         "Не умею этим пользоваться, но знаю кто точно поможет: ",
         ""
@@ -12405,7 +12405,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Событие! {0_effectType} силой {1_amplifier} на {2} минут": {
+    "Событие! {0} силой {1} на {2} минут": {
       "s": [
         "Событие! ",
         " силой ",
@@ -12418,7 +12418,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Время: {0_new_Date___toHHMMSS__}": {
+    "Время: {0}": {
       "s": [
         "Время: ",
         ""
@@ -12427,7 +12427,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "{0_event_effectType} {1_event_amplifier___1}\nЧерез {2_i18n_time_next_getTime_____now_} ({3_next_toHHMM__})": {
+    "{0} {1}\nЧерез {2} ({3})": {
       "s": [
         "",
         " ",
@@ -12442,7 +12442,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         3
       ]
     },
-    "Ваш первый рекорд {0_name} поставлен! Это заняло {1_i18n_hhmmss_took_}": {
+    "Ваш первый рекорд {0} поставлен! Это заняло {1}": {
       "s": [
         "Ваш первый рекорд ",
         " поставлен! Это заняло ",
@@ -12453,7 +12453,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "Вы побили ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+    "Вы побили ваш предыдущий рекорд {0}! {1} -> {2}": {
       "s": [
         "Вы побили ваш предыдущий рекорд ",
         "! ",
@@ -12466,7 +12466,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы не смогли побить ваш предыдущий рекорд {0_name}! {1_i18n_hhmmss_took_} -> {2_i18n_hhmmss_previous_}": {
+    "Вы не смогли побить ваш предыдущий рекорд {0}! {1} -> {2}": {
       "s": [
         "Вы не смогли побить ваш предыдущий рекорд ",
         "! ",
@@ -12479,7 +12479,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0_i18n_hhmmss_player_scores_anarchyOnlineTime___2_5_}": {
+    "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: {0}": {
       "s": [
         "Вы можете выбрать одну из категорий ниже для спидрана. Время считается только когда вы находитесь на анархии, т.е. пока вы оффлайн или стоите на спавне время не считается. Ваше время на анархии сейчас: ",
         ""
@@ -12488,7 +12488,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Спидран '{0_name}' начат. Для сброса времени воспользуйтесь .wipe": {
+    "Спидран '{0}' начат. Для сброса времени воспользуйтесь .wipe": {
       "s": [
         "Спидран '",
         "' начат. Для сброса времени воспользуйтесь .wipe"
@@ -12497,7 +12497,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0_resource_displayName}) с помощью компаса": {
+    "Вы можете взять это задание чтобы отслеживать направления источника ресурса ({0}) с помощью компаса": {
       "s": [
         "Вы можете взять это задание чтобы отслеживать направления источника ресурса (",
         ") с помощью компаса"
@@ -12506,7 +12506,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Руды на y: {0_y}:\n{1_ores_map_e____e_text_to_player_lang___join______}": {
+    "Руды на y: {0}:\n{1}": {
       "s": [
         "Руды на y: ",
         ":\n",
@@ -12517,7 +12517,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         1
       ]
     },
-    "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": {
+    "{0}, {1}, Группа: {2}%%": {
       "s": [
         "",
         ", ",
@@ -12530,7 +12530,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Добыть: {0___rawtext_____translate__langToken_itemType______}": {
+    "Добыть: {0}": {
       "s": [
         "Добыть: ",
         ""
@@ -12539,7 +12539,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         0
       ]
     },
-    "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": {
+    "Копать нужно на высоте от {0} до {1}. Ваш y = {2}": {
       "s": [
         "Копать нужно на высоте от ",
         " до ",
@@ -12552,7 +12552,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
         2
       ]
     },
-    "Руды на {0_y}": {
+    "Руды на {0}": {
       "s": [
         "Руды на ",
         ""
@@ -12570,7 +12570,7 @@ export const extractedTranslatedMessages: Record<Language, Record<MessageId, { s
  */
 export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Record<string, { s: string[], i: number[] }>>> = {
   "en_US": {
-    "У вас {0_unreadCount} непрочитанных сообщений!": {
+    "У вас {0} непрочитанных сообщений!": {
       "one": {
         "s": [
           "У вас ",
@@ -12592,7 +12592,7 @@ export const extractedTranslatedPlurals: Record<Language, Record<MessageId, Reco
     }
   },
   "ru_RU": {
-    "У вас {0_unreadCount} непрочитанных сообщений!": {
+    "У вас {0} непрочитанных сообщений!": {
       "one": {
         "s": [
           "У вас ",

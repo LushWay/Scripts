@@ -12,7 +12,7 @@ import {
 import { MinecraftEntityTypes } from '@minecraft/vanilla-data'
 import { developersAreWarned } from 'lib/assets/text'
 import { Core } from 'lib/extensions/core'
-import { i18n } from 'lib/i18n/text'
+import { i18n, noI18n } from 'lib/i18n/text'
 import { ConfigurableLocation, location } from 'lib/location'
 import { anyPlayerNear } from 'lib/player-move'
 import { actionGuard, ActionGuardOrder } from 'lib/region'
@@ -110,6 +110,10 @@ export class Npc {
   static logger = createLogger('Npc')
 
   static {
+    debugger
+    console.log(noI18n.nocolor`Something ${5} something`)
+    this.logger.info`Something ${5} something`
+
     actionGuard((__, _, ctx) => {
       if (ctx.type !== 'interactWithEntity') return
       const { event } = ctx

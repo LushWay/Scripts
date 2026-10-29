@@ -913,5 +913,7 @@
   "{0_oreName_ore__getChance_chance__totalChance__}, {1___7__ore_below______ore_above__}, Группа: {2_ore_groupChance}%%": "{0}, {1}, Group: {2}%%",
   "Добыть: {0___rawtext_____translate__langToken_itemType______}": "Mine: {0}",
   "Копать нужно на высоте от {0_above} до {1_below}. Ваш y = {2_y}": "You need to mine at height from {0} to {1}. Your y = {2}",
-  "Руды на {0_y}": "Ores at {0}"
+  "Руды на {0_y}": "Ores at {0}",
+  "{0_this_name} ящик": "{0_this_name} ящик",
+  "Доберитесь до {0_i18n_accent____________} по дороге": "Доберитесь до {0_i18n_accent____________} по дороге"
 }

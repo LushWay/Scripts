@@ -1,5 +1,5 @@
 import { system, world } from '@minecraft/server'
-import { MinecraftBlockTypes } from '@minecraft/vanilla-data'
+import { MinecraftBlockTypes, MinecraftItemTypes } from '@minecraft/vanilla-data'
 import { Vec } from 'lib/vector'
 import { antiCheatLog } from './log-provider'
 import { noI18n } from 'lib/i18n/text'
@@ -28,3 +28,11 @@ world.afterEvents.pistonActivate.subscribe(event => {
     2,
   )
 })
+
+world.afterEvents.playerInventoryItemChange.subscribe(
+  event => {
+    event.player
+    event.slot
+  },
+  { includeItems: [MinecraftItemTypes.Bundle] },
+)

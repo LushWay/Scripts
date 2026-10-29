@@ -2,6 +2,7 @@ import 'lib/anticheat/ban'
 import 'lib/anticheat/forbidden-items'
 import 'lib/anticheat/freeze'
 import 'lib/anticheat/whitelist'
+import 'lib/anticheat/anti-dupe-rejoin'
 
 import 'lib/database/command'
 

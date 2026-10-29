@@ -15,7 +15,7 @@ class LangWriter {
   /** @type {Record<string, Record<string, T>>} */
   storage = {}
 
-  /** @param {string} [base='lang'] . Default is `'lang'` */
+  /** @param {string} [base='lang'] . . . . . . . . Default is `'lang'` */
   constructor(base = 'lang') {
     this.base = base
   }
@@ -314,14 +314,14 @@ export async function writeMessages() {
     for (const id in langData) {
       const value = langData[id]
       if (typeof value === 'string') {
-        simple[id] = preprocessPlaceholderString(value)
+        simple[normalizeId(id)] = preprocessPlaceholderString(value)
       } else if (typeof value === 'object' && !Array.isArray(value)) {
         /** @type {Record<string, { s: string[]; i: number[] }>} */
         const forms = {}
         for (const rule in value) {
           forms[rule] = preprocessPlaceholderString(value[rule])
         }
-        plural[id] = forms
+        plural[normalizeId(id)] = forms
       }
     }
 
@@ -330,7 +330,7 @@ export async function writeMessages() {
   }
 
   const sharedIds = Object.fromEntries(
-    Object.entries(sharedMessages.storage[sourceCodeLang]).map(([id, token]) => [id, templateToSharedId(id)]),
+    Object.entries(sharedMessages.storage[sourceCodeLang]).map(([id]) => [normalizeId(id), templateToSharedId(id)]),
   )
 
   await fs.writeFile(
@@ -385,6 +385,9 @@ function templateToSharedId(id) {
 const plurals = Object.fromEntries(
   supportedLanguages.map(e => [e, new Intl.PluralRules(e.replace('_', '-')).resolvedOptions().pluralCategories]),
 )
+
+/** @param {string} id */
+const normalizeId = id => id.replace(/\{(\d+)(?:_\w+)?\}/g, '{$1}')
 
 /**
  * Adds or updates a translation entry.

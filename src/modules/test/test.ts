@@ -48,7 +48,7 @@ import { LootTable } from 'lib/rpg/loot-table'
 import { Compass } from 'lib/rpg/menu'
 import { setMinimapNpcPosition } from 'lib/rpg/minimap'
 import { Settings } from 'lib/settings'
-import { hexToRgb, hexToRgba, inspect, isKeyof, pick, util } from 'lib/util'
+import { hexToRgba, inspect, isKeyof, pick, util } from 'lib/util'
 import { restorePlayerCamera } from 'lib/utils/game'
 import { toPoint } from 'lib/utils/point'
 import { Rewards } from 'lib/utils/rewards'
@@ -78,6 +78,9 @@ const tests: Record<
   string,
   (ctx: Pick<CommandContext, 'args' | 'player' | 'reply' | 'error'>) => void | Promise<void>
 > = {
+  hueyu(ctx) {
+    ctx.reply(ctx.player.lang)
+  },
   a(ctx) {
     const line = new d.DebugLine(ctx.player.location, Vec.add(ctx.player.location, Vec.down.multiply(4)))
     line.color = hexToRgba('#F9B1B1FF')

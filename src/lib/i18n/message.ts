@@ -24,7 +24,7 @@ export class Message {
     protected readonly args: readonly unknown[],
     protected colors: Text.Colors,
   ) {
-    this.id = template.join('\x00')
+    this.id = template.reduce((acc, s, i) => acc + (i ? `{${i - 1}}` : '') + s, '')
   }
 
   color(c: Text.Colors | Pick<Text.Static<never>, 'style'>, children = true) {
@@ -70,7 +70,13 @@ export class Message {
       return this.interpolatePreprocessed(language, preprocessed, this.args, this.colors, this.postfixes)
     }
     // Fallback to raw template joined with \x00 (should not happen)
-    return this.interpolateRaw(language, this.template.join('\x00'), this.args, this.colors, this.postfixes)
+    return this.interpolateRaw(
+      language,
+      this.template.reduce((acc, s, i) => acc + (i ? `{${i - 1}}` : '') + s, ''),
+      this.args,
+      this.colors,
+      this.postfixes,
+    )
   }
 
   protected interpolatePreprocessed(
@@ -141,7 +147,13 @@ String.prototype.to = function () {
 
 export class NoI18nMessage extends Message {
   to(): string {
-    return this.interpolateRaw(defaultLang, this.template.join('\x00'), this.args, this.colors, this.postfixes)
+    return this.interpolateRaw(
+      defaultLang,
+      this.template.reduce((acc, s, i) => acc + (i ? `{${i - 1}}` : '') + s, ''),
+      this.args,
+      this.colors,
+      this.postfixes,
+    )
   }
 }
 
@@ -167,9 +179,8 @@ export class SharedI18nMessage extends Message {
     const order: number[] = []
     const regex = /\{(\d+)(?:_\w+)?\}/g
     let match
-    while (typeof (match = regex.exec(this.id)) === 'string') {
-      order.push(parseInt(match[1], 10))
-    }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    while ((match = regex.exec(this.id)) !== null) order.push(parseInt(match[1]!, 10))
     return order
   }
 
@@ -199,7 +210,7 @@ export class SharedI18nMessage extends Message {
     }
     return this.interpolateRaw(
       language,
-      this.template.join('\x00'),
+      this.template.reduce((acc, s, i) => acc + (i ? `{${i - 1}}` : '') + s, ''),
       this.args.map(e => (isRawText(e) ? rawTextToString(e, language) : e)),
       this.colors,
       this.postfixes,
@@ -266,6 +277,12 @@ export class PluralMessage extends Message {
       }
     }
     // Fallback: raw template with regex
-    return this.interpolateRaw(l, this.template.join('\x00'), [n], this.colors, this.postfixes)
+    return this.interpolateRaw(
+      l,
+      this.template.reduce((acc, s, i) => acc + (i ? `{${i - 1}}` : '') + s, ''),
+      [n],
+      this.colors,
+      this.postfixes,
+    )
   }
 }

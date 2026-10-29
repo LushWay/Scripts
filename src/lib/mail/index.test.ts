@@ -25,11 +25,11 @@ describe('mail', () => {
         {
           "index": 0,
           "letter": {
-            "content": "Content",
+            "content": "§7Content",
             "read": false,
             "rewards": [],
             "rewardsClaimed": false,
-            "title": "Some mail",
+            "title": "§7Some mail",
           },
         },
       ]
