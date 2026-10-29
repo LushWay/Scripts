@@ -28,11 +28,3 @@ world.afterEvents.pistonActivate.subscribe(event => {
     2,
   )
 })
-
-world.afterEvents.playerInventoryItemChange.subscribe(
-  event => {
-    event.player
-    event.slot
-  },
-  { includeItems: [MinecraftItemTypes.Bundle] },
-)
