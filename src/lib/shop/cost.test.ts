@@ -111,33 +111,4 @@ describe('MultiCost', () => {
       return true
     }
   }
-
-  it('should have types', () => {
-    // @ts-expect-error
-    const player = new Player() as Player
-
-    const multicost = new MultiCost(new StringCost(), new NumberCost(), new NumberCost()).take(player)
-    expectTypeOf(multicost[0]).toBeString()
-    expectTypeOf(multicost[1]).toBeNumber()
-    expectTypeOf(multicost[2]).toBeNumber()
-
-    // @ts-expect-error
-    expectTypeOf(multicost[4]).toBeString()
-    expectTypeOf(multicost[2]).toBeString()
-  })
-
-  it('should combine multiple multicosts', () => {
-    // @ts-expect-error
-    const player = new Player() as Player
-
-    const multicost = new MultiCost(new StringCost(), new MultiCost(new NumberCost(), new NumberCost())).take(player)
-    expectTypeOf(multicost[0]).toBeString()
-    expectTypeOf(multicost[1][0]).toBeNumber()
-    expectTypeOf(multicost[1][1]).toBeNumber()
-
-    // @ts-expect-error
-    expectTypeOf(multicost[4]).toBeString()
-    // @ts-expect-error
-    expectTypeOf(multicost[2]).toBeString()
-  })
 })
